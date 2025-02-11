@@ -27,3 +27,6 @@ cabead_xrf-fits
 cabead_xrf-roi
 cabead_xrf-roi-plus
 
+# Apple stuff
+
+*.DS_Store
