@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+# TODO Create code for selecting transmission and fluorescence HDF5 files and creating separate HDF5 files containing
+# information about all projection angles (all values of theta, elements, 2d projection images)
+
 import os
 import sys
 import numpy as np

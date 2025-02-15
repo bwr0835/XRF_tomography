@@ -135,6 +135,7 @@ def reconstruct_jXRFT_tomography(
     rank = comm.Get_rank()
     
     loss_fn = nn.MSELoss()
+    #TODO # loss_fn = nn.PoissonNLLLoss()
     dia_len_n = int(1.2 * (sample_height_n**2 + sample_size_n**2 + sample_size_n**2)**0.5) #dev
     n_voxel_minibatch = minibatch_size * sample_size_n #dev
     n_voxel = sample_height_n * sample_size_n**2 #dev
