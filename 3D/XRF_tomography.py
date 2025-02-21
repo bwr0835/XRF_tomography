@@ -156,7 +156,7 @@ def reconstruct_jXRFT_tomography(
                                                     sample_size_n, sample_size_cm,
                                                     fl_line_groups = np.array(["K", "L", "M"]), fl_K = fl_K, fl_L = fl_L, fl_M = fl_M) #cpu
     
-    stdout_options = {'root':0, 'output_folder': recon_path, 'save_stdout': True, 'print_terminal': False}
+    stdout_options = {'root': 0, 'output_folder': recon_path, 'save_stdout': True, 'print_terminal': False}
     
     FL_line_attCS_ls = tc.as_tensor(xlib_np.CS_Total(aN_ls, fl_all_lines_dic["fl_energy"])).float().to(dev) #dev
     detected_fl_unit_concentration = tc.as_tensor(fl_all_lines_dic["detected_fl_unit_concentration"]).float().to(dev)
@@ -715,7 +715,7 @@ def reconstruct_jXRFT_tomography(
                     s["sample/elements"][...] = np.array(list(this_aN_dic.keys())).astype('S5')
 #                 dxchange.write_tiff(X_cpu, os.path.join(recon_path, f_recon_grid)+"_"+str(epoch), dtype='float32', overwrite=True)     
             
-        ## It's important to close the hdf5 file hadle in the end of the reconstruction.
+        ## It's important to close the hdf5 file handle in the end of the reconstruction.
         P_handle.close()  
         y1_true_handle.close()
         y2_true_handle.close()

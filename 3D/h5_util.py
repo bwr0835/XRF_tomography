@@ -106,7 +106,7 @@ def extract_h5_xrf_data(file_path, synchrotron):
 
         return elements_string, counts, theta, nx, ny, dx_cm, dy_cm
 
-def create_single_xrf_h5(file_path_array, output_h5_file, synchrotron):
+def create_aggregate_xrf_h5(file_path_array, output_h5_file, synchrotron):
     
     n_theta = len(file_path_array)
 
@@ -133,6 +133,39 @@ def create_single_xrf_h5(file_path_array, output_h5_file, synchrotron):
         exchange.create_dataset('data', data = counts_array, compression = 'gzip', compression_opts = 6)
         exchange.create_dataset('elements', data = elements_new)
         exchange.create_dataset('theta', data = theta_array)
+        exchange.create_dataset('dataset_type', data = 'xrf')
+
+def extract_h5_aggregate_xrf_data(file_path):
+    h5 = h5py.File(file_path, 'r')
+    
+    counts_h5 = h5['exchange/data']
+    theta_h5 = h5['exchange/theta']
+    elements_h5 = h5['exchange/elements']
+    dataset_type_h5 = h5['exchange/dataset_type']
+
+    counts = counts_h5[()]
+    theta = theta_h5[()]
+    elements = elements_h5[()]
+    dataset_type = dataset_type_h5[()]
+
+    elements_string = [element.decode() for element in elements]
+
+    return elements_string, counts, theta, dataset_type.decode()
+
+# def extract_h5_aggregate_xrt_data(file_path):
+#     h5 = h5py.File(file_path, 'r')
+    
+#     counts_h5 = h5['exchange/data']
+#     theta_h5 = h5['exchange/theta']
+#     elements_h5 = h5['exchange/elements']
+
+#     counts = counts_h5[()]
+#     theta = theta_h5[()]
+#     elements = elements_h5[()]
+
+#     return elements, counts, theta
+    
+    
 
 # TODO def extract_h5_xrt_data(file_path, synchrotron):
 #     h5 = h5py.File(file_path, 'r')
@@ -142,31 +175,31 @@ def create_single_xrf_h5(file_path_array, output_h5_file, synchrotron):
 
 #     return counts, theta, nx, ny, dx_cm, dy_cm   
 
-def create_single_xrt_h5(file_path_array, output_h5_file, synchrotron):
-    n_theta = len(file_path_array) # Each file has a different projection angle theta
+# def create_single_xrt_h5(file_path_array, output_h5_file, synchrotron):
+#     n_theta = len(file_path_array) # Each file has a different projection angle theta
 
-    theta_array = np.zeros(n_theta) 
+#     theta_array = np.zeros(n_theta) 
 
-    elements, counts, theta, nx, ny, dx_cm, dy_cm = extract_h5_xrt_data(file_path_array[0], synchrotron) # Invoke the first time for getting the number of elements and the number of pixels
+#     elements, counts, theta, nx, ny, dx_cm, dy_cm = extract_h5_xrt_data(file_path_array[0], synchrotron) # Invoke the first time for getting the number of elements and the number of pixels
     
-    n_elements = len(elements)
+#     n_elements = len(elements)
 
-    counts_array = np.zeros((n_elements, n_theta, ny, nx))
+#     counts_array = np.zeros((n_elements, n_theta, ny, nx))
 
-    for theta_idx, file_path in enumerate(file_path_array):
-        elements_new, counts, theta, nx_new, ny_new, dx_cm_new, dy_cm_new = extract_h5_xrt_data(file_path, synchrotron)
+#     for theta_idx, file_path in enumerate(file_path_array):
+#         elements_new, counts, theta, nx_new, ny_new, dx_cm_new, dy_cm_new = extract_h5_xrt_data(file_path, synchrotron)
         
-        assert nx == nx_new and ny == ny_new, f"Dimension mismatch in {file_path}." # Check that the dimensions of the new data match the dimensions of the first data set
-        assert np.array_equal(elements, elements_new), f"Element mismatch in {file_path}." # Check that the elements are the same
+#         assert nx == nx_new and ny == ny_new, f"Dimension mismatch in {file_path}." # Check that the dimensions of the new data match the dimensions of the first data set
+#         assert np.array_equal(elements, elements_new), f"Element mismatch in {file_path}." # Check that the elements are the same
         
-        counts_array[:, theta_idx, :, :] = counts
-        theta_array[theta_idx] = theta
+#         counts_array[:, theta_idx, :, :] = counts
+#         theta_array[theta_idx] = theta
     
-    with h5py.File(output_h5_file, 'w') as f:
-        exchange = f.create_group('exchange')
+#     with h5py.File(output_h5_file, 'w') as f:
+#         exchange = f.create_group('exchange')
 
-        exchange.create_dataset('data', data = counts_array, compression = 'gzip', compression_opts = 6)
-        exchange.create_dataset('elements', data = elements_new)
-        exchange.create_dataset('theta', data = theta_array)
+#         exchange.create_dataset('data', data = counts_array, compression = 'gzip', compression_opts = 6)
+#         exchange.create_dataset('elements', data = elements_new)
+#         exchange.create_dataset('theta', data = theta_array)
 
     
