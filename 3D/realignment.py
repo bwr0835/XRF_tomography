@@ -1,8 +1,8 @@
-import numpy as np, h5py, os, skimage, tkinter as tk, tomopy as tomo, matplotlib as mpl
+import numpy as np, h5py, os, skimage, tkinter as tk, tomopy as tomo, matplotlib as mpl, scipy.ndimage as spndi
 
 from skimage import transform as xform
 from scipy import signal as sig
-from numpy.fft import fft, ifft, fftfreq
+from numpy.fft import fft, ifft, fftfreq, fftn, ifftn
 from h5_util import extract_h5_aggregate_xrf_data, create_aggregate_xrf_h5
 from matplotlib import pyplot as plt
 from tkinter import filedialog
@@ -19,49 +19,78 @@ def ramp_filter(sinogram):
 
     return filtered_sinogram
 
-def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array): 
-    sinogram = np.zeros((xrf_proj_img_array.shape[1], xrf_proj_img_array.shape[2], xrf_proj_img_array.shape[3])) # (num_projections, num_rows, num_columns)
-    # reconstructed_slice_array = []
-
-    theta_array *= np.pi/180
+def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_iterations, eps = 1e-8): 
+    # theta_array *= np.pi/180
     
     ref_element_idx = element_array.index(ref_element)
-    reference_projection_imgs = xrf_proj_img_array[ref_element_idx]
+    reference_projection_imgs = xrf_proj_img_array[ref_element_idx] # These are effectively sinograms for the element of interest
+                                                                    # (n_theta, n_slices -> n_rows, n_columns)
+    # tomo.normalize_roi(reference_projection_imgs)
+    # reference_projection_imgs = tomo.minus_log(reference_projection_imgs)
 
-    for slice_idx in range(xrf_proj_img_array.shape[2]):
-        sinogram[:, slice_idx, :] = reference_projection_imgs[:, slice_idx, :]
+    center_of_rotation = tomo.find_center(reference_projection_imgs, theta_array)
+    filtered_projection_imgs = ramp_filter(reference_projection_imgs)
+    recon = tomo.recon(filtered_projection_imgs, theta = theta_array, center = center_of_rotation, algorithm = 'fbp', sinogram_order = False)
+    # recon = tomo.recon(reference_projection_imgs, theta = theta_array, center = center_of_rotation, algorithm = 'mlem', sinogram_order = False)
+    print(xrf_proj_img_array.shape[2]//2)
+    print(recon.shape)
 
-    filtered_sinogram = ramp_filter(sinogram)
+    proj_3d = np.rot90(skimage.transform.radon(recon[recon.shape[0]//2, :, :], theta = theta_array), k = 1)
 
-    
+    for iteration in range(n_iterations):
+        mse = skimage.metrics.mean_squared_error(proj_3d, reference_projection_imgs[:, reference_projection_imgs.shape[1]//2, :])/np.size(proj_3d)
 
-    fig1 = plt.figure(1)
-    plt.imshow(sinogram[:, xrf_proj_img_array.shape[2]//2, :], aspect = 'auto')
-    fig2 = plt.figure(2)
-    plt.imshow(filtered_sinogram[:, xrf_proj_img_array.shape[2]//2, :], aspect = 'auto')
+        print('MSE = ' + str(mse))
+
+        if mse > eps:
+            proj_3d = realign_translate(reference_projection_imgs[:, reference_projection_imgs.shape[1]//2, :], proj_3d)
+
+        else:
+            break
+
+    # recon = tomo.circ_mask(recon, axis = 0, ratio = 0.95)
+
+    # fig1 = plt.figure(1)
+    # plt.imshow(np.rot90(reference_projection_imgs[:, xrf_proj_img_array.shape[2]//2, :], k = 1), aspect = 'auto', extent = [0, reference_projection_imgs.shape[2], np.min(theta_array), np.max(theta_array)])
+    # plt.imshow(np.rot90(reference_projection_imgs[:, xrf_proj_img_array.shape[2]//2, :], k = 1), aspect = 'auto', extent = [np.min(theta_array), np.max(theta_array), 0, reference_projection_imgs.shape[2]], cmap = 'Grays')
+    # fig2 = plt.figure(2)
+    # plt.imshow(filtered_projection_imgs[:, xrf_proj_img_array.shape[2]//2, :], extent = [0, reference_projection_imgs.shape[2], np.min(theta_array), np.max(theta_array)], aspect = 'auto')
+    # fig3 = plt.figure(3)
+    plt.imshow(proj_3d, aspect = 'auto')
     plt.show()
 
+def realign_translate(array1, array2):
+    shift, error, phase_diff = skimage.registration.phase_cross_correlation(array1, array2)
 
+    array2_fft = fftn(array2)
+    array2_realigned = spndi.fourier_shift(array2_fft, shift)
+    array2_realigned = np.real(ifftn(array2_realigned))
 
+    return array2_realigned
 
     
     
     # plt.imshow(sinogram[:, xrf_proj_img_array.shape[2]//15, :])
     
 
-root = tk.Tk()
+# root = tk.Tk()
     
-root.withdraw()
+# root.withdraw()
 
+# file_path_array = filedialog.askopenfilenames(parent = root, title = "Upload HDF5 files", filetypes = [('HDF5 Files', '*.h5')])
+# output_h5_file_path = filedialog.asksaveasfilename(parent = root, title = "Select save path", filetypes = (('HDF5 Files', '*.h5')))
 
 # elements_xrf, counts_xrf, theta_xrf, dataset_type_xrf = extract_h5_aggregate_xrf_data(file_path_xrf)
 
 file_path_xrf = '/home/bwr0835/2_ide_aggregate_xrf.h5'
+
+# create_aggregate_xrf_h5(file_path_array, file_path_xrf, synchrotron = 'aps')
+
 # # file_path_xrt = ''
 
 elements_xrf, counts_xrf, theta_xrf, dataset_type_xrf = extract_h5_aggregate_xrf_data(file_path_xrf)
 
-iter_reproj('Fe', elements_xrf, theta_xrf, counts_xrf)
+iter_reproj('Fe', elements_xrf, theta_xrf, counts_xrf, 1000)
 
 
 
