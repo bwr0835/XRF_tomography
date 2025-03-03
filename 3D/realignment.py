@@ -1,4 +1,4 @@
-import numpy as np, h5py, os, skimage, tkinter as tk, tomopy as tomo
+import numpy as np, h5py, os, skimage, tkinter as tk, tomopy as tomo, matplotlib as mpl
 
 from skimage import transform as xform
 from scipy import signal as sig
@@ -43,7 +43,7 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array):
     
     # plt.imshow(sinogram[:, xrf_proj_img_array.shape[2]//15, :])
     
-    
+mpl.use('Agg')
 
 root = tk.Tk()
     
