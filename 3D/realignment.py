@@ -32,7 +32,9 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array):
 
     filtered_sinogram = ramp_filter(sinogram)
 
+    fig1 = plt.figure(1)
     plt.imshow(sinogram[:, xrf_proj_img_array.shape[2]//2, :], aspect = 'auto')
+    fig2 = plt.figure(2)
     plt.imshow(filtered_sinogram[:, xrf_proj_img_array.shape[2]//2, :], aspect = 'auto')
     plt.show()
 
