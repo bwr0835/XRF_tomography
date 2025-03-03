@@ -23,14 +23,17 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array):
     sinogram = np.zeros((xrf_proj_img_array.shape[1], xrf_proj_img_array.shape[2], xrf_proj_img_array.shape[3])) # (num_projections, num_rows, num_columns)
     # reconstructed_slice_array = []
 
-    ref_element_idx = element_array.index(ref_element)
+    theta_array *= np.pi/180
     
+    ref_element_idx = element_array.index(ref_element)
     reference_projection_imgs = xrf_proj_img_array[ref_element_idx]
 
     for slice_idx in range(xrf_proj_img_array.shape[2]):
         sinogram[:, slice_idx, :] = reference_projection_imgs[:, slice_idx, :]
 
     filtered_sinogram = ramp_filter(sinogram)
+
+    
 
     fig1 = plt.figure(1)
     plt.imshow(sinogram[:, xrf_proj_img_array.shape[2]//2, :], aspect = 'auto')
