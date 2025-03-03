@@ -43,7 +43,6 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array):
     
     # plt.imshow(sinogram[:, xrf_proj_img_array.shape[2]//15, :])
     
-mpl.use('Agg')
 
 root = tk.Tk()
     
