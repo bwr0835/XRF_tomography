@@ -57,7 +57,7 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
         for element_idx in range(current_xrf_proj_img_array.shape[0]):
             filtered_proj = ramp_filter(current_xrf_proj_img_array[element_idx])
             
-            recon[element_idx] = tomo.recon(filtered_proj, theta = theta_array*np.pi/180, center = center_of_rotation, algorithm = 'fbp')
+            recon[element_idx, :, :, :] = tomo.recon(filtered_proj, theta = theta_array*np.pi/180, center = center_of_rotation, algorithm = 'fbp')
             print(recon.shape)
             
             for slice_idx in range(n_slices):
