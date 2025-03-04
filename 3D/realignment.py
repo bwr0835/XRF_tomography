@@ -49,30 +49,40 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
 
     current_xrf_proj_img_array = xrf_proj_img_array
 
-
     for iteration_idx in range(n_iterations):
         print('Iteration ' + str(iteration_idx + 1) + '/' + str(n_iterations))
         
+        # Perform FBP for each element and create 2D projection images using the same available angles
+
         for element_idx in range(current_xrf_proj_img_array.shape[0]):
             filtered_proj = ramp_filter(current_xrf_proj_img_array[element_idx])
             
             recon[element_idx] = tomo.recon(filtered_proj, theta = theta_array*np.pi/180, center = center_of_rotation, algorithm = 'fbp')
 
-        for slice_idx in range(n_slices):
-            proj_imgs_from_3d_recon[:, slice_idx, :] = np.rot90(skimage.transform.radon(recon[element_idx, slice_idx, :, :]))
+            for slice_idx in range(n_slices):
+                proj_imgs_from_3d_recon[element_idx, :, slice_idx, :] = np.rot90(skimage.transform.radon(recon[element_idx, slice_idx, :, :]))
 
-        mse = skimage.metrics.mean_squared_error(proj_imgs_from_3d_recon, reference_projection_imgs)/(n_theta*n_columns*n_slices)
+        mse = skimage.metrics.mean_squared_error(proj_imgs_from_3d_recon[element_idx], reference_projection_imgs)/(n_theta*n_columns) # MSE (for convergence)
 
         print(mse)
 
         if mse <= eps:
             print('Number of iterations taken: ' + str(iteration_idx + 1))
+            
             break
-        
-        tmat_array = [] # Transformation matrix array for each projection
 
         for theta_idx in range(n_theta):
-            tmat = sr_trans.register_transform(reference_projection_imgs[theta_idx], proj_imgs_from_3d_recon[theta_idx])
+            tmat = sr_trans.register_transform(reference_projection_imgs[theta_idx], proj_imgs_from_3d_recon[ref_element_idx, theta_idx, :, :]) # Transformation matrix for a particular angle relative to the experimental projection image for that angle
+
+            for element_idx in range(n_elements):
+                if element_idx == ref_element:
+                    aligned_proj_from_3d_recon[element_idx, theta_idx, :, :] = sr_trans.transform(proj_imgs_from_3d_recon[element_idx, theta_idx, :, :], tmat = tmat)
+
+        current_xrf_proj_img_array = aligned_proj_from_3d_recon
+        center_of_rotation = tomo.find_center(current_xrf_proj_img_array[ref_element], theta_array*np.pi/180)    
+
+    plt.imshow(proj_imgs_from_3d_recon[ref_element, :, n_slices//2, :])
+    plt.show()
             
 
                 
