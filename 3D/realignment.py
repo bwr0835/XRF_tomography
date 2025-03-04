@@ -58,9 +58,9 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
             filtered_proj = ramp_filter(current_xrf_proj_img_array[element_idx])
             
             recon[element_idx] = tomo.recon(filtered_proj, theta = theta_array*np.pi/180, center = center_of_rotation, algorithm = 'fbp')
-
+            print(recon.shape)
             for slice_idx in range(n_slices):
-                proj_imgs_from_3d_recon[element_idx, :, slice_idx, :] = np.rot90(skimage.transform.radon(recon[element_idx][slice_idx, :, :]))
+                proj_imgs_from_3d_recon[element_idx, :, slice_idx, :] = np.rot90(skimage.transform.radon(recon[element_idx, slice_idx, :, :]))
 
         mse = skimage.metrics.mean_squared_error(proj_imgs_from_3d_recon[element_idx], reference_projection_imgs)/(n_theta*n_columns) # MSE (for convergence)
 
@@ -79,6 +79,7 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
                     aligned_proj_from_3d_recon[element_idx, theta_idx, :, :] = sr_trans.transform(proj_imgs_from_3d_recon[element_idx, theta_idx, :, :], tmat = tmat)
 
         current_xrf_proj_img_array = aligned_proj_from_3d_recon
+        print(current_xrf_proj_img_array.shape)
         center_of_rotation = tomo.find_center(current_xrf_proj_img_array[ref_element], theta_array*np.pi/180)    
 
     plt.imshow(proj_imgs_from_3d_recon[ref_element, :, n_slices//2, :])
