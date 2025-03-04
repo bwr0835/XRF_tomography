@@ -1,8 +1,8 @@
-import numpy as np, h5py, os, skimage, tkinter as tk, tomopy as tomo, matplotlib as mpl, scipy.ndimage as spndi
+import numpy as np, h5py, os, skimage, tkinter as tk, tomopy as tomo, matplotlib as mpl, scipy.ndimage as spndi, pystackreg as psr
 
 from skimage import transform as xform
 from scipy import signal as sig
-from numpy.fft import fft, ifft, fftfreq, fftn, ifftn
+from numpy.fft import fft, ifft, fftfreq, fftn, ifftn, fft2, ifft2
 from h5_util import extract_h5_aggregate_xrf_data, create_aggregate_xrf_h5
 from matplotlib import pyplot as plt
 from tkinter import filedialog
@@ -35,18 +35,22 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
     print(xrf_proj_img_array.shape[2]//2)
     print(recon.shape)
 
-    proj_3d = np.rot90(skimage.transform.radon(recon[recon.shape[0]//2, :, :], theta = theta_array), k = 1)
+    # proj_3d = np.rot90(skimage.transform.radon(recon[recon.shape[0]//2, :, :], theta = theta_array), k = 1)
+    # tomo.project()
+    
+    mse = skimage.metrics.mean_squared_error(proj_3d, reference_projection_imgs[:, reference_projection_imgs.shape[1]//2, :])/np.size(proj_3d)
 
-    for iteration in range(n_iterations):
-        mse = skimage.metrics.mean_squared_error(proj_3d, reference_projection_imgs[:, reference_projection_imgs.shape[1]//2, :])/np.size(proj_3d)
+    
+    if mse > eps:
+        for iteration in range(n_iterations):
+            if mse > eps:
+            # proj_3d = realign_translate(reference_projection_imgs[:, reference_projection_imgs.shape[1]//2, :], proj_3d)
+                sr = psr.StackReg(psr.StackReg.TRANSLATION)
 
-        print('MSE = ' + str(mse))
+                proj_3d = sr.register_transform( proj_3d)
 
-        if mse > eps:
-            proj_3d = realign_translate(reference_projection_imgs[:, reference_projection_imgs.shape[1]//2, :], proj_3d)
-
-        else:
-            break
+        # else:
+            # break
 
     # recon = tomo.circ_mask(recon, axis = 0, ratio = 0.95)
 
@@ -59,14 +63,21 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
     plt.imshow(proj_3d, aspect = 'auto')
     plt.show()
 
-def realign_translate(array1, array2):
-    shift, error, phase_diff = skimage.registration.phase_cross_correlation(array1, array2)
+# def cross_correlate(orig_proj, recon_proj):
+#     orig_proj_fft = fft2(orig_proj)
+#     recon_proj_fft = fft2(recon_proj)
 
-    array2_fft = fftn(array2)
-    array2_realigned = spndi.fourier_shift(array2_fft, shift)
-    array2_realigned = np.real(ifftn(array2_realigned))
+#     cross_corr = (ifft2(orig_proj_fft*recon_proj_fft.conj())).real # Imaginary component will only yield artifacts
 
-    return array2_realigned
+#     shift_y, shift_x = np.unravel_index(np.argmax(cross_corr), cross_corr.shape)
+
+#     if shift_y > array1.shape[0]//2:
+#         shift_y -= array1.shape[0]
+    
+#     if shift_x > array1.shape[1]//2:
+#         shift_x -= array1.shape[1]
+    
+#     return shift_x, shift_y
 
     
     
