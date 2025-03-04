@@ -58,11 +58,11 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
             filtered_proj = ramp_filter(current_xrf_proj_img_array[element_idx])
             
             recon[element_idx] = tomo.recon(filtered_proj, theta = theta_array*np.pi/180, center = center_of_rotation, algorithm = 'fbp')
-            
             print(recon.shape)
             
             for slice_idx in range(n_slices):
-                proj_imgs_from_3d_recon[element_idx, :, slice_idx, :] = skimage.transform.radon(recon[element_idx, slice_idx, :, :], theta = theta_array)
+                proj_slice = recon[element_idx, slice_idx, :, :]
+                proj_imgs_from_3d_recon[element_idx, :, slice_idx, :] = np.rot90(skimage.transform.radon(proj_slice, theta = theta_array), k = 1)
 
         mse = skimage.metrics.mean_squared_error(proj_imgs_from_3d_recon[element_idx], reference_projection_imgs)/(n_theta*n_columns) # MSE (for convergence)
 
