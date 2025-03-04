@@ -11,7 +11,7 @@ def ramp_filter(sinogram):
     n_theta, n_rows, n_columns = sinogram.shape
     
     fft_sinogram = fft(sinogram, axis = 2) # Fourier transform along columns/horizontal scan dimension
-    frequency_array = fftfreq(n_columns) # Create
+    frequency_array = fftfreq(n_columns) # Create frequency array
 
     ramp_filt = np.abs(frequency_array)
 
@@ -19,35 +19,77 @@ def ramp_filter(sinogram):
 
     return filtered_sinogram
 
-def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_iterations, eps = 1e-8): 
-    # theta_array *= np.pi/180
-    
-    ref_element_idx = element_array.index(ref_element)
-    reference_projection_imgs = xrf_proj_img_array[ref_element_idx] # These are effectively sinograms for the element of interest
-                                                                    # (n_theta, n_slices -> n_rows, n_columns)
-    # tomo.normalize_roi(reference_projection_imgs)
-    # reference_projection_imgs = tomo.minus_log(reference_projection_imgs)
+def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_iterations, eps = 1e-8):
+    n_elements = xrf_proj_img_array.shape[0] # Number of elements
+    n_theta = xrf_proj_img_array.shape[1] # Number of projection angles (projection images)
+    n_slices = xrf_proj_img_array.shape[2] # Number of rows in a projection image
+    n_columns = xrf_proj_img_array.shape[3] # Number of columns in a projection image
 
-    center_of_rotation = tomo.find_center(reference_projection_imgs, theta_array)
-    filtered_projection_imgs = ramp_filter(reference_projection_imgs)
-    recon = tomo.recon(filtered_projection_imgs, theta = theta_array, center = center_of_rotation, algorithm = 'fbp', sinogram_order = False)
-    # recon = tomo.recon(reference_projection_imgs, theta = theta_array, center = center_of_rotation, algorithm = 'mlem', sinogram_order = False)
-    print(xrf_proj_img_array.shape[2]//2)
-    print(recon.shape)
+    ref_element_idx = element_array.index(ref_element)
+    reference_projection_imgs = xrf_proj_img_array[ref_element_idx] # These are effectively sinograms for the element of interest (highest contrast -> for realignment purposes)
+                                                                    # (n_theta, n_slices -> n_rows, n_columns)
+
+    center_of_rotation_init = tomo.find_center(reference_projection_imgs, theta_array*np.pi/180)
+    
+    # filtered_projection_imgs = ramp_filter(reference_projection_imgs)
+        
+    # recon = tomo.recon(filtered_projection_imgs, theta = theta_array*np.pi/180, center = center_of_rotation, algorithm = 'fbp', sinogram_order = False)
+
+    proj_imgs_from_3d_recon = np.zeros_like(reference_projection_imgs)
+
+    # current_proj_imgs = reference_projection_imgs
+
+    sr_trans = psr.StackReg(psr.StackReg.TRANSLATION)
+
+    center_of_rotation = center_of_rotation_init
+
+    recon = np.zeros((n_elements, n_slices, n_columns, n_columns))
+    
+    aligned_proj_from_3d_recon = np.zeros_like(xrf_proj_img_array)
+
+    current_xrf_proj_img_array = xrf_proj_img_array
+
+
+    for iteration_idx in range(n_iterations):
+        print('Iteration ' + str(iteration_idx + 1) + '/' + str(n_iterations))
+        
+        for element_idx in range(current_xrf_proj_img_array.shape[0]):
+            filtered_proj = ramp_filter(current_xrf_proj_img_array[element_idx])
+            
+            recon[element_idx] = tomo.recon(filtered_proj, theta = theta_array*np.pi/180, center = center_of_rotation, algorithm = 'fbp')
+
+        for slice_idx in range(n_slices):
+            proj_imgs_from_3d_recon[:, slice_idx, :] = np.rot90(skimage.transform.radon(recon[element_idx, slice_idx, :, :]))
+
+        mse = skimage.metrics.mean_squared_error(proj_imgs_from_3d_recon, reference_projection_imgs)/(n_theta*n_columns*n_slices)
+
+        print(mse)
+
+        if mse <= eps:
+            print('Number of iterations taken: ' + str(iteration_idx + 1))
+            break
+        
+        tmat_array = [] # Transformation matrix array for each projection
+
+        for theta_idx in range(n_theta):
+            tmat = sr_trans.register_transform(reference_projection_imgs[theta_idx], proj_imgs_from_3d_recon[theta_idx])
+            
+
+                
 
     # proj_3d = np.rot90(skimage.transform.radon(recon[recon.shape[0]//2, :, :], theta = theta_array), k = 1)
     # tomo.project()
     
-    mse = skimage.metrics.mean_squared_error(proj_3d, reference_projection_imgs[:, reference_projection_imgs.shape[1]//2, :])/np.size(proj_3d)
+    # mse = skimage.metrics.mean_squared_error(proj_3d, reference_projection_imgs[:, reference_projection_imgs.shape[1]//2, :])/np.size(proj_3d)
 
     
-    if mse > eps:
-        for iteration in range(n_iterations):
-            if mse > eps:
-            # proj_3d = realign_translate(reference_projection_imgs[:, reference_projection_imgs.shape[1]//2, :], proj_3d)
-                sr = psr.StackReg(psr.StackReg.TRANSLATION)
+    # if mse > eps:
+    #     for iteration in range(n_iterations):
+    #         if mse > eps:
+    #         # proj_3d = realign_translate(reference_projection_imgs[:, reference_projection_imgs.shape[1]//2, :], proj_3d)
+    #             sr = psr.StackReg(psr.StackReg.TRANSLATION)
 
-                proj_3d = sr.register_transform( proj_3d)
+    #             proj_3d = sr.register_transform( proj_3d)
 
         # else:
             # break
@@ -60,8 +102,8 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
     # fig2 = plt.figure(2)
     # plt.imshow(filtered_projection_imgs[:, xrf_proj_img_array.shape[2]//2, :], extent = [0, reference_projection_imgs.shape[2], np.min(theta_array), np.max(theta_array)], aspect = 'auto')
     # fig3 = plt.figure(3)
-    plt.imshow(proj_3d, aspect = 'auto')
-    plt.show()
+    # plt.imshow(proj_3d, aspect = 'auto')
+    # plt.show()
 
 # def cross_correlate(orig_proj, recon_proj):
 #     orig_proj_fft = fft2(orig_proj)
@@ -101,7 +143,7 @@ file_path_xrf = '/home/bwr0835/2_ide_aggregate_xrf.h5'
 
 elements_xrf, counts_xrf, theta_xrf, dataset_type_xrf = extract_h5_aggregate_xrf_data(file_path_xrf)
 
-iter_reproj('Fe', elements_xrf, theta_xrf, counts_xrf, 1000)
+iter_reproj('Fe', elements_xrf, theta_xrf, counts_xrf, 2)
 
 
 
