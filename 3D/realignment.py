@@ -62,7 +62,7 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
                 for slice_idx in range(n_slices):
                     print('Slice ' + str(slice_idx + 1) + '/' + str(n_slices))
                     proj_slice = recon[element_idx, slice_idx, :, :]
-                    proj_imgs_from_3d_recon[element_idx, :, slice_idx, :] = np.rot90(skimage.transform.radon(proj_slice, theta = theta_array), k = 1)
+                    proj_imgs_from_3d_recon[element_idx, :, slice_idx, :] = skimage.transform.radon(proj_slice, theta = theta_array)
 
         mse = skimage.metrics.mean_squared_error(proj_imgs_from_3d_recon[ref_element_idx], reference_projection_imgs) # MSE (for convergence)
 
