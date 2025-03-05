@@ -75,11 +75,12 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
                 print(recon.shape)
 
                 
-            
-                for slice_idx in range(n_slices):
-                    print('Slice ' + str(slice_idx + 1) + '/' + str(n_slices))
-                    proj_slice = recon[element_idx, slice_idx, :, :]
-                    proj_imgs_from_3d_recon[element_idx, :, slice_idx, :] = np.rot90(skimage.transform.radon(proj_slice, theta = theta_array), k = 1) # This radon transform assumes slices are defined by columns and not rows
+
+                proj_imgs_from_3d_recon[element_idx] = tomo.project(recon[element_idx], theta = theta_array*np.pi/180, pad = False)
+                # for slice_idx in range(n_slices):
+                #     print('Slice ' + str(slice_idx + 1) + '/' + str(n_slices))
+                #     proj_slice = recon[element_idx, slice_idx, :, :]
+                #     proj_imgs_from_3d_recon[element_idx, :, slice_idx, :] = np.rot90(skimage.transform.radon(proj_slice, theta = theta_array), k = 1) # This radon transform assumes slices are defined by columns and not rows
 
         # plt.imshow(proj_imgs_from_3d_recon[ref_element_idx, :, n_slices//2, :])
         # plt.show()
