@@ -62,7 +62,7 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
                 for slice_idx in range(n_slices):
                     print('Slice ' + str(slice_idx + 1) + '/' + str(n_slices))
                     proj_slice = recon[element_idx, slice_idx, :, :]
-                    proj_imgs_from_3d_recon[element_idx, :, slice_idx, :] = np.rot90(skimage.transform.radon(proj_slice, theta = theta_array), k = -1)
+                    proj_imgs_from_3d_recon[element_idx, :, slice_idx, :] = (skimage.transform.radon(np.rot90(proj_slice, k = -1), theta = theta_array)) # This radon transform assumes slices are defined by columns and not rows
 
         plt.imshow(proj_imgs_from_3d_recon[ref_element_idx, :, n_slices//2, :])
         plt.show()
@@ -82,7 +82,7 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
     #             if element_idx == ref_element_idx:
     #                 aligned_proj_from_3d_recon[element_idx, theta_idx, :, :] = sr_trans.transform(proj_imgs_from_3d_recon[element_idx, theta_idx, :, :], tmat = tmat)
 
-    #     current_xrf_proj_img_array = aligned_proj_from_3d_recon
+    #     current_xrf_proj_img_array = aligned_proj_from_3d_recon.copy()
     #     print(current_xrf_proj_img_array.shape)
          
 
