@@ -43,7 +43,7 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
     reference_projection_imgs = xrf_proj_img_array[ref_element_idx] # These are effectively sinograms for the element of interest (highest contrast -> for realignment purposes)
                                                                     # (n_theta, n_slices -> n_rows, n_columns)
 
-    # center_of_rotation = tomo.find_center(reference_projection_imgs, theta_array*np.pi/180)
+    center_of_rotation = tomo.find_center(reference_projection_imgs, theta_array*np.pi/180)
     
     # filtered_projection_imgs = ramp_filter(reference_projection_imgs)
         
@@ -67,7 +67,7 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
 
         for element_idx in range(current_xrf_proj_img_array.shape[0]):
             if element_idx == ref_element_idx:
-                center_of_rotation = tomo.find_center(current_xrf_proj_img_array[element_idx], theta_array*np.pi/180)
+                # center_of_rotation = tomo.find_center(current_xrf_proj_img_array[element_idx], theta_array*np.pi/180)
                 
                 filtered_proj = ramp_filter(current_xrf_proj_img_array[element_idx])
 
@@ -76,7 +76,7 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
 
                 
 
-                proj_imgs_from_3d_recon[element_idx] = tomo.project(recon[element_idx], theta = theta_array*np.pi/180)
+                proj_imgs_from_3d_recon[element_idx] = tomo.project(recon[element_idx], theta = theta_array*np.pi/180, pad = False)
                 # for slice_idx in range(n_slices):
                 #     print('Slice ' + str(slice_idx + 1) + '/' + str(n_slices))
                 #     proj_slice = recon[element_idx, slice_idx, :, :]
