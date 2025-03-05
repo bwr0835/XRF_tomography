@@ -19,6 +19,20 @@ def ramp_filter(sinogram):
 
     return filtered_sinogram
 
+def round_correct(num, ndec): # CORRECTLY round a number (num) to chosen number of decimal places (ndec)
+
+    if ndec == 0:
+        return int(num + 0.5)
+    
+    else:
+        digit_value = 10**ndec
+        
+        if num > 0:
+            return int(num*digit_value + 0.5)/digit_value
+        
+        else:
+            return int(num*digit_value - 0.5)/digit_value
+
 def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_iterations, eps = 1e-8):
     n_elements = xrf_proj_img_array.shape[0] # Number of elements
     n_theta = xrf_proj_img_array.shape[1] # Number of projection angles (projection images)
@@ -69,8 +83,10 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
         # plt.imshow(proj_imgs_from_3d_recon[ref_element_idx, :, n_slices//2, :])
         # plt.show()
         mse = skimage.metrics.mean_squared_error(proj_imgs_from_3d_recon[ref_element_idx], reference_projection_imgs) # MSE (for convergence)
-
-        print(mse)
+        mse_exponent = np.floor(np.log10(mse))  # Calculate exponent
+        mse_mantissa = round_correct(mse / (10 ** mse_exponent), ndec = 3)
+        
+        print('MSE = ' + str(mse_mantissa) + 'E' + str(mse_exponent))
 
         if mse <= eps:
             print('Number of iterations taken: ' + str(iteration_idx + 1))
