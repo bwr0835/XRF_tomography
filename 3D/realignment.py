@@ -11,9 +11,9 @@ def ramp_filter(sinogram):
     n_theta, n_rows, n_columns = sinogram.shape
     
     fft_sinogram = fft(sinogram, axis = 2) # Fourier transform along columns/horizontal scan dimension
-    frequency_array = fftfreq(n_columns) # Create frequency array
+    frequency_array = fftfreq(n_columns) # Create NORMALIZED (w.r.t. Nyquist frequency) frequency array
 
-    ramp_filt = np.abs(frequency_array)
+    ramp_filt = 2*np.abs(frequency_array) # Need factor of 2 since frequency array goes from -0.5 to just under 0.5
 
     filtered_sinogram = np.real(ifft(fft_sinogram*ramp_filt, axis = 2)) # Only want the real component, or else artifacts will show up
 
@@ -34,8 +34,6 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
     # filtered_projection_imgs = ramp_filter(reference_projection_imgs)
         
     # recon = tomo.recon(filtered_projection_imgs, theta = theta_array*np.pi/180, center = center_of_rotation, algorithm = 'fbp', sinogram_order = False)
-
-    proj_imgs_from_3d_recon = np.zeros_like(xrf_proj_img_array)
 
     # current_proj_imgs = reference_projection_imgs
 
@@ -58,6 +56,8 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
             
                 recon[element_idx] = tomo.recon(filtered_proj, theta = theta_array*np.pi/180, center = center_of_rotation, algorithm = 'fbp')
                 print(recon.shape)
+
+                proj_imgs_from_3d_recon = np.zeros_like(xrf_proj_img_array)
             
                 for slice_idx in range(n_slices):
                     print('Slice ' + str(slice_idx + 1) + '/' + str(n_slices))
