@@ -64,7 +64,7 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
                     proj_slice = recon[element_idx, slice_idx, :, :]
                     proj_imgs_from_3d_recon[element_idx, :, slice_idx, :] = np.rot90(skimage.transform.radon(proj_slice, theta = theta_array), k = -1)
 
-        plt.imshow(proj_imgs_from_3d_recon[element_idx, :, slice_idx, :])
+        plt.imshow(proj_imgs_from_3d_recon[element_idx, :, n_slices//2, :])
         plt.show()
     #     mse = skimage.metrics.mean_squared_error(proj_imgs_from_3d_recon[ref_element_idx], reference_projection_imgs) # MSE (for convergence)
 
