@@ -76,7 +76,7 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
             break
 
         for theta_idx in range(n_theta):
-            tmat = sr_trans.register_transform(reference_projection_imgs[theta_idx], proj_imgs_from_3d_recon[ref_element_idx, theta_idx, :, :]) # Transformation matrix for a particular angle relative to the experimental projection image for that angle
+            tmat = sr_trans.register(reference_projection_imgs[theta_idx], proj_imgs_from_3d_recon[ref_element_idx, theta_idx, :, :]) # Transformation matrix for a particular angle relative to the experimental projection image for that angle
 
             for element_idx in range(n_elements):
                 if element_idx == ref_element_idx:
