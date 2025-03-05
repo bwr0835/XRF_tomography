@@ -64,30 +64,30 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
                     proj_slice = recon[element_idx, slice_idx, :, :]
                     proj_imgs_from_3d_recon[element_idx, :, slice_idx, :] = (skimage.transform.radon(proj_slice, theta = theta_array)).T # This radon transform assumes slices are defined by columns and not rows
 
-        plt.imshow(proj_imgs_from_3d_recon[ref_element_idx, :, n_slices//2, :])
-        plt.show()
-    #     mse = skimage.metrics.mean_squared_error(proj_imgs_from_3d_recon[ref_element_idx], reference_projection_imgs) # MSE (for convergence)
+        # plt.imshow(proj_imgs_from_3d_recon[ref_element_idx, :, n_slices//2, :])
+        # plt.show()
+        mse = skimage.metrics.mean_squared_error(proj_imgs_from_3d_recon[ref_element_idx], reference_projection_imgs) # MSE (for convergence)
 
-    #     print(mse)
+        print(mse)
 
-    #     if mse <= eps:
-    #         print('Number of iterations taken: ' + str(iteration_idx + 1))
+        if mse <= eps:
+            print('Number of iterations taken: ' + str(iteration_idx + 1))
             
-    #         break
+            break
 
-    #     for theta_idx in range(n_theta):
-    #         tmat = sr_trans.register_transform(reference_projection_imgs[theta_idx], proj_imgs_from_3d_recon[ref_element_idx, theta_idx, :, :]) # Transformation matrix for a particular angle relative to the experimental projection image for that angle
+        for theta_idx in range(n_theta):
+            tmat = sr_trans.register_transform(reference_projection_imgs[theta_idx], proj_imgs_from_3d_recon[ref_element_idx, theta_idx, :, :]) # Transformation matrix for a particular angle relative to the experimental projection image for that angle
 
-    #         for element_idx in range(n_elements):
-    #             if element_idx == ref_element_idx:
-    #                 aligned_proj_from_3d_recon[element_idx, theta_idx, :, :] = sr_trans.transform(proj_imgs_from_3d_recon[element_idx, theta_idx, :, :], tmat = tmat)
+            for element_idx in range(n_elements):
+                if element_idx == ref_element_idx:
+                    aligned_proj_from_3d_recon[element_idx, theta_idx, :, :] = sr_trans.transform(proj_imgs_from_3d_recon[element_idx, theta_idx, :, :], tmat = tmat)
 
-    #     current_xrf_proj_img_array = aligned_proj_from_3d_recon.copy()
-    #     print(current_xrf_proj_img_array.shape)
+        current_xrf_proj_img_array = aligned_proj_from_3d_recon.copy()
+        print(current_xrf_proj_img_array.shape)
          
 
-    # plt.imshow(current_xrf_proj_img_array[ref_element_idx, :, n_slices//2, :])
-    # plt.show()
+    plt.imshow(current_xrf_proj_img_array[ref_element_idx, :, n_slices//2, :])
+    plt.show()
             
 
                 
