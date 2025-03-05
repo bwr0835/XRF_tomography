@@ -84,7 +84,7 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
         print(current_xrf_proj_img_array.shape)
          
 
-    plt.imshow(proj_imgs_from_3d_recon[ref_element, :, n_slices//2, :])
+    plt.imshow(proj_imgs_from_3d_recon[ref_element_idx, :, n_slices//2, :])
     plt.show()
             
 
@@ -156,7 +156,7 @@ file_path_xrf = '/home/bwr0835/2_ide_aggregate_xrf.h5'
 
 elements_xrf, counts_xrf, theta_xrf, dataset_type_xrf = extract_h5_aggregate_xrf_data(file_path_xrf)
 
-iter_reproj('Fe', elements_xrf, theta_xrf, counts_xrf, 2)
+iter_reproj('Fe', elements_xrf, theta_xrf, counts_xrf, 5)
 
 
 
