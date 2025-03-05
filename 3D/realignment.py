@@ -37,20 +37,20 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
 
     # current_proj_imgs = reference_projection_imgs
 
-    sr_trans = psr.StackReg(psr.StackReg.TRANSLATION)
+    sr_trans = psr.StackReg(psr.StackReg.AFFINE)
 
     recon = np.zeros((n_elements, n_slices, n_columns, n_columns))
     
     aligned_proj_from_3d_recon = np.zeros_like(xrf_proj_img_array)
 
-    current_xrf_proj_img_array = xrf_proj_img_array
+    current_xrf_proj_img_array = xrf_proj_img_array.copy()
+    proj_imgs_from_3d_recon = np.zeros_like(xrf_proj_img_array)
 
     for iteration_idx in range(n_iterations):
         print('Iteration ' + str(iteration_idx + 1) + '/' + str(n_iterations))
         
         # Perform FBP for each element and create 2D projection images using the same available angles
-        proj_imgs_from_3d_recon = np.zeros_like(xrf_proj_img_array)
-        
+
         for element_idx in range(current_xrf_proj_img_array.shape[0]):
             if element_idx == ref_element_idx:
                 filtered_proj = ramp_filter(current_xrf_proj_img_array[element_idx])
