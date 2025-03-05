@@ -76,7 +76,7 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
 
                 
 
-                proj_imgs_from_3d_recon[element_idx] = tomo.project(recon[element_idx], theta = theta_array*np.pi/180, pad = False)
+                proj_imgs_from_3d_recon[element_idx] = tomo.project(recon[element_idx], theta = theta_array*np.pi/180)
                 # for slice_idx in range(n_slices):
                 #     print('Slice ' + str(slice_idx + 1) + '/' + str(n_slices))
                 #     proj_slice = recon[element_idx, slice_idx, :, :]
