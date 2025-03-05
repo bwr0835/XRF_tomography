@@ -67,10 +67,11 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
 
         for element_idx in range(current_xrf_proj_img_array.shape[0]):
             if element_idx == ref_element_idx:
-                # filtered_proj = ramp_filter(current_xrf_proj_img_array[element_idx])
                 center_of_rotation = tomo.find_center(current_xrf_proj_img_array[element_idx], theta_array*np.pi/180)
+                
+                filtered_proj = ramp_filter(current_xrf_proj_img_array[element_idx])
 
-                recon[element_idx] = tomo.recon(current_xrf_proj_img_array[element_idx], theta = theta_array*np.pi/180, center = center_of_rotation, algorithm = 'gridrec')
+                recon[element_idx] = tomo.recon(filtered_proj, theta = theta_array*np.pi/180, center = center_of_rotation, algorithm = 'fbp')
                 print(recon.shape)
 
                 
@@ -86,7 +87,7 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
         mse_exponent = np.floor(np.log10(mse))  # Calculate exponent
         mse_mantissa = round_correct(mse / (10 ** mse_exponent), ndec = 3)
         
-        print('MSE = ' + str(mse_mantissa) + 'E' + str(mse_exponent))
+        print('MSE = ' + str(mse_mantissa) + 'E' + str(int(mse_exponent)))
 
         if mse <= eps:
             print('Number of iterations taken: ' + str(iteration_idx + 1))
