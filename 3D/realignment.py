@@ -13,7 +13,7 @@ def ramp_filter(sinogram):
     fft_sinogram = fft(sinogram, axis = 2) # Fourier transform along columns/horizontal scan dimension
     frequency_array = fftfreq(n_columns) # Create NORMALIZED (w.r.t. Nyquist frequency) frequency array
 
-    ramp_filt = np.abs(frequency_array)
+    ramp_filt = (frequency_array)
 
     filtered_sinogram = np.real(ifft(fft_sinogram*ramp_filt, axis = 2)) # Only want the real component, or else artifacts will show up
 
@@ -95,6 +95,8 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
             
             print('x-shift: ' + str(x_shift) + '(Theta = ' + str(theta_array[theta_idx]) + ' degrees')
             print('y-shift: ' + str(y_shift))
+
+            input("Enter")
 
             # fig1 = plt.figure(1)
             # plt.imshow(reference_projection_imgs[theta_idx])
