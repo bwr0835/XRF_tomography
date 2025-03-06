@@ -76,7 +76,7 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
                 proj = current_xrf_proj_img_array[element_idx]
 
                 # recon[element_idx] = tomo.recon(filtered_proj, theta = theta_array*np.pi/180, center = center_of_rotation, algorithm = 'fbp')
-                recon[element_idx] = tomo.recon(proj, theta = theta_array*np.pi/180, center = center_of_rotation, algorithm = 'gridrec')
+                recon[element_idx] = tomo.recon(proj, theta = theta_array*np.pi/180, center = center_of_rotation, algorithm = 'gridrec', filter_name = 'ramlak')
                 print(recon.shape)
 
                 # proj_imgs_from_3d_recon[element_idx] = tomo.project(recon[element_idx], theta = theta_array*np.pi/180, pad = False)
