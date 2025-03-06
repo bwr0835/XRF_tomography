@@ -93,7 +93,7 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
             x_shifts.append(x_shift)
             y_shifts.append(y_shift)
             
-            print('x-shift: ' + str(x_shift) + '(Theta = ' + theta_array[theta_idx] + ' degrees')
+            print('x-shift: ' + str(x_shift) + '(Theta = ' + str(theta_array[theta_idx]) + ' degrees')
             print('y-shift: ' + str(y_shift))
 
             # fig1 = plt.figure(1)
