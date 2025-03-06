@@ -33,7 +33,7 @@ def round_correct(num, ndec): # CORRECTLY round a number (num) to chosen number 
         else:
             return int(num*digit_value - 0.5)/digit_value
 
-def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_iterations, eps = 1e-8):
+def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_iterations, eps = 1):
     n_elements = xrf_proj_img_array.shape[0] # Number of elements
     n_theta = xrf_proj_img_array.shape[1] # Number of projection angles (projection images)
     n_slices = xrf_proj_img_array.shape[2] # Number of rows in a projection image
@@ -93,18 +93,18 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
             x_shifts.append(x_shift)
             y_shifts.append(y_shift)
             
-            print('x-shift: ' + str(x_shift))
+            print('x-shift: ' + str(x_shift) + '(Theta = ' + theta_array[theta_idx] + ' degrees')
             print('y-shift: ' + str(y_shift))
 
-            fig1 = plt.figure(1)
-            plt.imshow(reference_projection_imgs[theta_idx])
-            fig2 = plt.figure(2)
-            plt.imshow(proj_imgs_from_3d_recon[ref_element_idx, theta_idx, :, :])
-            fig3 = plt.figure(3)
-            plt.imshow(fftshift(corr_mat))
-            plt.show()
+            # fig1 = plt.figure(1)
+            # plt.imshow(reference_projection_imgs[theta_idx])
+            # fig2 = plt.figure(2)
+            # plt.imshow(proj_imgs_from_3d_recon[ref_element_idx, theta_idx, :, :])
+            # fig3 = plt.figure(3)
+            # plt.imshow(fftshift(corr_mat))
+            # plt.show()
 
-        if np.max(np.abs(x_shift)) < eps and np.max(np.abs(y_shift)) < eps:
+        if np.max(np.abs(x_shift)) <= eps and np.max(np.abs(y_shift)) <= eps:
             print('Number of iterations taken: ' + str(iteration_idx + 1))
         
             break
