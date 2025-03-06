@@ -2,7 +2,7 @@ import numpy as np, h5py, os, skimage, tkinter as tk, tomopy as tomo, matplotlib
 
 from skimage import transform as xform
 from scipy import signal as sig
-from numpy.fft import fft, ifft, fftfreq, fftn, ifftn, fft2, ifft2
+from numpy.fft import fft, ifft, fftshift, ifftshift, fftfreq, fftn, ifftn, fft2, ifft2
 from h5_util import extract_h5_aggregate_xrf_data, create_aggregate_xrf_h5
 from matplotlib import pyplot as plt
 from tkinter import filedialog
@@ -101,7 +101,7 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
             fig2 = plt.figure(2)
             plt.imshow(proj_imgs_from_3d_recon[ref_element_idx, theta_idx, :, :])
             fig3 = plt.figure(3)
-            plt.imshow(corr_mat)
+            plt.imshow(fftshift(corr_mat))
             plt.show()
 
         if np.max(np.abs(x_shift)) < eps and np.max(np.abs(y_shift)) < eps:
