@@ -6,4 +6,4 @@ for i in range(len(a)):
     b.append(a[i])
 a[2] = 5
 
-print(b)
+print(np.reshape(a, (-1, 1)))
