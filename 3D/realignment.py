@@ -14,8 +14,9 @@ def ramp_filter(sinogram):
     frequency_array = fftfreq(n_columns) # Create NORMALIZED (w.r.t. Nyquist frequency) frequency array
 
     ramp_filt = np.abs(frequency_array)
+    hamming_filt = 0.54 + 0.46*np.cos(2*np.pi*frequency_array)
 
-    filtered_sinogram = np.real(ifft(fft_sinogram*ramp_filt, axis = 2)) # Only want the real component, or else artifacts will show up
+    filtered_sinogram = np.real(ifft(fft_sinogram*ramp_filt*hamming_filt, axis = 2)) # Only want the real component, or else artifacts will show up
 
     return filtered_sinogram
 
