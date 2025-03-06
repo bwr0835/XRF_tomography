@@ -11,7 +11,7 @@ def ramp_filter(sinogram):
     n_theta, n_rows, n_columns = sinogram.shape
     
     fft_sinogram = fft(sinogram, axis = 2) # Fourier transform along columns/horizontal scan dimension
-    frequency_array = 2*fftfreq(n_columns) # Create NORMALIZED (w.r.t. Nyquist frequency) frequency array
+    frequency_array = fftfreq(n_theta) # Create NORMALIZED (w.r.t. Nyquist frequency) frequency array
 
     ramp_filt = np.abs(frequency_array) # Need factor of 2 since frequency array goes from -0.5 to just under 0.5
 
@@ -61,6 +61,9 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
     proj_imgs_from_3d_recon = np.zeros_like(xrf_proj_img_array)
 
     for iteration_idx in range(n_iterations):
+        x_shifts = []
+        y_shifts = []
+
         print('Iteration ' + str(iteration_idx + 1) + '/' + str(n_iterations))
         
         # Perform FBP for each element and create 2D projection images using the same available angles
@@ -83,30 +86,67 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
                     # plt.show()
         # plt.imshow(proj_imgs_from_3d_recon[ref_element_idx, :, n_slices//2, :])
         # plt.show()
-        mse = skimage.metrics.mean_squared_error(proj_imgs_from_3d_recon[ref_element_idx], reference_projection_imgs) # MSE (for convergence)
-        mse_exponent = np.floor(np.log10(mse))  # Calculate exponent
-        mse_mantissa = round_correct(mse / (10 ** mse_exponent), ndec = 3)
-        
-        print('MSE = ' + str(mse_mantissa) + 'E' + str(int(mse_exponent)))
-
-        if mse <= eps:
-            print('Number of iterations taken: ' + str(iteration_idx + 1))
-            
-            break
 
         for theta_idx in range(n_theta):
-            tmat = sr_trans.register(reference_projection_imgs[theta_idx], proj_imgs_from_3d_recon[ref_element_idx, theta_idx, :, :]) # Transformation matrix for a particular angle relative to the experimental projection image for that angle
+            y_shift, x_shift, corr_mat = cross_correlate(reference_projection_imgs[theta_idx], proj_imgs_from_3d_recon[ref_element_idx, theta_idx, :, :]) # Cross-correlation
+            
+            x_shifts.append(x_shift)
+            y_shifts.append(y_shift)
+            
+            print('x-shift: ' + str(x_shift))
+            print('y-shift: ' + str(y_shift))
 
-            for element_idx in range(n_elements):
-                if element_idx == ref_element_idx:
-                    aligned_proj_from_3d_recon[element_idx, theta_idx, :, :] = sr_trans.transform(proj_imgs_from_3d_recon[element_idx, theta_idx, :, :], tmat = tmat)
+            fig1 = plt.figure(1)
+            plt.imshow(reference_projection_imgs[theta_idx])
+            fig2 = plt.figure(2)
+            plt.imshow(proj_imgs_from_3d_recon[ref_element, theta_idx, :, :])
+            fig3 = plt.figure(3)
+            plt.imshow(corr_mat)
+            plt.show()
+
+        if np.max(np.abs(x_shift)) < eps and np.max(np.abs(y_shift)) < eps:
+            print('Number of iterations taken: ' + str(iteration_idx + 1))
+        
+            break
+            
+        for element_idx in range(n_elements):
+            if element_idx == ref_element_idx:
+                for theta_idx in range(n_theta):
+                    y_shift = y_shifts[theta_idx]
+                    x_shift = x_shifts[theta_idx]
+                    
+                    aligned_proj_from_3d_recon[element_idx, theta_idx, :, :] = spndi.shift(proj_imgs_from_3d_recon[ref_element_idx, theta_idx, :, :], shift = (-y_shift, -x_shift)) # Undo the translational shifts by the cross-correlation peak
 
         current_xrf_proj_img_array = aligned_proj_from_3d_recon.copy()
-        print(current_xrf_proj_img_array.shape)
-         
+            
+        # mse_exponent = np.floor(np.log10(mse))  # Calculate exponent
+        # mse_mantissa = round_correct(mse / (10 ** mse_exponent), ndec = 3)
+        
+        # print('MSE = ' + str(mse_mantissa) + 'E' + str(int(mse_exponent)))
 
-    plt.imshow(current_xrf_proj_img_array[ref_element_idx, :, n_slices//2, :])
-    plt.show()
+        # if mse <= eps:
+        #     print('Number of iterations taken: ' + str(iteration_idx + 1))
+            
+        #     break
+
+    #     for theta_idx in range(n_theta):
+    #         tmat = sr_trans.register(ref = reference_projection_imgs[theta_idx], mov = proj_imgs_from_3d_recon[ref_element_idx, theta_idx, :, :]) # Transformation matrix for a particular angle relative to the experimental projection image for that angle
+
+    #         for element_idx in range(n_elements):
+    #             if element_idx == ref_element_idx:
+    #                 aligned_proj_from_3d_recon[element_idx, theta_idx, :, :] = sr_trans.transform(mov = proj_imgs_from_3d_recon[element_idx, theta_idx, :, :], tmat = tmat)
+
+    #     current_xrf_proj_img_array = aligned_proj_from_3d_recon.copy()
+    #     print(current_xrf_proj_img_array.shape)
+         
+    # tmat = sr_trans.register(ref = reference_projection_imgs[n_theta//2, :, :], mov = current_xrf_proj_img_array[ref_element_idx, n_theta//2, :, :])
+
+    # fig1 = plt.figure(1)
+    # plt.imshow(current_xrf_proj_img_array[ref_element_idx, n_theta//2, :, :])
+    # fig2 = plt.figure(2)
+    # plt.imshow(reference_projection_imgs[n_theta//2, :, :])
+    # fig3 = plt.figure(3)
+    # # plt.show(tmat)
             
 
                 
@@ -139,11 +179,29 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
     # plt.imshow(proj_3d, aspect = 'auto')
     # plt.show()
 
-# def cross_correlate(orig_proj, recon_proj):
-#     orig_proj_fft = fft2(orig_proj)
-#     recon_proj_fft = fft2(recon_proj)
+def cross_correlate(orig_proj, recon_proj):
+    # Credit goes to Fabricio Marin and the XRFTomo GUI
 
-#     cross_corr = (ifft2(orig_proj_fft*recon_proj_fft.conj())).real # Imaginary component will only yield artifacts
+    orig_proj_fft = fft2(orig_proj)
+    recon_proj_fft = fft2(recon_proj)
+
+    img_dims = orig_proj.shape
+    
+    y_dim = img_dims[0]
+    x_dim = img_dims[1]
+
+   
+    cross_corr = np.abs(ifft2(orig_proj_fft*recon_proj_fft.conjugate()))
+    
+    y_shift, x_shift = np.unravel_index(np.argmax(cross_corr), img_dims) # Locate maximum peak in cross-correlation matrix and output the 
+    
+    if y_shift > y_dim//2:
+        y_shift -= y_dim
+    
+    if x_shift > x_dim//2:
+        x_shift -= x_dim
+
+    return y_shift, x_shift, cross_corr
 
 #     shift_y, shift_x = np.unravel_index(np.argmax(cross_corr), cross_corr.shape)
 
