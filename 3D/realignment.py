@@ -11,7 +11,7 @@ def ramp_filter(sinogram):
     n_theta, n_rows, n_columns = sinogram.shape
     
     fft_sinogram = fft(sinogram, axis = 2) # Fourier transform along columns/horizontal scan dimension
-    frequency_array = fftfreq(n_theta) # Create NORMALIZED (w.r.t. Nyquist frequency) frequency array
+    frequency_array = fftfreq(n_columns) # Create NORMALIZED (w.r.t. Nyquist frequency) frequency array
 
     ramp_filt = np.abs(frequency_array) # Need factor of 2 since frequency array goes from -0.5 to just under 0.5
 
