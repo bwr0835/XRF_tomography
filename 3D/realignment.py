@@ -45,7 +45,7 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
 
     center_of_rotation = tomo.find_center(reference_projection_imgs, theta_array*np.pi/180)
     
-    filtered_projection_imgs = ramp_filter(reference_projection_imgs)
+    # filtered_projection_imgs = ramp_filter(reference_projection_imgs)
         
     # recon = tomo.recon(filtered_projection_imgs, theta = theta_array*np.pi/180, center = center_of_rotation, algorithm = 'fbp', sinogram_order = False)
 
@@ -74,15 +74,14 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
                 
                 filtered_proj = ramp_filter(current_xrf_proj_img_array[element_idx])
 
-                recon[element_idx] = tomo.recon(filtered_proj, theta = theta_array*np.pi/180, sinogram_order = True, center = center_of_rotation, algorithm = 'fbp')
+                recon[element_idx] = tomo.recon(filtered_proj, theta = theta_array*np.pi/180, center = center_of_rotation, sinogram_order = True, algorithm = 'fbp')
                 print(recon.shape)
 
                 # proj_imgs_from_3d_recon[element_idx] = tomo.project(recon[element_idx], theta = theta_array*np.pi/180, pad = False)
                 for slice_idx in range(n_slices):
                     print('Slice ' + str(slice_idx + 1) + '/' + str(n_slices))
                     proj_slice = recon[element_idx, slice_idx, :, :]
-                    # proj_imgs_from_3d_recon[element_idx, :, slice_idx, :] = (skimage.transform.radon(proj_slice, theta = theta_array)).T # This radon transform assumes slices are defined by columns and not rows
-                    proj_imgs_from_3d_recon[element_idx, :, slice_idx, :] = (skimage.transform.radon(proj_slice, theta = theta_array))
+                    proj_imgs_from_3d_recon[element_idx, :, slice_idx, :] = (skimage.transform.radon(proj_slice, theta = theta_array)).T # This radon transform assumes slices are defined by columns and not rows
                     # plt.imshow(proj_imgs_from_3d_recon[element_idx, :, slice_idx, :], aspect = 'auto')
                     # plt.show()
         # plt.imshow(proj_imgs_from_3d_recon[ref_element_idx, :, n_slices//2, :])
