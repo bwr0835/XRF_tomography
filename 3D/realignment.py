@@ -13,7 +13,7 @@ def ramp_filter(sinogram):
     fft_sinogram = fft(sinogram, axis = 2) # Fourier transform along columns/horizontal scan dimension
     frequency_array = fftfreq(n_columns) # Create NORMALIZED (w.r.t. Nyquist frequency) frequency array
 
-    ramp_filt = (frequency_array)
+    ramp_filt = np.abs(frequency_array)
 
     filtered_sinogram = np.real(ifft(fft_sinogram*ramp_filt, axis = 2)) # Only want the real component, or else artifacts will show up
 
@@ -81,7 +81,7 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
                 for slice_idx in range(n_slices):
                     print('Slice ' + str(slice_idx + 1) + '/' + str(n_slices))
                     proj_slice = recon[element_idx, slice_idx, :, :]
-                    proj_imgs_from_3d_recon[element_idx, :, slice_idx, :] = np.rot90(np.flip(skimage.transform.radon(proj_slice, theta = theta_array), axis = 1), k = 1) # This radon transform assumes slices are defined by columns and not rows
+                    proj_imgs_from_3d_recon[element_idx, :, slice_idx, :] = (skimage.transform.radon(proj_slice, theta = theta_array)).T # This radon transform assumes slices are defined by columns and not rows
                     # plt.imshow(proj_imgs_from_3d_recon[element_idx, :, slice_idx, :], aspect = 'auto')
                     # plt.show()
         # plt.imshow(proj_imgs_from_3d_recon[ref_element_idx, :, n_slices//2, :])
@@ -93,18 +93,17 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
             x_shifts.append(x_shift)
             y_shifts.append(y_shift)
             
-            print('x-shift: ' + str(x_shift) + '(Theta = ' + str(theta_array[theta_idx]) + ' degrees')
-            print('y-shift: ' + str(y_shift))
+            if theta_idx % 50 == 0:
+                print('x-shift: ' + str(x_shift) + '(Theta = ' + str(theta_array[theta_idx]) + ' degrees')
+                print('y-shift: ' + str(y_shift))
 
-            input("Enter")
-
-            # fig1 = plt.figure(1)
-            # plt.imshow(reference_projection_imgs[theta_idx])
-            # fig2 = plt.figure(2)
-            # plt.imshow(proj_imgs_from_3d_recon[ref_element_idx, theta_idx, :, :])
-            # fig3 = plt.figure(3)
-            # plt.imshow(fftshift(corr_mat))
-            # plt.show()
+                fig1 = plt.figure(1)
+                plt.imshow(reference_projection_imgs[theta_idx])
+                fig2 = plt.figure(2)
+                plt.imshow(proj_imgs_from_3d_recon[ref_element_idx, theta_idx, :, :])
+                fig3 = plt.figure(3)
+                plt.imshow(fftshift(corr_mat))
+                plt.show()
 
         if np.max(np.abs(x_shift)) <= eps and np.max(np.abs(y_shift)) <= eps:
             print('Number of iterations taken: ' + str(iteration_idx + 1))
