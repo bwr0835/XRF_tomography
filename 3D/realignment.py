@@ -72,9 +72,11 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
             if element_idx == ref_element_idx:
                 # center_of_rotation = tomo.find_center(current_xrf_proj_img_array[element_idx], theta_array*np.pi/180)
                 
-                filtered_proj = ramp_filter(current_xrf_proj_img_array[element_idx])
+                # filtered_proj = ramp_filter(current_xrf_proj_img_array[element_idx])
+                proj = current_xrf_proj_img_array[element_idx]
 
-                recon[element_idx] = tomo.recon(filtered_proj, theta = theta_array*np.pi/180, center = center_of_rotation, sinogram_order = True, algorithm = 'fbp')
+                # recon[element_idx] = tomo.recon(filtered_proj, theta = theta_array*np.pi/180, center = center_of_rotation, algorithm = 'fbp')
+                recon[element_idx] = tomo.recon(proj, theta = theta_array*np.pi/180, center = center_of_rotation, algorithm = 'gridrec')
                 print(recon.shape)
 
                 # proj_imgs_from_3d_recon[element_idx] = tomo.project(recon[element_idx], theta = theta_array*np.pi/180, pad = False)
