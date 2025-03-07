@@ -81,8 +81,8 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
                 recon[element_idx] = tomo.recon(proj, theta = theta_array*np.pi/180, center = center_of_rotation, algorithm = 'gridrec', filter_name = 'ramlak')
                 print(recon.shape)
 
-                plt.imshow(recon[element_idx, 0, :, :])
-                plt.show()
+                # plt.imshow(recon[element_idx, 0, :, :])
+                # plt.show()
 
                 # proj_imgs_from_3d_recon[element_idx] = tomo.project(recon[element_idx], theta = theta_array*np.pi/180, pad = False)
                 for slice_idx in range(n_slices):
@@ -104,19 +104,19 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
                 print('x-shift: ' + str(x_shift) + ' (Theta = ' + str(theta_array[theta_idx]) + ' degrees')
                 print('y-shift: ' + str(y_shift))
 
-                # fig1 = plt.figure(1)
-                # plt.imshow(recon[element_idx, 0, :, :])
-                # plt.title('Slice 0')
-                # fig2 = plt.figure(2)
-                # plt.imshow(recon[element_idx, n_slices//2, :, :])
-                # plt.title('Slice ' + str(n_slices//2))
-                # fig3 = plt.figure(3)
-                # plt.imshow(reference_projection_imgs[theta_idx])
-                # fig4 = plt.figure(4)
-                # plt.imshow(proj_imgs_from_3d_recon[ref_element_idx, theta_idx, :, :])
-                # fig5 = plt.figure(5)
-                # plt.imshow(fftshift(corr_mat))
-                # plt.show()
+                fig1 = plt.figure(1)
+                plt.imshow(recon[ref_element_idx, 0, :, :])
+                plt.title('Slice 0')
+                fig2 = plt.figure(2)
+                plt.imshow(recon[ref_element_idx, n_slices//2, :, :])
+                plt.title('Slice ' + str(n_slices//2))
+                fig3 = plt.figure(3)
+                plt.imshow(reference_projection_imgs[theta_idx])
+                fig4 = plt.figure(4)
+                plt.imshow(proj_imgs_from_3d_recon[ref_element_idx, theta_idx, :, :])
+                fig5 = plt.figure(5)
+                plt.imshow(fftshift(corr_mat))
+                plt.show()
 
         if np.max(np.abs(x_shifts - prev_x_shifts)) <= eps and np.max(np.abs(y_shifts - prev_y_shifts)) <= eps:
             print('Number of iterations taken: ' + str(iteration_idx + 1))
