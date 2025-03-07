@@ -55,7 +55,7 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
 
     recon = np.zeros((n_elements, n_slices, n_columns, n_columns))
     
-    aligned_proj_from_3d_recon = np.zeros_like(xrf_proj_img_array)
+    aligned_proj = np.zeros_like(xrf_proj_img_array)
 
     current_xrf_proj_img_array = xrf_proj_img_array.copy()
     proj_imgs_from_3d_recon = np.zeros_like(xrf_proj_img_array)
@@ -103,20 +103,20 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
             if theta_idx % 7 == 0:
                 print('x-shift: ' + str(x_shift) + ' (Theta = ' + str(theta_array[theta_idx]) + ' degrees')
                 print('y-shift: ' + str(y_shift))
-
-                fig1 = plt.figure(1)
-                plt.imshow(recon[ref_element_idx, 0, :, :])
-                plt.title('Slice 0')
-                fig2 = plt.figure(2)
-                plt.imshow(recon[ref_element_idx, n_slices//2, :, :])
-                plt.title('Slice ' + str(n_slices//2))
-                fig3 = plt.figure(3)
-                plt.imshow(reference_projection_imgs[theta_idx])
-                fig4 = plt.figure(4)
-                plt.imshow(proj_imgs_from_3d_recon[ref_element_idx, theta_idx, :, :])
-                fig5 = plt.figure(5)
-                plt.imshow(fftshift(corr_mat))
-                plt.show()
+                if iteration_idx == n_iterations - 1:
+                    fig1 = plt.figure(1)
+                    plt.imshow(recon[ref_element_idx, 0, :, :])
+                    plt.title('Slice 0')
+                    fig2 = plt.figure(2)
+                    plt.imshow(recon[ref_element_idx, n_slices//2, :, :])
+                    plt.title('Slice ' + str(n_slices//2))
+                    fig3 = plt.figure(3)
+                    plt.imshow(reference_projection_imgs[theta_idx])
+                    fig4 = plt.figure(4)
+                    plt.imshow(proj_imgs_from_3d_recon[ref_element_idx, theta_idx, :, :])
+                    fig5 = plt.figure(5)
+                    plt.imshow(fftshift(corr_mat))
+                    plt.show()
 
         if np.max(np.abs(x_shifts - prev_x_shifts)) <= eps and np.max(np.abs(y_shifts - prev_y_shifts)) <= eps:
             print('Number of iterations taken: ' + str(iteration_idx + 1))
@@ -129,9 +129,9 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
                     y_shift = y_shifts[theta_idx]
                     x_shift = x_shifts[theta_idx]
                     
-                    aligned_proj_from_3d_recon[element_idx, theta_idx, :, :] = spndi.shift(proj_imgs_from_3d_recon[ref_element_idx, theta_idx, :, :], shift = (-y_shift, -x_shift)) # Undo the translational shifts by the cross-correlation peak
+                    aligned_proj[element_idx, theta_idx, :, :] = spndi.shift(current_xrf_proj_img_array[ref_element_idx, theta_idx, :, :], shift = (-y_shift, -x_shift)) # Undo the translational shifts by the cross-correlation peak
 
-        current_xrf_proj_img_array = aligned_proj_from_3d_recon.copy()
+        current_xrf_proj_img_array = aligned_proj.copy()
         prev_x_shifts = x_shifts.copy()
         prev_y_shifts = y_shifts.copy()
             
