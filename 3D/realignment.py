@@ -44,6 +44,8 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
                                                                     # (n_theta, n_slices -> n_rows, n_columns)
 
     center_of_rotation = tomo.find_center(reference_projection_imgs, theta_array*np.pi/180)
+
+    iterations = []
     
     # filtered_projection_imgs = ramp_filter(reference_projection_imgs)
         
@@ -55,7 +57,7 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
 
     recon = np.zeros((n_elements, n_slices, n_columns, n_columns))
     
-    aligned_proj = np.zeros_like(xrf_proj_img_array)
+    aligned_proj_from_3d_recon = np.zeros_like(xrf_proj_img_array)
 
     current_xrf_proj_img_array = xrf_proj_img_array.copy()
     proj_imgs_from_3d_recon = np.zeros_like(xrf_proj_img_array)
@@ -64,9 +66,14 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
     y_shifts = np.zeros(n_theta)
     prev_x_shifts = np.zeros(n_theta)
     prev_y_shifts = np.zeros(n_theta)
+
+    max_x_shift = []
+    max_y_shift = []
     
     for iteration_idx in range(n_iterations):
         print('Iteration ' + str(iteration_idx + 1) + '/' + str(n_iterations))
+
+        iterations.append(iteration_idx + 1)
         
         # Perform FBP for each element and create 2D projection images using the same available angles
 
@@ -103,20 +110,23 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
             if theta_idx % 7 == 0:
                 print('x-shift: ' + str(x_shift) + ' (Theta = ' + str(theta_array[theta_idx]) + ' degrees')
                 print('y-shift: ' + str(y_shift))
-                if iteration_idx == n_iterations - 1:
-                    fig1 = plt.figure(1)
-                    plt.imshow(recon[ref_element_idx, 0, :, :])
-                    plt.title('Slice 0')
-                    fig2 = plt.figure(2)
-                    plt.imshow(recon[ref_element_idx, n_slices//2, :, :])
-                    plt.title('Slice ' + str(n_slices//2))
-                    fig3 = plt.figure(3)
-                    plt.imshow(reference_projection_imgs[theta_idx])
-                    fig4 = plt.figure(4)
-                    plt.imshow(proj_imgs_from_3d_recon[ref_element_idx, theta_idx, :, :])
-                    fig5 = plt.figure(5)
-                    plt.imshow(fftshift(corr_mat))
-                    plt.show()
+
+                # fig1 = plt.figure(1)
+                # plt.imshow(recon[ref_element_idx, 0, :, :])
+                # plt.title('Slice 0')
+                # fig2 = plt.figure(2)
+                # plt.imshow(recon[ref_element_idx, n_slices//2, :, :])
+                # plt.title('Slice ' + str(n_slices//2))
+                # fig3 = plt.figure(3)
+                # plt.imshow(reference_projection_imgs[theta_idx])
+                # fig4 = plt.figure(4)
+                # plt.imshow(proj_imgs_from_3d_recon[ref_element_idx, theta_idx, :, :])
+                # fig5 = plt.figure(5)
+                # plt.imshow(fftshift(corr_mat))
+                # plt.show()
+        
+        print('Maximum x-shift (magnitude): ' + str(np.max(np.abs(x_shifts))))
+        print('Maximum y-shift (magnitude): ' + str(np.max(np.abs(y_shifts))))
 
         if np.max(np.abs(x_shifts - prev_x_shifts)) <= eps and np.max(np.abs(y_shifts - prev_y_shifts)) <= eps:
             print('Number of iterations taken: ' + str(iteration_idx + 1))
@@ -129,11 +139,22 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
                     y_shift = y_shifts[theta_idx]
                     x_shift = x_shifts[theta_idx]
                     
-                    aligned_proj[element_idx, theta_idx, :, :] = spndi.shift(current_xrf_proj_img_array[ref_element_idx, theta_idx, :, :], shift = (-y_shift, -x_shift)) # Undo the translational shifts by the cross-correlation peak
+                    aligned_proj_from_3d_recon[element_idx, theta_idx, :, :] = spndi.shift(proj_imgs_from_3d_recon[ref_element_idx, theta_idx, :, :], shift = (-y_shift, -x_shift)) # Undo the translational shifts by the cross-correlation peak
 
-        current_xrf_proj_img_array = aligned_proj.copy()
+        current_xrf_proj_img_array = aligned_proj_from_3d_recon.copy()
         prev_x_shifts = x_shifts.copy()
         prev_y_shifts = y_shifts.copy()
+
+        if iteration_idx == n_iterations - 1:
+            fig6 = plt.figure(6)
+            
+            max_x_shift = np.array(max_x_shift)
+            max_y_shift = np.array(max_y_shift)
+            iterations = np.array(iterations)
+            
+            plt.plot(iterations, max_x_shift, 'k-o')
+            plt.plot(iterations, max_y_shift, 'b-o')
+            plt.show()
             
         # mse_exponent = np.floor(np.log10(mse))  # Calculate exponent
         # mse_mantissa = round_correct(mse / (10 ** mse_exponent), ndec = 3)
@@ -251,7 +272,7 @@ file_path_xrf = '/home/bwr0835/2_ide_aggregate_xrf.h5'
 
 elements_xrf, counts_xrf, theta_xrf, dataset_type_xrf = extract_h5_aggregate_xrf_data(file_path_xrf)
 
-iter_reproj('Fe', elements_xrf, theta_xrf, counts_xrf, 2)
+iter_reproj('Fe', elements_xrf, theta_xrf, counts_xrf, 3)
 
 
 
