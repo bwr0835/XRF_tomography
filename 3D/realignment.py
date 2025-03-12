@@ -146,8 +146,8 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
                 y_shifts_pc[iteration_idx, theta_idx] = y_shifts_pc[iteration_idx - 1, theta_idx] + y_shift_pc
 
             if (theta_idx % 7 == 0):
-                print('x-shift: ' + str(x_shift_cc) + ' (Theta = ' + str(theta_array[theta_idx]) + ' degrees')
-                print('y-shift: ' + str(y_shift_cc))
+                print('x-shift: ' + str(x_shift_pc) + ' (Theta = ' + str(theta_array[theta_idx]) + ' degrees')
+                print('y-shift: ' + str(y_shift_pc))
 
                 if iteration_idx > 0:
                     fig1 = plt.figure(1)
@@ -177,8 +177,8 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
             y_shifts_pc_new = y_shifts_pc[:len(iterations)]
 
             fig7 = plt.figure(7)
-            plt.plot(iterations, x_shifts_pc, 'k-o', label = r'$\Delta x$')
-            plt.plot(iterations, y_shifts_pc, 'b-o', label = r'$\Delta y$')
+            plt.plot(iterations, x_shifts_pc_new, 'k-o', label = r'$\Delta x$')
+            plt.plot(iterations, y_shifts_pc_new, 'b-o', label = r'$\Delta y$')
             plt.xlabel(r'Iteration')
             plt.ylabel(r'Net shift (pixels)')
             plt.show()
@@ -188,8 +188,8 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
         for element_idx in range(n_elements):
             if element_idx == ref_element_idx:
                 for theta_idx in range(n_theta):
-                    y_shift = y_shifts_pc[theta_idx]
-                    x_shift = x_shifts_pc[theta_idx]
+                    y_shift = x_shift_pc_array[theta_idx]
+                    x_shift = y_shift_pc_array[theta_idx]
                     
                     aligned_proj_from_3d_recon[element_idx, theta_idx, :, :] = spndi.shift(proj_imgs_from_3d_recon[ref_element_idx, theta_idx, :, :], shift = (-y_shift, -x_shift), order = 5, cval = 0) # Undo the translational shifts by the cross-correlation peak
 
