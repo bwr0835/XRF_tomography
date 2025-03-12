@@ -1,7 +1,6 @@
 import numpy as np, h5py, os, skimage, tkinter as tk, tomopy as tomo, matplotlib as mpl, scipy.ndimage as spndi, pystackreg as psr
 
-from skimage import transform as xform
-from scipy import signal as sig
+from skimage import transform as xform, registration as reg
 from numpy.fft import fft, ifft, fftshift, ifftshift, fftfreq, fftn, ifftn, fft2, ifft2
 from h5_util import extract_h5_aggregate_xrf_data, create_aggregate_xrf_h5
 from matplotlib import pyplot as plt
@@ -33,6 +32,37 @@ def round_correct(num, ndec): # CORRECTLY round a number (num) to chosen number 
         else:
             return int(num*digit_value - 0.5)/digit_value
 
+def cross_correlate(orig_proj, recon_proj):
+    # Credit goes to Fabricio Marin and the XRFTomo GUI
+
+    orig_proj_fft = fft2(orig_proj)
+    recon_proj_fft = fft2(recon_proj)
+
+    img_dims = orig_proj.shape
+    
+    y_dim = img_dims[0]
+    x_dim = img_dims[1]
+
+   
+    cross_corr = np.abs(ifft2(orig_proj_fft*recon_proj_fft.conjugate()))
+    
+    y_shift, x_shift = np.unravel_index(np.argmax(cross_corr), img_dims) # Locate maximum peak in cross-correlation matrix and output the 
+    
+    if y_shift > y_dim//2:
+        y_shift -= y_dim
+    
+    if x_shift > x_dim//2:
+        x_shift -= x_dim
+
+    return y_shift, x_shift, cross_corr
+
+def phase_correlate(orig_proj, recon_proj, upsample_factor):
+    shift, error, diffphase = reg.phase_cross_correlation(orig_proj, recon_proj, upsample_factor = upsample_factor)
+
+    y_shift, x_shift = shift[0], shift[1]
+
+    return y_shift, x_shift
+
 def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_iterations, eps = 1):
     n_elements = xrf_proj_img_array.shape[0] # Number of elements
     n_theta = xrf_proj_img_array.shape[1] # Number of projection angles (projection images)
@@ -46,14 +76,6 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
     center_of_rotation = tomo.find_center(reference_projection_imgs, theta_array*np.pi/180)
 
     iterations = []
-    
-    # filtered_projection_imgs = ramp_filter(reference_projection_imgs)
-        
-    # recon = tomo.recon(filtered_projection_imgs, theta = theta_array*np.pi/180, center = center_of_rotation, algorithm = 'fbp', sinogram_order = False)
-
-    # current_proj_imgs = reference_projection_imgs
-
-    sr_trans = psr.StackReg(psr.StackReg.TRANSLATION)
 
     recon = np.zeros((n_elements, n_slices, n_columns, n_columns))
     
@@ -62,13 +84,14 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
     current_xrf_proj_img_array = xrf_proj_img_array.copy()
     proj_imgs_from_3d_recon = np.zeros_like(xrf_proj_img_array)
 
-    x_shifts = np.zeros(n_theta)
-    y_shifts = np.zeros(n_theta)
-    prev_x_shifts = np.zeros(n_theta)
-    prev_y_shifts = np.zeros(n_theta)
+    x_shifts_cc = np.zeros((n_iterations, n_theta))
+    y_shifts_cc = np.zeros((n_iterations, n_theta))
 
-    max_x_shift = []
-    max_y_shift = []
+    x_shifts_pc = np.zeros((n_iterations, n_theta))
+    y_shifts_pc = np.zeros((n_iterations, n_theta))
+
+    x_shift_pc_array = np.zeros(n_theta)
+    y_shift_pc_array = np.zeros(n_theta)
     
     for iteration_idx in range(n_iterations):
         print('Iteration ' + str(iteration_idx + 1) + '/' + str(n_iterations))
@@ -84,8 +107,8 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
                 # filtered_proj = ramp_filter(current_xrf_proj_img_array[element_idx])
                 proj = current_xrf_proj_img_array[element_idx]
 
-                # recon[element_idx] = tomo.recon(filtered_proj, theta = theta_array*np.pi/180, center = center_of_rotation, algorithm = 'fbp')
-                recon[element_idx] = tomo.recon(proj, theta = theta_array*np.pi/180, center = center_of_rotation, algorithm = 'mlem', num_iter = 60)
+                recon[element_idx] = tomo.recon(proj, theta = theta_array*np.pi/180, center = center_of_rotation, algorithm = 'gridrec')
+                # recon[element_idx] = tomo.recon(proj, theta = theta_array*np.pi/180, center = center_of_rotation, algorithm = 'mlem', num_iter = 60)
                 print(recon.shape)
 
                 # plt.imshow(recon[element_idx, 0, :, :])
@@ -102,14 +125,29 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
         # plt.show()
 
         for theta_idx in range(n_theta):
-            y_shift, x_shift, corr_mat = cross_correlate(reference_projection_imgs[theta_idx], proj_imgs_from_3d_recon[ref_element_idx, theta_idx, :, :]) # Cross-correlation
+            y_shift_cc, x_shift_cc, corr_mat_cc = cross_correlate(reference_projection_imgs[theta_idx], proj_imgs_from_3d_recon[ref_element_idx, theta_idx, :, :]) # Cross-correlation
+            y_shift_pc, x_shift_pc = phase_correlate(reference_projection_imgs[theta_idx], proj_imgs_from_3d_recon[ref_element_idx, theta_idx, :, :], upsample_factor = 100)
+
+            x_shift_pc_array[theta_idx] = x_shift_pc
+            y_shift_pc_array[theta_idx] = y_shift_pc
             
-            x_shifts[theta_idx] = x_shift
-            y_shifts[theta_idx] = y_shift
+            if iteration_idx == 0:
+                x_shifts_cc[iteration_idx, theta_idx] = x_shift_cc
+                y_shifts_cc[iteration_idx, theta_idx] = y_shift_cc
+
+                x_shifts_pc[iteration_idx, theta_idx] = x_shift_pc
+                y_shifts_pc[iteration_idx, theta_idx] = y_shift_pc
             
+            else:
+                x_shifts_cc[iteration_idx, theta_idx] = x_shifts_cc[iteration_idx - 1, theta_idx] + x_shift_cc
+                y_shifts_cc[iteration_idx, theta_idx] = y_shifts_cc[iteration_idx - 1, theta_idx] + y_shift_cc
+
+                x_shifts_pc[iteration_idx, theta_idx] = x_shifts_pc[iteration_idx - 1, theta_idx] + x_shift_pc
+                y_shifts_pc[iteration_idx, theta_idx] = y_shifts_pc[iteration_idx - 1, theta_idx] + y_shift_pc
+
             if (theta_idx % 7 == 0):
-                print('x-shift: ' + str(x_shift) + ' (Theta = ' + str(theta_array[theta_idx]) + ' degrees')
-                print('y-shift: ' + str(y_shift))
+                print('x-shift: ' + str(x_shift_cc) + ' (Theta = ' + str(theta_array[theta_idx]) + ' degrees')
+                print('y-shift: ' + str(y_shift_cc))
 
                 if iteration_idx > 0:
                     fig1 = plt.figure(1)
@@ -124,44 +162,47 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
                     plt.imshow(proj_imgs_from_3d_recon[ref_element_idx, theta_idx, :, :])
                     plt.title('Synthesized Projection from Reconstruction')
                     fig5 = plt.figure(5)
-                    plt.imshow(fftshift(corr_mat))
+                    plt.imshow(fftshift(corr_mat_cc))
                     fig6 = plt.figure(6)
                     plt.imshow(current_xrf_proj_img_array[ref_element_idx, theta_idx, :, :])
                     plt.title('Aligned Projection from Previous Iteration')
                     plt.show()
-        
-        print('Maximum x-shift (magnitude): ' + str(np.max(np.abs(x_shifts))))
-        print('Maximum y-shift (magnitude): ' + str(np.max(np.abs(y_shifts))))
 
-        if np.max(np.abs(x_shifts - prev_x_shifts)) <= eps and np.max(np.abs(y_shifts - prev_y_shifts)) <= eps:
+        if np.max(np.abs(x_shift_pc_array)) <= eps and np.max(np.abs(y_shift_pc_array)) <= eps:
             print('Number of iterations taken: ' + str(iteration_idx + 1))
+            
+            iterations = np.array(iterations)
+           
+            x_shifts_pc_new = x_shifts_pc[:len(iterations)]
+            y_shifts_pc_new = y_shifts_pc[:len(iterations)]
+
+            fig7 = plt.figure(7)
+            plt.plot(iterations, x_shifts_pc, 'k-o', label = r'$\Delta x$')
+            plt.plot(iterations, y_shifts_pc, 'b-o', label = r'$\Delta y$')
+            plt.xlabel(r'Iteration')
+            plt.ylabel(r'Net shift (pixels)')
+            plt.show()
         
             break
-        
-        max_x_shift.append(np.max(np.abs(x_shifts)))
-        max_y_shift.append(np.max(np.abs(y_shifts)))
 
         for element_idx in range(n_elements):
             if element_idx == ref_element_idx:
                 for theta_idx in range(n_theta):
-                    y_shift = y_shifts[theta_idx]
-                    x_shift = x_shifts[theta_idx]
+                    y_shift = y_shifts_pc[theta_idx]
+                    x_shift = x_shifts_pc[theta_idx]
                     
                     aligned_proj_from_3d_recon[element_idx, theta_idx, :, :] = spndi.shift(proj_imgs_from_3d_recon[ref_element_idx, theta_idx, :, :], shift = (-y_shift, -x_shift), order = 5, cval = 0) # Undo the translational shifts by the cross-correlation peak
 
         current_xrf_proj_img_array = aligned_proj_from_3d_recon.copy()
-        prev_x_shifts = x_shifts.copy()
-        prev_y_shifts = y_shifts.copy()
 
         if iteration_idx == n_iterations - 1:
-            fig7 = plt.figure(7)
-            
-            max_x_shift = np.array(max_x_shift)
-            max_y_shift = np.array(max_y_shift)
+            fig8 = plt.figure(8)
             iterations = np.array(iterations)
             
-            plt.plot(iterations, max_x_shift, 'k-o')
-            plt.plot(iterations, max_y_shift, 'b-o')
+            plt.plot(iterations, x_shifts_pc, 'k-o', label = r'$\Delta x$')
+            plt.plot(iterations, y_shifts_pc, 'b-o', label = r'$\Delta y$')
+            plt.xlabel(r'Iteration')
+            plt.ylabel(r'Net shift (pixels)')
             plt.show()
             
         # mse_exponent = np.floor(np.log10(mse))  # Calculate exponent
@@ -224,29 +265,6 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
     # plt.imshow(proj_3d, aspect = 'auto')
     # plt.show()
 
-def cross_correlate(orig_proj, recon_proj):
-    # Credit goes to Fabricio Marin and the XRFTomo GUI
-
-    orig_proj_fft = fft2(orig_proj)
-    recon_proj_fft = fft2(recon_proj)
-
-    img_dims = orig_proj.shape
-    
-    y_dim = img_dims[0]
-    x_dim = img_dims[1]
-
-   
-    cross_corr = np.abs(ifft2(orig_proj_fft*recon_proj_fft.conjugate()))
-    
-    y_shift, x_shift = np.unravel_index(np.argmax(cross_corr), img_dims) # Locate maximum peak in cross-correlation matrix and output the 
-    
-    if y_shift > y_dim//2:
-        y_shift -= y_dim
-    
-    if x_shift > x_dim//2:
-        x_shift -= x_dim
-
-    return y_shift, x_shift, cross_corr
 
 #     shift_y, shift_x = np.unravel_index(np.argmax(cross_corr), cross_corr.shape)
 
