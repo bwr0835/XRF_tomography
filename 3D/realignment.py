@@ -203,10 +203,13 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
                     aligned_proj[element_idx, theta_idx, :, :] = spndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx, :, :], shift = (-y_shift, -x_shift), order = 3, cval = 0) # Undo the translational shifts by the cross-correlation peak
 
         current_xrf_proj_img_array = aligned_proj.copy()
-        
-        if (iteration_idx % 5):
+
+        if iteration_idx % 5 == 0:
             fig13 = plt.figure(9)
             iterations = np.array(iterations)
+           
+            x_shifts_pc_new = x_shifts_pc[:len(iterations)]
+            y_shifts_pc_new = y_shifts_pc[:len(iterations)]
 
             current_xrf_proj_img_array_fe_min_22_deg = current_xrf_proj_img_array[ref_element_idx, n_theta//2, :, :]
             orig_fe_min_22_deg = xrf_proj_img_array[ref_element_idx, n_theta//2, :, :]
@@ -218,8 +221,8 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
 
             rgb = np.dstack((current_xrf_proj_img_array_fe_min_22_deg_scaled, green, orig_fe_min_22_deg_scaled))
             
-            plt.plot(iterations, x_shifts_pc[:, n_theta//2], 'k-o', label = r'$\Delta x$')
-            plt.plot(iterations, y_shifts_pc[:, n_theta//2], 'b-o', label = r'$\Delta y$')
+            plt.plot(iterations, x_shifts_pc_new[:, n_theta//2], 'k-o', label = r'$\Delta x$')
+            plt.plot(iterations, y_shifts_pc_new[:, n_theta//2], 'b-o', label = r'$\Delta y$')
             plt.xlabel(r'Iteration')
             plt.ylabel(r'Net shift (pixels)')
             
