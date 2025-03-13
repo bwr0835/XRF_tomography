@@ -4,7 +4,7 @@ from skimage import transform as xform, registration as reg
 from numpy.fft import fft, ifft, fftshift, ifftshift, fftfreq, fftn, ifftn, fft2, ifft2
 from h5_util import extract_h5_aggregate_xrf_data, create_aggregate_xrf_h5
 from matplotlib import pyplot as plt
-from tkinter import filedialog
+# from tkinter import filedialog
 
 plt.rcParams['text.usetex'] = True
 plt.rcParams['font.family'] = 'serif'
@@ -200,7 +200,7 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
                     y_shift = x_shift_pc_array[theta_idx]
                     x_shift = y_shift_pc_array[theta_idx]
                     
-                    aligned_proj[element_idx, theta_idx, :, :] = spndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx, :, :], shift = (y_shift, x_shift), order = 3, cval = 0) # Undo the translational shifts by the cross-correlation peak
+                    aligned_proj[element_idx, theta_idx, :, :] = spndi.shift(current_xrf_proj_img_array[ref_element_idx, theta_idx, :, :], shift = (y_shift, x_shift), order = 3, cval = 0) # Undo the translational shifts by the cross-correlation peak
 
         current_xrf_proj_img_array = aligned_proj.copy()
 
@@ -214,8 +214,11 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
             plt.ylabel(r'Net shift (pixels)')
             
             fig10 = plt.figure(10)
-            plt.imshow(current_xrf_proj_img_array[ref_element_idx, n_theta//2, :, :])
+            plt.imshow(current_xrf_proj_img_array[ref_element_idx, n_theta//2, :, :], cmap = 'Blues')
             plt.title(r'Aligned projection image after + ${0}$ iterations'.format(n_iterations))
+            fig11 = plt.figure(11)
+            plt.imshow(xrf_proj_img_array[ref_element_idx, n_theta//2, :, :], cmap = 'Reds')
+            plt.title(r'Original projection image ($\theta = {0}$ degrees)'.format(theta_array[n_theta//2]))
             plt.show()
             
         # mse_exponent = np.floor(np.log10(mse))  # Calculate exponent
@@ -311,7 +314,7 @@ file_path_xrf = '/home/bwr0835/2_ide_aggregate_xrf.h5'
 
 elements_xrf, counts_xrf, theta_xrf, dataset_type_xrf = extract_h5_aggregate_xrf_data(file_path_xrf)
 
-iter_reproj('Fe', elements_xrf, theta_xrf, counts_xrf, 3)
+iter_reproj('Fe', elements_xrf, theta_xrf, counts_xrf, 1)
 
 
 
