@@ -204,9 +204,9 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
 
         current_xrf_proj_img_array = aligned_proj.copy()
 
-        if iteration_idx % 5 == 0:
+        if (iteration_idx % 5 == 0) and iteration_idx > 0:
             fig13 = plt.figure(9)
-            iterations = np.array(iterations)
+            iterations_nparray = np.array(iterations)
            
             x_shifts_pc_new = x_shifts_pc[:len(iterations)]
             y_shifts_pc_new = y_shifts_pc[:len(iterations)]
@@ -221,8 +221,8 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
 
             rgb = np.dstack((current_xrf_proj_img_array_fe_min_22_deg_scaled, green, orig_fe_min_22_deg_scaled))
             
-            plt.plot(iterations, x_shifts_pc_new[:, n_theta//2], 'k-o', label = r'$\Delta x$')
-            plt.plot(iterations, y_shifts_pc_new[:, n_theta//2], 'b-o', label = r'$\Delta y$')
+            plt.plot(iterations_nparray, x_shifts_pc_new[:, n_theta//2], 'k-o', label = r'$\Delta x$')
+            plt.plot(iterations_nparray, y_shifts_pc_new[:, n_theta//2], 'b-o', label = r'$\Delta y$')
             plt.xlabel(r'Iteration')
             plt.ylabel(r'Net shift (pixels)')
             
