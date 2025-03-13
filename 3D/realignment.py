@@ -200,7 +200,7 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
                     y_shift = x_shifts_pc[iteration_idx, theta_idx]
                     x_shift = y_shifts_pc[iteration_idx, theta_idx]
                     
-                    aligned_proj[element_idx, theta_idx, :, :] = spndi.shift(current_xrf_proj_img_array[ref_element_idx, theta_idx, :, :], shift = (y_shift, x_shift), cval = 0) # Undo the translational shifts by the cross-correlation peak
+                    aligned_proj[element_idx, theta_idx, :, :] = spndi.shift(current_xrf_proj_img_array[ref_element_idx, theta_idx, :, :], shift = (-y_shift, -x_shift), cval = 0) # Undo the translational shifts by the cross-correlation peak
 
         current_xrf_proj_img_array = aligned_proj.copy()
 
