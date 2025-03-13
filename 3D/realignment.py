@@ -234,6 +234,8 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
             plt.title(r'Original projection image ($\theta = {0}$ degrees)'.format(theta_array[n_theta//2]))
             fig16 = plt.figure(12)
             plt.imshow(rgb)
+            fig17 = plt.figure(17)
+            plt.imshow(proj_imgs_from_3d_recon[ref_element_idx, n_theta//2, :, :])
             plt.show()
 
         if iteration_idx == n_iterations - 1:
