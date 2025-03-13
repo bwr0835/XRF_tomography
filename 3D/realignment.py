@@ -67,7 +67,7 @@ def phase_correlate(orig_proj, recon_proj, upsample_factor):
 
     return y_shift, x_shift
 
-def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_iterations, eps = 1):
+def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_iterations, eps = 0.3):
     n_elements = xrf_proj_img_array.shape[0] # Number of elements
     n_theta = xrf_proj_img_array.shape[1] # Number of projection angles (projection images)
     n_slices = xrf_proj_img_array.shape[2] # Number of rows in a projection image
