@@ -177,8 +177,8 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
             y_shifts_pc_new = y_shifts_pc[:len(iterations)]
 
             fig7 = plt.figure(7)
-            plt.plot(iterations, x_shifts_pc_new, 'k-o', label = r'$\Delta x$')
-            plt.plot(iterations, y_shifts_pc_new, 'b-o', label = r'$\Delta y$')
+            plt.plot(iterations, x_shifts_pc_new[:, n_theta//2], 'k-o', label = r'$\Delta x$')
+            plt.plot(iterations, y_shifts_pc_new[:, n_theta//2], 'b-o', label = r'$\Delta y$')
             plt.xlabel(r'Iteration')
             plt.ylabel(r'Net shift (pixels)')
             plt.show()
