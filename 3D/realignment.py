@@ -197,12 +197,41 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
         for element_idx in range(n_elements):
             if element_idx == ref_element_idx:
                 for theta_idx in range(n_theta):
-                    y_shift = x_shift_pc[iteration_idx, theta_idx]
-                    x_shift = y_shift_pc[iteration_idx, theta_idx]
+                    y_shift = x_shifts_pc[iteration_idx, theta_idx]
+                    x_shift = y_shifts_pc[iteration_idx, theta_idx]
                     
                     aligned_proj[element_idx, theta_idx, :, :] = spndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx, :, :], shift = (-y_shift, -x_shift), order = 3, cval = 0) # Undo the translational shifts by the cross-correlation peak
 
         current_xrf_proj_img_array = aligned_proj.copy()
+        
+        if (iteration_idx % 5):
+            fig13 = plt.figure(9)
+            iterations = np.array(iterations)
+
+            current_xrf_proj_img_array_fe_min_22_deg = current_xrf_proj_img_array[ref_element_idx, n_theta//2, :, :]
+            orig_fe_min_22_deg = xrf_proj_img_array[ref_element_idx, n_theta//2, :, :]
+
+            current_xrf_proj_img_array_fe_min_22_deg_scaled = (current_xrf_proj_img_array_fe_min_22_deg - np.nanmin(current_xrf_proj_img_array_fe_min_22_deg))/(np.nanmax(current_xrf_proj_img_array_fe_min_22_deg) - np.nanmin(current_xrf_proj_img_array_fe_min_22_deg))
+            orig_fe_min_22_deg_scaled = (orig_fe_min_22_deg - np.nanmin(orig_fe_min_22_deg))/(np.nanmax(orig_fe_min_22_deg) - np.nanmin(orig_fe_min_22_deg))
+            
+            green = np.zeros((n_slices, n_columns))
+
+            rgb = np.dstack((current_xrf_proj_img_array_fe_min_22_deg_scaled, green, orig_fe_min_22_deg_scaled))
+            
+            plt.plot(iterations, x_shifts_pc[:, n_theta//2], 'k-o', label = r'$\Delta x$')
+            plt.plot(iterations, y_shifts_pc[:, n_theta//2], 'b-o', label = r'$\Delta y$')
+            plt.xlabel(r'Iteration')
+            plt.ylabel(r'Net shift (pixels)')
+            
+            fig14 = plt.figure(10)
+            plt.imshow(current_xrf_proj_img_array[ref_element_idx, n_theta//2, :, :], cmap = 'Reds')
+            plt.title(r'Aligned projection image after + ${0}$ iterations'.format(n_iterations))
+            fig15 = plt.figure(11)
+            plt.imshow(xrf_proj_img_array[ref_element_idx, n_theta//2, :, :], cmap = 'Blues')
+            plt.title(r'Original projection image ($\theta = {0}$ degrees)'.format(theta_array[n_theta//2]))
+            fig16 = plt.figure(12)
+            plt.imshow(rgb)
+            plt.show()
 
         if iteration_idx == n_iterations - 1:
             fig9 = plt.figure(9)
