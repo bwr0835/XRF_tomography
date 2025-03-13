@@ -6,6 +6,10 @@ from h5_util import extract_h5_aggregate_xrf_data, create_aggregate_xrf_h5
 from matplotlib import pyplot as plt
 from tkinter import filedialog
 
+plt.rcParams['text.usetex'] = True
+plt.rcParams['font.family'] = 'serif'
+plt.rcParams['text.latex.preamble'] = r'\usepackage{times}'
+
 def ramp_filter(sinogram):
     n_theta, n_rows, n_columns = sinogram.shape
     
@@ -79,7 +83,7 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
 
     recon = np.zeros((n_elements, n_slices, n_columns, n_columns))
     
-    aligned_proj_from_3d_recon = np.zeros_like(xrf_proj_img_array)
+    aligned_proj = np.zeros_like(xrf_proj_img_array)
 
     current_xrf_proj_img_array = xrf_proj_img_array.copy()
     proj_imgs_from_3d_recon = np.zeros_like(xrf_proj_img_array)
@@ -196,9 +200,9 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
                     y_shift = x_shift_pc_array[theta_idx]
                     x_shift = y_shift_pc_array[theta_idx]
                     
-                    aligned_proj_from_3d_recon[element_idx, theta_idx, :, :] = spndi.shift(proj_imgs_from_3d_recon[ref_element_idx, theta_idx, :, :], shift = (-y_shift, -x_shift), order = 5, cval = 0) # Undo the translational shifts by the cross-correlation peak
+                    aligned_proj[element_idx, theta_idx, :, :] = spndi.shift(current_xrf_proj_img_array[ref_element_idx, theta_idx, :, :], shift = (-y_shift, -x_shift), order = 5, cval = 0) # Undo the translational shifts by the cross-correlation peak
 
-        current_xrf_proj_img_array = aligned_proj_from_3d_recon.copy()
+        current_xrf_proj_img_array = aligned_proj.copy()
 
         if iteration_idx == n_iterations - 1:
             fig9 = plt.figure(9)
@@ -307,7 +311,7 @@ file_path_xrf = '/home/bwr0835/2_ide_aggregate_xrf.h5'
 
 elements_xrf, counts_xrf, theta_xrf, dataset_type_xrf = extract_h5_aggregate_xrf_data(file_path_xrf)
 
-iter_reproj('Fe', elements_xrf, theta_xrf, counts_xrf, 10)
+iter_reproj('Fe', elements_xrf, theta_xrf, counts_xrf, 3)
 
 
 
