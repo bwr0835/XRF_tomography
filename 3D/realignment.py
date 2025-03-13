@@ -1,4 +1,4 @@
-import numpy as np, h5py, os, skimage, tkinter as tk, tomopy as tomo, matplotlib as mpl, scipy.ndimage as spndi, pystackreg as psr
+import numpy as np, h5py, os, skimage, tkinter as tk, tomopy as tomo, matplotlib as mpl, scipy.ndimage as spndi, pystackreg as psr, os
 
 from skimage import transform as xform, registration as reg
 from numpy.fft import fft, ifft, fftshift, ifftshift, fftfreq, fftn, ifftn, fft2, ifft2
@@ -149,7 +149,7 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
                 x_shifts_pc[iteration_idx, theta_idx] = x_shifts_pc[iteration_idx - 1, theta_idx] + x_shift_pc
                 y_shifts_pc[iteration_idx, theta_idx] = y_shifts_pc[iteration_idx - 1, theta_idx] + y_shift_pc
 
-            if (theta_idx % 7 == 0) or (theta_array[theta_idx] == 22):
+            if (theta_idx % 7 == 0) or (theta_array[theta_idx] == -22):
                 print('x-shift: ' + str(x_shift_pc) + ' (Theta = ' + str(theta_array[theta_idx]) + ' degrees')
                 print('y-shift: ' + str(y_shift_pc))
 
@@ -229,15 +229,15 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
             
             fig14 = plt.figure(10)
             plt.imshow(current_xrf_proj_img_array[ref_element_idx, n_theta//2, :, :], cmap = 'Reds')
-            plt.title(r'Aligned projection image after + ${0}$ iterations'.format(n_iterations))
+            plt.title(r'Aligned projection image after + ${0}$ iterations'.format(len(iterations)))
             fig15 = plt.figure(11)
             plt.imshow(xrf_proj_img_array[ref_element_idx, n_theta//2, :, :], cmap = 'Blues')
             plt.title(r'Original projection image ($\theta = {0}$ degrees)'.format(theta_array[n_theta//2]))
             fig16 = plt.figure(12)
             plt.imshow(rgb)
             fig17 = plt.figure(17)
-            plt.imshow(proj_imgs_from_3d_recon[ref_element_idx, n_theta//2, :, :], cmap = 'Greens')
-            plt.show()
+            plt.imshow(proj_imgs_from_3d_recon[ref_element_idx, n_theta//2, :, :])
+            plt.show(block = False)
 
         if iteration_idx == n_iterations - 1:
             fig9 = plt.figure(9)
