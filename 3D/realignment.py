@@ -36,11 +36,11 @@ def round_correct(num, ndec): # CORRECTLY round a number (num) to chosen number 
         else:
             return int(num*digit_value - 0.5)/digit_value
 
-def cross_correlate(orig_proj, recon_proj):
+def cross_correlate(recon_proj, orig_proj):
     # Credit goes to Fabricio Marin and the XRFTomo GUI
 
-    orig_proj_fft = fft2(orig_proj)
     recon_proj_fft = fft2(recon_proj)
+    orig_proj_fft = fft2(orig_proj)
 
     img_dims = orig_proj.shape
     
@@ -48,7 +48,7 @@ def cross_correlate(orig_proj, recon_proj):
     x_dim = img_dims[1]
 
    
-    cross_corr = np.abs(ifft2(orig_proj_fft*recon_proj_fft.conjugate()))
+    cross_corr = np.abs(ifft2(recon_proj_fft*orig_proj_fft.conjugate()))
     
     y_shift, x_shift = np.unravel_index(np.argmax(cross_corr), img_dims) # Locate maximum peak in cross-correlation matrix and output the 
     
@@ -60,8 +60,8 @@ def cross_correlate(orig_proj, recon_proj):
 
     return y_shift, x_shift, cross_corr
 
-def phase_correlate(orig_proj, recon_proj, upsample_factor):
-    shift, error, diffphase = reg.phase_cross_correlation(orig_proj, recon_proj, upsample_factor = upsample_factor)
+def phase_correlate(recon_proj, orig_proj, upsample_factor):
+    shift, error, diffphase = reg.phase_cross_correlation(reference_image = recon_proj, moving_image = orig_proj, upsample_factor = upsample_factor)
 
     y_shift, x_shift = shift[0], shift[1]
 
@@ -112,7 +112,7 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
                 proj = current_xrf_proj_img_array[element_idx]
 
                 # recon[element_idx] = tomo.recon(proj, theta = theta_array*np.pi/180, center = center_of_rotation, algorithm = 'gridrec', filter_name = 'ramlak')
-                recon[element_idx] = tomo.recon(proj, theta = theta_array*np.pi/180, center = center_of_rotation, algorithm = 'mlem', num_iter = 55)
+                recon[element_idx] = tomo.recon(proj, theta = theta_array*np.pi/180, center = center_of_rotation, algorithm = 'mlem', num_iter = 20)
                 print(recon.shape)
 
                 # plt.imshow(recon[element_idx, 0, :, :])
@@ -129,8 +129,8 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
         # plt.show()
 
         for theta_idx in range(n_theta):
-            y_shift_cc, x_shift_cc, corr_mat_cc = cross_correlate(reference_projection_imgs[theta_idx], proj_imgs_from_3d_recon[ref_element_idx, theta_idx, :, :]) # Cross-correlation
-            y_shift_pc, x_shift_pc = phase_correlate(reference_projection_imgs[theta_idx], proj_imgs_from_3d_recon[ref_element_idx, theta_idx, :, :], upsample_factor = 25)
+            y_shift_cc, x_shift_cc, corr_mat_cc = cross_correlate(proj_imgs_from_3d_recon[ref_element_idx, theta_idx, :, :], reference_projection_imgs[theta_idx]) # Cross-correlation
+            y_shift_pc, x_shift_pc = phase_correlate(proj_imgs_from_3d_recon[ref_element_idx, theta_idx, :, :], reference_projection_imgs[theta_idx], upsample_factor = 25)
 
             x_shift_pc_array[theta_idx] = x_shift_pc
             y_shift_pc_array[theta_idx] = y_shift_pc
@@ -200,7 +200,7 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
                     x_shift = x_shifts_pc[iteration_idx, theta_idx]
                     y_shift = y_shifts_pc[iteration_idx, theta_idx]
                     
-                    aligned_proj[element_idx, theta_idx, :, :] = spndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx, :, :], shift = (-y_shift, -x_shift), cval = 0) # Undo the translational shifts by the cross-correlation peak
+                    aligned_proj[element_idx, theta_idx, :, :] = spndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx, :, :], shift = (y_shift, x_shift), cval = 0) # Undo the translational shifts by the cross-correlation peak
 
         current_xrf_proj_img_array = aligned_proj.copy()
 
