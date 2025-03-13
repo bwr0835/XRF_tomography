@@ -225,6 +225,7 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
             plt.plot(iterations_nparray, y_shifts_pc_new[:, n_theta//2], 'b-o', label = r'$\Delta y$')
             plt.xlabel(r'Iteration')
             plt.ylabel(r'Net shift (pixels)')
+            plt.legend(frameon = False)
             
             fig14 = plt.figure(10)
             plt.imshow(current_xrf_proj_img_array[ref_element_idx, n_theta//2, :, :], cmap = 'Reds')
@@ -235,7 +236,7 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
             fig16 = plt.figure(12)
             plt.imshow(rgb)
             fig17 = plt.figure(17)
-            plt.imshow(proj_imgs_from_3d_recon[ref_element_idx, n_theta//2, :, :])
+            plt.imshow(proj_imgs_from_3d_recon[ref_element_idx, n_theta//2, :, :], cmap = 'Greens')
             plt.show()
 
         if iteration_idx == n_iterations - 1:
@@ -256,6 +257,7 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
             plt.plot(iterations, y_shifts_pc[:, n_theta//2], 'b-o', label = r'$\Delta y$')
             plt.xlabel(r'Iteration')
             plt.ylabel(r'Net shift (pixels)')
+            plt.legend(frameon = False)
             
             fig10 = plt.figure(10)
             plt.imshow(current_xrf_proj_img_array[ref_element_idx, n_theta//2, :, :], cmap = 'Reds')
