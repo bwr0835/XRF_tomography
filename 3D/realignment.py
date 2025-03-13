@@ -149,24 +149,24 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
                 print('x-shift: ' + str(x_shift_pc) + ' (Theta = ' + str(theta_array[theta_idx]) + ' degrees')
                 print('y-shift: ' + str(y_shift_pc))
 
-                if iteration_idx > 0:
-                    fig1 = plt.figure(1)
-                    plt.imshow(recon[ref_element_idx, 0, :, :])
-                    plt.title('Slice 0')
-                    fig2 = plt.figure(2)
-                    plt.imshow(recon[ref_element_idx, n_slices//2, :, :])
-                    plt.title('Slice ' + str(n_slices//2))
-                    fig3 = plt.figure(3)
-                    plt.imshow(reference_projection_imgs[theta_idx])
-                    fig4 = plt.figure(4)
-                    plt.imshow(proj_imgs_from_3d_recon[ref_element_idx, theta_idx, :, :])
-                    plt.title('Synthesized Projection from Reconstruction')
-                    fig5 = plt.figure(5)
-                    plt.imshow(fftshift(corr_mat_cc))
-                    fig6 = plt.figure(6)
-                    plt.imshow(current_xrf_proj_img_array[ref_element_idx, theta_idx, :, :])
-                    plt.title('Aligned Projection from Previous Iteration')
-                    plt.show()
+                # if iteration_idx > 0:
+                    # fig1 = plt.figure(1)
+                    # plt.imshow(recon[ref_element_idx, 0, :, :])
+                    # plt.title('Slice 0')
+                    # fig2 = plt.figure(2)
+                    # plt.imshow(recon[ref_element_idx, n_slices//2, :, :])
+                    # plt.title('Slice ' + str(n_slices//2))
+                    # fig3 = plt.figure(3)
+                    # plt.imshow(reference_projection_imgs[theta_idx])
+                    # fig4 = plt.figure(4)
+                    # plt.imshow(proj_imgs_from_3d_recon[ref_element_idx, theta_idx, :, :])
+                    # plt.title('Synthesized Projection from Reconstruction')
+                    # fig5 = plt.figure(5)
+                    # plt.imshow(fftshift(corr_mat_cc))
+                    # fig6 = plt.figure(6)
+                    # plt.imshow(current_xrf_proj_img_array[ref_element_idx, theta_idx, :, :])
+                    # plt.title('Aligned Projection from Previous Iteration')
+                    # plt.show()
 
         if np.max(np.abs(x_shift_pc_array)) <= eps and np.max(np.abs(y_shift_pc_array)) <= eps:
             print('Number of iterations taken: ' + str(iteration_idx + 1))
@@ -298,7 +298,7 @@ file_path_xrf = '/home/bwr0835/2_ide_aggregate_xrf.h5'
 
 elements_xrf, counts_xrf, theta_xrf, dataset_type_xrf = extract_h5_aggregate_xrf_data(file_path_xrf)
 
-iter_reproj('Fe', elements_xrf, theta_xrf, counts_xrf, 3)
+iter_reproj('Fe', elements_xrf, theta_xrf, counts_xrf, 10)
 
 
 
