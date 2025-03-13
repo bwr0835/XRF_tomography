@@ -111,8 +111,8 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
                 # filtered_proj = ramp_filter(current_xrf_proj_img_array[element_idx])
                 proj = current_xrf_proj_img_array[element_idx]
 
-                # recon[element_idx] = tomo.recon(proj, theta = theta_array*np.pi/180, center = center_of_rotation, algorithm = 'gridrec')
-                recon[element_idx] = tomo.recon(proj, theta = theta_array*np.pi/180, center = center_of_rotation, algorithm = 'mlem', num_iter = 50)
+                recon[element_idx] = tomo.recon(proj, theta = theta_array*np.pi/180, center = center_of_rotation, algorithm = 'gridrec', filter_name = 'ramlak')
+                # recon[element_idx] = tomo.recon(proj, theta = theta_array*np.pi/180, center = center_of_rotation, algorithm = 'mlem', num_iter = 50)
                 print(recon.shape)
 
                 # plt.imshow(recon[element_idx, 0, :, :])
@@ -197,10 +197,10 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
         for element_idx in range(n_elements):
             if element_idx == ref_element_idx:
                 for theta_idx in range(n_theta):
-                    y_shift = x_shift_pc_array[theta_idx]
-                    x_shift = y_shift_pc_array[theta_idx]
+                    y_shift = x_shift_pc[iteration_idx, theta_idx]
+                    x_shift = y_shift_pc[iteration_idx, theta_idx]
                     
-                    aligned_proj[element_idx, theta_idx, :, :] = spndi.shift(current_xrf_proj_img_array[ref_element_idx, theta_idx, :, :], shift = (y_shift, x_shift), order = 3, cval = 0) # Undo the translational shifts by the cross-correlation peak
+                    aligned_proj[element_idx, theta_idx, :, :] = spndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx, :, :], shift = (-y_shift, -x_shift), order = 3, cval = 0) # Undo the translational shifts by the cross-correlation peak
 
         current_xrf_proj_img_array = aligned_proj.copy()
 
@@ -327,7 +327,7 @@ file_path_xrf = '/home/bwr0835/2_ide_aggregate_xrf.h5'
 
 elements_xrf, counts_xrf, theta_xrf, dataset_type_xrf = extract_h5_aggregate_xrf_data(file_path_xrf)
 
-iter_reproj('Fe', elements_xrf, theta_xrf, counts_xrf, 5)
+iter_reproj('Fe', elements_xrf, theta_xrf, counts_xrf, 30)
 
 
 
