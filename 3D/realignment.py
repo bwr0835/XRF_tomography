@@ -111,8 +111,8 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
                 # filtered_proj = ramp_filter(current_xrf_proj_img_array[element_idx])
                 proj = current_xrf_proj_img_array[element_idx]
 
-                recon[element_idx] = tomo.recon(proj, theta = theta_array*np.pi/180, center = center_of_rotation, algorithm = 'gridrec', filter_name = 'ramlak')
-                # recon[element_idx] = tomo.recon(proj, theta = theta_array*np.pi/180, center = center_of_rotation, algorithm = 'mlem', num_iter = 20)
+                # recon[element_idx] = tomo.recon(proj, theta = theta_array*np.pi/180, center = center_of_rotation, algorithm = 'gridrec', filter_name = 'ramlak')
+                recon[element_idx] = tomo.recon(proj, theta = theta_array*np.pi/180, center = center_of_rotation, algorithm = 'mlem', num_iter = 20)
                 print(recon.shape)
 
                 # plt.imshow(recon[element_idx, 0, :, :])
