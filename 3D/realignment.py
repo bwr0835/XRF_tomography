@@ -130,7 +130,7 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
 
         for theta_idx in range(n_theta):
             y_shift_cc, x_shift_cc, corr_mat_cc = cross_correlate(reference_projection_imgs[theta_idx], proj_imgs_from_3d_recon[ref_element_idx, theta_idx, :, :]) # Cross-correlation
-            y_shift_pc, x_shift_pc = phase_correlate(reference_projection_imgs[theta_idx], proj_imgs_from_3d_recon[ref_element_idx, theta_idx, :, :], upsample_factor = 100)
+            y_shift_pc, x_shift_pc = phase_correlate(reference_projection_imgs[theta_idx], proj_imgs_from_3d_recon[ref_element_idx, theta_idx, :, :], upsample_factor = 25)
 
             x_shift_pc_array[theta_idx] = x_shift_pc
             y_shift_pc_array[theta_idx] = y_shift_pc
@@ -149,7 +149,7 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
                 x_shifts_pc[iteration_idx, theta_idx] = x_shifts_pc[iteration_idx - 1, theta_idx] + x_shift_pc
                 y_shifts_pc[iteration_idx, theta_idx] = y_shifts_pc[iteration_idx - 1, theta_idx] + y_shift_pc
 
-            if (theta_idx % 7 == 0):
+            if (theta_idx % 7 == 0) or (theta_array[theta_idx] == 22):
                 print('x-shift: ' + str(x_shift_pc) + ' (Theta = ' + str(theta_array[theta_idx]) + ' degrees')
                 print('y-shift: ' + str(y_shift_pc))
 
@@ -200,11 +200,11 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
                     y_shift = x_shifts_pc[iteration_idx, theta_idx]
                     x_shift = y_shifts_pc[iteration_idx, theta_idx]
                     
-                    aligned_proj[element_idx, theta_idx, :, :] = spndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx, :, :], shift = (-y_shift, -x_shift), order = 3, cval = 0) # Undo the translational shifts by the cross-correlation peak
+                    aligned_proj[element_idx, theta_idx, :, :] = spndi.shift(current_xrf_proj_img_array[ref_element_idx, theta_idx, :, :], shift = (-y_shift, -x_shift), mode='grid-wrap') # Undo the translational shifts by the cross-correlation peak
 
         current_xrf_proj_img_array = aligned_proj.copy()
 
-        if (iteration_idx % 5 == 0) and iteration_idx > 0:
+        if (iteration_idx % 9 == 0) and iteration_idx > 0:
             fig13 = plt.figure(9)
             iterations_nparray = np.array(iterations)
            
