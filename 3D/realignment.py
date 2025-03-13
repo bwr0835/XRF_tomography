@@ -181,6 +181,11 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
             plt.plot(iterations, y_shifts_pc_new[:, n_theta//2], 'b-o', label = r'$\Delta y$')
             plt.xlabel(r'Iteration')
             plt.ylabel(r'Net shift (pixels)')
+
+            fig8 = plt.figure(8)
+            plt.imshow(current_xrf_proj_img_array[ref_element_idx, n_theta//2, :, :])
+            plt.title(r'Aligned projection image after + ${0}$ iterations'.format(len(iterations)))
+
             plt.show()
         
             break
@@ -196,13 +201,17 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
         current_xrf_proj_img_array = aligned_proj_from_3d_recon.copy()
 
         if iteration_idx == n_iterations - 1:
-            fig8 = plt.figure(8)
+            fig9 = plt.figure(9)
             iterations = np.array(iterations)
             
             plt.plot(iterations, x_shifts_pc[:, n_theta//2], 'k-o', label = r'$\Delta x$')
             plt.plot(iterations, y_shifts_pc[:, n_theta//2], 'b-o', label = r'$\Delta y$')
             plt.xlabel(r'Iteration')
             plt.ylabel(r'Net shift (pixels)')
+            
+            fig10 = plt.figure(10)
+            plt.imshow(current_xrf_proj_img_array[ref_element_idx, n_theta//2, :, :])
+            plt.title(r'Aligned projection image after + ${0}$ iterations'.format(n_iterations))
             plt.show()
             
         # mse_exponent = np.floor(np.log10(mse))  # Calculate exponent
