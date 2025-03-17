@@ -90,7 +90,7 @@ def save_recon_slice_npy(array, iter_idx, slice_idx, recon_mode, output_file_pat
     iter_idx += 1
     slice_idx += 1
 
-    full_output_dir_path = os.path.join(output_file_path, recon_mode, 'iteration_' + str(iter_idx))
+    full_output_dir_path = os.path.join(output_file_path, recon_mode, 'iteration_' + str(iter_idx), 'recon')
 
     os.makedirs(full_output_dir_path, exist_ok = True)
 
