@@ -1,10 +1,10 @@
-import numpy as np, h5py, os, skimage, tkinter as tk, tomopy as tomo, matplotlib as mpl, scipy.ndimage as spndi, os
+import numpy as np, h5py, os, skimage, tkinter as tk, tomopy as tomo, matplotlib as mpl, scipy.ndimage as spndi, pystackreg as psr, os
 
 from skimage import transform as xform, registration as reg
 from numpy.fft import fft, ifft, fftshift, ifftshift, fftfreq, fftn, ifftn, fft2, ifft2
 from h5_util import extract_h5_aggregate_xrf_data, create_aggregate_xrf_h5
 from matplotlib import pyplot as plt
-# from tkinter import filedialog
+from tkinter import filedialog
 
 plt.rcParams['text.usetex'] = True
 plt.rcParams['font.family'] = 'serif'
@@ -61,23 +61,76 @@ def cross_correlate(recon_proj, orig_proj):
     return y_shift, x_shift, cross_corr
 
 def phase_correlate(recon_proj, orig_proj, upsample_factor):
-    reference_mask = ~np.isnan(recon_proj)
-    moving_mask = ~np.isnan(orig_proj)
-
-    # if np.any(~reference_mask):
-    #     print("At least one NaN value in synthetic projection. Using NaN mask.")
-    
-    # if np.any(~moving_mask):
-    #     print('At least one NaN value in orignal projection. Using NaN mask.')
-    
-    # shift, _, _ = reg.phase_cross_correlation(reference_image = recon_proj, moving_image = orig_proj, reference_mask = reference_mask, moving_mask = moving_mask, upsample_factor = upsample_factor)
-    shift, _, _ = reg.phase_cross_correlation(reference_image = recon_proj, moving_image = orig_proj, upsample_factor = upsample_factor)
+    shift, error, diffphase = reg.phase_cross_correlation(reference_image = recon_proj, moving_image = orig_proj, upsample_factor = upsample_factor)
 
     y_shift, x_shift = shift[0], shift[1]
 
     return y_shift, x_shift
 
-def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_iterations, eps = 0.3):
+def save_proj_img_npy(array, iter_idx, theta, proj_type, recon_mode, output_file_path):
+    if output_file_path == "":
+        return
+    
+    iter_idx += 1
+
+    full_output_dir_path = os.path.join(output_file_path, recon_mode, 'iteration_' + str(iter_idx), proj_type)
+
+    os.makedirs(full_output_file_path, exist_ok = True)
+
+    full_output_file_path = os.path.join(full_output_dir_path, 'proj_img_' + str(int(theta)) + '_deg.npy')
+
+    np.save(full_output_file_path, array)
+
+    return
+
+def save_recon_slice_npy(array, iter_idx, slice_idx, recon_mode, output_file_path):
+    if output_file_path == "":
+        return
+    
+    iter_idx += 1
+    slice_idx += 1
+
+    full_output_dir_path = os.path.join(output_file_path, recon_mode, 'iteration_' + str(iter_idx))
+
+    os.makedirs(full_output_dir_path, exist_ok = True)
+
+    full_output_file_path = os.path.join(full_output_dir_path, 'recon_slice_' + str(slice_idx) + '.npy')
+
+    np.save(full_output_file_path, array)
+
+    return
+
+def save_net_shift_data_npy(shift_array, theta, shift_dxn, recon_mode, output_file_path):
+    if output_file_path == "":
+        return
+
+    full_output_dir_path = os.join(output_file_path, recon_mode, 'net_shifts')
+
+    os.makedirs(full_output_dir_path, exist_ok = True)
+
+    if shift_dxn == 'x':
+        full_output_dir_path = os.join(full_output_dir_path, 'x_shifts')
+
+        os.makedirs(full_output_dir_path, exist_ok = True)
+
+        full_output_file_path = os.path.join(full_output_dir_path, 'x_shift_array_' + str(int(theta)) + '_deg')
+
+        np.save(full_output_file_path, shift_array)
+    
+    elif shift_dxn == 'y':
+        full_output_dir_path = os.join(full_output_dir_path, 'y_shifts')
+
+        os.makedirs(full_output_dir_path, exist_ok = True)
+
+        full_output_file_path = os.path.join(full_output_dir_path, 'y_shift_array_' + str(int(theta)) + '_deg')
+
+        np.save(full_output_file_path, shift_array)
+
+    return
+
+    # full_output_file_path = os.path.join(full_output_dir_path, shift_dxn, str(theta) + '_deg.py')
+
+def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_iterations, output_dir_path, eps = 0.3):
     n_elements = xrf_proj_img_array.shape[0] # Number of elements
     n_theta = xrf_proj_img_array.shape[1] # Number of projection angles (projection images)
     n_slices = xrf_proj_img_array.shape[2] # Number of rows in a projection image
@@ -108,8 +161,6 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
     y_shift_pc_array = np.zeros(n_theta)
     
     for iteration_idx in range(n_iterations):
-        plt.ion()
-
         print('Iteration ' + str(iteration_idx + 1) + '/' + str(n_iterations))
 
         iterations.append(iteration_idx + 1)
@@ -123,11 +174,10 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
                 # filtered_proj = ramp_filter(current_xrf_proj_img_array[element_idx])
                 proj = current_xrf_proj_img_array[element_idx]
 
-                recon[element_idx] = tomo.recon(proj, theta = theta_array*np.pi/180, center = center_of_rotation, algorithm = 'gridrec', filter_name = 'ramlak')
-                # recon[element_idx] = tomo.recon(proj, theta = theta_array*np.pi/180, center = center_of_rotation, algorithm = 'mlem', num_iter = 60)
-                # recon[element_idx] = tomo.recon(proj, theta = theta_array*np.pi/180, center = center_of_rotation, algorithm = 'sirt', num_iter = 30)
+                # recon[element_idx] = tomo.recon(proj, theta = theta_array*np.pi/180, center = center_of_rotation, algorithm = 'gridrec', filter_name = 'ramlak')
+                recon[element_idx] = tomo.recon(proj, theta = theta_array*np.pi/180, center = center_of_rotation, algorithm = 'mlem', num_iter = 20)
                 print(recon.shape)
-
+                                    
                 # plt.imshow(recon[element_idx, 0, :, :])
                 # plt.show()
 
@@ -135,7 +185,11 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
                 for slice_idx in range(n_slices):
                     print('Slice ' + str(slice_idx + 1) + '/' + str(n_slices))
                     proj_slice = recon[element_idx, slice_idx, :, :]
+
                     proj_imgs_from_3d_recon[element_idx, :, slice_idx, :] = (skimage.transform.radon(proj_slice, theta = theta_array)).T # This radon transform assumes slices are defined by columns and not rows
+                    
+                    save_recon_slice_npy(proj_slice, iteration_idx, slice_idx, 'gridrec', output_dir_path)
+                
                     # plt.imshow(proj_imgs_from_3d_recon[element_idx, :, slice_idx, :], aspect = 'auto')
                     # plt.show()
         # plt.imshow(proj_imgs_from_3d_recon[ref_element_idx, :, n_slices//2, :])
@@ -144,7 +198,10 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
         for theta_idx in range(n_theta):
             y_shift_cc, x_shift_cc, corr_mat_cc = cross_correlate(proj_imgs_from_3d_recon[ref_element_idx, theta_idx, :, :], reference_projection_imgs[theta_idx]) # Cross-correlation
             y_shift_pc, x_shift_pc = phase_correlate(proj_imgs_from_3d_recon[ref_element_idx, theta_idx, :, :], reference_projection_imgs[theta_idx], upsample_factor = 25)
-
+            
+            save_proj_img_npy(proj_imgs_from_3d_recon[ref_element_idx, theta_idx, :, :], iteration_idx, theta_array[theta_idx], 'synthesized', 'gridrec', output_dir_path)
+            save_proj_img_npy(current_xrf_proj_img_array[ref_element_idx, theta_idx, :, :], iteration_idx, theta_array[theta_idx], 'experimental', 'gridrec', output_dir_path)
+            
             x_shift_pc_array[theta_idx] = x_shift_pc
             y_shift_pc_array[theta_idx] = y_shift_pc
             
@@ -162,9 +219,9 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
                 x_shifts_pc[iteration_idx, theta_idx] = x_shifts_pc[iteration_idx - 1, theta_idx] + x_shift_pc
                 y_shifts_pc[iteration_idx, theta_idx] = y_shifts_pc[iteration_idx - 1, theta_idx] + y_shift_pc
 
-            if (theta_idx % 7 == 0) or (theta_array[theta_idx] == -22):
-                print('x-shift: ' + str(x_shift_pc) + ' (Theta = ' + str(theta_array[theta_idx]) + ' degrees')
-                print('y-shift: ' + str(y_shift_pc))
+            # if (theta_idx % 7 == 0) or (theta_array[theta_idx] == -22):
+            #     print('x-shift: ' + str(x_shift_pc) + ' (Theta = ' + str(theta_array[theta_idx]) + ' degrees')
+            #     print('y-shift: ' + str(y_shift_pc))
 
                 # if iteration_idx > 0:
                     # fig1 = plt.figure(1)
@@ -193,20 +250,21 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
             x_shifts_pc_new = x_shifts_pc[:len(iterations)]
             y_shifts_pc_new = y_shifts_pc[:len(iterations)]
 
-            fig7 = plt.figure(7)
-            fig7.clear()
-            plt.plot(iterations, x_shifts_pc_new[:, n_theta//2], 'k-o', label = r'$\Delta x$')
-            plt.plot(iterations, y_shifts_pc_new[:, n_theta//2], 'b-o', label = r'$\Delta y$')
-            plt.xlabel(r'Iteration')
-            plt.ylabel(r'Net shift (pixels)')
-
-            fig8 = plt.figure(8)
-            fig8.clear()
-            plt.imshow(current_xrf_proj_img_array[ref_element_idx, n_theta//2, :, :])
-            plt.title(r'Aligned projection image after + ${0}$ iterations'.format(len(iterations)))
-
-            plt.pause(0.05)
+            for theta_idx in range(n_theta):
+                save_net_shift_data_npy(x_shifts_pc_new, theta_array[theta_idx], 'x', 'gridrec', output_dir_path)
+                save_net_shift_data_npy(y_shifts_pc_new, theta_array[theta_idx], 'y', 'gridrec', output_dir_path)
         
+            break
+        
+        if iteration_idx == n_iterations - 1:
+            print('Iterative reprojection complete')
+
+            iterations = np.array(iterations)
+            
+            for theta_idx in range(n_theta):
+                save_net_shift_data_npy(x_shifts_pc, theta_array[theta_idx], 'x', 'gridrec', output_dir_path)
+                save_net_shift_data_npy(y_shifts_pc, theta_array[theta_idx], 'y', 'gridrec', output_dir_path)
+
             break
 
         for element_idx in range(n_elements):
@@ -215,52 +273,44 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
                     x_shift = x_shifts_pc[iteration_idx, theta_idx]
                     y_shift = y_shifts_pc[iteration_idx, theta_idx]
                     
-                    aligned_proj[element_idx, theta_idx, :, :] = spndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx, :, :], shift = (y_shift, x_shift), cval = 0)
+                    aligned_proj[element_idx, theta_idx, :, :] = spndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx, :, :], shift = (y_shift, x_shift), cval = 0) # Undo the translational shifts by the cross-correlation peak
 
         current_xrf_proj_img_array = aligned_proj.copy()
 
-        if iteration_idx > 1:
-            fig13 = plt.figure(13)
-            iterations_nparray = np.array(iterations)
+        # if (iteration_idx % 9 == 0) and iteration_idx > 0:
+        #     fig13 = plt.figure(9)
+        #     iterations_nparray = np.array(iterations)
            
-            x_shifts_pc_new = x_shifts_pc[:len(iterations)]
-            y_shifts_pc_new = y_shifts_pc[:len(iterations)]
+        #     x_shifts_pc_new = x_shifts_pc[:len(iterations)]
+        #     y_shifts_pc_new = y_shifts_pc[:len(iterations)]
 
-            current_xrf_proj_img_array_fe_min_22_deg = current_xrf_proj_img_array[ref_element_idx, n_theta//2, :, :]
-            orig_fe_min_22_deg = xrf_proj_img_array[ref_element_idx, n_theta//2, :, :]
+        #     current_xrf_proj_img_array_fe_min_22_deg = current_xrf_proj_img_array[ref_element_idx, n_theta//2, :, :]
+        #     orig_fe_min_22_deg = xrf_proj_img_array[ref_element_idx, n_theta//2, :, :]
 
-            current_xrf_proj_img_array_fe_min_22_deg_scaled = (current_xrf_proj_img_array_fe_min_22_deg - np.nanmin(current_xrf_proj_img_array_fe_min_22_deg))/(np.nanmax(current_xrf_proj_img_array_fe_min_22_deg) - np.nanmin(current_xrf_proj_img_array_fe_min_22_deg))
-            orig_fe_min_22_deg_scaled = (orig_fe_min_22_deg - np.nanmin(orig_fe_min_22_deg))/(np.nanmax(orig_fe_min_22_deg) - np.nanmin(orig_fe_min_22_deg))
+        #     current_xrf_proj_img_array_fe_min_22_deg_scaled = (current_xrf_proj_img_array_fe_min_22_deg - np.nanmin(current_xrf_proj_img_array_fe_min_22_deg))/(np.nanmax(current_xrf_proj_img_array_fe_min_22_deg) - np.nanmin(current_xrf_proj_img_array_fe_min_22_deg))
+        #     orig_fe_min_22_deg_scaled = (orig_fe_min_22_deg - np.nanmin(orig_fe_min_22_deg))/(np.nanmax(orig_fe_min_22_deg) - np.nanmin(orig_fe_min_22_deg))
             
-            green = np.zeros((n_slices, n_columns))
+        #     green = np.zeros((n_slices, n_columns))
 
-            rgb = np.dstack((current_xrf_proj_img_array_fe_min_22_deg_scaled, green, orig_fe_min_22_deg_scaled))
+        #     rgb = np.dstack((current_xrf_proj_img_array_fe_min_22_deg_scaled, green, orig_fe_min_22_deg_scaled))
             
-            figure14 = plt.figure(14)
-            figure14.clear()
-            plt.plot(iterations_nparray, x_shifts_pc_new[:, n_theta//2], 'k-o', label = r'$\Delta x$')
-            plt.plot(iterations_nparray, y_shifts_pc_new[:, n_theta//2], 'b-o', label = r'$\Delta y$')
-            plt.xlabel(r'Iteration')
-            plt.ylabel(r'Net shift (pixels)')
-            plt.legend(frameon = False)
+        #     plt.plot(iterations_nparray, x_shifts_pc_new[:, n_theta//2], 'k-o', label = r'$\Delta x$')
+        #     plt.plot(iterations_nparray, y_shifts_pc_new[:, n_theta//2], 'b-o', label = r'$\Delta y$')
+        #     plt.xlabel(r'Iteration')
+        #     plt.ylabel(r'Net shift (pixels)')
+        #     plt.legend(frameon = False)
             
-            fig15 = plt.figure(15)
-            fig15.clear()
-            plt.imshow(current_xrf_proj_img_array[ref_element_idx, n_theta//2, :, :], cmap = 'Reds')
-            plt.title(r'Aligned projection image after + ${0}$ iterations'.format(len(iterations)))
-            fig16 = plt.figure(16)
-            fig16.clear()
-            plt.imshow(xrf_proj_img_array[ref_element_idx, n_theta//2, :, :], cmap = 'Blues')
-            plt.title(r'Original projection image ($\theta = {0}$ degrees)'.format(theta_array[n_theta//2]))
-            fig17 = plt.figure(17)
-            fig17.clear()
-            plt.imshow(rgb)
-            fig18 = plt.figure(18)
-            fig18.clear()
-            plt.imshow(proj_imgs_from_3d_recon[ref_element_idx, n_theta//2, :, :])
-            plt.title(r'Current synthetic projection image')
-            
-            plt.pause(0.05)
+        #     fig14 = plt.figure(10)
+        #     plt.imshow(current_xrf_proj_img_array[ref_element_idx, n_theta//2, :, :], cmap = 'Reds')
+        #     plt.title(r'Aligned projection image after + ${0}$ iterations'.format(len(iterations)))
+        #     fig15 = plt.figure(11)
+        #     plt.imshow(xrf_proj_img_array[ref_element_idx, n_theta//2, :, :], cmap = 'Blues')
+        #     plt.title(r'Original projection image ($\theta = {0}$ degrees)'.format(theta_array[n_theta//2]))
+        #     fig16 = plt.figure(12)
+        #     plt.imshow(rgb)
+        #     fig17 = plt.figure(17)
+        #     plt.imshow(proj_imgs_from_3d_recon[ref_element_idx, n_theta//2, :, :])
+        #     plt.show(block = False)
 
         # if iteration_idx == n_iterations - 1:
         #     fig9 = plt.figure(9)
@@ -290,9 +340,6 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
         #     plt.title(r'Original projection image ($\theta = {0}$ degrees)'.format(theta_array[n_theta//2]))
         #     fig12 = plt.figure(12)
         #     plt.imshow(rgb)
-        #     fig13 = plt.figure(13)
-        #     plt.imshow(proj_imgs_from_3d_recon[reference_projection_imgs, n_theta//2, :, :])
-        #     plt.title(r'Synthetic projection image')
         #     plt.show()
             
             
@@ -372,11 +419,10 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
     # plt.imshow(sinogram[:, xrf_proj_img_array.shape[2]//15, :])
     
 
-# root = tk.Tk()
+root = tk.Tk()
     
-# root.withdraw()
+root.withdraw()
 
-# file_path_array = filedialog.askopenfilenames(parent = root, title = "Upload HDF5 files", filetypes = [('HDF5 Files', '*.h5')])
 # output_h5_file_path = filedialog.asksaveasfilename(parent = root, title = "Select save path", filetypes = (('HDF5 Files', '*.h5')))
 
 # elements_xrf, counts_xrf, theta_xrf, dataset_type_xrf = extract_h5_aggregate_xrf_data(file_path_xrf)
@@ -389,10 +435,9 @@ file_path_xrf = '/home/bwr0835/2_ide_aggregate_xrf.h5'
 
 elements_xrf, counts_xrf, theta_xrf, dataset_type_xrf = extract_h5_aggregate_xrf_data(file_path_xrf)
 
-iter_reproj('Fe', elements_xrf, theta_xrf, counts_xrf, 30)
+output_dir_path = filedialog.askdirectory(parent = root, title = "Choose directory to output NPY files to.")
 
-plt.ioff()
-plt.show()
+iter_reproj('Fe', elements_xrf, theta_xrf, counts_xrf, 5, output_dir_path)
 
 
 
