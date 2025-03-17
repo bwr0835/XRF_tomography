@@ -54,12 +54,12 @@ else:
         xcorr_proj_file_path = [os.path.join(xcorr_dir_path, file_name) for file_name in os.listdir(xcorr_dir_path)]
         recon_file_path = [os.path.join(recon_dir_path, file_name) for file_name in os.listdir(recon_dir_path)]
 
-        for theta_idx in n_theta:
+        for theta_idx in range(n_theta):
             synthetic_proj[theta_idx] = np.load(synthetic_proj_file_path[theta_idx])
             actual_proj[theta_idx] = np.load(actual_proj_file_path[theta_idx])
             xcorr_proj[theta_idx] = np.load(xcorr_proj_file_path[theta_idx])
         
-        for slice_idx in n_slices:
+        for slice_idx in range(n_slices):
             recon[slice_idx] = np.load(recon_file_path[theta_idx])
        
         synthetic_proj_data = np.append(synthetic_proj_data, synthetic_proj)
