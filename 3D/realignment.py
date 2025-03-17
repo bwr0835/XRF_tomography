@@ -104,7 +104,7 @@ def save_net_shift_data_npy(shift_array, theta, shift_dxn, recon_mode, output_fi
     if output_file_path == "":
         return
 
-    full_output_dir_path = os.join(output_file_path, recon_mode, 'net_shifts')
+    full_output_dir_path = os.path.join(output_file_path, recon_mode, 'net_shifts')
 
     os.makedirs(full_output_dir_path, exist_ok = True)
 
