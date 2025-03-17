@@ -109,7 +109,7 @@ def save_net_shift_data_npy(shift_array, theta, shift_dxn, recon_mode, output_fi
     os.makedirs(full_output_dir_path, exist_ok = True)
 
     if shift_dxn == 'x':
-        full_output_dir_path = os.join(full_output_dir_path, 'x_shifts')
+        full_output_dir_path = os.path.join(full_output_dir_path, 'x_shifts')
 
         os.makedirs(full_output_dir_path, exist_ok = True)
 
@@ -118,7 +118,7 @@ def save_net_shift_data_npy(shift_array, theta, shift_dxn, recon_mode, output_fi
         np.save(full_output_file_path, shift_array)
     
     elif shift_dxn == 'y':
-        full_output_dir_path = os.join(full_output_dir_path, 'y_shifts')
+        full_output_dir_path = os.path.join(full_output_dir_path, 'y_shifts')
 
         os.makedirs(full_output_dir_path, exist_ok = True)
 
