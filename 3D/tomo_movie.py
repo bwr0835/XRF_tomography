@@ -48,7 +48,7 @@ else:
     xcorr_proj_data = []
     recon_data = []
 
-    for subdir in iteration_subdir_array:
+    for idx, subdir in enumerate(iteration_subdir_array):
         synthetic_proj_dir_path = os.path.join(directory_path, subdir, 'synthesized')
         actual_proj_dir_path = os.path.join(directory_path, subdir, 'experimental')
         xcorr_dir_path = os.path.join(directory_path, subdir, 'xcorr')
@@ -66,7 +66,10 @@ else:
         
         for slice_idx in range(n_slices):
             recon[slice_idx] = np.load(recon_file_path[theta_idx])
-       
+
+        if idx == 0:
+            print(synthetic_proj_file_path)
+
         synthetic_proj_data = np.append(synthetic_proj_data, synthetic_proj)
         actual_proj_data = np.append(actual_proj_data, actual_proj)
         xcorr_proj_data = np.append(xcorr_proj_data, xcorr_proj)
