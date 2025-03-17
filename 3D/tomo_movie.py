@@ -44,7 +44,7 @@ else:
     recon_data = []
 
     for subdir in iteration_subdir_array:
-        synthetic_proj_dir_path = os.path.join(directory_path, subdir, 'synthetic')
+        synthetic_proj_dir_path = os.path.join(directory_path, subdir, 'synthetized')
         actual_proj_dir_path = os.path.join(directory_path, subdir, 'experimental')
         xcorr_dir_path = os.path.join(directory_path, subdir, 'xcorr')
         recon_dir_path = os.path.join(directory_path, subdir, 'recon')
