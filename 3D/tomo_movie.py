@@ -49,10 +49,10 @@ else:
         xcorr_dir_path = os.path.join(directory_path, subdir, 'xcorr')
         recon_dir_path = os.path.join(directory_path, subdir, 'recon')
 
-        synthetic_proj_file_path = [os.path.join(synthetic_proj_dir_path, file_name) for file_name in os.listdir(synthetic_proj_dir_path)]
-        actual_proj_file_path = [os.path.join(actual_proj_dir_path, file_name) for file_name in os.listdir(actual_proj_dir_path)]
-        xcorr_proj_file_path = [os.path.join(xcorr_dir_path, file_name) for file_name in os.listdir(xcorr_dir_path)]
-        recon_file_path = [os.path.join(recon_dir_path, file_name) for file_name in os.listdir(recon_dir_path)]
+        synthetic_proj_file_path = [os.path.join(synthetic_proj_dir_path, file_name) for file_name in os.listdir(synthetic_proj_dir_path) if os.path.isfile(os.path.join(synthetic_proj_dir_path, file_name))]
+        actual_proj_file_path = [os.path.join(actual_proj_dir_path, file_name) for file_name in os.listdir(actual_proj_dir_path) if os.path.isfile(os.path.join(actual_proj_dir_path, file_name))]
+        xcorr_proj_file_path = [os.path.join(xcorr_dir_path, file_name) for file_name in os.listdir(xcorr_dir_path) if os.path.isfile(os.path.join(xcorr_dir_path, file_name))]
+        recon_file_path = [os.path.join(recon_dir_path, file_name) for file_name in os.listdir(recon_dir_path) if os.path.isfile(os.path.join(recon_dir_path, file_name))]
 
         for theta_idx in range(n_theta):
             synthetic_proj[theta_idx] = np.load(synthetic_proj_file_path[theta_idx])
