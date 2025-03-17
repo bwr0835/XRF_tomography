@@ -75,7 +75,7 @@ def save_proj_img_npy(array, iter_idx, theta, proj_type, recon_mode, output_file
 
     full_output_dir_path = os.path.join(output_file_path, recon_mode, 'iteration_' + str(iter_idx), proj_type)
 
-    os.makedirs(full_output_file_path, exist_ok = True)
+    os.makedirs(full_output_dir_path, exist_ok = True)
 
     full_output_file_path = os.path.join(full_output_dir_path, 'proj_img_' + str(int(theta)) + '_deg.npy')
 
