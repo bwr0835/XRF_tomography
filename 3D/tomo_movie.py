@@ -7,7 +7,7 @@ def load_dir(dir_path, filter_function = None):
     subdir_array = [subdir for subdir in os.listdir(dir_path) if os.path.isdir(os.path.join(dir_path, subdir))]
 
     if filter_function:
-        subdir_array_new = [subdir for subdir in subdir_array if filter_function]
+        subdir_array_new = [subdir for subdir in subdir_array if filter_function(subdir)]
 
         return subdir_array_new
     
