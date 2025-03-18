@@ -208,7 +208,7 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
 
                     proj_imgs_from_3d_recon[element_idx, :, slice_idx, :] = (skimage.transform.radon(proj_slice, theta = theta_array)).T # This radon transform assumes slices are defined by columns and not rows
                     
-                    save_recon_slice_npy(proj_slice, iteration_idx, slice_idx, 'gridrec', output_dir_path)
+                    # save_recon_slice_npy(proj_slice, iteration_idx, slice_idx, 'gridrec', output_dir_path)
                 
                     # plt.imshow(proj_imgs_from_3d_recon[element_idx, :, slice_idx, :], aspect = 'auto')
                     # plt.show()
@@ -219,9 +219,9 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
             y_shift_cc, x_shift_cc, corr_mat_cc = cross_correlate(proj_imgs_from_3d_recon[ref_element_idx, theta_idx, :, :], reference_projection_imgs[theta_idx]) # Cross-correlation
             y_shift_pc, x_shift_pc = subpixel_cross_correlation(proj_imgs_from_3d_recon[ref_element_idx, theta_idx, :, :], reference_projection_imgs[theta_idx], upsample_factor = 25)
             
-            save_proj_img_npy(proj_imgs_from_3d_recon[ref_element_idx, theta_idx, :, :], iteration_idx, theta_array[theta_idx], 'synthesized', 'gridrec', output_dir_path)
-            save_proj_img_npy(current_xrf_proj_img_array[ref_element_idx, theta_idx, :, :], iteration_idx, theta_array[theta_idx], 'experimental', 'gridrec', output_dir_path)
-            save_proj_img_npy(corr_mat_cc, iteration_idx, theta_array[theta_idx], 'xcorr', 'gridrec', output_dir_path)
+            # save_proj_img_npy(proj_imgs_from_3d_recon[ref_element_idx, theta_idx, :, :], iteration_idx, theta_array[theta_idx], 'synthesized', 'gridrec', output_dir_path)
+            # save_proj_img_npy(current_xrf_proj_img_array[ref_element_idx, theta_idx, :, :], iteration_idx, theta_array[theta_idx], 'experimental', 'gridrec', output_dir_path)
+            # save_proj_img_npy(corr_mat_cc, iteration_idx, theta_array[theta_idx], 'xcorr', 'gridrec', output_dir_path)
             
             x_shift_pc_array[theta_idx] = x_shift_pc
             y_shift_pc_array[theta_idx] = y_shift_pc
@@ -271,9 +271,9 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
             x_shifts_pc_new = x_shifts_pc[:len(iterations)]
             y_shifts_pc_new = y_shifts_pc[:len(iterations)]
 
-            save_net_shift_data_npy(x_shifts_pc_new, 'x', 'gridrec', output_dir_path)
-            save_net_shift_data_npy(y_shifts_pc_new, 'y', 'gridrec', output_dir_path)
-            save_theta_array(theta_array, 'gridrec', output_dir_path)
+            # save_net_shift_data_npy(x_shifts_pc_new, 'x', 'gridrec', output_dir_path)
+            # save_net_shift_data_npy(y_shifts_pc_new, 'y', 'gridrec', output_dir_path)
+            # save_theta_array(theta_array, 'gridrec', output_dir_path)
         
             break
         
@@ -282,9 +282,9 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
 
             iterations = np.array(iterations)
             
-            save_net_shift_data_npy(x_shifts_pc, 'x', 'gridrec', output_dir_path)
-            save_net_shift_data_npy(y_shifts_pc, 'y', 'gridrec', output_dir_path)
-            save_theta_array(theta_array, 'gridrec', output_dir_path)
+            # save_net_shift_data_npy(x_shifts_pc, 'x', 'gridrec', output_dir_path)
+            # save_net_shift_data_npy(y_shifts_pc, 'y', 'gridrec', output_dir_path)
+            # save_theta_array(theta_array, 'gridrec', output_dir_path)
 
             break
 
