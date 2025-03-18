@@ -119,10 +119,10 @@ else:
             actual_proj[theta_idx] = np.load(actual_proj_file_path[theta_idx])
             xcorr_proj[theta_idx] = np.load(xcorr_proj_file_path[theta_idx])
 
-            synthetic_proj_data_scaled = normalize_array(synthetic_proj_data[theta_idx])
-            actual_proj_data_scaled = normalize_array(actual_proj_data[theta_idx])
+            synthetic_proj_scaled = normalize_array(synthetic_proj[theta_idx])
+            actual_proj_scaled = normalize_array(actual_proj[theta_idx])
 
-            shift_rgb = np.dstack((actual_proj_data_scaled, np.zeros_like(synthetic_proj_data_scaled)), synthetic_proj_data_scaled)
+            shift_rgb = np.dstack((actual_proj_scaled, np.zeros_like(synthetic_proj_scaled)), synthetic_proj_scaled)
 
             synthetic_proj_data.append(synthetic_proj[theta_idx])
             actual_proj_data.append(actual_proj[theta_idx])
