@@ -114,6 +114,20 @@ def save_net_shift_data_npy(shift_array, shift_dxn, recon_mode, output_file_path
 
     return
 
+def save_theta_array(theta_array, recon_mode, output_file_path):
+    if output_file_path == "":
+        return
+    
+    full_output_dir_path = os.path.join(output_dir_path, recon_mode)
+
+    os.makedirs(full_output_dir_path, exist_ok = True)
+
+    full_output_file_path = os.path.join(full_output_dir_path, 'theta_array.npy')
+
+    np.save(full_output_file_path)
+
+    return
+
     # full_output_file_path = os.path.join(full_output_dir_path, shift_dxn, str(theta) + '_deg.py')
 
 def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_iterations, output_dir_path, eps = 0.3):
@@ -239,6 +253,7 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
 
             save_net_shift_data_npy(x_shifts_pc_new, 'x', 'gridrec', output_dir_path)
             save_net_shift_data_npy(y_shifts_pc_new, 'y', 'gridrec', output_dir_path)
+            save_theta_array(theta_array, 'gridrec', output_dir_path)
         
             break
         
@@ -249,6 +264,7 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
             
             save_net_shift_data_npy(x_shifts_pc, 'x', 'gridrec', output_dir_path)
             save_net_shift_data_npy(y_shifts_pc, 'y', 'gridrec', output_dir_path)
+            save_theta_array(theta_array, 'gridrec', output_dir_path)
 
             break
 

@@ -3,6 +3,10 @@ import numpy as np, tkinter as tk, os, re
 from matplotlib import pyplot as plt, animation as anim
 from tkinter import filedialog
 
+plt.rcParams['text.usetex'] = True
+plt.rcParams['font.family'] = 'serif'
+plt.rcParams['text.latex.preamble'] = r'\usepackage{times}'
+
 # def load_dir(dir_path, filter_function = None):
 #     subdir_array = [subdir for subdir in os.listdir(dir_path) if os.path.isdir(os.path.join(dir_path, subdir))]
 
@@ -16,8 +20,11 @@ from tkinter import filedialog
 
 def load_dir(dir_path):
     subdir_array = [subdir for subdir in os.listdir(dir_path) if os.path.isdir(os.path.join(dir_path, subdir))]
+    
+    theta_array = np.load('theta_array.npy')
+    theta_array = np.sort(theta_array)
 
-    return subdir_array
+    return subdir_array, theta_array
 
 def get_theta(file_name):
     return int(file_name.split('_')[2].strip())
@@ -58,10 +65,11 @@ else:
     subdir_array = load_dir(directory_path)
     
     iteration_subdir_array = []
-    synthetic_proj_data = []
-    actual_proj_data = []
-    xcorr_proj_data = []
-    recon_data = []
+    
+    synthetic_proj_data_dict = {}
+    actual_proj_data_dict = {}
+    xcorr_proj_data_dict = {}
+    recon_data_dict = {}
     
     for subdir in subdir_array:
         if subdir != 'net_shifts':
@@ -74,7 +82,12 @@ else:
 
     n_iterations = len(iteration_subdir_array)    
 
-    for idx, subdir in enumerate(iteration_subdir_array):
+    for subdir in iteration_subdir_array:
+        synthetic_proj_data = []
+        actual_proj_data = []
+        xcorr_proj_data = []
+        recon_data = []
+
         synthetic_proj_dir_path = os.path.join(directory_path, subdir, 'synthesized')
         actual_proj_dir_path = os.path.join(directory_path, subdir, 'experimental')
         xcorr_dir_path = os.path.join(directory_path, subdir, 'xcorr')
@@ -97,17 +110,57 @@ else:
             synthetic_proj[theta_idx] = np.load(synthetic_proj_file_path[theta_idx])
             actual_proj[theta_idx] = np.load(actual_proj_file_path[theta_idx])
             xcorr_proj[theta_idx] = np.load(xcorr_proj_file_path[theta_idx])
-        
+
+            synthetic_proj_data = np.append(synthetic_proj[theta_idx])
+            actual_proj_data = np.append(actual_proj[theta_idx])
+            xcorr_proj_data = np.append(xcorr_proj_data[theta_idx])
+
         for slice_idx in range(n_slices):
             recon[slice_idx] = np.load(recon_file_path[theta_idx])
 
-        synthetic_proj_data = np.append(synthetic_proj_data, synthetic_proj)
-        actual_proj_data = np.append(actual_proj_data, actual_proj)
-        xcorr_proj_data = np.append(xcorr_proj_data, xcorr_proj)
-        recon_data = np.append(recon_data, recon)
+            recon_data = np.append(recon_data[slice_idx])
+
+        synthetic_proj_data_dict[subdir] = synthetic_proj_data
+        actual_proj_data_dict[subdir] = actual_proj_data
+        xcorr_proj_data_dict[subdir] = xcorr_proj_data
+        recon_data_dict[subdir] = recon_data
 
     x_shifts_file_path = os.path.join(directory_path, net_shift_subdir, 'x_shift_array.npy')
     y_shifts_file_path = os.path.join(directory_path, net_shift_subdir, 'y_shift_array.npy')
 
     x_shifts_data = np.load(x_shifts_file_path)
     y_shifts_data = np.load(y_shifts_file_path)
+
+    fig1, axs1 = plt.subplots(n_iterations, 1)
+
+    recon_images = []
+    recon_text = []
+
+    for idx, subdir in enumerate(iteration_subdir_array):
+        recons = recon_data_dict[subdir]
+
+        im = axs1[idx].imshow(recons[0], cmap = 'hot')
+
+        recon_images.append(im)
+
+        text = axs1[idx].set_text(0.02, 0.02, r'Slice 0', transform = axs1[idx].transAxes)
+            
+        recon_text.append(text)
+
+    def animate_recon(frame):
+        for idx, subdir in enumerate(iteration_subdir_array):
+            recons = recon_data_dict[subdir]
+
+            im = axs1[idx].imshow(recons[frame], cmap = 'hot')
+
+            recon_images.append(im)
+
+            text = axs1[idx].set_text(0.02, 0.02, r'Slice {0}'.format(frame + 1), transform = axs1[idx].transAxes)
+            
+            recon_text.append(text)
+
+
+
+        
+
+
