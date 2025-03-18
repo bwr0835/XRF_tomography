@@ -229,6 +229,8 @@ else:
         proj_text.set_text(r'$\theta = {0}$\textdegree'.format(theta_array[frame]))
 
         artists.append(proj_text)
+
+        return artists
     
     anim1 = anim.FuncAnimation(fig1, animate_recon, frames = n_slices, interval = 150, blit = True)
     anim2 = anim.FuncAnimation(fig2, animate_proj, frames = n_theta, interval = 150, blit = True)
