@@ -106,16 +106,8 @@ else:
         xcorr_proj_data = np.append(xcorr_proj_data, xcorr_proj)
         recon_data = np.append(recon_data, recon)
 
-    x_shifts = np.zeros((n_iterations, n_theta))
-    y_shifts = np.zeros((n_iterations, n_theta))
+    x_shifts_file_path = os.path.join(directory_path, net_shift_subdir, 'x_shift_array.npy')
+    y_shifts_file_path = os.path.join(directory_path, net_shift_subdir, 'y_shift_array.npy')
 
-    x_shifts_dir_path = os.path.join(net_shift_subdir, 'x_shifts')
-    y_shifts_dir_path = os.path.join(net_shift_subdir, 'y_shifts')
-
-    x_shifts_file_name = [file_name for file_name in os.listdir(x_shifts_dir_path)]
-    y_shifts_file_name = [file_name for file_name in os.listdir(y_shifts_dir_path)]
-
-
-
-
-    
+    x_shifts_data = np.load(x_shifts_file_path)
+    y_shifts_data = np.load(y_shifts_file_path)
