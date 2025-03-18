@@ -199,7 +199,7 @@ else:
             recons = recon_data_dict[subdir]
 
             recon_imgs[idx].set_array(recons[frame])
-            recon_text.set_text(r'Slice {0}'.format(frame))
+            recon_text[0].set_text(r'Slice {0}'.format(frame))
             
             artists.append(recon_imgs[idx])
         
@@ -226,7 +226,7 @@ else:
             artists.append(xcorr_imgs[idx])
             artists.append(shift_rgb_imgs[idx])
         
-        proj_text.set_text(r'$\theta = {0}$\textdegree'.format(theta_array[frame]))
+        proj_text[0].set_text(r'$\theta = {0}$\textdegree'.format(theta_array[frame]))
 
         artists.append(proj_text)
 
