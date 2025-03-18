@@ -100,7 +100,7 @@ def save_recon_slice_npy(array, iter_idx, slice_idx, recon_mode, output_file_pat
 
     return
 
-def save_net_shift_data_npy(shift_array, theta, shift_dxn, recon_mode, output_file_path):
+def save_net_shift_data_npy(shift_array, shift_dxn, recon_mode, output_file_path):
     if output_file_path == "":
         return
 
@@ -113,7 +113,7 @@ def save_net_shift_data_npy(shift_array, theta, shift_dxn, recon_mode, output_fi
 
         os.makedirs(full_output_dir_path, exist_ok = True)
 
-        full_output_file_path = os.path.join(full_output_dir_path, 'x_shift_array_' + str(int(theta)) + '_deg')
+        full_output_file_path = os.path.join(full_output_dir_path, 'x_shift_array')
 
         np.save(full_output_file_path, shift_array)
     
@@ -122,7 +122,7 @@ def save_net_shift_data_npy(shift_array, theta, shift_dxn, recon_mode, output_fi
 
         os.makedirs(full_output_dir_path, exist_ok = True)
 
-        full_output_file_path = os.path.join(full_output_dir_path, 'y_shift_array_' + str(int(theta)) + '_deg')
+        full_output_file_path = os.path.join(full_output_dir_path, 'y_shift_array')
 
         np.save(full_output_file_path, shift_array)
 
@@ -251,9 +251,8 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
             x_shifts_pc_new = x_shifts_pc[:len(iterations)]
             y_shifts_pc_new = y_shifts_pc[:len(iterations)]
 
-            for theta_idx in range(n_theta):
-                save_net_shift_data_npy(x_shifts_pc_new, theta_array[theta_idx], 'x', 'gridrec', output_dir_path)
-                save_net_shift_data_npy(y_shifts_pc_new, theta_array[theta_idx], 'y', 'gridrec', output_dir_path)
+            save_net_shift_data_npy(x_shifts_pc_new, 'x', 'gridrec', output_dir_path)
+            save_net_shift_data_npy(y_shifts_pc_new, 'y', 'gridrec', output_dir_path)
         
             break
         
@@ -262,9 +261,8 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
 
             iterations = np.array(iterations)
             
-            for theta_idx in range(n_theta):
-                save_net_shift_data_npy(x_shifts_pc, theta_array[theta_idx], 'x', 'gridrec', output_dir_path)
-                save_net_shift_data_npy(y_shifts_pc, theta_array[theta_idx], 'y', 'gridrec', output_dir_path)
+            save_net_shift_data_npy(x_shifts_pc, 'x', 'gridrec', output_dir_path)
+            save_net_shift_data_npy(y_shifts_pc, 'y', 'gridrec', output_dir_path)
 
             break
 
