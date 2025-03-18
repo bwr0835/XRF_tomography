@@ -124,7 +124,7 @@ else:
         for slice_idx in range(n_slices):
             recon[slice_idx] = np.load(recon_file_path[theta_idx])
 
-            recon_data.append(recon_data, recon[slice_idx])
+            recon_data.append(recon[slice_idx])
 
         synthetic_proj_data = np.array(synthetic_proj_data)
         actual_proj_data = np.array(actual_proj_data)
