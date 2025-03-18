@@ -163,6 +163,8 @@ else:
     
     anim1 = anim.FuncAnimation(fig1, animate_recon, frames = n_slices, interval = 50, blit = True)
 
+    plt.show()
+
 
 
         
