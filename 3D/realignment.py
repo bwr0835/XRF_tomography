@@ -124,7 +124,7 @@ def save_theta_array(theta_array, recon_mode, output_file_path):
 
     full_output_file_path = os.path.join(full_output_dir_path, 'theta_array.npy')
 
-    np.save(full_output_file_path)
+    np.save(full_output_file_path, theta_array)
 
     return
 

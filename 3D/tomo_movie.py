@@ -159,6 +159,10 @@ else:
             
             recon_text.append(text)
 
+            return recon_images, recon_text
+    
+    anim1 = anim.FuncAnimation(fig1, animate_recon, frames = n_slices, interval = 50, blit = True)
+
 
 
         
