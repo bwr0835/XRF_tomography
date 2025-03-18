@@ -47,7 +47,6 @@ def cross_correlate(recon_proj, orig_proj):
     y_dim = img_dims[0]
     x_dim = img_dims[1]
 
-   
     cross_corr = np.abs(ifft2(recon_proj_fft*orig_proj_fft.conjugate()))
     
     y_shift, x_shift = np.unravel_index(np.argmax(cross_corr), img_dims) # Locate maximum peak in cross-correlation matrix and output the 
@@ -66,6 +65,27 @@ def phase_correlate(recon_proj, orig_proj, upsample_factor):
     y_shift, x_shift = shift[0], shift[1]
 
     return y_shift, x_shift
+
+def subpixel_cross_correlation(recon_proj, orig_proj):
+    y_shift, x_shift, cross_corr = cross_correlate(recon_proj, orig_proj)
+
+    cross_corr = fftshift(cross_corr)
+
+    y_center, x_center = recon_proj.shape[0]//2, recon_proj.shape[1]//2
+
+    x_shift_array = np.array([x_shift - 1, x_shift, x_shift + 1]) + x_center
+    y_shift_array = np.array([y_shift - 1, y_shift, y_shift + 1]) + y_center
+
+    x_values = cross_corr[y_shift_array[1], x_shift_array]
+    y_values = cross_corr[y_shift_array, x_shift[1]]
+
+    x_fit_coeffs, _, _ = np.polyfit(x_shift_array, x_values, deg = 2)
+    y_fit_coeffs, _, _ = np.polyfit(y_shift_array, y_values, deg = 2)
+
+    x_shift_subpixel = -x_fit_coeffs[1]/(2*x_fit_coeffs[0])
+    y_shift_subpixel = -y_fit_coeffs[1]/(2*y_fit_coeffs[0])
+
+    return y_shift_subpixel, x_shift_subpixel
 
 def save_proj_img_npy(array, iter_idx, theta, proj_type, recon_mode, output_file_path):
     if output_file_path == "":
@@ -197,7 +217,7 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
 
         for theta_idx in range(n_theta):
             y_shift_cc, x_shift_cc, corr_mat_cc = cross_correlate(proj_imgs_from_3d_recon[ref_element_idx, theta_idx, :, :], reference_projection_imgs[theta_idx]) # Cross-correlation
-            y_shift_pc, x_shift_pc = phase_correlate(proj_imgs_from_3d_recon[ref_element_idx, theta_idx, :, :], reference_projection_imgs[theta_idx], upsample_factor = 25)
+            y_shift_pc, x_shift_pc = subpixel_cross_correlation(proj_imgs_from_3d_recon[ref_element_idx, theta_idx, :, :], reference_projection_imgs[theta_idx], upsample_factor = 25)
             
             save_proj_img_npy(proj_imgs_from_3d_recon[ref_element_idx, theta_idx, :, :], iteration_idx, theta_array[theta_idx], 'synthesized', 'gridrec', output_dir_path)
             save_proj_img_npy(current_xrf_proj_img_array[ref_element_idx, theta_idx, :, :], iteration_idx, theta_array[theta_idx], 'experimental', 'gridrec', output_dir_path)
@@ -220,9 +240,9 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
                 x_shifts_pc[iteration_idx, theta_idx] = x_shifts_pc[iteration_idx - 1, theta_idx] + x_shift_pc
                 y_shifts_pc[iteration_idx, theta_idx] = y_shifts_pc[iteration_idx - 1, theta_idx] + y_shift_pc
 
-            # if (theta_idx % 7 == 0) or (theta_array[theta_idx] == -22):
-            #     print('x-shift: ' + str(x_shift_pc) + ' (Theta = ' + str(theta_array[theta_idx]) + ' degrees')
-            #     print('y-shift: ' + str(y_shift_pc))
+            if (theta_idx % 7 == 0) or (theta_array[theta_idx] == -22):
+                print('x-shift: ' + str(x_shift_pc) + ' (Theta = ' + str(theta_array[theta_idx]) + ' degrees')
+                print('y-shift: ' + str(y_shift_pc))
 
                 # if iteration_idx > 0:
                     # fig1 = plt.figure(1)
@@ -274,7 +294,7 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
                     x_shift = x_shifts_pc[iteration_idx, theta_idx]
                     y_shift = y_shifts_pc[iteration_idx, theta_idx]
                     
-                    aligned_proj[element_idx, theta_idx, :, :] = spndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx, :, :], shift = (y_shift, -x_shift), cval = 0) # Undo the translational shifts by the cross-correlation peak
+                    aligned_proj[element_idx, theta_idx, :, :] = spndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx, :, :], shift = (y_shift, x_shift), cval = 0) # Undo the translational shifts by the cross-correlation peak
 
         current_xrf_proj_img_array = aligned_proj.copy()
 
