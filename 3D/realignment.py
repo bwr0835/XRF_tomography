@@ -77,7 +77,7 @@ def subpixel_cross_correlation(recon_proj, orig_proj):
     y_shift_array = np.array([y_shift - 1, y_shift, y_shift + 1]) + y_center
 
     x_values = cross_corr[y_shift_array[1], x_shift_array]
-    y_values = cross_corr[y_shift_array, x_shift[1]]
+    y_values = cross_corr[y_shift_array, x_shift_array[1]]
 
     x_fit_coeffs, _, _ = np.polyfit(x_shift_array, x_values, deg = 2)
     y_fit_coeffs, _, _ = np.polyfit(y_shift_array, y_values, deg = 2)
