@@ -341,7 +341,7 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
 
         for theta_idx in range(n_theta):
             y_shift_cc, x_shift_cc, corr_mat_cc = cross_correlate(proj_imgs_from_3d_recon[ref_element_idx, theta_idx, :, :], reference_projection_imgs[theta_idx]) # Cross-correlation
-            y_shift_pc, x_shift_pc = phase_correlate(proj_imgs_from_3d_recon[ref_element_idx, theta_idx, :, :], reference_projection_imgs[theta_idx], upsample_factor = 1)
+            y_shift_pc, x_shift_pc = phase_correlate(proj_imgs_from_3d_recon[ref_element_idx, theta_idx, :, :], reference_projection_imgs[theta_idx], upsample_factor = 10)
             # y_shift_pc, x_shift_pc = subpixel_cross_correlation(proj_imgs_from_3d_recon[ref_element_idx, theta_idx, :, :], reference_projection_imgs[theta_idx])
             
             # save_proj_img_npy(proj_imgs_from_3d_recon[ref_element_idx, theta_idx, :, :], iteration_idx, theta_array[theta_idx], 'synthesized', 'gridrec', output_dir_path)
