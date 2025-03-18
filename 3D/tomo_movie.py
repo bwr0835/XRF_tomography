@@ -62,7 +62,7 @@ else:
     file_path_idx = 0
 
     # subdir_array = load_dir(directory_path, lambda subdir: subdir.startswith('iteration_'))
-    subdir_array = load_dir(directory_path)
+    subdir_array, theta_array = load_dir(directory_path)
     
     iteration_subdir_array = []
     
