@@ -122,7 +122,7 @@ else:
         print('Loading reconstructions...')
 
         for slice_idx in range(n_slices):
-            recon[slice_idx] = np.load(recon_file_path[theta_idx])
+            recon[slice_idx] = np.load(recon_file_path[slice_idx])
 
             recon_data.append(recon[slice_idx])
 
