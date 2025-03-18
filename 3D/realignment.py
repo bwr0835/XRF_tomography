@@ -183,7 +183,7 @@ def cross_correlate(recon_proj, orig_proj):
     return y_shift, x_shift, cross_corr
 
 def phase_correlate(recon_proj, orig_proj, upsample_factor):
-    shift, _, _ = reg.phase_cross_correlation(reference_image = recon_proj, moving_image = orig_proj, upsample_factor = upsample_factor, normalization=None)
+    shift, _, _ = reg.phase_cross_correlation(reference_image = recon_proj, moving_image = orig_proj, upsample_factor = upsample_factor)
 
     y_shift, x_shift = shift[0], shift[1]
 
@@ -282,7 +282,7 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
     ref_element_idx = element_array.index(ref_element)
     reference_projection_imgs = xrf_proj_img_array[ref_element_idx] # These are effectively sinograms for the element of interest (highest contrast -> for realignment purposes)
                                                                     # (n_theta, n_slices -> n_rows, n_columns)
-    # sr_trans = sr(sr.TRANSLATION)
+    sr_aff = sr(sr.AFFINE)
 
     center_of_rotation = tomo.find_center(reference_projection_imgs, theta_array*np.pi/180)
 
@@ -341,7 +341,7 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
 
         for theta_idx in range(n_theta):
             y_shift_cc, x_shift_cc, corr_mat_cc = cross_correlate(proj_imgs_from_3d_recon[ref_element_idx, theta_idx, :, :], reference_projection_imgs[theta_idx]) # Cross-correlation
-            y_shift_pc, x_shift_pc = phase_correlate(proj_imgs_from_3d_recon[ref_element_idx, theta_idx, :, :], reference_projection_imgs[theta_idx], upsample_factor = 20)
+            y_shift_pc, x_shift_pc = phase_correlate(proj_imgs_from_3d_recon[ref_element_idx, theta_idx, :, :], reference_projection_imgs[theta_idx], upsample_factor = 25)
             # y_shift_pc, x_shift_pc = subpixel_cross_correlation(proj_imgs_from_3d_recon[ref_element_idx, theta_idx, :, :], reference_projection_imgs[theta_idx])
             
             # save_proj_img_npy(proj_imgs_from_3d_recon[ref_element_idx, theta_idx, :, :], iteration_idx, theta_array[theta_idx], 'synthesized', 'gridrec', output_dir_path)
@@ -419,9 +419,9 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
                     x_shift = x_shifts_pc[iteration_idx, theta_idx]
                     y_shift = y_shifts_pc[iteration_idx, theta_idx]
                     
-                    # aligned_proj[element_idx, theta_idx, :, :] = sr_trans.register_transform(ref = proj_imgs_from_3d_recon[ref_element_idx, theta_idx, :, :], mov = reference_projection_imgs[theta_idx])
+                    aligned_proj[element_idx, theta_idx, :, :] = sr_aff.register_transform(ref = proj_imgs_from_3d_recon[ref_element_idx, theta_idx, :, :], mov = reference_projection_imgs[theta_idx])
 
-                    aligned_proj[element_idx, theta_idx, :, :] = spndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx, :, :], shift = (y_shift, x_shift), cval = 0) # Undo the translational shifts by the cross-correlation peak
+                    # aligned_proj[element_idx, theta_idx, :, :] = spndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx, :, :], shift = (y_shift, x_shift), cval = 0) # Undo the translational shifts by the cross-correlation peak
 
         current_xrf_proj_img_array = aligned_proj.copy()
 
