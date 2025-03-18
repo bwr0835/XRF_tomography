@@ -203,7 +203,7 @@ else:
             
             artists.append(recon_imgs[idx])
         
-        artists.append(recon_text)
+        artists.append(recon_text[0])
 
         return artists
     
@@ -228,7 +228,7 @@ else:
         
         proj_text[0].set_text(r'$\theta = {0}$\textdegree'.format(theta_array[frame]))
 
-        artists.append(proj_text)
+        artists.append(proj_text[0])
 
         return artists
     
