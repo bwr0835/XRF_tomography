@@ -21,7 +21,9 @@ plt.rcParams['text.latex.preamble'] = r'\usepackage{times}'
 def load_dir(dir_path):
     subdir_array = [subdir for subdir in os.listdir(dir_path) if os.path.isdir(os.path.join(dir_path, subdir))]
     
-    theta_array = np.load('theta_array.npy')
+    theta_array_file_path = os.path.join(dir_path, 'theta_array.npy')
+
+    theta_array = np.load(theta_array_file_path)
     theta_array = np.sort(theta_array)
 
     return subdir_array, theta_array
