@@ -340,8 +340,8 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
         # plt.show()
 
         for theta_idx in range(n_theta):
-            y_shift_cc, x_shift_cc, corr_mat_cc = cross_correlate(proj_imgs_from_3d_recon[ref_element_idx, theta_idx, :, :], reference_projection_imgs[theta_idx]) # Cross-correlation
-            y_shift_pc, x_shift_pc = phase_correlate(proj_imgs_from_3d_recon[ref_element_idx, theta_idx, :, :], reference_projection_imgs[theta_idx], upsample_factor = 25)
+            y_shift_cc, x_shift_cc, corr_mat_cc = cross_correlate(proj_imgs_from_3d_recon[ref_element_idx, theta_idx, :, :], current_xrf_proj_img_array[ref_element_idx, theta_idx, :, :]) # Cross-correlation
+            y_shift_pc, x_shift_pc = phase_correlate(proj_imgs_from_3d_recon[ref_element_idx, theta_idx, :, :], current_xrf_proj_img_array[ref_element_idx, theta_idx, :, :], upsample_factor = 25)
             # y_shift_pc, x_shift_pc = subpixel_cross_correlation(proj_imgs_from_3d_recon[ref_element_idx, theta_idx, :, :], reference_projection_imgs[theta_idx])
             
             # save_proj_img_npy(proj_imgs_from_3d_recon[ref_element_idx, theta_idx, :, :], iteration_idx, theta_array[theta_idx], 'synthesized', 'gridrec', output_dir_path)
@@ -420,9 +420,9 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
                     y_shift = y_shifts_pc[iteration_idx, theta_idx]
                     
                     # aligned_proj[element_idx, theta_idx, :, :] = sr_trans.register_transform(ref = proj_imgs_from_3d_recon[ref_element_idx, theta_idx, :, :], mov = reference_projection_imgs[theta_idx])
-                    tform = xform.SimilarityTransform(translation = (-x_shift, -y_shift))
-                    aligned_proj[element_idx, theta_idx, :, :] = xform.warp(xrf_proj_img_array[ref_element_idx, theta_idx, :, :], tform, preserve_range = True) # Undo the translational shifts by the cross-correlation peak
-                    # aligned_proj[element_idx, theta_idx, :, :] = spndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx, :, :], shift = (y_shift, x_shift), cval = 0) # Undo the translational shifts by the cross-correlation peak
+                    # tform = xform.SimilarityTransform(translation = (x_shift, y_shift))
+                    # aligned_proj[element_idx, theta_idx, :, :] = xform.warp(xrf_proj_img_array[ref_element_idx, theta_idx, :, :], tform, preserve_range = True) # Undo the translational shifts by the cross-correlation peak
+                    aligned_proj[element_idx, theta_idx, :, :] = spndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx, :, :], shift = (y_shift, x_shift), cval = 0) # Undo the translational shifts by the cross-correlation peak
 
         current_xrf_proj_img_array = aligned_proj.copy()
 
