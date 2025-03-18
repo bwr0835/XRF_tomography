@@ -60,14 +60,16 @@ else:
         xcorr_dir_path = os.path.join(directory_path, subdir, 'xcorr')
         recon_dir_path = os.path.join(directory_path, subdir, 'recon')
 
-        synthetic_proj_file_path = [file_name for file_name in os.listdir(synthetic_proj_dir_path)]
-        actual_proj_file_path = [file_name for file_name in os.listdir(actual_proj_dir_path)]
-        xcorr_proj_file_path = [file_name for file_name in os.listdir(xcorr_dir_path)]
+        proj_file_path = [file_name for file_name in os.listdir(synthetic_proj_dir_path)]
+        # actual_proj_file_path = [file_name for file_name in os.listdir(actual_proj_dir_path)]
+        # xcorr_proj_file_path = [file_name for file_name in os.listdir(xcorr_dir_path)]
         recon_file_path = [file_name for file_name in os.listdir(recon_dir_path)]
 
         synthetic_proj_file_path = sorted(synthetic_proj_file_path, key = get_theta)
+        recon_file_path = sorted(recon_file_path, key = get_slice)
+
         if idx == 0:
-            print(synthetic_proj_file_path)
+            print(recon_file_path)
 
         # for theta_idx in range(n_theta):
         #     synthetic_proj[theta_idx] = np.load(synthetic_proj_file_path[theta_idx])
