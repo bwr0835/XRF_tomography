@@ -185,11 +185,12 @@ else:
         xcorr_imgs.append(im2_2)
         shift_rgb_imgs.append(im2_3)
 
-    text_recon = axs1[0].text(0.02, 0.02, r'Slice 0', transform = axs1[0].transAxes, color = 'white')
-    text_proj = axs2[0, 0].text(0.02, 0.02, r'$\theta = {0}$\textdegree'.format(theta_array[0]), transform = axs1[0].transAxes, color = 'white')    
-
-    recon_text.append(text_recon)
-    proj_text.append(text_proj)
+        text_recon = axs1[0].text(0.02, 0.02, r'Slice 0', transform = axs1[0].transAxes, color = 'white')
+        text_proj = axs2[0, 0].text(0.02, 0.02, r'$\theta = {0}$\textdegree'.format(theta_array[0]), transform = axs2[0, 0].transAxes, color = 'white')    
+        
+        if idx == 0:
+            recon_text.append(text_recon)
+            proj_text.append(text_proj)
 
     def animate_recon(frame):
         artists = []
@@ -198,11 +199,11 @@ else:
             recons = recon_data_dict[subdir]
 
             recon_imgs[idx].set_array(recons[frame])
-            recon_text[0].set_text(r'Slice {0}'.format(frame))
+            recon_text.set_text(r'Slice {0}'.format(frame))
             
             artists.append(recon_imgs[idx])
         
-        artists.append(recon_text[0])
+        artists.append(recon_text)
 
         return artists
     
@@ -225,9 +226,9 @@ else:
             artists.append(xcorr_imgs[idx])
             artists.append(shift_rgb_imgs[idx])
         
-        proj_text[0].set_text(r'$\theta = {0}$\textdegree'.format(theta_array[frame]))
+        proj_text.set_text(r'$\theta = {0}$\textdegree'.format(theta_array[frame]))
 
-        artists.append(proj_text[0])
+        artists.append(proj_text)
     
     anim1 = anim.FuncAnimation(fig1, animate_recon, frames = n_slices, interval = 150, blit = True)
     anim2 = anim.FuncAnimation(fig2, animate_proj, frames = n_theta, interval = 150, blit = True)
