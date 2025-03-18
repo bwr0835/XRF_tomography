@@ -154,18 +154,22 @@ else:
 
         recon_images.append(im)
 
-        text = axs1[idx].text(0.02, 0.02, r'Slice 0', transform = axs1[idx].transAxes)
+        text = axs1[idx].text(0.02, 0.02, r'Slice 0', transform = axs1[idx].transAxes, color = 'white')
             
         recon_text.append(text)
 
     def animate_recon(frame):
+        artists = []
+
         for idx, subdir in enumerate(iteration_subdir_array):
             recons = recon_data_dict[subdir]
 
             recon_images[idx].set_array(recons[frame])
             recon_text[idx].set_text(r'Slice {0}'.format(frame))
-            
-            return recon_images, recon_text
+            artists.append(recon_images[idx])
+            artists.append(recon_text[idx])
+
+            return artists
     
     anim1 = anim.FuncAnimation(fig1, animate_recon, frames = n_slices, interval = 50, blit = True)
 
