@@ -224,7 +224,7 @@ else:
             artists.append(xcorr_imgs[idx])
             artists.append(shift_rgb_imgs[idx])
         
-        proj_text[0, 0].set_text(r'$\theta = {0}$\textdegree'.format(theta_array[frame]))
+        proj_text[0].set_text(r'$\theta = {0}$\textdegree'.format(theta_array[frame]))
 
         artists.append(proj_text[0, 0])
     
