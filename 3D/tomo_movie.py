@@ -62,9 +62,6 @@ else:
     actual_proj_data = []
     xcorr_proj_data = []
     recon_data = []
-    x_shifts_data = []
-    
-    
     
     for subdir in subdir_array:
         if subdir != 'net_shifts':
