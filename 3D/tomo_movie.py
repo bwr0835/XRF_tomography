@@ -2,6 +2,7 @@ import numpy as np, tkinter as tk, os, re
 
 from matplotlib import pyplot as plt, animation as anim
 from tkinter import filedialog
+from numpy.fft import fftshift
 
 plt.rcParams['text.usetex'] = True
 plt.rcParams['font.family'] = 'serif'
@@ -117,7 +118,7 @@ else:
         for theta_idx in range(n_theta):
             synthetic_proj[theta_idx] = np.load(synthetic_proj_file_path[theta_idx])
             actual_proj[theta_idx] = np.load(actual_proj_file_path[theta_idx])
-            xcorr_proj[theta_idx] = np.load(xcorr_proj_file_path[theta_idx])
+            xcorr_proj[theta_idx] = fftshift(np.load(xcorr_proj_file_path[theta_idx]))
 
             synthetic_proj_scaled = normalize_array(synthetic_proj[theta_idx])
             actual_proj_scaled = normalize_array(actual_proj[theta_idx])
