@@ -1,4 +1,4 @@
-import numpy as np, tkinter as tk, os
+import numpy as np, tkinter as tk, os, re
 
 from matplotlib import pyplot as plt, animation as anim
 from tkinter import filedialog
@@ -13,6 +13,12 @@ def load_dir(dir_path, filter_function = None):
     
     else:
         return subdir_array
+
+def get_theta(file_name):
+    return int(file_name.split('_')[2].strip())
+
+def get_slice(file_name):
+    return int(file_name.split('_')[2].split('.')[0])
 
 root = tk.Tk()
     
@@ -54,26 +60,27 @@ else:
         xcorr_dir_path = os.path.join(directory_path, subdir, 'xcorr')
         recon_dir_path = os.path.join(directory_path, subdir, 'recon')
 
-        synthetic_proj_file_path = [os.path.join(synthetic_proj_dir_path, file_name) for file_name in os.listdir(synthetic_proj_dir_path)]
-        actual_proj_file_path = [os.path.join(actual_proj_dir_path, file_name) for file_name in os.listdir(actual_proj_dir_path)]
-        xcorr_proj_file_path = [os.path.join(xcorr_dir_path, file_name) for file_name in os.listdir(xcorr_dir_path)]
-        recon_file_path = [os.path.join(recon_dir_path, file_name) for file_name in os.listdir(recon_dir_path)]
+        synthetic_proj_file_path = [file_name for file_name in os.listdir(synthetic_proj_dir_path)]
+        actual_proj_file_path = [file_name for file_name in os.listdir(actual_proj_dir_path)]
+        xcorr_proj_file_path = [file_name for file_name in os.listdir(xcorr_dir_path)]
+        recon_file_path = [file_name for file_name in os.listdir(recon_dir_path)]
 
-        for theta_idx in range(n_theta):
-            synthetic_proj[theta_idx] = np.load(synthetic_proj_file_path[theta_idx])
-            actual_proj[theta_idx] = np.load(actual_proj_file_path[theta_idx])
-            xcorr_proj[theta_idx] = np.load(xcorr_proj_file_path[theta_idx])
-        
-        for slice_idx in range(n_slices):
-            recon[slice_idx] = np.load(recon_file_path[theta_idx])
-
+        synthetic_proj_file_path = sorted(synthetic_proj_file_path, key = get_theta)
         if idx == 0:
             print(synthetic_proj_file_path)
 
-        synthetic_proj_data = np.append(synthetic_proj_data, synthetic_proj)
-        actual_proj_data = np.append(actual_proj_data, actual_proj)
-        xcorr_proj_data = np.append(xcorr_proj_data, xcorr_proj)
-        recon_data = np.append(recon_data, recon)
+        # for theta_idx in range(n_theta):
+        #     synthetic_proj[theta_idx] = np.load(synthetic_proj_file_path[theta_idx])
+        #     actual_proj[theta_idx] = np.load(actual_proj_file_path[theta_idx])
+        #     xcorr_proj[theta_idx] = np.load(xcorr_proj_file_path[theta_idx])
+        
+        # for slice_idx in range(n_slices):
+        #     recon[slice_idx] = np.load(recon_file_path[theta_idx])
+
+        # synthetic_proj_data = np.append(synthetic_proj_data, synthetic_proj)
+        # actual_proj_data = np.append(actual_proj_data, actual_proj)
+        # xcorr_proj_data = np.append(xcorr_proj_data, xcorr_proj)
+        # recon_data = np.append(recon_data, recon)
 
 
     
