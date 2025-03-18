@@ -150,7 +150,7 @@ else:
     for idx, subdir in enumerate(iteration_subdir_array):
         recons = recon_data_dict[subdir]
 
-        im = axs1[idx].imshow(recons[0], cmap = 'hot')
+        im = axs1[idx].imshow(recons[0])
 
         recon_images.append(im)
 
@@ -171,7 +171,7 @@ else:
 
             return artists
     
-    anim1 = anim.FuncAnimation(fig1, animate_recon, frames = n_slices, interval = 50, blit = True)
+    anim1 = anim.FuncAnimation(fig1, animate_recon, frames = n_slices, interval = 100, blit = True)
 
     plt.show()
 
