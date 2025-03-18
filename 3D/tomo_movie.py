@@ -113,14 +113,14 @@ else:
             actual_proj[theta_idx] = np.load(actual_proj_file_path[theta_idx])
             xcorr_proj[theta_idx] = np.load(xcorr_proj_file_path[theta_idx])
 
-            synthetic_proj_data = np.append(synthetic_proj[theta_idx])
-            actual_proj_data = np.append(actual_proj[theta_idx])
-            xcorr_proj_data = np.append(xcorr_proj_data[theta_idx])
+            synthetic_proj_data = np.append(synthetic_proj_data, synthetic_proj[theta_idx])
+            actual_proj_data = np.append(actual_proj_data, actual_proj[theta_idx])
+            xcorr_proj_data = np.append(xcorr_proj_data, xcorr_proj[theta_idx])
 
         for slice_idx in range(n_slices):
             recon[slice_idx] = np.load(recon_file_path[theta_idx])
 
-            recon_data = np.append(recon_data[slice_idx])
+            recon_data = np.append(recon_data, recon[slice_idx])
 
         synthetic_proj_data_dict[subdir] = synthetic_proj_data
         actual_proj_data_dict[subdir] = actual_proj_data
