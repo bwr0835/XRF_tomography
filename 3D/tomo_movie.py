@@ -172,7 +172,7 @@ else:
         exp_projs = actual_proj_data_dict[subdir]
         synth_projs = synthetic_proj_data_dict[subdir]
         xcorrs = xcorr_proj_data_dict[subdir]
-        shift_rgbs = xcorr_proj_data_dict[subdir]
+        shift_rgbs = shift_change_dict[subdir]
 
         im1 = axs1[idx].imshow(recons[0])
         im2_0 = axs2[idx, 0].imshow(exp_projs[0])
