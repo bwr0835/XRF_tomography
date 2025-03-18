@@ -166,12 +166,13 @@ else:
 
             recon_images[idx].set_array(recons[frame])
             recon_text[idx].set_text(r'Slice {0}'.format(frame))
+            
             artists.append(recon_images[idx])
             artists.append(recon_text[idx])
 
-            return artists
+        return artists
     
-    anim1 = anim.FuncAnimation(fig1, animate_recon, frames = n_slices, interval = 100, blit = True)
+    anim1 = anim.FuncAnimation(fig1, animate_recon, frames = n_slices, interval = 150, blit = True)
 
     plt.show()
 
