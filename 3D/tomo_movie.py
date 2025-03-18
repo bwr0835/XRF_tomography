@@ -117,7 +117,7 @@ else:
 
             synthetic_proj_data.append(synthetic_proj[theta_idx])
             actual_proj_data.append(actual_proj[theta_idx])
-            xcorr_proj_data.append(xcorr_proj_data, xcorr_proj[theta_idx])
+            xcorr_proj_data.append(xcorr_proj[theta_idx])
         
         print('Loading reconstructions...')
 
