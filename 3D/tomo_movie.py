@@ -154,7 +154,7 @@ else:
 
         recon_images.append(im)
 
-        text = axs1[idx].set_text(0.02, 0.02, r'Slice 0', transform = axs1[idx].transAxes)
+        text = axs1[idx].text(0.02, 0.02, r'Slice 0', transform = axs1[idx].transAxes)
             
         recon_text.append(text)
 
@@ -162,14 +162,9 @@ else:
         for idx, subdir in enumerate(iteration_subdir_array):
             recons = recon_data_dict[subdir]
 
-            im = axs1[idx].imshow(recons[frame], cmap = 'hot')
-
-            recon_images.append(im)
-
-            text = axs1[idx].set_text(0.02, 0.02, r'Slice {0}'.format(frame + 1), transform = axs1[idx].transAxes)
+            recon_images[idx].set_array(recons[frame])
+            recon_text[idx].set_text(r'Slice {0}'.format(frame))
             
-            recon_text.append(text)
-
             return recon_images, recon_text
     
     anim1 = anim.FuncAnimation(fig1, animate_recon, frames = n_slices, interval = 50, blit = True)
