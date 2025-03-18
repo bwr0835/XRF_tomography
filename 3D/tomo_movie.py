@@ -65,7 +65,7 @@ else:
         # xcorr_proj_file_path = [file_name for file_name in os.listdir(xcorr_dir_path)]
         recon_file_path = [file_name for file_name in os.listdir(recon_dir_path)]
 
-        synthetic_proj_file_path = sorted(synthetic_proj_file_path, key = get_theta)
+        proj_file_path = sorted(proj_file_path, key = get_theta)
         recon_file_path = sorted(recon_file_path, key = get_slice)
 
         if idx == 0:
