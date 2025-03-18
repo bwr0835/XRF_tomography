@@ -592,7 +592,7 @@ elements_xrf, counts_xrf, theta_xrf, dataset_type_xrf = extract_h5_aggregate_xrf
 
 output_dir_path = '/raid/users/roter'
 
-iter_reproj('Fe', elements_xrf, theta_xrf, counts_xrf, 5, output_dir_path)
+iter_reproj('Fe', elements_xrf, theta_xrf, counts_xrf, 10, output_dir_path)
 
 
 
