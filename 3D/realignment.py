@@ -1,10 +1,11 @@
-import numpy as np, h5py, os, skimage, tkinter as tk, tomopy as tomo, matplotlib as mpl, scipy.ndimage as spndi, pystackreg as psr, os
+import numpy as np, h5py, os, skimage, tkinter as tk, tomopy as tomo, matplotlib as mpl, scipy.ndimage as spndi, os
 
 from skimage import transform as xform, registration as reg
 from numpy.fft import fft, ifft, fftshift, ifftshift, fftfreq, fftn, ifftn, fft2, ifft2
 from h5_util import extract_h5_aggregate_xrf_data, create_aggregate_xrf_h5
 from matplotlib import pyplot as plt
 from tkinter import filedialog
+from pystackreg import StackReg as sr
 
 plt.rcParams['text.usetex'] = True
 plt.rcParams['font.family'] = 'serif'
@@ -159,6 +160,7 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
     ref_element_idx = element_array.index(ref_element)
     reference_projection_imgs = xrf_proj_img_array[ref_element_idx] # These are effectively sinograms for the element of interest (highest contrast -> for realignment purposes)
                                                                     # (n_theta, n_slices -> n_rows, n_columns)
+    sr_trans = sr(sr.TRANSLATION)
 
     center_of_rotation = tomo.find_center(reference_projection_imgs, theta_array*np.pi/180)
 
@@ -295,7 +297,9 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
                     x_shift = x_shifts_pc[iteration_idx, theta_idx]
                     y_shift = y_shifts_pc[iteration_idx, theta_idx]
                     
-                    aligned_proj[element_idx, theta_idx, :, :] = spndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx, :, :], shift = (y_shift, x_shift), cval = 0) # Undo the translational shifts by the cross-correlation peak
+                    aligned_proj[element_idx, theta_idx, :, :] = sr.register_transform(proj_imgs_from_3d_recon[ref_element_idx, theta_idx, :, :], reference_projection_imgs[theta_idx])
+
+                    # aligned_proj[element_idx, theta_idx, :, :] = spndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx, :, :], shift = (y_shift, x_shift), cval = 0) # Undo the translational shifts by the cross-correlation peak
 
         current_xrf_proj_img_array = aligned_proj.copy()
 
