@@ -108,6 +108,8 @@ else:
         xcorr_proj_file_path = [os.path.join(xcorr_dir_path, file_name) for file_name in proj_file_name]
         recon_file_path = [os.path.join(recon_dir_path, file_name) for file_name in recon_file_name]
 
+        print('Loading projection images...')
+
         for theta_idx in range(n_theta):
             synthetic_proj[theta_idx] = np.load(synthetic_proj_file_path[theta_idx])
             actual_proj[theta_idx] = np.load(actual_proj_file_path[theta_idx])
@@ -116,6 +118,8 @@ else:
             synthetic_proj_data.append(synthetic_proj[theta_idx])
             actual_proj_data.append(actual_proj[theta_idx])
             xcorr_proj_data.append(xcorr_proj_data, xcorr_proj[theta_idx])
+        
+        print('Loading reconstructions...')
 
         for slice_idx in range(n_slices):
             recon[slice_idx] = np.load(recon_file_path[theta_idx])
