@@ -215,7 +215,7 @@ else:
             exp_projs = actual_proj_data_dict[subdir]
             synth_projs = synthetic_proj_data_dict[subdir]
             xcorrs = xcorr_proj_data_dict[subdir]
-            shift_rgbs = xcorr_proj_data_dict[subdir]
+            shift_rgbs = shift_change_dict[subdir]
 
             exp_proj_imgs[idx].set_array(exp_projs[frame])
             synthetic_proj_imgs[idx].set_array(synth_projs[frame])
