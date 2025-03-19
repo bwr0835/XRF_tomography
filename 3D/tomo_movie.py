@@ -163,13 +163,13 @@ else:
 
     iter_array = 1 + np.arange(n_iterations)
 
-    curve1 = axs3.plot(iter_array, np.zeros_like(iter_array), 'k-o', markersize = 3, label = r'$\Delta x$', )[0]
-    curve2 = axs3.plot(iter_array, np.zeros_like(iter_array), 'r-o', markersize = 3, label = r'$\Delta y$')[0]
+    curve1 = axs3.plot(iter_array, x_shifts_data[:, 0], 'k-o', markersize = 3, label = r'$\Delta x$')[0]
+    curve2 = axs3.plot(iter_array, y_shifts_data[:, 0], 'r-o', markersize = 3, label = r'$\Delta y$')[0]
 
     axs1[0].set_title(r'Recon. Slice (It. 1)')
     axs1[1].set_title(r'Recon. Slice (It. {0})'.format(n_iterations))
-    axs2[0, 0].set_title(r'(Aligned) Exp. Proj. (It. 1)')
-    axs2[1, 0].set_title(r'(Aligned) Exp. Proj. (It. {0})'.format(n_iterations))
+    axs2[0, 0].set_title(r'(Al.) Exp. Proj. (It. 1)')
+    axs2[1, 0].set_title(r'(Al.) Exp. Proj. (It. {0})'.format(n_iterations))
     axs2[0, 1].set_title(r'Synth. Proj. (It. 1)')
     axs2[1, 1].set_title(r'Synth. Proj. (It. {0})'.format(n_iterations))
     axs2[0, 2].set_title(r'Int.-Pix. CC (It. 1)')
