@@ -230,15 +230,21 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
             x_shift_pc_array[theta_idx] = x_shift_pc
             y_shift_pc_array[theta_idx] = y_shift_pc
 
-            # save_proj_img_npy(proj_imgs_from_3d_recon[ref_element_idx, theta_idx, :, :], iteration_idx, theta_array[theta_idx], 'synthesized', 'gridrec', output_dir_path)
-            # save_proj_img_npy(current_xrf_proj_img_array[ref_element_idx, theta_idx, :, :], iteration_idx, theta_array[theta_idx], 'experimental', 'gridrec', output_dir_path)
-            # save_proj_img_npy(corr_mat_cc, iteration_idx, theta_array[theta_idx], 'xcorr', 'gridrec', output_dir_path)
-            #             
-            
+            save_proj_img_npy(proj_imgs_from_3d_recon[theta_idx, :, :], iteration_idx, theta_array[theta_idx], 'synthesized', 'gridrec', output_dir_path)
+            save_proj_img_npy(aligned_proj[theta_idx, :, :], iteration_idx, theta_array[theta_idx], 'experimental', 'gridrec', output_dir_path)
+            save_proj_img_npy(corr_mat_cc, iteration_idx, theta_array[theta_idx], 'xcorr', 'gridrec', output_dir_path)
 
             if theta_idx % 7 == 0:
                 print('x-shift: ' + str(x_shift_pc) + ' (Theta = ' + str(theta_array[theta_idx]) + ' degrees')
                 print('y-shift: ' + str(y_shift_pc))
+            
+            if iteration_idx == 0:
+                x_shifts_pc[iteration_idx, theta_idx] = x_shift_pc_array[theta_idx]
+                y_shifts_pc[iteration_idx, theta_idx] = y_shift_pc_array[theta_idx]
+            
+            else:
+                x_shifts_pc[iteration_idx, theta_idx] = x_shifts_pc[iteration_idx - 1, theta_idx] + x_shift_pc_array[theta_idx]
+                y_shifts_pc[iteration_idx, theta_idx] = y_shifts_pc[iteration_idx - 1, theta_idx] + y_shift_pc_array[theta_idx]
 
         if np.max(np.abs(x_shift_pc_array)) <= eps and np.max(np.abs(y_shift_pc_array)) <= eps:
             print('Number of iterations taken: ' + str(iteration_idx + 1))
@@ -248,9 +254,9 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
             x_shifts_pc_new = x_shifts_pc[:len(iterations)]
             y_shifts_pc_new = y_shifts_pc[:len(iterations)]
 
-            # save_net_shift_data_npy(x_shifts_pc_new, 'x', 'gridrec', output_dir_path)
-            # save_net_shift_data_npy(y_shifts_pc_new, 'y', 'gridrec', output_dir_path)
-            # save_theta_array(theta_array, 'gridrec', output_dir_path)
+            save_net_shift_data_npy(x_shifts_pc_new, 'x', 'gridrec', output_dir_path)
+            save_net_shift_data_npy(y_shifts_pc_new, 'y', 'gridrec', output_dir_path)
+            save_theta_array(theta_array, 'gridrec', output_dir_path)
         
             break
         
@@ -259,9 +265,9 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
 
             iterations = np.array(iterations)
             
-            # save_net_shift_data_npy(x_shifts_pc, 'x', 'gridrec', output_dir_path)
-            # save_net_shift_data_npy(y_shifts_pc, 'y', 'gridrec', output_dir_path)
-            # save_theta_array(theta_array, 'gridrec', output_dir_path)
+            save_net_shift_data_npy(x_shifts_pc, 'x', 'gridrec', output_dir_path)
+            save_net_shift_data_npy(y_shifts_pc, 'y', 'gridrec', output_dir_path)
+            save_theta_array(theta_array, 'gridrec', output_dir_path)
 
             break
     
