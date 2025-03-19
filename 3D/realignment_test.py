@@ -168,7 +168,7 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
     
     aligned_proj = np.zeros_like(xrf_proj_img_array)
 
-    proj_imgs_from_3d_recon = np.zeros_like(xrf_proj_img_array)
+    proj_imgs_from_3d_recon = np.zeros((n_theta, n_slices, n_columns))
 
     x_shifts_cc = np.zeros((n_iterations, n_theta))
     y_shifts_cc = np.zeros((n_iterations, n_theta))
@@ -201,8 +201,15 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
         else:  
             aligned_proj = xrf_proj_img_array
         
-        recon = tomo.recon(aligned_proj[ref_element_idx], theta = theta_array*np.pi/180, center = center_of_rotation, algorithm = 'gridrec', filter_name = 'ramlak')
-        # recon = tomo.recon(proj, theta = theta_array*np.pi/180, center = center_of_rotation, algorithm = 'mlem', num_iter = 60)
+        algorithm = 'gridrec'
+
+        print('Performing ' + algorithm)
+
+        if algorithm == 'gridrec':
+            recon = tomo.recon(aligned_proj[ref_element_idx], theta = theta_array*np.pi/180, center = center_of_rotation, algorithm = algorithm, filter_name = 'ramlak')
+        
+        elif algorithm == 'mlem':
+            recon = tomo.recon(aligned_proj[ref_element_idx], theta = theta_array*np.pi/180, center = center_of_rotation, algorithm = 'mlem', num_iter = 60)
         
         print(recon.shape)
                                     
