@@ -257,8 +257,8 @@ else:
 
         return artists
     
-    fps_shifts = 5
-    fps_images = 5
+    fps_shifts = 10 # Frames per second (fps)
+    fps_images = 25
 
     def animate_shifts(frame):
         artists = []
@@ -280,9 +280,9 @@ else:
 
         return artists
 
-    anim1 = anim.FuncAnimation(fig1, animate_recon, frames = n_slices, interval = 1/fps_images, blit = True) # Interval is seconds/frame (NOT frames per second, or fps)
-    anim2 = anim.FuncAnimation(fig2, animate_proj, frames = n_theta, interval = 1/fps_images, blit = True)
-    anim3 = anim.FuncAnimation(fig3, animate_shifts, frames = n_theta, interval = 1/fps_shifts, blit = False) # "Blitting" not useful since titles are changing
+    anim1 = anim.FuncAnimation(fig1, animate_recon, frames = n_slices, interval = 1000/fps_images, blit = True) # Interval is ms/frame (NOT frames per second, or fps)
+    anim2 = anim.FuncAnimation(fig2, animate_proj, frames = n_theta, interval = 1000/fps_images, blit = True)
+    anim3 = anim.FuncAnimation(fig3, animate_shifts, frames = n_theta, interval = 1000/fps_shifts, blit = False) # "Blitting" not useful since titles are changing
 
     plt.show()
 
