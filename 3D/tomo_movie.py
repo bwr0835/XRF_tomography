@@ -103,8 +103,8 @@ else:
         recon_dir_path = os.path.join(directory_path, subdir, 'recon')
 
         proj_file_name = [file_name for file_name in os.listdir(synthetic_proj_dir_path)]
-            # actual_proj_file_path = [file_name for file_name in os.listdir(actual_proj_dir_path)]
-            # xcorr_proj_file_path = [file_name for file_name in os.listdir(xcorr_dir_path)]
+        # actual_proj_file_path = [file_name for file_name in os.listdir(actual_proj_dir_path)]
+        # xcorr_proj_file_path = [file_name for file_name in os.listdir(xcorr_dir_path)]
         recon_file_name = [file_name for file_name in os.listdir(recon_dir_path)]
 
         proj_file_name = sorted(proj_file_name, key = get_theta)
@@ -191,7 +191,7 @@ else:
     recon_text = []
     proj_text = []
 
-    for idx, subdir in enumerate(iteration_subdir_array):
+    for idx, subdir in enumerate(iteration_subdir_array_truncated):
         recons = recon_data_dict[subdir]
         exp_projs = actual_proj_data_dict[subdir]
         synth_projs = synthetic_proj_data_dict[subdir]
@@ -220,7 +220,7 @@ else:
     def animate_recon(frame):
         artists = []
 
-        for idx, subdir in enumerate(iteration_subdir_array):
+        for idx, subdir in enumerate(iteration_subdir_array_truncated):
             recons = recon_data_dict[subdir]
 
             recon_imgs[idx].set_array(recons[frame])
@@ -235,7 +235,7 @@ else:
     def animate_proj(frame):
         artists = []
 
-        for idx, subdir in enumerate(iteration_subdir_array):
+        for idx, subdir in enumerate(iteration_subdir_array_truncated):
             exp_projs = actual_proj_data_dict[subdir]
             synth_projs = synthetic_proj_data_dict[subdir]
             xcorrs = xcorr_proj_data_dict[subdir]
