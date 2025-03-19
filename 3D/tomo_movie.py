@@ -168,13 +168,13 @@ else:
     axs1[0].set_title(r'Recon. Slice (It. 1)')
     axs1[1].set_title(r'Recon. Slice (It. {0})'.format(n_iterations))
     axs2[0, 0].set_title(r'(Aligned) Exp. Proj. (It. 1)')
-    axs2[0, 1].set_title(r'(Aligned) Exp. Proj. (It. {0})'.format(n_iterations))
-    axs2[1, 0].set_title(r'Synth. Proj. (It. 1)')
+    axs2[1, 0].set_title(r'(Aligned) Exp. Proj. (It. {0})'.format(n_iterations))
+    axs2[0, 1].set_title(r'Synth. Proj. (It. 1)')
     axs2[1, 1].set_title(r'Synth. Proj. (It. {0})'.format(n_iterations))
-    axs2[2, 0].set_title(r'Int.-Pix. CC (It. 1)')
-    axs2[2, 1].set_title(r'Int.-Pix. CC (It. {0})'.format(n_iterations))
-    axs2[3, 0].set_title(r'Curr. shift (It. 1)')
-    axs2[3, 1].set_title(r'Curr. shift (It. {0})'.format(n_iterations))
+    axs2[0, 2].set_title(r'Int.-Pix. CC (It. 1)')
+    axs2[1, 2].set_title(r'Int.-Pix. CC (It. {0})'.format(n_iterations))
+    axs2[0, 3].set_title(r'Curr. shift (It. 1)')
+    axs2[1, 3].set_title(r'Curr. shift (It. {0})'.format(n_iterations))
 
     axs3.set_xlabel(r'Iteration')
     axs3.set_ylabel(r'Net shift (pixels)')
@@ -198,11 +198,19 @@ else:
             xcorrs = xcorr_proj_data_dict[subdir]
             shift_rgbs = shift_change_dict[subdir]
 
-            im1 = axs1[idx].imshow(recons[0])
-            im2_0 = axs2[idx, 0].imshow(exp_projs[0])
-            im2_1 = axs2[idx, 1].imshow(synth_projs[0])
-            im2_2 = axs2[idx, 2].imshow(xcorrs[0])
-            im2_3 = axs2[idx, 3].imshow(shift_rgbs[0])
+            if idx == 0:
+                im1 = axs1[0].imshow(recons[0])
+                im2_0 = axs2[0, 0].imshow(exp_projs[0])
+                im2_1 = axs2[0, 1].imshow(synth_projs[0])
+                im2_2 = axs2[0, 2].imshow(xcorrs[0])
+                im2_3 = axs2[0, 3].imshow(shift_rgbs[0])
+
+            else:
+                im1 = axs1[1].imshow(recons[0])
+                im2_0 = axs2[1, 0].imshow(exp_projs[0])
+                im2_1 = axs2[1, 1].imshow(synth_projs[0])
+                im2_2 = axs2[1, 2].imshow(xcorrs[0])
+                im2_3 = axs2[1, 3].imshow(shift_rgbs[0])
 
             recon_imgs.append(im1)
             exp_proj_imgs.append(im2_0)
@@ -223,11 +231,18 @@ else:
         for idx, subdir in enumerate(iteration_subdir_array):
             if idx == 0 or idx == n_iterations - 1:
                 recons = recon_data_dict[subdir]
+                
+                if idx == 0:
+                    recon_imgs[0].set_array(recons[frame])
 
-                recon_imgs[idx].set_array(recons[frame])
-                recon_text[0].set_text(r'Slice {0}'.format(frame))
-            
-                artists.append(recon_imgs[idx])
+                    artists.append(recon_imgs[0])
+                
+                else:
+                    recon_imgs[0].set_array(recons[frame])
+
+                    artists.append(recon_imgs[0])
+        
+        recon_text[0].set_text(r'Slice {0}'.format(frame))
         
         artists.append(recon_text[0])
 
@@ -242,16 +257,29 @@ else:
                 synth_projs = synthetic_proj_data_dict[subdir]
                 xcorrs = xcorr_proj_data_dict[subdir]
                 shift_rgbs = shift_change_dict[subdir]
+            
+                if idx == 0:
+                    exp_proj_imgs[0].set_array(exp_projs[frame])
+                    synthetic_proj_imgs[0].set_array(synth_projs[frame])
+                    xcorr_imgs[0].set_array(xcorrs[frame])
+                    shift_rgb_imgs[0].set_array(shift_rgbs[frame])
 
-                exp_proj_imgs[idx].set_array(exp_projs[frame])
-                synthetic_proj_imgs[idx].set_array(synth_projs[frame])
-                xcorr_imgs[idx].set_array(xcorrs[frame])
-                shift_rgb_imgs[idx].set_array(shift_rgbs[frame])
+                    artists.append(exp_proj_imgs[0])
+                    artists.append(synthetic_proj_imgs[0])
+                    artists.append(xcorr_imgs[0])
+                    artists.append(shift_rgb_imgs[0])
+            
+                else:
+                    exp_proj_imgs[1].set_array(exp_projs[frame])
+                    synthetic_proj_imgs[1].set_array(synth_projs[frame])
+                    xcorr_imgs[1].set_array(xcorrs[frame])
+                    shift_rgb_imgs[1].set_array(shift_rgbs[frame])
 
-                artists.append(exp_proj_imgs[idx])
-                artists.append(synthetic_proj_imgs[idx])
-                artists.append(xcorr_imgs[idx])
-                artists.append(shift_rgb_imgs[idx])
+                    artists.append(exp_proj_imgs[1])
+                    artists.append(synthetic_proj_imgs[1])
+                    artists.append(xcorr_imgs[1])
+                    artists.append(shift_rgb_imgs[1])
+
         
         proj_text[0].set_text(r'$\theta = {0}$\textdegree'.format(theta_array[frame]))
 
