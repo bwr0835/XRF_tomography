@@ -162,8 +162,8 @@ else:
 
     iter_array = 1 + np.arange(n_iterations)
 
-    curve1 = axs3.plot(iter_array, np.zeros_like(iter_array), label = r'$\Delta x$', color = 'k')
-    curve2 = axs3.plot(iter_array, np.zeros_like(iter_array), label = r'$\Delta y$', color = 'r')
+    curve1, = axs3.plot(iter_array, np.zeros_like(iter_array), label = r'$\Delta x$', color = 'k')
+    curve2, = axs3.plot(iter_array, np.zeros_like(iter_array), label = r'$\Delta y$', color = 'r')
 
     axs1[0].set_title(r'Recon. Slice (It. 1)')
     axs1[1].set_title(r'Recon. Slice (It. {0})'.format(n_iterations))
@@ -238,9 +238,9 @@ else:
                     artists.append(recon_imgs[0])
                 
                 else:
-                    recon_imgs[0].set_array(recons[frame])
+                    recon_imgs[1].set_array(recons[frame])
 
-                    artists.append(recon_imgs[0])
+                    artists.append(recon_imgs[1])
         
         recon_text[0].set_text(r'Slice {0}'.format(frame))
         
