@@ -272,7 +272,7 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
             
             else:
                 x_shifts_pc[iteration_idx, theta_idx] = x_shift_pc[iteration_idx - 1, theta_idx] + x_shift_pc_array[theta_idx]
-                y_shifts_pc[iteration_idx, theta_idx] = y_shift_pc_array[iteration_idx - 1, theta_idx] + y_shift_pc_array[theta_idx]
+                y_shifts_pc[iteration_idx, theta_idx] = y_shift_pc[iteration_idx - 1, theta_idx] + y_shift_pc_array[theta_idx]
 
 
         
