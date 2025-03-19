@@ -259,6 +259,8 @@ else:
     
     def animate_shifts(frame):
         artists = []
+
+        axs3.cla()
         
         net_shift_x = x_shifts_data[:, frame]
         net_shift_y = y_shifts_data[:, frame]
