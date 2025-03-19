@@ -292,7 +292,7 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
     
     aligned_proj = np.zeros_like(xrf_proj_img_array)
 
-    current_xrf_proj_img_array = xrf_proj_img_array.copy()
+    current_xrf_proj_img_array = xrf_proj_img_array
     proj_imgs_from_3d_recon = np.zeros_like(xrf_proj_img_array)
 
     x_shifts_cc = np.zeros((n_iterations, n_theta))
@@ -428,7 +428,7 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
                     # aligned_proj[element_idx, theta_idx, :, :] = xform.warp(xrf_proj_img_array[ref_element_idx, theta_idx, :, :], tform, preserve_range = True) # Undo the translational shifts by the cross-correlation peak
                     aligned_proj[element_idx, theta_idx, :, :] = spndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx, :, :], shift = (y_shift, x_shift)) # Undo the translational shifts by the cross-correlation peak
 
-        current_xrf_proj_img_array = aligned_proj.copy()
+        current_xrf_proj_img_array = np.copy(aligned_proj)
 
         # if (iteration_idx % 9 == 0) and iteration_idx > 0:
         #     fig13 = plt.figure(9)
