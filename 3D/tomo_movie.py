@@ -280,7 +280,7 @@ else:
         artists.append(curve1)
         artists.append(curve2)
 
-        return curve1, curve2
+        return artists
 
     # anim1 = anim.FuncAnimation(fig1, animate_recon, frames = n_slices, interval = 150, blit = True)
     # anim2 = anim.FuncAnimation(fig2, animate_proj, frames = n_theta, interval = 150, blit = True)
