@@ -172,14 +172,14 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
 
     x_shifts_pc = np.zeros((n_iterations, n_theta))
     y_shifts_pc = np.zeros((n_iterations, n_theta))
-
-    x_shift_pc_array = np.zeros(n_theta)
-    y_shift_pc_array = np.zeros(n_theta)
     
     for iteration_idx in range(n_iterations):
         print('Iteration ' + str(iteration_idx + 1) + '/' + str(n_iterations))
 
         iterations.append(iteration_idx)
+
+        x_shift_pc_array = np.zeros(n_theta)
+        y_shift_pc_array = np.zeros(n_theta)
         
         if iteration_idx > 0:
             for theta_idx in range(n_theta):
