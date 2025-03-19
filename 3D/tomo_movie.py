@@ -264,8 +264,8 @@ else:
         curve1.set_ydata(net_shift_x)
         curve2.set_ydata(net_shift_y)
 
-        min_shift = np.min(np.min(net_shift_x), np.min(net_shift_y))
-        max_shift = np.max(np.max(net_shift_x), np.max(net_shift_y))
+        min_shift = np.min([np.min(net_shift_x), np.min(net_shift_y)])
+        max_shift = np.max([np.max(net_shift_x), np.max(net_shift_y)])
 
         axs3.set_ylim(min_shift, max_shift)
         axs3.set_title(r'$\theta = {0}$\textdegree'.format(theta_array[frame]))
