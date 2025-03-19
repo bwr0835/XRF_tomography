@@ -271,7 +271,7 @@ else:
         min_shift = np.min([np.min(net_shift_x), np.min(net_shift_y)])
         max_shift = np.max([np.max(net_shift_x), np.max(net_shift_y)])
 
-        axs3.set_ylim(min_shift, max_shift)
+        axs3.set_ylim(min_shift, max_shift + 0.1)
         axs3.set_title(r'$\theta = {0}$\textdegree'.format(theta_array[frame]))
         
         # shift_title.set_text(r'$\theta = {0}$\textdegree'.format(theta_array[frame]))
@@ -284,7 +284,7 @@ else:
 
     # anim1 = anim.FuncAnimation(fig1, animate_recon, frames = n_slices, interval = 150, blit = True)
     # anim2 = anim.FuncAnimation(fig2, animate_proj, frames = n_theta, interval = 150, blit = True)
-    anim3 = anim.FuncAnimation(fig3, animate_shifts, frames = n_theta, interval = 20, blit = False)
+    anim3 = anim.FuncAnimation(fig3, animate_shifts, frames = n_theta, interval = 5, blit = False)
 
     plt.show()
 
