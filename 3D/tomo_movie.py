@@ -86,69 +86,70 @@ else:
     
     iteration_subdir_array = sorted(iteration_subdir_array, key = get_iteration)
 
+    iteration_subdir_array_truncated = [iteration_subdir_array[0], iteration_subdir_array[-1]]
+
     n_iterations = len(iteration_subdir_array)    
 
-    for idx, subdir in enumerate(iteration_subdir_array):
-        if idx == 0 or idx == n_iterations - 1:
-            synthetic_proj_data = []
-            actual_proj_data = []
-            xcorr_proj_data = []
-            recon_data = []
-            shift_rgb_data = []
+    for idx, subdir in enumerate(iteration_subdir_array_truncated):
+        synthetic_proj_data = []
+        actual_proj_data = []
+        xcorr_proj_data = []
+        recon_data = []
+        shift_rgb_data = []
 
-            synthetic_proj_dir_path = os.path.join(directory_path, subdir, 'synthesized')
-            actual_proj_dir_path = os.path.join(directory_path, subdir, 'experimental')
-            xcorr_dir_path = os.path.join(directory_path, subdir, 'xcorr')
-            recon_dir_path = os.path.join(directory_path, subdir, 'recon')
+        synthetic_proj_dir_path = os.path.join(directory_path, subdir, 'synthesized')
+        actual_proj_dir_path = os.path.join(directory_path, subdir, 'experimental')
+        xcorr_dir_path = os.path.join(directory_path, subdir, 'xcorr')
+        recon_dir_path = os.path.join(directory_path, subdir, 'recon')
 
-            proj_file_name = [file_name for file_name in os.listdir(synthetic_proj_dir_path)]
+        proj_file_name = [file_name for file_name in os.listdir(synthetic_proj_dir_path)]
             # actual_proj_file_path = [file_name for file_name in os.listdir(actual_proj_dir_path)]
             # xcorr_proj_file_path = [file_name for file_name in os.listdir(xcorr_dir_path)]
-            recon_file_name = [file_name for file_name in os.listdir(recon_dir_path)]
+        recon_file_name = [file_name for file_name in os.listdir(recon_dir_path)]
 
-            proj_file_name = sorted(proj_file_name, key = get_theta)
-            recon_file_name = sorted(recon_file_name, key = get_slice)
+        proj_file_name = sorted(proj_file_name, key = get_theta)
+        recon_file_name = sorted(recon_file_name, key = get_slice)
 
-            synthetic_proj_file_path = [os.path.join(synthetic_proj_dir_path, file_name) for file_name in proj_file_name]
-            actual_proj_file_path = [os.path.join(actual_proj_dir_path, file_name) for file_name in proj_file_name]
-            xcorr_proj_file_path = [os.path.join(xcorr_dir_path, file_name) for file_name in proj_file_name]
-            recon_file_path = [os.path.join(recon_dir_path, file_name) for file_name in recon_file_name]
+        synthetic_proj_file_path = [os.path.join(synthetic_proj_dir_path, file_name) for file_name in proj_file_name]
+        actual_proj_file_path = [os.path.join(actual_proj_dir_path, file_name) for file_name in proj_file_name]
+        xcorr_proj_file_path = [os.path.join(xcorr_dir_path, file_name) for file_name in proj_file_name]
+        recon_file_path = [os.path.join(recon_dir_path, file_name) for file_name in recon_file_name]
 
-            print('Loading projection images...')
+        print('Loading projection images...')
 
-            for theta_idx in range(n_theta):
-                synthetic_proj[theta_idx] = np.load(synthetic_proj_file_path[theta_idx])
-                actual_proj[theta_idx] = np.load(actual_proj_file_path[theta_idx])
-                xcorr_proj[theta_idx] = fftshift(np.load(xcorr_proj_file_path[theta_idx]))
+        for theta_idx in range(n_theta):
+            synthetic_proj[theta_idx] = np.load(synthetic_proj_file_path[theta_idx])
+            actual_proj[theta_idx] = np.load(actual_proj_file_path[theta_idx])
+            xcorr_proj[theta_idx] = fftshift(np.load(xcorr_proj_file_path[theta_idx]))
 
-                synthetic_proj_scaled = normalize_array(synthetic_proj[theta_idx])
-                actual_proj_scaled = normalize_array(actual_proj[theta_idx])
+            synthetic_proj_scaled = normalize_array(synthetic_proj[theta_idx])
+            actual_proj_scaled = normalize_array(actual_proj[theta_idx])
 
-                shift_rgb = np.dstack((actual_proj_scaled, np.zeros_like(synthetic_proj_scaled), synthetic_proj_scaled))
+            shift_rgb = np.dstack((actual_proj_scaled, np.zeros_like(synthetic_proj_scaled), synthetic_proj_scaled))
 
-                synthetic_proj_data.append(synthetic_proj[theta_idx])
-                actual_proj_data.append(actual_proj[theta_idx])
-                xcorr_proj_data.append(xcorr_proj[theta_idx])
-                shift_rgb_data.append(shift_rgb)
+            synthetic_proj_data.append(synthetic_proj[theta_idx])
+            actual_proj_data.append(actual_proj[theta_idx])
+            xcorr_proj_data.append(xcorr_proj[theta_idx])
+            shift_rgb_data.append(shift_rgb)
 
-            print('Loading reconstructions...')
+        print('Loading reconstructions...')
 
-            for slice_idx in range(n_slices):
-                recon[slice_idx] = np.load(recon_file_path[slice_idx])
+        for slice_idx in range(n_slices):
+            recon[slice_idx] = np.load(recon_file_path[slice_idx])
 
-                recon_data.append(recon[slice_idx])
+            recon_data.append(recon[slice_idx])
 
-            synthetic_proj_data = np.array(synthetic_proj_data)
-            actual_proj_data = np.array(actual_proj_data)
-            xcorr_proj_data = np.array(xcorr_proj_data)
-            recon_data = np.array(recon_data)
-            shift_rgb_data = np.array(shift_rgb_data)
+        synthetic_proj_data = np.array(synthetic_proj_data)
+        actual_proj_data = np.array(actual_proj_data)
+        xcorr_proj_data = np.array(xcorr_proj_data)
+        recon_data = np.array(recon_data)
+        shift_rgb_data = np.array(shift_rgb_data)
         
-            synthetic_proj_data_dict[subdir] = synthetic_proj_data
-            actual_proj_data_dict[subdir] = actual_proj_data
-            xcorr_proj_data_dict[subdir] = xcorr_proj_data
-            recon_data_dict[subdir] = recon_data
-            shift_change_dict[subdir] = shift_rgb_data
+        synthetic_proj_data_dict[subdir] = synthetic_proj_data
+        actual_proj_data_dict[subdir] = actual_proj_data
+        xcorr_proj_data_dict[subdir] = xcorr_proj_data
+        recon_data_dict[subdir] = recon_data
+        shift_change_dict[subdir] = shift_rgb_data
 
     x_shifts_file_path = os.path.join(directory_path, net_shift_subdir, 'x_shift_array.npy')
     y_shifts_file_path = os.path.join(directory_path, net_shift_subdir, 'y_shift_array.npy')
@@ -162,8 +163,8 @@ else:
 
     iter_array = 1 + np.arange(n_iterations)
 
-    curve1, = axs3.plot(iter_array, np.zeros_like(iter_array), label = r'$\Delta x$', color = 'k')
-    curve2, = axs3.plot(iter_array, np.zeros_like(iter_array), label = r'$\Delta y$', color = 'r')
+    curve1, _ = axs3.plot(iter_array, np.zeros_like(iter_array), label = r'$\Delta x$', color = 'k')
+    curve2, _ = axs3.plot(iter_array, np.zeros_like(iter_array), label = r'$\Delta y$', color = 'r')
 
     axs1[0].set_title(r'Recon. Slice (It. 1)')
     axs1[1].set_title(r'Recon. Slice (It. {0})'.format(n_iterations))
@@ -191,58 +192,41 @@ else:
     proj_text = []
 
     for idx, subdir in enumerate(iteration_subdir_array):
-        if idx == 0 or idx == n_iterations - 1:
-            recons = recon_data_dict[subdir]
-            exp_projs = actual_proj_data_dict[subdir]
-            synth_projs = synthetic_proj_data_dict[subdir]
-            xcorrs = xcorr_proj_data_dict[subdir]
-            shift_rgbs = shift_change_dict[subdir]
+        recons = recon_data_dict[subdir]
+        exp_projs = actual_proj_data_dict[subdir]
+        synth_projs = synthetic_proj_data_dict[subdir]
+        xcorrs = xcorr_proj_data_dict[subdir]
+        shift_rgbs = shift_change_dict[subdir]
 
-            if idx == 0:
-                im1 = axs1[0].imshow(recons[0])
-                im2_0 = axs2[0, 0].imshow(exp_projs[0])
-                im2_1 = axs2[0, 1].imshow(synth_projs[0])
-                im2_2 = axs2[0, 2].imshow(xcorrs[0])
-                im2_3 = axs2[0, 3].imshow(shift_rgbs[0])
+        im1 = axs1[idx].imshow(recons[0])
+        im2_0 = axs2[idx, 0].imshow(exp_projs[0])
+        im2_1 = axs2[idx, 1].imshow(synth_projs[0])
+        im2_2 = axs2[idx, 2].imshow(xcorrs[0])
+        im2_3 = axs2[idx, 3].imshow(shift_rgbs[0])
 
-            else:
-                im1 = axs1[1].imshow(recons[0])
-                im2_0 = axs2[1, 0].imshow(exp_projs[0])
-                im2_1 = axs2[1, 1].imshow(synth_projs[0])
-                im2_2 = axs2[1, 2].imshow(xcorrs[0])
-                im2_3 = axs2[1, 3].imshow(shift_rgbs[0])
+        recon_imgs.append(im1)
+        exp_proj_imgs.append(im2_0)
+        synthetic_proj_imgs.append(im2_1)
+        xcorr_imgs.append(im2_2)
+        shift_rgb_imgs.append(im2_3)
 
-            recon_imgs.append(im1)
-            exp_proj_imgs.append(im2_0)
-            synthetic_proj_imgs.append(im2_1)
-            xcorr_imgs.append(im2_2)
-            shift_rgb_imgs.append(im2_3)
-
-            text_recon = axs1[0].text(0.02, 0.02, r'Slice 0', transform = axs1[0].transAxes, color = 'white')
-            text_proj = axs2[0, 0].text(0.02, 0.02, r'$\theta = {0}$\textdegree'.format(theta_array[0]), transform = axs2[0, 0].transAxes, color = 'white')    
+        text_recon = axs1[0].text(0.02, 0.02, r'Slice 0', transform = axs1[0].transAxes, color = 'white')
+        text_proj = axs2[0, 0].text(0.02, 0.02, r'$\theta = {0}$\textdegree'.format(theta_array[0]), transform = axs2[0, 0].transAxes, color = 'white')    
         
-            if idx == 0:
-                recon_text.append(text_recon)
-                proj_text.append(text_proj)
+        if idx == 0:
+            recon_text.append(text_recon)
+            proj_text.append(text_proj)
 
     def animate_recon(frame):
         artists = []
 
         for idx, subdir in enumerate(iteration_subdir_array):
-            if idx == 0 or idx == n_iterations - 1:
-                recons = recon_data_dict[subdir]
-                
-                if idx == 0:
-                    recon_imgs[0].set_array(recons[frame])
+            recons = recon_data_dict[subdir]
 
-                    artists.append(recon_imgs[0])
-                
-                else:
-                    recon_imgs[1].set_array(recons[frame])
-
-                    artists.append(recon_imgs[1])
-        
-        recon_text[0].set_text(r'Slice {0}'.format(frame))
+            recon_imgs[idx].set_array(recons[frame])
+            recon_text[0].set_text(r'Slice {0}'.format(frame))
+            
+            artists.append(recon_imgs[idx])
         
         artists.append(recon_text[0])
 
@@ -252,34 +236,20 @@ else:
         artists = []
 
         for idx, subdir in enumerate(iteration_subdir_array):
-            if idx == 0 or idx == n_iterations - 1:
-                exp_projs = actual_proj_data_dict[subdir]
-                synth_projs = synthetic_proj_data_dict[subdir]
-                xcorrs = xcorr_proj_data_dict[subdir]
-                shift_rgbs = shift_change_dict[subdir]
-            
-                if idx == 0:
-                    exp_proj_imgs[0].set_array(exp_projs[frame])
-                    synthetic_proj_imgs[0].set_array(synth_projs[frame])
-                    xcorr_imgs[0].set_array(xcorrs[frame])
-                    shift_rgb_imgs[0].set_array(shift_rgbs[frame])
+            exp_projs = actual_proj_data_dict[subdir]
+            synth_projs = synthetic_proj_data_dict[subdir]
+            xcorrs = xcorr_proj_data_dict[subdir]
+            shift_rgbs = shift_change_dict[subdir]
 
-                    artists.append(exp_proj_imgs[0])
-                    artists.append(synthetic_proj_imgs[0])
-                    artists.append(xcorr_imgs[0])
-                    artists.append(shift_rgb_imgs[0])
-            
-                else:
-                    exp_proj_imgs[1].set_array(exp_projs[frame])
-                    synthetic_proj_imgs[1].set_array(synth_projs[frame])
-                    xcorr_imgs[1].set_array(xcorrs[frame])
-                    shift_rgb_imgs[1].set_array(shift_rgbs[frame])
+            exp_proj_imgs[idx].set_array(exp_projs[frame])
+            synthetic_proj_imgs[idx].set_array(synth_projs[frame])
+            xcorr_imgs[idx].set_array(xcorrs[frame])
+            shift_rgb_imgs[idx].set_array(shift_rgbs[frame])
 
-                    artists.append(exp_proj_imgs[1])
-                    artists.append(synthetic_proj_imgs[1])
-                    artists.append(xcorr_imgs[1])
-                    artists.append(shift_rgb_imgs[1])
-
+            artists.append(exp_proj_imgs[idx])
+            artists.append(synthetic_proj_imgs[idx])
+            artists.append(xcorr_imgs[idx])
+            artists.append(shift_rgb_imgs[idx])
         
         proj_text[0].set_text(r'$\theta = {0}$\textdegree'.format(theta_array[frame]))
 
