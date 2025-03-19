@@ -260,8 +260,6 @@ else:
         return artists
     
     def animate_shifts(frame):
-        artists = []
-        
         net_shift_x = x_shifts_data[:, frame]
         net_shift_y = y_shifts_data[:, frame]
 
@@ -276,11 +274,9 @@ else:
         shift_title.set_text(r'$\theta = {0}$\textdegree'.format(theta_array[frame]))
         # axs3.set_title(r'$\theta = {0}$\textdegree'.format(theta_array[frame]))
 
-        artists.append(curve1)
-        artists.append(curve2)
-        artists.append(shift_title)
+        
 
-        return artists
+        return curve1, curve2
 
     anim1 = anim.FuncAnimation(fig1, animate_recon, frames = n_slices, interval = 150, blit = True)
     anim2 = anim.FuncAnimation(fig2, animate_proj, frames = n_theta, interval = 150, blit = True)
