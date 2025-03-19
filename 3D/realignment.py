@@ -330,7 +330,7 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
                     print('Slice ' + str(slice_idx + 1) + '/' + str(n_slices))
                     proj_slice = recon[element_idx, slice_idx, :, :]
 
-                    proj_imgs_from_3d_recon[element_idx, :, slice_idx, :] = (skimage.transform.radon(proj_slice, theta = theta_array, preserve_range = True)).T # This radon transform assumes slices are defined by columns and not rows
+                    proj_imgs_from_3d_recon[element_idx, :, slice_idx, :] = (skimage.transform.radon(proj_slice, theta = theta_array)).T # This radon transform assumes slices are defined by columns and not rows
                     
                     # save_recon_slice_npy(proj_slice, iteration_idx, slice_idx, 'gridrec', output_dir_path)
                 
@@ -428,7 +428,7 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
                     # aligned_proj[element_idx, theta_idx, :, :] = xform.warp(xrf_proj_img_array[ref_element_idx, theta_idx, :, :], tform, preserve_range = True) # Undo the translational shifts by the cross-correlation peak
                     aligned_proj[element_idx, theta_idx, :, :] = spndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx, :, :], shift = (y_shift, x_shift)) # Undo the translational shifts by the cross-correlation peak
 
-        current_xrf_proj_img_array = np.copy(aligned_proj)
+        current_xrf_proj_img_array = aligned_proj.copy()
 
         # if (iteration_idx % 9 == 0) and iteration_idx > 0:
         #     fig13 = plt.figure(9)
