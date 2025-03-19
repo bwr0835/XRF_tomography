@@ -274,10 +274,7 @@ else:
 
     anim1 = anim.FuncAnimation(fig1, animate_recon, frames = n_slices, interval = 150, blit = True)
     anim2 = anim.FuncAnimation(fig2, animate_proj, frames = n_theta, interval = 150, blit = True)
-
-    fig3 = plt.figure()
-    plt.plot(1 + np.arange(n_iterations), x_shifts_data[:, x_shifts_data.shape[1]//2])
-    plt.plot(1 + np.arange(n_iterations), y_shifts_data[:, y_shifts_data.shape[1]//2])
+    anim3 = anim.FuncAnimation(fig3, animate_shifts, frames = n_theta, interval = 150, blit = True)
 
     plt.show()
 
