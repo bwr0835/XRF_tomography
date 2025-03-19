@@ -163,7 +163,10 @@ else:
 
     iter_array = 1 + np.arange(n_iterations)
 
+    curve1, = axs3.plot(iter_array, np.zeros_like(iter_array), 'k-o', markersize = 3, label = r'$\Delta x$')
+    curve2, = axs3.plot(iter_array, np.zeros_like(iter_array), 'r-o', markersize = 3, label = r'$\Delta y$')
 
+    shift_title = axs3.text(0.5, 1.1, r'$\theta = {0}'.format(theta_array[0]), transform = axs3.transAxes, color = 'black', fontsize = 16, ha = 'center')
 
     axs1[0].set_title(r'Recon. Slice (It. 1)')
     axs1[1].set_title(r'Recon. Slice (It. {0})'.format(n_iterations))
@@ -208,7 +211,7 @@ else:
         synthetic_proj_imgs.append(im2_1)
         xcorr_imgs.append(im2_2)
         shift_rgb_imgs.append(im2_3)
-
+    
         text_recon = axs1[0].text(0.02, 0.02, r'Slice 0', transform = axs1[0].transAxes, color = 'white')
         text_proj = axs2[0, 0].text(0.02, 0.02, r'$\theta = {0}$\textdegree'.format(theta_array[0]), transform = axs2[0, 0].transAxes, color = 'white')    
         
@@ -259,9 +262,6 @@ else:
     def animate_shifts(frame):
         artists = []
         
-        curve1, = axs3.plot(iter_array, np.zeros_like(iter_array), 'k-o', markersize = 3, label = r'$\Delta x$')
-        curve2, = axs3.plot(iter_array, np.zeros_like(iter_array), 'r-o', markersize = 3, label = r'$\Delta y$')
-
         net_shift_x = x_shifts_data[:, frame]
         net_shift_y = y_shifts_data[:, frame]
 
@@ -272,10 +272,13 @@ else:
         max_shift = np.max([np.max(net_shift_x), np.max(net_shift_y)])
 
         axs3.set_ylim(min_shift, max_shift)
-        axs3.set_title(r'$\theta = {0}$\textdegree'.format(theta_array[frame]))
+        
+        shift_title.set_text(r'$\theta = {0}$\textdegree'.format(theta_array[frame]))
+        # axs3.set_title(r'$\theta = {0}$\textdegree'.format(theta_array[frame]))
 
         artists.append(curve1)
         artists.append(curve2)
+        artists.append(shift_title)
 
         return artists
 
