@@ -149,7 +149,7 @@ def save_theta_array(theta_array, recon_mode, output_file_path):
 
     return
 
-def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_iterations, output_dir_path, eps = 0.3):
+def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_iterations, output_dir_path, eps = 0.3): # Assuming no initial shift performed
     n_elements = xrf_proj_img_array.shape[0] # Number of elements
     n_theta = xrf_proj_img_array.shape[1] # Number of projection angles (projection images)
     n_slices = xrf_proj_img_array.shape[2] # Number of rows in a projection image
@@ -276,11 +276,17 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
             y_shifts_pc[iteration_idx, theta_idx] = y_shift_pc
             
         else:
-            x_shifts_cc[iteration_idx, theta_idx] = x_shifts_cc[iteration_idx - 1, theta_idx] + x_shift_cc
-            y_shifts_cc[iteration_idx, theta_idx] = y_shifts_cc[iteration_idx - 1, theta_idx] + y_shift_cc
+            x_shifts_cc[iteration_idx, theta_idx] += x_shift_cc
+            y_shifts_cc[iteration_idx, theta_idx] += y_shift_cc
 
-            x_shifts_pc[iteration_idx, theta_idx] = x_shifts_pc[iteration_idx - 1, theta_idx] + x_shift_pc
-            y_shifts_pc[iteration_idx, theta_idx] = y_shifts_pc[iteration_idx - 1, theta_idx] + y_shift_pc
+            x_shifts_pc[iteration_idx, theta_idx] += x_shift_pc
+            y_shifts_pc[iteration_idx, theta_idx] += y_shift_pc
+
+            # x_shifts_cc[iteration_idx, theta_idx] = x_shifts_cc[iteration_idx - 1, theta_idx] + x_shift_cc
+            # y_shifts_cc[iteration_idx, theta_idx] = y_shifts_cc[iteration_idx - 1, theta_idx] + y_shift_cc
+
+            # x_shifts_pc[iteration_idx, theta_idx] = x_shifts_pc[iteration_idx - 1, theta_idx] + x_shift_pc
+            # y_shifts_pc[iteration_idx, theta_idx] = y_shifts_pc[iteration_idx - 1, theta_idx] + y_shift_pc
 
         
             
