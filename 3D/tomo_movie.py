@@ -163,8 +163,8 @@ else:
 
     iter_array = 1 + np.arange(n_iterations)
 
-    curve1 = axs3.plot(iter_array, [], 'k-o', markersize = 3, label = r'$\Delta x$')[0]
-    curve2 = axs3.plot(iter_array, [], 'r-o', markersize = 3, label = r'$\Delta y$')[0]
+    curve1 = axs3.plot(iter_array, np.zeros_like(iter_array), 'k-o', markersize = 3, label = r'$\Delta x$')[0]
+    curve2 = axs3.plot(iter_array, np.zeros_like(iter_array), 'r-o', markersize = 3, label = r'$\Delta y$')[0]
 
     axs1[0].set_title(r'Recon. Slice (It. 1)')
     axs1[1].set_title(r'Recon. Slice (It. {0})'.format(n_iterations))
