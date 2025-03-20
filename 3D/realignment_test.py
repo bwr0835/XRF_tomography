@@ -327,10 +327,18 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
 
                 if theta_idx == n_theta//2:
                     diff = aligned_proj[ref_element_idx, theta_idx, :, :] - xrf_proj_img_array[ref_element_idx, theta_idx, :, :]
+                    
+                    y, x = phase_correlate(xrf_proj_img_array[ref_element_idx, theta_idx, :, :], aligned_proj[ref_element_idx, theta_idx, :, :], upsample_factor = 50)
 
                     plt.imshow(diff)
+                    
+                    shift = spndi.shift(aligned_proj[ref_element_idx, theta_idx, :, :], shift = (y, x))
+
+                    y, x = phase_correlate(xrf_proj_img_array[ref_element_idx, theta_idx, :, :], shift)
+
+                    print(print(str(y) + ', ' + str(x)))
+
                     plt.show()
-        
         else:
             aligned_proj = xrf_proj_img_array
 
