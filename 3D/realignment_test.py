@@ -334,7 +334,7 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
                     
                     shift = spndi.shift(aligned_proj[ref_element_idx, theta_idx, :, :], shift = (y, x))
 
-                    y, x = phase_correlate(xrf_proj_img_array[ref_element_idx, theta_idx, :, :], shift)
+                    y, x = phase_correlate(xrf_proj_img_array[ref_element_idx, theta_idx, :, :], shift, upsample_factor = 50)
 
                     print(print(str(y) + ', ' + str(x)))
 
