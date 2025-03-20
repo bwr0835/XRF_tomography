@@ -193,7 +193,8 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
                     print('Cumulative x shift = ' + str(x_shift))
                     print('Cumulative y shift = ' + str(y_shift))
                     
-                aligned_proj[ref_element_idx, theta_idx, :, :] = spndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx, :, :], shift = (y_shift, x_shift))
+                # aligned_proj[ref_element_idx, theta_idx, :, :] = spndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx, :, :], shift = (y_shift, x_shift))
+                aligned_proj[ref_element_idx, theta_idx, :, :] = spndi.shift(current_xrf_proj_img[ref_element_idx, theta_idx, :, :], shift = (y_shift, x_shift))
 
         elif init_x_shift != 0 or init_y_shift != 0:
             print('Initial x shift: ' + str(init_x_shift))
@@ -227,8 +228,8 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
             # save_recon_slice_npy(proj_slice, iteration_idx, slice_idx, 'gridrec', output_dir_path)
     
         for theta_idx in range(n_theta):
-            y_shift_cc, x_shift_cc, corr_mat_cc = cross_correlate(proj_imgs_from_3d_recon[theta_idx, :, :], aligned_proj[ref_element_idx, theta_idx, :, :]) # Cross-correlation
-            y_shift_pc, x_shift_pc = phase_correlate(proj_imgs_from_3d_recon[theta_idx, :, :], aligned_proj[ref_element_idx, theta_idx, :, :], upsample_factor = 50)
+            y_shift_pc, x_shift_pc, corr_mat_cc = cross_correlate(proj_imgs_from_3d_recon[theta_idx, :, :], aligned_proj[ref_element_idx, theta_idx, :, :]) # Cross-correlation
+            # y_shift_pc, x_shift_pc = phase_correlate(proj_imgs_from_3d_recon[theta_idx, :, :], aligned_proj[ref_element_idx, theta_idx, :, :], upsample_factor = 50)
             
             x_shift_pc_array[theta_idx] = x_shift_pc
             y_shift_pc_array[theta_idx] = y_shift_pc
@@ -273,7 +274,8 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
             # save_theta_array(theta_array, 'gridrec', output_dir_path)
 
             break
-            
+        
+        current_xrf_proj_img = aligned_proj.copy()
 # root = tk.Tk()
     
 # root.withdraw()
