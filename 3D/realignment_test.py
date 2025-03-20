@@ -297,7 +297,7 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
     x_shift_pc_array = np.zeros(n_theta)
     y_shift_pc_array = np.zeros(n_theta)
 
-    init_x_shift = 0
+    init_x_shift = -223.32
     init_y_shift = 0
     
     for iteration_idx in range(n_iterations):
@@ -307,18 +307,14 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
         
         if iteration_idx > 0:
             for theta_idx in range(n_theta):
-                cum_x_shift = x_shifts_pc[iteration_idx - 1, theta_idx] # Cumulative shift
-                cum_y_shift = y_shifts_pc[iteration_idx - 1, theta_idx]
-
-                x_shift = (x_shift_pc_array[theta_idx]).copy()
-                y_shift = (y_shift_pc_array[theta_idx]).copy()
+                x_shift = x_shifts_pc[iteration_idx - 1, theta_idx] # Cumulative shift
+                y_shift = y_shifts_pc[iteration_idx - 1, theta_idx]
 
                 if theta_idx % 7 == 0:
-                    print('Cumulative x shift = ' + str(cum_x_shift))
-                    print('Cumulative y shift = ' + str(cum_y_shift))
+                    print('Cumulative x shift = ' + str(x_shift))
+                    print('Cumulative y shift = ' + str(y_shift))
                     
-                # aligned_proj[ref_element_idx, theta_idx, :, :] = spndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx, :, :], shift = (y_shift, x_shift))
-                aligned_proj[ref_element_idx, theta_idx, :, :] = spndi.shift(aligned_proj[ref_element_idx, theta_idx, :, :], shift = (y_shift, x_shift))
+                aligned_proj[ref_element_idx, theta_idx, :, :] = spndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx, :, :], shift = (y_shift, x_shift))
 
         elif init_x_shift != 0 or init_y_shift != 0:
             print('Initial x shift: ' + str(init_x_shift))
