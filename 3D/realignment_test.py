@@ -298,7 +298,7 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
     x_shift_pc_array = np.zeros(n_theta)
     y_shift_pc_array = np.zeros(n_theta)
 
-    init_x_shift = -2
+    init_x_shift = -15
     init_y_shift = 0
     
     for iteration_idx in range(n_iterations):
@@ -324,6 +324,12 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
             
             for theta_idx in range(n_theta):
                 aligned_proj[ref_element_idx, theta_idx, :, :] = spndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx, :, :], shift = (init_y_shift, init_x_shift))
+
+                if theta_idx == n_theta//2:
+                    diff = aligned_proj[ref_element_idx, theta_idx, :, :] - xrf_proj_img_array[ref_element_idx, theta_idx, :, :]
+
+                    plt.imshow(diff)
+                    plt.show()
         
         else:
             aligned_proj = xrf_proj_img_array
@@ -351,7 +357,7 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
     
         for theta_idx in range(n_theta):
             # y_shift_pc, x_shift_cc, corr_mat_cc = cross_correlate(proj_imgs_from_3d_recon[theta_idx, :, :], aligned_proj[ref_element_idx, theta_idx, :, :]) # Cross-correlation
-            y_shift_pc, x_shift_pc = phase_correlate(edge_gauss_filter(proj_imgs_from_3d_recon[theta_idx, :, :], 5, 10, n_columns, n_slices), edge_gauss_filter(aligned_proj[ref_element_idx, theta_idx, :, :], 5, 10, n_columns, n_slices), upsample_factor = 50)
+            y_shift_pc, x_shift_pc = phase_correlate(proj_imgs_from_3d_recon[theta_idx, :, :], aligned_proj[ref_element_idx, theta_idx, :, :], upsample_factor = 50)
             
             x_shift_pc_array[theta_idx] = x_shift_pc
             y_shift_pc_array[theta_idx] = y_shift_pc
