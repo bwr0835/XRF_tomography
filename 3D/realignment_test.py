@@ -175,6 +175,9 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
 
     x_shift_pc_array = np.zeros(n_theta)
     y_shift_pc_array = np.zeros(n_theta)
+
+    init_x_shift = -2
+    init_y_shift = 0
     
     for iteration_idx in range(n_iterations):
         print('Iteration ' + str(iteration_idx + 1) + '/' + str(n_iterations))
@@ -183,21 +186,22 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
         
         if iteration_idx > 0:
             for theta_idx in range(n_theta):
-                x_shift = x_shifts_pc[iteration_idx - 1, theta_idx]
+                x_shift = x_shifts_pc[iteration_idx - 1, theta_idx] # Cumulative shift
                 y_shift = y_shifts_pc[iteration_idx - 1, theta_idx]
 
                 if theta_idx % 7 == 0:
                     print('Cumulative x shift = ' + str(x_shift))
                     print('Cumulative y shift = ' + str(y_shift))
                     
-                # alignexd_proj[element_idx, theta_idx, :, :] = sr_trans.register_transform(ref = proj_imgs_from_3d_recon[ref_element_idx, theta_idx, :, :], mov = current_xrf_proj_img_array[ref_element_idx, theta_idx, :, :])
-                # tform = xform.SimilarityTransform(translation = (x_shift, y_shift))
-                # aligned_proj[element_idx, theta_idx, :, :] = xform.warp(xrf_proj_img_array[ref_element_idx, theta_idx, :, :], tform, preserve_range = True) # Undo the translational shifts by the cross-correlation peak
-                aligned_proj[ref_element_idx, theta_idx, :, :] = spndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx, :, :], shift = (y_shift, x_shift)) # Undo the translational shifts by the cross-correlation peak
-
+                aligned_proj[ref_element_idx, theta_idx, :, :] = spndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx, :, :], shift = (y_shift, x_shift))
+                
+        elif init_x_shift != 0 or init_y_shift != 0:
+            for theta_idx in range(n_theta):
+                aligned_proj[ref_element_idx, theta_idx, :, :] = spndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx, :, :], shift = (init_y_shift, init_x_shift))
+        
         else:
             aligned_proj = xrf_proj_img_array
-        
+
         algorithm = 'gridrec'
 
         print('Performing ' + algorithm)
@@ -217,31 +221,30 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
 
             proj_imgs_from_3d_recon[:, slice_idx, :] = (skimage.transform.radon(proj_slice, theta = theta_array)).T # This radon transform assumes slices are defined by columns and not rows
                     
-            save_recon_slice_npy(proj_slice, iteration_idx, slice_idx, 'gridrec', output_dir_path)
+            # save_recon_slice_npy(proj_slice, iteration_idx, slice_idx, 'gridrec', output_dir_path)
     
         for theta_idx in range(n_theta):
             y_shift_cc, x_shift_cc, corr_mat_cc = cross_correlate(proj_imgs_from_3d_recon[theta_idx, :, :], aligned_proj[ref_element_idx, theta_idx, :, :]) # Cross-correlation
             y_shift_pc, x_shift_pc = phase_correlate(proj_imgs_from_3d_recon[theta_idx, :, :], aligned_proj[ref_element_idx, theta_idx, :, :], upsample_factor = 50)
-            # y_shift_pc, x_shift_pc = subpixel_cross_correlation(proj_imgs_from_3d_recon[ref_element_idx, theta_idx, :, :], reference_projection_imgs[theta_idx])
             
             x_shift_pc_array[theta_idx] = x_shift_pc
             y_shift_pc_array[theta_idx] = y_shift_pc
 
-            save_proj_img_npy(proj_imgs_from_3d_recon[theta_idx, :, :], iteration_idx, theta_array[theta_idx], 'synthesized', 'gridrec', output_dir_path)
-            save_proj_img_npy(aligned_proj[ref_element_idx, theta_idx, :, :], iteration_idx, theta_array[theta_idx], 'experimental', 'gridrec', output_dir_path)
-            save_proj_img_npy(corr_mat_cc, iteration_idx, theta_array[theta_idx], 'xcorr', 'gridrec', output_dir_path)
+            # save_proj_img_npy(proj_imgs_from_3d_recon[theta_idx, :, :], iteration_idx, theta_array[theta_idx], 'synthesized', 'gridrec', output_dir_path)
+            # save_proj_img_npy(aligned_proj[ref_element_idx, theta_idx, :, :], iteration_idx, theta_array[theta_idx], 'experimental', 'gridrec', output_dir_path)
+            # save_proj_img_npy(corr_mat_cc, iteration_idx, theta_array[theta_idx], 'xcorr', 'gridrec', output_dir_path)
 
             if theta_idx % 7 == 0:
                 print('x-shift: ' + str(x_shift_pc) + ' (Theta = ' + str(theta_array[theta_idx]) + ' degrees')
                 print('y-shift: ' + str(y_shift_pc))
             
             if iteration_idx == 0:
-                x_shifts_pc[iteration_idx, theta_idx] = x_shift_pc_array[theta_idx]
-                y_shifts_pc[iteration_idx, theta_idx] = y_shift_pc_array[theta_idx]
-            
+                x_shifts_pc[iteration_idx, theta_idx] = x_shift_pc
+                y_shifts_pc[iteration_idx, theta_idx] = y_shift_pc
+                
             else:
-                x_shifts_pc[iteration_idx, theta_idx] = x_shifts_pc[iteration_idx - 1, theta_idx] + x_shift_pc_array[theta_idx]
-                y_shifts_pc[iteration_idx, theta_idx] = y_shifts_pc[iteration_idx - 1, theta_idx] + y_shift_pc_array[theta_idx]
+                x_shifts_pc[iteration_idx, theta_idx] = x_shifts_pc[iteration_idx - 1, theta_idx] + x_shift_pc
+                y_shifts_pc[iteration_idx, theta_idx] = y_shifts_pc[iteration_idx - 1, theta_idx] + y_shift_pc
 
         if np.max(np.abs(x_shift_pc_array)) <= eps and np.max(np.abs(y_shift_pc_array)) <= eps:
             print('Number of iterations taken: ' + str(iteration_idx + 1))
@@ -251,9 +254,9 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
             x_shifts_pc_new = x_shifts_pc[:len(iterations)]
             y_shifts_pc_new = y_shifts_pc[:len(iterations)]
 
-            save_net_shift_data_npy(x_shifts_pc_new, 'x', 'gridrec', output_dir_path)
-            save_net_shift_data_npy(y_shifts_pc_new, 'y', 'gridrec', output_dir_path)
-            save_theta_array(theta_array, 'gridrec', output_dir_path)
+            # save_net_shift_data_npy(x_shifts_pc_new, 'x', algorithm, output_dir_path)
+            # save_net_shift_data_npy(y_shifts_pc_new, 'y', algorithm, output_dir_path)
+            # save_theta_array(theta_array, algorithm, output_dir_path)
         
             break
         
@@ -262,33 +265,11 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
 
             iterations = np.array(iterations)
             
-            save_net_shift_data_npy(x_shifts_pc, 'x', 'gridrec', output_dir_path)
-            save_net_shift_data_npy(y_shifts_pc, 'y', 'gridrec', output_dir_path)
-            save_theta_array(theta_array, 'gridrec', output_dir_path)
+            # save_net_shift_data_npy(x_shifts_pc, 'x', 'gridrec', output_dir_path)
+            # save_net_shift_data_npy(y_shifts_pc, 'y', 'gridrec', output_dir_path)
+            # save_theta_array(theta_array, 'gridrec', output_dir_path)
 
             break
-    
-        for theta_idx in range(n_theta):
-            if iteration_idx == 0:
-                x_shifts_pc[iteration_idx, theta_idx] = x_shift_pc_array[theta_idx]
-                y_shifts_pc[iteration_idx, theta_idx] = y_shift_pc_array[theta_idx]
-            
-            else:
-                x_shifts_pc[iteration_idx, theta_idx] = x_shifts_pc[iteration_idx - 1, theta_idx] + x_shift_pc_array[theta_idx]
-                y_shifts_pc[iteration_idx, theta_idx] = y_shifts_pc[iteration_idx - 1, theta_idx] + y_shift_pc_array[theta_idx]
-
-
-        
-            
-        # if iteration_idx == n_iterations - 1:
-        #     fig9 = plt.figure(9)
-        #     iterations = np.array(iterations)
-            
-        #     plt.plot(iterations, x_shifts_pc[:, n_theta//2], 'k-o', label = r'$\Delta x$')
-        #     plt.plot(iterations, y_shifts_pc[:, n_theta//2], 'b-o', label = r'$\Delta y$')
-        #     plt.xlabel(r'Iteration')
-        #     plt.ylabel(r'Net shift (pixels)')
-        #     plt.legend(frameon = False)
             
 # root = tk.Tk()
     
