@@ -323,22 +323,22 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
             for theta_idx in range(n_theta):
                 aligned_proj[ref_element_idx, theta_idx, :, :] = spndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx, :, :], shift = (init_y_shift, init_x_shift))
 
-                # if theta_idx == n_theta//2:
-                #     diff = aligned_proj[ref_element_idx, theta_idx, :, :] - xrf_proj_img_array[ref_element_idx, theta_idx, :, :]
+                if theta_idx == n_theta//2:
+                    diff = aligned_proj[ref_element_idx, theta_idx, :, :] - xrf_proj_img_array[ref_element_idx, theta_idx, :, :]
                     
-                #     y, x = phase_correlate(xrf_proj_img_array[ref_element_idx, theta_idx, :, :], aligned_proj[ref_element_idx, theta_idx, :, :], upsample_factor = 50)
+                    y, x = phase_correlate(xrf_proj_img_array[ref_element_idx, theta_idx, :, :], aligned_proj[ref_element_idx, theta_idx, :, :], upsample_factor = 50)
 
-                #     print(str(y) + ', ' + str(x))
+                    print(str(y) + ', ' + str(x))
 
-                #     plt.imshow(diff)
+                    plt.imshow(diff)
                     
-                #     shift = spndi.shift(aligned_proj[ref_element_idx, theta_idx, :, :], shift = (y, x))
+                    shift = spndi.shift(aligned_proj[ref_element_idx, theta_idx, :, :], shift = (y, x))
 
-                #     y, x = phase_correlate(xrf_proj_img_array[ref_element_idx, theta_idx, :, :], shift, upsample_factor = 50)
+                    y, x = phase_correlate(xrf_proj_img_array[ref_element_idx, theta_idx, :, :], shift, upsample_factor = 50)
 
-                #     print(str(y) + ', ' + str(x))
+                    print(str(y) + ', ' + str(x))
 
-                #     plt.show()
+                    plt.show()
         else:
             aligned_proj = xrf_proj_img_array
 
