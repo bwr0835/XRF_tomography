@@ -297,7 +297,7 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
     x_shift_pc_array = np.zeros(n_theta)
     y_shift_pc_array = np.zeros(n_theta)
 
-    init_x_shift = 0
+    init_x_shift = -223.32
     init_y_shift = 0
     
     for iteration_idx in range(n_iterations):
@@ -309,6 +309,9 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
             for theta_idx in range(n_theta):
                 cum_x_shift = x_shifts_pc[iteration_idx - 1, theta_idx] # Cumulative shift
                 cum_y_shift = y_shifts_pc[iteration_idx - 1, theta_idx]
+
+                x_shift = (x_shift_pc_array[theta_idx]).copy()
+                y_shift = (y_shift_pc_array[theta_idx]).copy()
 
                 if theta_idx % 7 == 0:
                     print('Cumulative x shift = ' + str(cum_x_shift))
@@ -386,9 +389,6 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
             else:
                 x_shifts_pc[iteration_idx, theta_idx] = x_shifts_pc[iteration_idx - 1, theta_idx] + x_shift_pc
                 y_shifts_pc[iteration_idx, theta_idx] = y_shifts_pc[iteration_idx - 1, theta_idx] + y_shift_pc
-
-            x_shift = x_shift_pc.copy()
-            y_shift = y_shift_pc.copy()
 
         if np.max(np.abs(x_shift_pc_array)) <= eps and np.max(np.abs(y_shift_pc_array)) <= eps:
             print('Number of iterations taken: ' + str(iteration_idx + 1))
