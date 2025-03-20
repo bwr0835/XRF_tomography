@@ -23,6 +23,128 @@ def ramp_filter(sinogram):
 
     return filtered_sinogram
 
+def edge_gauss_filter(image, sigma, alpha, nx, ny):
+    import numpy as np
+
+    n_rolloff = int(0.5 + alpha*sigma)
+    
+    if n_rolloff > 2:
+        exp_arg =  np.arange(n_rolloff)/float(sigma)
+
+        rolloff = 1 - np.exp(-0.5*exp_arg**2)
+    
+    edge_total = 0
+        
+    # Bottom edge
+ 
+    y1 = ny - sigma
+    y2 = ny
+
+    edge_total = edge_total + np.sum(image[y1:y2, 0:nx])
+
+    # Top edge
+        
+    y3 = 0
+    y4 = sigma
+        
+        
+    edge_total = edge_total + np.sum(image[y3:y4, 0:nx])
+
+    # Left edge
+
+    x1 = 0
+    x2 = sigma
+
+    edge_total = edge_total + np.sum(image[y4:y1, x1:x2])
+
+    # Right edge
+
+    x3 = nx - sigma
+    x4 = nx
+
+    edge_total = edge_total + np.sum(image[y4:y1, x3:x4])
+
+    n_pixels = 2*sigma*(nx + ny - 2*sigma) # Total number of edge pixels for this "vignetting"
+                                           # sigma*nx + sigma*nx + [(ny - sigma) - sigma]*sigma + (ny - sigma) - sigma]*sigma
+    
+    dc_value = edge_total/n_pixels # Average of edge_total over total number of edge pixels
+
+    image = np.copy(image) - dc_value
+    
+    # Top edge
+
+    xstart = 0
+    xstop = nx - 1
+    idy = 0
+
+    for i_rolloff in range(n_rolloff):
+        image[idy, xstart:(xstop+1)] = image[idy, xstart:(xstop+1)]*rolloff[idy]
+        
+        if xstart < (nx/2 - 1):
+            xstart += 1
+        
+        if xstop > (nx/2):
+            xstop -= 1
+        
+        if idy < (ny - 1):
+            idy += 1
+
+    # Bottom edge
+    
+    xstart = 0
+    xstop = nx - 1
+    idy = ny - 1
+
+    for i_rolloff in range(n_rolloff):
+        image[idy, xstart:(xstop+1)] = image[idy, xstart:(xstop+1)]*rolloff[ny - 1 - idy]
+
+        if xstart < (nx/2 - 1):
+            xstart += 1
+        
+        if xstop > nx/2:
+            xstop -= 1
+        
+        if idy > 0:
+            idy -= 1
+
+    # Left edge
+
+    ystart = 1
+    ystop = ny - 2
+    idx = 0
+
+    for i_rolloff in range(n_rolloff):
+        image[ystart:(ystop+1), idx] = image[ystart:(ystop+1), idx]*rolloff[idx]
+
+        if ystart < (ny/2 - 1):
+            ystart += 1
+       
+        if ystop > (ny/2):
+            ystop -= 1
+        
+        if idx < (nx - 1):
+            idx += 1
+
+    # Right edge
+
+    ystart = 1
+    ystop = ny - 2
+    idx = nx - 1
+
+    for i_rolloff in range(n_rolloff):
+        image[ystart:(ystop+1), idx] = image[ystart:(ystop+1), idx]*rolloff[nx - 1 - idx]
+
+        if ystart < (ny/2 - 1):
+            ystart += 1
+        
+        if ystop > (ny/2):
+            ystop -= 1
+        
+        if idx > 0:
+            idx -= 1
+    
+    return (image + dc_value)
+
 def round_correct(num, ndec): # CORRECTLY round a number (num) to chosen number of decimal places (ndec)
 
     if ndec == 0:
@@ -228,8 +350,8 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
             # save_recon_slice_npy(proj_slice, iteration_idx, slice_idx, 'gridrec', output_dir_path)
     
         for theta_idx in range(n_theta):
-            y_shift_pc, x_shift_pc, corr_mat_cc = cross_correlate(proj_imgs_from_3d_recon[theta_idx, :, :], aligned_proj[ref_element_idx, theta_idx, :, :]) # Cross-correlation
-            # y_shift_pc, x_shift_pc = phase_correlate(proj_imgs_from_3d_recon[theta_idx, :, :], aligned_proj[ref_element_idx, theta_idx, :, :], upsample_factor = 50)
+            # y_shift_pc, x_shift_cc, corr_mat_cc = cross_correlate(proj_imgs_from_3d_recon[theta_idx, :, :], aligned_proj[ref_element_idx, theta_idx, :, :]) # Cross-correlation
+            y_shift_pc, x_shift_pc = phase_correlate(edge_gauss_filter(proj_imgs_from_3d_recon[theta_idx, :, :], 5, 10, n_columns, n_slices), edge_gauss_filter(aligned_proj[ref_element_idx, theta_idx, :, :], 5, 10, n_columns, n_slices), upsample_factor = 50)
             
             x_shift_pc_array[theta_idx] = x_shift_pc
             y_shift_pc_array[theta_idx] = y_shift_pc
