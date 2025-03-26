@@ -1,6 +1,8 @@
-import numpy as np, h5py, os, skimage, tkinter as tk, tomopy as tomo, matplotlib as mpl, scipy.ndimage as spndi
+import scipy.ndimage
+import numpy as np, h5py, os, skimage, tkinter as tk, tomopy as tomo, matplotlib as mpl
 
 from skimage import transform as xform, registration as reg
+from scipy import ndimage as ndi
 from numpy.fft import fft, ifft, fftshift, ifftshift, fftfreq, fftn, ifftn, fft2, ifft2
 from h5_util import extract_h5_aggregate_xrf_data, create_aggregate_xrf_h5
 from matplotlib import pyplot as plt
@@ -314,14 +316,14 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
                     print('Cumulative x shift = ' + str(x_shift))
                     print('Cumulative y shift = ' + str(y_shift))
                     
-                aligned_proj[ref_element_idx, theta_idx, :, :] = spndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx, :, :], shift = (y_shift, x_shift))
+                aligned_proj[ref_element_idx, theta_idx, :, :] = ndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx, :, :], shift = (y_shift, x_shift))
 
         elif init_x_shift != 0 or init_y_shift != 0:
             print('Initial x shift: ' + str(init_x_shift))
             print('Initial y shift: ' + str(init_y_shift))
             
             for theta_idx in range(n_theta):
-                aligned_proj[ref_element_idx, theta_idx, :, :] = spndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx, :, :], shift = (init_y_shift, init_x_shift))
+                aligned_proj[ref_element_idx, theta_idx, :, :] = ndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx, :, :], shift = (init_y_shift, init_x_shift))
 
                 # if theta_idx == n_theta//2:
                 #     diff = aligned_proj[ref_element_idx, theta_idx, :, :] - xrf_proj_img_array[ref_element_idx, theta_idx, :, :]
@@ -332,7 +334,7 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
 
                 #     plt.imshow(diff)
                     
-                #     shift = spndi.shift(aligned_proj[ref_element_idx, theta_idx, :, :], shift = (y, x))
+                #     shift = ndi.shift(aligned_proj[ref_element_idx, theta_idx, :, :], shift = (y, x))
 
                 #     y, x = phase_correlate(xrf_proj_img_array[ref_element_idx, theta_idx, :, :], shift, upsample_factor = 50)
 
