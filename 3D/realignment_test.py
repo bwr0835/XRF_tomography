@@ -162,9 +162,8 @@ def round_correct(num, ndec): # CORRECTLY round a number (num) to chosen number 
             return int(num*digit_value - 0.5)/digit_value
 
 def pad_col_row(array):
-    array_new = np.zeros((array.shape[0], array.shape[1], array.shape[2], array.shape[3] + 1))
-    array_new_1 = np.zeros((array_new.shape[0], array_new.shape[1], array_new.shape[2] + 1, array_new.shape[3]))
-    
+    array_new = np.zeros((array.shape[0], array.shape[1], array.shape[2] + 1, array.shape[3] + 1))
+
     for element_idx in range(array.shape[0]):
         for theta_idx in range(array.shape[1]):
             final_column = array[element_idx, theta_idx, :, -1].reshape(-1, 1) # Reshape to column vector (-1 means Python automatically determines missing dimension based on original orray length)
@@ -172,13 +171,13 @@ def pad_col_row(array):
             print(final_column.shape)
             print(array.shape)
 
-            array_new[element_idx, theta_idx, :, :] = np.hstack((array[element_idx, theta_idx, :, :], final_column))
+            array_temp = np.hstack((array[element_idx, theta_idx, :, :], final_column))
             
-            final_row = array_new[element_idx, theta_idx, -1, :]
+            final_row = array_temp[element_idx, theta_idx, -1, :]
 
-            array_new_1[element_idx, theta_idx, :, :] = np.vstack((array_new_1[element_idx, theta_idx, :, :], final_row))
+            array_new[element_idx, theta_idx, :, :] = np.vstack((array_temp[element_idx, theta_idx, :, :], final_row))
 
-    return array_new_1
+    return array_new
 
 def pad_col(array):
     for element_idx in range(array.shape[0]):
