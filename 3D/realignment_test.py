@@ -161,6 +161,37 @@ def round_correct(num, ndec): # CORRECTLY round a number (num) to chosen number 
         else:
             return int(num*digit_value - 0.5)/digit_value
 
+def pad_col_row(array):
+    for element_idx in range(array.shape[0]):
+        for theta_idx in range(array.shape[1]):
+            final_column = array[element_idx, theta_idx, :, -1].T
+                
+            array[element_idx, theta_idx, :, :] = np.hstack(array[element_idx, theta_idx, :, :], final_column)
+
+            final_row = final_column = array[element_idx, theta_idx, -1, :]
+
+            array[element_idx, theta_idx, :, :] = np.vstack(array[element_idx, theta_idx, :, :], final_row)
+
+    return array
+
+def pad_col(array):
+    for element_idx in range(array.shape[0]):
+        for theta_idx in range(array.shape[1]):
+            final_column = array[element_idx, theta_idx, :, -1].T
+                
+            array[element_idx, theta_idx, :, :] = np.hstack(array[element_idx, theta_idx, :, :], final_column)
+
+    return array
+
+def pad_row(array):
+    for element_idx in range(array.shape[0]):
+        for theta_idx in range(array.shape[1]):
+            final_row = array[element_idx, theta_idx, -1, :]
+                
+            array[element_idx, theta_idx, :, :] = np.vstack(array[element_idx, theta_idx, :, :], final_row)
+
+    return array
+
 def cross_correlate(recon_proj, orig_proj):
     # Credit goes to Fabricio Marin and the XRFTomo GUI
 
@@ -280,9 +311,28 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
     n_columns = xrf_proj_img_array.shape[3] # Number of columns in a projection image
      #TODO Pad images
     ref_element_idx = element_array.index(ref_element)
+    
+    if (n_slices % 2) or (n_columns % 2):
+        if (n_slices % 2) and (n_columns % 2):
+            xrf_proj_img_array = pad_col_row(xrf_proj_img_array)
+            
+            n_slices += 1
+            n_columns += 1
+        
+        elif n_slices % 2:
+            xrf_proj_img_array = pad_row(xrf_proj_img_array)
+
+            n_slices += 1
+
+        else:
+            xrf_proj_img_array = pad_col(xrf_proj_img_array)
+
+            n_columns += 1
+    
+    print(xrf_proj_img_array.shape)
+
     reference_projection_imgs = xrf_proj_img_array[ref_element_idx] # These are effectively sinograms for the element of interest (highest contrast -> for realignment purposes)
                                                                     # (n_theta, n_slices -> n_rows, n_columns)
-
     center_of_rotation = tomo.find_center(reference_projection_imgs, theta_array*np.pi/180)
 
     iterations = []
@@ -299,7 +349,7 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
     x_shift_pc_array = np.zeros(n_theta)
     y_shift_pc_array = np.zeros(n_theta)
 
-    init_x_shift = -20
+    init_x_shift = 0
     init_y_shift = 0
     
     for iteration_idx in range(n_iterations):
@@ -434,7 +484,7 @@ elements_xrf, counts_xrf, theta_xrf, dataset_type_xrf = extract_h5_aggregate_xrf
 
 output_dir_path = '/raid/users/roter'
 
-iter_reproj('Fe', elements_xrf, theta_xrf, counts_xrf, 10, output_dir_path)
+# iter_reproj('Fe', elements_xrf, theta_xrf, counts_xrf, 10, output_dir_path)
 
 
 
