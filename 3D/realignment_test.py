@@ -354,7 +354,7 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
     x_shift_pc_array = np.zeros(n_theta)
     y_shift_pc_array = np.zeros(n_theta)
 
-    init_x_shift = -15
+    init_x_shift = -5
     init_y_shift = 0
     
     for iteration_idx in range(n_iterations):
