@@ -30,14 +30,14 @@ def extract_h5_xrf_data(file_path, synchrotron):
             nx, ny = ny, nx
         
             elements_entries_to_ignore = [b'Ar_Ar',
-                                            b'Si_Si',
-                                            b'Fe_Fe', 
-                                            b'COMPTON_AMPLITUDE', 
-                                            b'COHERENT_SCT_AMPLITUDE', 
-                                            b'Num_Iter', 
-                                            b'Fit_Residual', 
-                                            b'Total_Fluorescence_Yield',
-                                            b'Sum_Elastic_Inelastic']
+                                          b'Si_Si',
+                                          b'Fe_Fe', 
+                                          b'COMPTON_AMPLITUDE', 
+                                          b'COHERENT_SCT_AMPLITUDE', 
+                                          b'Num_Iter', 
+                                          b'Fit_Residual', 
+                                          b'Total_Fluorescence_Yield',
+                                          b'Sum_Elastic_Inelastic']
             
             counts_new = np.zeros((len(elements), ny, nx))
                 

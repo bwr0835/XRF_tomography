@@ -89,7 +89,7 @@ def reconstruct_jXRFT_tomography(
         
         det_area_cm2=None,
         # For exp. data only. Set the value of the total sensing area;
-        # For simulation data, set to None (program calaultes sensing area with given det_dia_cm)
+        # For simulation data, set to None (program calculates sensing area with given det_dia_cm)
     
         det_dia_cm=None, 
         # For simulation data only. Diameter of the sensor assuming a circular sensing area.
