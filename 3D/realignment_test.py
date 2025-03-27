@@ -164,7 +164,7 @@ def round_correct(num, ndec): # CORRECTLY round a number (num) to chosen number 
 def pad_col_row(array):
     for element_idx in range(array.shape[0]):
         for theta_idx in range(array.shape[1]):
-            final_column = array[element_idx, theta_idx, :, -1].T
+            final_column = array[element_idx, theta_idx, :, -1]
             
             print(final_column)
 
