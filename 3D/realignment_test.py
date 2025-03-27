@@ -175,7 +175,7 @@ def pad_col_row(array):
             
             final_row = array_temp[-1, :]
 
-            array_new[element_idx, theta_idx, :, :] = np.vstack((array_temp[element_idx, theta_idx, :, :], final_row))
+            array_new[element_idx, theta_idx, :, :] = np.vstack((array_temp, final_row))
 
     return array_new
 
