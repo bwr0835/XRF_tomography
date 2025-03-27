@@ -166,11 +166,11 @@ def pad_col_row(array):
         for theta_idx in range(array.shape[1]):
             final_column = array[element_idx, theta_idx, :, -1].T
                 
-            array[element_idx, theta_idx, :, :] = np.hstack(array[element_idx, theta_idx, :, :], final_column)
+            array[element_idx, theta_idx, :, :] = np.hstack((array[element_idx, theta_idx, :, :], final_column))
 
             final_row = final_column = array[element_idx, theta_idx, -1, :]
 
-            array[element_idx, theta_idx, :, :] = np.vstack(array[element_idx, theta_idx, :, :], final_row)
+            array[element_idx, theta_idx, :, :] = np.vstack((array[element_idx, theta_idx, :, :], final_row))
 
     return array
 
@@ -179,7 +179,7 @@ def pad_col(array):
         for theta_idx in range(array.shape[1]):
             final_column = array[element_idx, theta_idx, :, -1].T
                 
-            array[element_idx, theta_idx, :, :] = np.hstack(array[element_idx, theta_idx, :, :], final_column)
+            array[element_idx, theta_idx, :, :] = np.hstack((array[element_idx, theta_idx, :, :], final_column))
 
     return array
 
@@ -188,7 +188,7 @@ def pad_row(array):
         for theta_idx in range(array.shape[1]):
             final_row = array[element_idx, theta_idx, -1, :]
                 
-            array[element_idx, theta_idx, :, :] = np.vstack(array[element_idx, theta_idx, :, :], final_row)
+            array[element_idx, theta_idx, :, :] = np.vstack((array[element_idx, theta_idx, :, :], final_row))
 
     return array
 
