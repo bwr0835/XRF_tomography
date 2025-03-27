@@ -166,7 +166,7 @@ def pad_col_row(array):
         for theta_idx in range(array.shape[1]):
             final_column = array[element_idx, theta_idx, :, -1].reshape(-1, 1) # Reshape to column vector (-1 means Python automatically determines missing dimension based on original orray length)
             
-            print(final_column)
+            print(final_column.shape)
 
             array[element_idx, theta_idx, :, :] = np.hstack((array[element_idx, theta_idx, :, :], final_column))
             
