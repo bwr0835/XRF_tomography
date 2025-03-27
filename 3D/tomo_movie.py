@@ -157,132 +157,133 @@ else:
     x_shifts_data = np.load(x_shifts_file_path)
     y_shifts_data = np.load(y_shifts_file_path)
 
-    fig1, axs1 = plt.subplots(2, 1)
-    fig2, axs2 = plt.subplots(2, 4)
-    fig3, axs3 = plt.subplots()
+    plt.plot(theta_array, x_shifts_data[0, :], 'k-o')
+    # fig1, axs1 = plt.subplots(2, 1)
+    # fig2, axs2 = plt.subplots(2, 4)
+    # fig3, axs3 = plt.subplots()
 
-    iter_array = 1 + np.arange(n_iterations)
+    # iter_array = 1 + np.arange(n_iterations)
 
-    curve1, = axs3.plot(iter_array, np.zeros_like(iter_array), 'k-o', markersize = 3, label = r'$\Delta x$')
-    curve2, = axs3.plot(iter_array, np.zeros_like(iter_array), 'r-o', markersize = 3, label = r'$\Delta y$')
+    # curve1, = axs3.plot(iter_array, np.zeros_like(iter_array), 'k-o', markersize = 3, label = r'$\Delta x$')
+    # curve2, = axs3.plot(iter_array, np.zeros_like(iter_array), 'r-o', markersize = 3, label = r'$\Delta y$')
 
-    axs1[0].set_title(r'Recon. Slice (It. 1)')
-    axs1[1].set_title(r'Recon. Slice (It. {0})'.format(n_iterations))
-    axs2[0, 0].set_title(r'(Al.) Exp. Proj. (It. 1)')
-    axs2[1, 0].set_title(r'(Al.) Exp. Proj. (It. {0})'.format(n_iterations))
-    axs2[0, 1].set_title(r'Synth. Proj. (It. 1)')
-    axs2[1, 1].set_title(r'Synth. Proj. (It. {0})'.format(n_iterations))
-    axs2[0, 2].set_title(r'Int.-Pix. CC (It. 1)')
-    axs2[1, 2].set_title(r'Int.-Pix. CC (It. {0})'.format(n_iterations))
-    axs2[0, 3].set_title(r'Curr. shift (It. 1)')
-    axs2[1, 3].set_title(r'Curr. shift (It. {0})'.format(n_iterations))
+    # axs1[0].set_title(r'Recon. Slice (It. 1)')
+    # axs1[1].set_title(r'Recon. Slice (It. {0})'.format(n_iterations))
+    # axs2[0, 0].set_title(r'(Al.) Exp. Proj. (It. 1)')
+    # axs2[1, 0].set_title(r'(Al.) Exp. Proj. (It. {0})'.format(n_iterations))
+    # axs2[0, 1].set_title(r'Synth. Proj. (It. 1)')
+    # axs2[1, 1].set_title(r'Synth. Proj. (It. {0})'.format(n_iterations))
+    # axs2[0, 2].set_title(r'Int.-Pix. CC (It. 1)')
+    # axs2[1, 2].set_title(r'Int.-Pix. CC (It. {0})'.format(n_iterations))
+    # axs2[0, 3].set_title(r'Curr. shift (It. 1)')
+    # axs2[1, 3].set_title(r'Curr. shift (It. {0})'.format(n_iterations))
 
-    axs3.set_xlabel(r'Iteration')
-    axs3.set_ylabel(r'Net shift (pixels)')
-    axs3.set_xlim(1, n_iterations)
-    axs3.legend(frameon = False)
+    # axs3.set_xlabel(r'Iteration')
+    # axs3.set_ylabel(r'Net shift (pixels)')
+    # axs3.set_xlim(1, n_iterations)
+    # axs3.legend(frameon = False)
 
-    recon_imgs = []
-    exp_proj_imgs = []
-    synthetic_proj_imgs = []
-    xcorr_imgs = []
-    shift_rgb_imgs = []
+    # recon_imgs = []
+    # exp_proj_imgs = []
+    # synthetic_proj_imgs = []
+    # xcorr_imgs = []
+    # shift_rgb_imgs = []
     
-    recon_text = []
-    proj_text = []
+    # recon_text = []
+    # proj_text = []
 
-    for idx, subdir in enumerate(iteration_subdir_array_truncated):
-        recons = recon_data_dict[subdir]
-        exp_projs = actual_proj_data_dict[subdir]
-        synth_projs = synthetic_proj_data_dict[subdir]
-        xcorrs = xcorr_proj_data_dict[subdir]
-        shift_rgbs = shift_change_dict[subdir]
+    # for idx, subdir in enumerate(iteration_subdir_array_truncated):
+    #     recons = recon_data_dict[subdir]
+    #     exp_projs = actual_proj_data_dict[subdir]
+    #     synth_projs = synthetic_proj_data_dict[subdir]
+    #     xcorrs = xcorr_proj_data_dict[subdir]
+    #     shift_rgbs = shift_change_dict[subdir]
 
-        im1 = axs1[idx].imshow(recons[0])
-        im2_0 = axs2[idx, 0].imshow(exp_projs[0])
-        im2_1 = axs2[idx, 1].imshow(synth_projs[0])
-        im2_2 = axs2[idx, 2].imshow(xcorrs[0])
-        im2_3 = axs2[idx, 3].imshow(shift_rgbs[0])
+    #     im1 = axs1[idx].imshow(recons[0])
+    #     im2_0 = axs2[idx, 0].imshow(exp_projs[0])
+    #     im2_1 = axs2[idx, 1].imshow(synth_projs[0])
+    #     im2_2 = axs2[idx, 2].imshow(xcorrs[0])
+    #     im2_3 = axs2[idx, 3].imshow(shift_rgbs[0])
 
-        recon_imgs.append(im1)
-        exp_proj_imgs.append(im2_0)
-        synthetic_proj_imgs.append(im2_1)
-        xcorr_imgs.append(im2_2)
-        shift_rgb_imgs.append(im2_3)
+    #     recon_imgs.append(im1)
+    #     exp_proj_imgs.append(im2_0)
+    #     synthetic_proj_imgs.append(im2_1)
+    #     xcorr_imgs.append(im2_2)
+    #     shift_rgb_imgs.append(im2_3)
     
-        text_recon = axs1[0].text(0.02, 0.02, r'Slice 0', transform = axs1[0].transAxes, color = 'white')
-        text_proj = axs2[0, 0].text(0.02, 0.02, r'$\theta = {0}$\textdegree'.format(theta_array[0]), transform = axs2[0, 0].transAxes, color = 'white')    
+    #     text_recon = axs1[0].text(0.02, 0.02, r'Slice 0', transform = axs1[0].transAxes, color = 'white')
+    #     text_proj = axs2[0, 0].text(0.02, 0.02, r'$\theta = {0}$\textdegree'.format(theta_array[0]), transform = axs2[0, 0].transAxes, color = 'white')    
         
-        if idx == 0:
-            recon_text.append(text_recon)
-            proj_text.append(text_proj)
+    #     if idx == 0:
+    #         recon_text.append(text_recon)
+    #         proj_text.append(text_proj)
 
-    def animate_recon(frame):
-        artists = []
+    # def animate_recon(frame):
+    #     artists = []
 
-        for idx, subdir in enumerate(iteration_subdir_array_truncated):
-            recons = recon_data_dict[subdir]
+    #     for idx, subdir in enumerate(iteration_subdir_array_truncated):
+    #         recons = recon_data_dict[subdir]
 
-            recon_imgs[idx].set_array(recons[frame])
-            recon_text[0].set_text(r'Slice {0}'.format(frame))
+    #         recon_imgs[idx].set_array(recons[frame])
+    #         recon_text[0].set_text(r'Slice {0}'.format(frame))
             
-            artists.append(recon_imgs[idx])
+    #         artists.append(recon_imgs[idx])
         
-        artists.append(recon_text[0])
+    #     artists.append(recon_text[0])
 
-        return artists
+    #     return artists
     
-    def animate_proj(frame):
-        artists = []
+    # def animate_proj(frame):
+    #     artists = []
 
-        for idx, subdir in enumerate(iteration_subdir_array_truncated):
-            exp_projs = actual_proj_data_dict[subdir]
-            synth_projs = synthetic_proj_data_dict[subdir]
-            xcorrs = xcorr_proj_data_dict[subdir]
-            shift_rgbs = shift_change_dict[subdir]
+    #     for idx, subdir in enumerate(iteration_subdir_array_truncated):
+    #         exp_projs = actual_proj_data_dict[subdir]
+    #         synth_projs = synthetic_proj_data_dict[subdir]
+    #         xcorrs = xcorr_proj_data_dict[subdir]
+    #         shift_rgbs = shift_change_dict[subdir]
 
-            exp_proj_imgs[idx].set_array(exp_projs[frame])
-            synthetic_proj_imgs[idx].set_array(synth_projs[frame])
-            xcorr_imgs[idx].set_array(xcorrs[frame])
-            shift_rgb_imgs[idx].set_array(shift_rgbs[frame])
+    #         exp_proj_imgs[idx].set_array(exp_projs[frame])
+    #         synthetic_proj_imgs[idx].set_array(synth_projs[frame])
+    #         xcorr_imgs[idx].set_array(xcorrs[frame])
+    #         shift_rgb_imgs[idx].set_array(shift_rgbs[frame])
 
-            artists.append(exp_proj_imgs[idx])
-            artists.append(synthetic_proj_imgs[idx])
-            artists.append(xcorr_imgs[idx])
-            artists.append(shift_rgb_imgs[idx])
+    #         artists.append(exp_proj_imgs[idx])
+    #         artists.append(synthetic_proj_imgs[idx])
+    #         artists.append(xcorr_imgs[idx])
+    #         artists.append(shift_rgb_imgs[idx])
         
-        proj_text[0].set_text(r'$\theta = {0}$\textdegree'.format(theta_array[frame]))
+    #     proj_text[0].set_text(r'$\theta = {0}$\textdegree'.format(theta_array[frame]))
 
-        artists.append(proj_text[0])
+    #     artists.append(proj_text[0])
 
-        return artists
+    #     return artists
     
-    fps_shifts = 10 # Frames per second (fps)
-    fps_images = 25
+    # fps_shifts = 10 # Frames per second (fps)
+    # fps_images = 25
 
-    def animate_shifts(frame):
-        artists = []
+    # def animate_shifts(frame):
+    #     artists = []
         
-        net_shift_x = x_shifts_data[:, frame]
-        net_shift_y = y_shifts_data[:, frame]
+    #     net_shift_x = x_shifts_data[:, frame]
+    #     net_shift_y = y_shifts_data[:, frame]
 
-        curve1.set_ydata(net_shift_x)
-        curve2.set_ydata(net_shift_y)
+    #     curve1.set_ydata(net_shift_x)
+    #     curve2.set_ydata(net_shift_y)
 
-        min_shift = np.min([np.min(net_shift_x), np.min(net_shift_y)])
-        max_shift = np.max([np.max(net_shift_x), np.max(net_shift_y)])
+    #     min_shift = np.min([np.min(net_shift_x), np.min(net_shift_y)])
+    #     max_shift = np.max([np.max(net_shift_x), np.max(net_shift_y)])
 
-        axs3.set_ylim(min_shift, max_shift + 0.1)
-        axs3.set_title(r'$\theta = {0}$\textdegree'.format(theta_array[frame]))
+    #     axs3.set_ylim(min_shift, max_shift + 0.1)
+    #     axs3.set_title(r'$\theta = {0}$\textdegree'.format(theta_array[frame]))
 
-        artists.append(curve1)
-        artists.append(curve2)
+    #     artists.append(curve1)
+    #     artists.append(curve2)
 
-        return artists
+    #     return artists
 
-    anim1 = anim.FuncAnimation(fig1, animate_recon, frames = n_slices, interval = 1000/fps_images, blit = True) # Interval is ms/frame (NOT frames per second, or fps)
-    anim2 = anim.FuncAnimation(fig2, animate_proj, frames = n_theta, interval = 1000/fps_images, blit = True)
-    anim3 = anim.FuncAnimation(fig3, animate_shifts, frames = n_theta, interval = 1000/fps_shifts, blit = False) # "Blitting" not useful since titles are changing
+    # anim1 = anim.FuncAnimation(fig1, animate_recon, frames = n_slices, interval = 1000/fps_images, blit = True) # Interval is ms/frame (NOT frames per second, or fps)
+    # anim2 = anim.FuncAnimation(fig2, animate_proj, frames = n_theta, interval = 1000/fps_images, blit = True)
+    # anim3 = anim.FuncAnimation(fig3, animate_shifts, frames = n_theta, interval = 1000/fps_shifts, blit = False) # "Blitting" not useful since titles are changing
 
     plt.show()
 
