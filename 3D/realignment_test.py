@@ -278,7 +278,7 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
     n_theta = xrf_proj_img_array.shape[1] # Number of projection angles (projection images)
     n_slices = xrf_proj_img_array.shape[2] # Number of rows in a projection image
     n_columns = xrf_proj_img_array.shape[3] # Number of columns in a projection image
-    
+     #TODO Pad images
     ref_element_idx = element_array.index(ref_element)
     reference_projection_imgs = xrf_proj_img_array[ref_element_idx] # These are effectively sinograms for the element of interest (highest contrast -> for realignment purposes)
                                                                     # (n_theta, n_slices -> n_rows, n_columns)
@@ -299,8 +299,8 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
     x_shift_pc_array = np.zeros(n_theta)
     y_shift_pc_array = np.zeros(n_theta)
 
-    init_x_shift = 0
-    init_y_shift = -20
+    init_x_shift = -20
+    init_y_shift = 0
     
     for iteration_idx in range(n_iterations):
         print('Iteration ' + str(iteration_idx + 1) + '/' + str(n_iterations))
