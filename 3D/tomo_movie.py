@@ -157,7 +157,9 @@ else:
     x_shifts_data = np.load(x_shifts_file_path)
     y_shifts_data = np.load(y_shifts_file_path)
 
-    plt.plot(theta_array, x_shifts_data[0, :], 'k-o')
+    plt.plot(theta_array, x_shifts_data[0, :], 'k-o', label = r'Iteration Index 0')
+    plt.plot(theta_array, x_shifts_data[-1, :], 'bo-', label = r'Iteration Index 9')
+    plt.legend()
     # fig1, axs1 = plt.subplots(2, 1)
     # fig2, axs2 = plt.subplots(2, 4)
     # fig3, axs3 = plt.subplots()
