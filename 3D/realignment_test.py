@@ -450,7 +450,7 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
                     x_shifts_pc[iteration_idx, theta_idx] = x_shift_pc + init_x_shift
                     y_shifts_pc[iteration_idx, theta_idx] = y_shift_pc + init_y_shift
 
-                    aligned_proj_test = ndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx, :, :], shift = (x_shift_pc + init_x_shift, y_shift_pc + init_y_shift))
+                    aligned_proj_test = ndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx, :, :], shift = (y_shift_pc + init_y_shift, x_shift_pc + init_x_shift))
                     yshift, xshift = phase_correlate(proj_imgs_from_3d_recon[theta_idx], aligned_proj_test, upsample_factor = 100)
 
                     print('x-shift = ' + str(xshift))
