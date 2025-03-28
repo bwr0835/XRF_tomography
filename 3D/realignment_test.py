@@ -314,7 +314,7 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
     n_theta = xrf_proj_img_array.shape[1] # Number of projection angles (projection images)
     n_slices = xrf_proj_img_array.shape[2] # Number of rows in a projection image
     n_columns = xrf_proj_img_array.shape[3] # Number of columns in a projection image
-     #TODO Pad images
+
     ref_element_idx = element_array.index(ref_element)
     
     if (n_slices % 2) or (n_columns % 2):
@@ -338,7 +338,7 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
 
     reference_projection_imgs = xrf_proj_img_array[ref_element_idx] # These are effectively sinograms for the element of interest (highest contrast -> for realignment purposes)
                                                                     # (n_theta, n_slices -> n_rows, n_columns)
-    # center_of_rotation = tomo.find_center(reference_projection_imgs, theta_array*np.pi/180)
+    center_of_rotation = tomo.find_center(reference_projection_imgs, theta_array*np.pi/180)
 
     iterations = []
 
@@ -354,8 +354,8 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
     x_shift_pc_array = np.zeros(n_theta)
     y_shift_pc_array = np.zeros(n_theta)
 
-    init_x_shift = -100
-    init_y_shift = 0
+    init_x_shift = 0
+    init_y_shift = 10
     
     for iteration_idx in range(n_iterations):
         print('Iteration ' + str(iteration_idx + 1) + '/' + str(n_iterations))
@@ -408,7 +408,6 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
         print('Performing ' + algorithm)
 
         if algorithm == 'gridrec':
-            center_of_rotation = tomo.find_center(aligned_proj[ref_element_idx], theta_array*np.pi/180)
             recon = tomo.recon(aligned_proj[ref_element_idx], theta = theta_array*np.pi/180, center = center_of_rotation, algorithm = algorithm, filter_name = 'ramlak')
         
         elif algorithm == 'mlem':
@@ -422,7 +421,7 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
             proj_slice = recon[slice_idx, :, :]
 
             proj_imgs_from_3d_recon[:, slice_idx, :] = (skimage.transform.radon(proj_slice, theta = theta_array)).T # This radon transform assumes slices are defined by columns and not rows
-                    
+
             # save_recon_slice_npy(proj_slice, iteration_idx, slice_idx, 'gridrec', output_dir_path)
 
         for theta_idx in range(n_theta):
