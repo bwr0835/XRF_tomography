@@ -378,8 +378,8 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
             print('Initial y shift: ' + str(init_y_shift))
             
             for theta_idx in range(n_theta):
-                # if theta_idx == 0:
-                aligned_proj[ref_element_idx, theta_idx, :, :] = ndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx, :, :], shift = (init_y_shift, init_x_shift))
+                if theta_idx == 0:
+                    aligned_proj[ref_element_idx, theta_idx, :, :] = ndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx, :, :], shift = (init_y_shift, init_x_shift))
 
                 # if theta_idx == n_theta//2:
                 #     diff = aligned_proj[ref_element_idx, theta_idx, :, :] - xrf_proj_img_array[ref_element_idx, theta_idx, :, :]
