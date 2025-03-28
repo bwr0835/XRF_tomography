@@ -378,8 +378,8 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
             print('Initial y shift: ' + str(init_y_shift))
             
             for theta_idx in range(n_theta):
-                if theta_idx == 0:
-                    aligned_proj[ref_element_idx, theta_idx, :, :] = ndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx, :, :], shift = (init_y_shift, init_x_shift))
+                # if theta_idx == 0:
+                aligned_proj[ref_element_idx, theta_idx, :, :] = ndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx, :, :], shift = (init_y_shift, init_x_shift))
 
                 # if theta_idx == n_theta//2:
                 #     diff = aligned_proj[ref_element_idx, theta_idx, :, :] - xrf_proj_img_array[ref_element_idx, theta_idx, :, :]
@@ -424,7 +424,7 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
         for theta_idx in range(n_theta):
             # y_shift_pc, x_shift_cc, corr_mat_cc = cross_correlate(proj_imgs_from_3d_recon[theta_idx, :, :], aligned_proj[ref_element_idx, theta_idx, :, :]) # Cross-correlation
             y_shift_pc, x_shift_pc = phase_correlate(proj_imgs_from_3d_recon[theta_idx, :, :], aligned_proj[ref_element_idx, theta_idx, :, :], upsample_factor = 100)
-            
+
             x_shift_pc_array[theta_idx] = x_shift_pc
             y_shift_pc_array[theta_idx] = y_shift_pc
 
@@ -435,6 +435,11 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
             if theta_idx % 7 == 0:
                 print('x-shift: ' + str(x_shift_pc) + ' (Theta = ' + str(theta_array[theta_idx]) + ' degrees')
                 print('y-shift: ' + str(y_shift_pc))
+
+                fig1, axs1 = plt.subplots(2, 1)
+                axs1[0].imshow(proj_imgs_from_3d_recon[theta_idx])
+                axs1[1].imshow(aligned_proj[ref_element_idx, theta_idx, :, :])
+                plt.show()
             
             if iteration_idx == 0:
                 x_shifts_pc[iteration_idx, theta_idx] = x_shift_pc + init_x_shift
