@@ -317,22 +317,22 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
      #TODO Pad images
     ref_element_idx = element_array.index(ref_element)
     
-    # if (n_slices % 2) or (n_columns % 2):
-    #     if (n_slices % 2) and (n_columns % 2):
-    #         xrf_proj_img_array = pad_col_row(xrf_proj_img_array)
+    if (n_slices % 2) or (n_columns % 2):
+        if (n_slices % 2) and (n_columns % 2):
+            xrf_proj_img_array = pad_col_row(xrf_proj_img_array)
             
-    #         n_slices += 1
-    #         n_columns += 1
+            n_slices += 1
+            n_columns += 1
         
-    #     elif n_slices % 2:
-    #         xrf_proj_img_array = pad_row(xrf_proj_img_array)
+        elif n_slices % 2:
+            xrf_proj_img_array = pad_row(xrf_proj_img_array)
 
-    #         n_slices += 1
+            n_slices += 1
 
-    #     else:
-    #         xrf_proj_img_array = pad_col(xrf_proj_img_array)
+        else:
+            xrf_proj_img_array = pad_col(xrf_proj_img_array)
 
-    #         n_columns += 1
+            n_columns += 1
     
     print(xrf_proj_img_array.shape)
 
