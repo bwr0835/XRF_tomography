@@ -168,8 +168,8 @@ def pad_col_row(array):
         for theta_idx in range(array.shape[1]):
             final_column = array[element_idx, theta_idx, :, -1].reshape(-1, 1) # Reshape to column vector (-1 means Python automatically determines missing dimension based on original orray length)
             
-            print(final_column.shape)
-            print(array.shape)
+            # print(final_column.shape)
+            # print(array.shape)
 
             array_temp = np.hstack((array[element_idx, theta_idx, :, :], final_column))
             
@@ -439,15 +439,20 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
                 print('x-shift: ' + str(x_shift_pc) + ' (Theta = ' + str(theta_array[theta_idx]) + ' degrees')
                 print('y-shift: ' + str(y_shift_pc))
 
-                fig1, axs1 = plt.subplots(2, 1)
-                axs1[0].imshow(proj_imgs_from_3d_recon[theta_idx])
-                axs1[1].imshow(aligned_proj[ref_element_idx, theta_idx, :, :])
-                plt.show()
+                if theta_idx == 0:
+                    fig1, axs1 = plt.subplots(2, 1)
+                    axs1[0].imshow(proj_imgs_from_3d_recon[theta_idx])
+                    axs1[1].imshow(aligned_proj[ref_element_idx, theta_idx, :, :])
+                    plt.show()
             
             if iteration_idx == 0:
-                x_shifts_pc[iteration_idx, theta_idx] = x_shift_pc + init_x_shift
-                y_shifts_pc[iteration_idx, theta_idx] = y_shift_pc + init_y_shift
+                if theta_idx == 0:
+                    x_shifts_pc[iteration_idx, theta_idx] = x_shift_pc + init_x_shift
+                    y_shifts_pc[iteration_idx, theta_idx] = y_shift_pc + init_y_shift
                 
+                else:
+                    x_shifts_pc[iteration_idx, theta_idx] = x_shift_pc
+                    y_shifts_pc[iteration_idx, theta_idx] = y_shift_pc
             else:
                 x_shifts_pc[iteration_idx, theta_idx] = x_shifts_pc[iteration_idx - 1, theta_idx] + x_shift_pc
                 y_shifts_pc[iteration_idx, theta_idx] = y_shifts_pc[iteration_idx - 1, theta_idx] + y_shift_pc
