@@ -355,7 +355,7 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
     y_shift_pc_array = np.zeros(n_theta)
 
     init_x_shift = 0
-    init_y_shift = 10
+    init_y_shift = 0
     
     for iteration_idx in range(n_iterations):
         print('Iteration ' + str(iteration_idx + 1) + '/' + str(n_iterations))
