@@ -457,13 +457,13 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
 
                     print('x-shift = ' + str(xshift))
                     print('y-shift = ' + str(yshift))
-                    recon_test = tomo.recon(aligned_proj_test[ref_element_idx], theta = theta_array*np.pi/180, center = center_of_rotation, algorithm = algorithm, filter_name = 'ramlak')
+                    recon_test = tomo.recon(aligned_proj_test, theta = theta_array*np.pi/180, center = center_of_rotation, algorithm = algorithm, filter_name = 'ramlak')
                     
                     for slice_test_idx in range(n_slices):
                         print('Slice (Test) ' + str(slice_test_idx + 1) + '/' + str(n_slices))
                         synth_test[:, slice_test_idx, :] = (skimage.transform.radon(recon_test[:, 0, :], theta = theta_array)).T # This radon transform assumes slices are defined by columns and not rows
                     
-                    yshift_test, xshift_test = phase_correlate(synth_test[theta_idx, :, :], aligned_proj_test[ref_element_idx])
+                    yshift_test, xshift_test = phase_correlate(synth_test[theta_idx, :, :], aligned_proj_test)
                     print('(Test) x-shift: ' + str(xshift_test))
                     print('(Test) y-shift: ' + str(yshift_test))
                     fig1, axs1 = plt.subplots(2, 1)
