@@ -371,7 +371,7 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
                     print('Cumulative x shift = ' + str(x_shift))
                     print('Cumulative y shift = ' + str(y_shift))
                     
-                aligned_proj[ref_element_idx, theta_idx, :, :] = ndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx, :, :], shift = (y_shift, x_shift))
+                aligned_proj[ref_element_idx, theta_idx, :, :] = ndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx, :, :].copy(), shift = (y_shift, x_shift))
 
         elif (init_x_shift != 0 or init_y_shift != 0):
             print('Initial x shift: ' + str(init_x_shift))
@@ -379,10 +379,10 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
             
             for theta_idx in range(n_theta):
                 if theta_idx == 0:
-                    aligned_proj[ref_element_idx, theta_idx, :, :] = ndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx, :, :], shift = (init_y_shift, init_x_shift))
+                    aligned_proj[ref_element_idx, theta_idx, :, :] = ndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx, :, :].copy(), shift = (init_y_shift, init_x_shift))
             
                 else:
-                    aligned_proj[ref_element_idx, theta_idx, :, :] = xrf_proj_img_array[ref_element_idx, theta_idx, :, :]            
+                    aligned_proj[ref_element_idx, theta_idx, :, :] = xrf_proj_img_array[ref_element_idx, theta_idx, :, :].copy()          
 
                 # if theta_idx == n_theta//2:
                 #     diff = aligned_proj[ref_element_idx, theta_idx, :, :] - xrf_proj_img_array[ref_element_idx, theta_idx, :, :]
@@ -401,7 +401,7 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
 
                 #     plt.show()
         else:
-            aligned_proj = xrf_proj_img_array
+            aligned_proj = xrf_proj_img_array.copy()
 
         algorithm = 'gridrec'
 
