@@ -344,7 +344,7 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
 
     recon = np.zeros((n_slices, n_columns, n_columns))
     
-    # aligned_proj = np.zeros_like(xrf_proj_img_array)
+    aligned_proj = np.zeros_like(xrf_proj_img_array)
 
     proj_imgs_from_3d_recon = np.zeros((n_theta, n_slices, n_columns))
 
