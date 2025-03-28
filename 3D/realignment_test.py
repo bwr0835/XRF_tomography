@@ -347,6 +347,8 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
     aligned_proj = np.zeros_like(xrf_proj_img_array)
 
     proj_imgs_from_3d_recon = np.zeros((n_theta, n_slices, n_columns))
+    
+    synth_test = np.zeros((n_theta, n_slices, n_columns))
 
     x_shifts_pc = np.zeros((n_iterations, n_theta))
     y_shifts_pc = np.zeros((n_iterations, n_theta))
@@ -455,10 +457,20 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
 
                     print('x-shift = ' + str(xshift))
                     print('y-shift = ' + str(yshift))
-
+                    recon_test = tomo.recon(aligned_proj_test[ref_element_idx], theta = theta_array*np.pi/180, center = center_of_rotation, algorithm = algorithm, filter_name = 'ramlak')
+                    
+                    for slice_test_idx in range(n_slices):
+                        print('Slice (Test) ' + str(slice_test_idx + 1) + '/' + str(n_slices))
+                        synth_test[:, slice_test_idx, :] = (skimage.transform.radon(recon_test[:, 0, :], theta = theta_array)).T # This radon transform assumes slices are defined by columns and not rows
+                    
+                    yshift_test, xshift_test = phase_correlate(synth_test[theta_idx, :, :], aligned_proj_test[ref_element_idx])
+                    print('(Test) x-shift: ' + str(xshift_test))
+                    print('(Test) y-shift: ' + str(yshift_test))
                     fig1, axs1 = plt.subplots(2, 1)
-                    axs1[0].imshow(proj_imgs_from_3d_recon[theta_idx])
-                    axs1[1].imshow(aligned_proj[ref_element_idx, theta_idx, :, :])
+                    # axs1[0].imshow(proj_imgs_from_3d_recon[theta_idx])
+                    # axs1[1].imshow(aligned_proj[ref_element_idx, theta_idx, :, :])
+                    axs1[0].imshow(synth_test[theta_idx])
+                    axs1[1].imshow(aligned_proj_test[ref_element_idx, theta_idx, :, :])
                     plt.show()
 
                 else:
