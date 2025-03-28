@@ -439,17 +439,28 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
                 print('x-shift: ' + str(x_shift_pc) + ' (Theta = ' + str(theta_array[theta_idx]) + ' degrees')
                 print('y-shift: ' + str(y_shift_pc))
 
-                if theta_idx == 0:
-                    fig1, axs1 = plt.subplots(2, 1)
-                    axs1[0].imshow(proj_imgs_from_3d_recon[theta_idx])
-                    axs1[1].imshow(aligned_proj[ref_element_idx, theta_idx, :, :])
-                    plt.show()
+                # if theta_idx == 0:
+                #     fig1, axs1 = plt.subplots(2, 1)
+                #     axs1[0].imshow(proj_imgs_from_3d_recon[theta_idx])
+                #     axs1[1].imshow(aligned_proj[ref_element_idx, theta_idx, :, :])
+                #     plt.show()
             
             if iteration_idx == 0:
                 if theta_idx == 0:
                     x_shifts_pc[iteration_idx, theta_idx] = x_shift_pc + init_x_shift
                     y_shifts_pc[iteration_idx, theta_idx] = y_shift_pc + init_y_shift
-                
+
+                    aligned_proj_test = ndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx, :, :], shift = (x_shift_pc + init_x_shift, y_shift_pc + init_y_shift))
+
+                    pc, _, _ = phase_correlate(proj_imgs_from_3d_recon[theta_idx], aligned_proj_test)
+
+                    print('pc = ' + str(pc))
+
+                    fig1, axs1 = plt.subplots(2, 1)
+                    axs1[0].imshow(proj_imgs_from_3d_recon[theta_idx])
+                    axs1[1].imshow(aligned_proj[ref_element_idx, theta_idx, :, :])
+                    plt.show()
+
                 else:
                     x_shifts_pc[iteration_idx, theta_idx] = x_shift_pc
                     y_shifts_pc[iteration_idx, theta_idx] = y_shift_pc
