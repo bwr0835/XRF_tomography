@@ -87,7 +87,7 @@ def create_save_recon_shifts(elements_xrf, counts_xrf, theta_xrf, ref_element, c
     np.save(output_path, recon_array)
 
 def update(frame):
-    im.set_array(recon_array[frame])
+    im.set_array(recon_array[frame][slice_desired_idx])
     text.set_text(r'COR shift = {0} pixels'.format(cor_x_shift[frame]))
 
     return im, text
@@ -106,11 +106,13 @@ cor_x_shift = np.linspace(-40, 40, 161)
 
 recon_array = np.load(output_path)
 
+slice_desired_idx = 71
+
 fps_images = 35 # Frames per second
 
 fig, axs = plt.subplots()
 
-im = axs.imshow(recon_array[0], animated = True)
+im = axs.imshow(recon_array[0][slice_desired_idx], animated = True)
 text = axs.text(0.02, 0.02, r'COR shift = {0} pixels'.format(cor_x_shift[0]), transform = axs.transAxes, color = 'white')
 
 animation = anim.FuncAnimation(fig, update, frames = len(cor_x_shift), interval = 1000/fps_images, blit = True) # Interval is ms/frame (NOT frames per second, or fps)
