@@ -43,73 +43,76 @@ def pad_row(array):
 
     return array
 
-# def update(frame):
-#     im.set_array(recon_array[frame])
-#     text.set_text(r'COR shift = {0} pixels'.format(cor_x_shift[frame]))
+def create_save_recon_shifts(elements_xrf, counts_xrf, theta_xrf, ref_element, cor_x_shift, output_path):
+    ref_element_idx = elements_xrf.index(ref_element)
+    counts = counts_xrf[ref_element_idx]
 
-#     return im, text
+    n_theta = counts.shape[0] # Number of projection angles (projection images)
+    n_slices = counts.shape[1] # Number of rows in a projection image
+    n_columns = counts.shape[2] # Number of columns in a projection image
+
+    if (n_slices % 2) or (n_columns % 2):
+        if (n_slices % 2) and (n_columns % 2):
+            counts = pad_col_row(counts)
+            
+            n_slices += 1
+            n_columns += 1
+        
+        elif n_slices % 2:
+            counts = pad_row(counts)
+
+            n_slices += 1
+
+        else:
+            counts = pad_col(counts)
+
+            n_columns += 1
+
+    center_of_rotation = tomo.find_center(counts, theta_xrf*np.pi/180, tol = 0.05) # COR given with tolerance of ±0.05 pixels
+
+    recon_array = []
+
+    for x_shift in range(len(cor_x_shift)):
+        # for theta_idx in range(n_theta):
+        #     counts_fe[theta_idx] = ndi.shift(counts_fe[theta_idx], shift = (0, cor_x_shift[x_shift]))
+    
+        print('Performing gridrec for shift = ' + str(cor_x_shift[x_shift]))
+
+        recon = tomo.recon(counts, theta = theta_xrf*np.pi/180, center = center_of_rotation + cor_x_shift[x_shift], algorithm = 'gridrec', filter_name = 'ramlak')
+
+        recon_array.append(recon)
+
+    recon_array = np.array(recon_array)
+
+    np.save(output_path, recon_array)
+
+def update(frame):
+    im.set_array(recon_array[frame])
+    text.set_text(r'COR shift = {0} pixels'.format(cor_x_shift[frame]))
+
+    return im, text
 
 file_path_xrf = '/home/bwr0835/2_ide_aggregate_xrf.h5'
 output_path = '/home/bwr0835/cor_correction_shift_array.npy'
 ref_element = 'Fe'
 
-elements_xrf, counts_xrf, theta_xrf, dataset_type_xrf = extract_h5_aggregate_xrf_data(file_path_xrf)
-
-ref_element_idx = elements_xrf.index(ref_element)
-counts_fe = counts_xrf[ref_element_idx]
-
-n_theta = counts_fe.shape[0] # Number of projection angles (projection images)
-n_slices = counts_fe.shape[1] # Number of rows in a projection image
-n_columns = counts_fe.shape[2] # Number of columns in a projection image
-
-slice_desired_idx = 71
-
-if (n_slices % 2) or (n_columns % 2):
-    if (n_slices % 2) and (n_columns % 2):
-        xrf_proj_img_array = pad_col_row(counts_fe)
-            
-        n_slices += 1
-        n_columns += 1
-        
-    elif n_slices % 2:
-        xrf_proj_img_array = pad_row(counts_fe)
-
-        n_slices += 1
-
-    else:
-        xrf_proj_img_array = pad_col(counts_fe)
-
-        n_columns += 1
-
 cor_x_shift = np.linspace(-40, 40, 161)
-center_of_rotation = tomo.find_center(counts_fe, theta_xrf*np.pi/180, tol = 0.05) # COR given with tolerance of ±0.05 pixels
-print(center_of_rotation)
 
-# print(center_of_rotation)
+# elements_xrf, counts_xrf, theta_xrf, dataset_type_xrf = extract_h5_aggregate_xrf_data(file_path_xrf)
 
-recon_array = []
 
-for x_shift in range(len(cor_x_shift)):
-    # for theta_idx in range(n_theta):
-    #     counts_fe[theta_idx] = ndi.shift(counts_fe[theta_idx], shift = (0, cor_x_shift[x_shift]))
-    
-    print('Performing gridrec for shift = ' + str(cor_x_shift[x_shift]))
 
-    recon = tomo.recon(counts_fe, theta = theta_xrf*np.pi/180, center = center_of_rotation + cor_x_shift[x_shift], algorithm = 'gridrec', filter_name = 'ramlak')
+# create_save_recon_shifts(elements_xrf, counts_xrf, theta_xrf, 'Fe', output_path)
 
-    recon_array.append(recon)
+recon_array = np.load(output_path)
 
-recon_array = np.array(recon_array)
+fps_images = 35 # Frames per second
 
-np.save(output_path, recon_array)
+fig, axs = plt.subplots()
 
-# fps_images = 25 # Frames per second
+im = axs.imshow(recon_array[0], animated = True)
+text = axs.text(0.02, 0.02, r'COR shift = {0} pixels'.format(cor_x_shift[0]), transform = axs.transAxes, color = 'white')
 
-# fig, axs = plt.subplots()
+animation = anim.FuncAnimation(fig, update, frames = len(cor_x_shift), interval = 1000/fps_images, blit = True) # Interval is ms/frame (NOT frames per second, or fps)
 
-# im = axs.imshow(recon_array[0], animated = True)
-# text = axs.text(0.02, 0.02, r'COR shift = {0} pixels'.format(cor_x_shift[0]), transform = axs.transAxes, color = 'white')
-
-# animation = anim.FuncAnimation(fig, update, frames = len(cor_x_shift), interval = 1000/fps_images, blit = True) # Interval is ms/frame (NOT frames per second, or fps)
-
-# plt.show()
+plt.show()
