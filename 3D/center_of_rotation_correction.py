@@ -43,13 +43,14 @@ def pad_row(array):
 
     return array
 
-def update(frame):
-    im.set_array(recon_array[frame])
-    text.set_text(r'COR shift = {0} pixels'.format(cor_x_shift[frame]))
+# def update(frame):
+#     im.set_array(recon_array[frame])
+#     text.set_text(r'COR shift = {0} pixels'.format(cor_x_shift[frame]))
 
-    return im, text
+#     return im, text
 
 file_path_xrf = '/home/bwr0835/2_ide_aggregate_xrf.h5'
+output_path = '/home/bwr0835/cor_correction_shift_array.npy'
 ref_element = 'Fe'
 
 elements_xrf, counts_xrf, theta_xrf, dataset_type_xrf = extract_h5_aggregate_xrf_data(file_path_xrf)
@@ -80,7 +81,7 @@ if (n_slices % 2) or (n_columns % 2):
 
         n_columns += 1
 
-cor_x_shift = np.linspace(-20, 20, 81)
+cor_x_shift = np.linspace(-40, 40, 161)
 center_of_rotation = tomo.find_center(counts_fe, theta_xrf*np.pi/180, tol = 0.05) # COR given with tolerance of ±0.05 pixels
 print(center_of_rotation)
 
@@ -96,17 +97,19 @@ for x_shift in range(len(cor_x_shift)):
 
     recon = tomo.recon(counts_fe, theta = theta_xrf*np.pi/180, center = center_of_rotation + cor_x_shift[x_shift], algorithm = 'gridrec', filter_name = 'ramlak')
 
-    recon_array.append(recon[slice_desired_idx])
+    recon_array.append(recon)
 
 recon_array = np.array(recon_array)
 
-fps_images = 25 # Frames per second
+np.save(output_path, recon_array)
 
-fig, axs = plt.subplots()
+# fps_images = 25 # Frames per second
 
-im = axs.imshow(recon_array[0], animated = True)
-text = axs.text(0.02, 0.02, r'COR shift = {0} pixels'.format(cor_x_shift[0]), transform = axs.transAxes, color = 'white')
+# fig, axs = plt.subplots()
 
-animation = anim.FuncAnimation(fig, update, frames = len(cor_x_shift), interval = 1000/fps_images, blit = True) # Interval is ms/frame (NOT frames per second, or fps)
+# im = axs.imshow(recon_array[0], animated = True)
+# text = axs.text(0.02, 0.02, r'COR shift = {0} pixels'.format(cor_x_shift[0]), transform = axs.transAxes, color = 'white')
 
-plt.show()
+# animation = anim.FuncAnimation(fig, update, frames = len(cor_x_shift), interval = 1000/fps_images, blit = True) # Interval is ms/frame (NOT frames per second, or fps)
+
+# plt.show()
