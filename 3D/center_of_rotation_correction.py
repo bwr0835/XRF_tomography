@@ -13,8 +13,8 @@ plt.rcParams['text.latex.preamble'] = r'\usepackage{times}'
 def pad_col_row(array):
     array_new = np.zeros((array.shape[0], array.shape[1] + 1, array.shape[2] + 1))
 
-    for theta_idx in range(array.shape[1]):
-        final_column = array[theta_idx, :, -1] # Reshape to column vector (-1 means Python automatically determines missing dimension based on original orray length)
+    for theta_idx in range(array.shape[0]):
+        final_column = array[theta_idx, :, -1].reshape(-1, 1) # Reshape to column vector (-1 means Python automatically determines missing dimension based on original orray length)
             
         # print(final_column.shape)
         # print(array.shape)
