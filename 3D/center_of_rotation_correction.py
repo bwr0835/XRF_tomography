@@ -102,7 +102,7 @@ fps_images = 25 # Frames per second
 
 fig, axs = plt.subplots()
 
-im = axs.imshow(recon_array[0], animated = True)
+im = axs.imshow(recon_array[0])
 text = axs.text(0.02, 0.02, r'COR shift = {0} pixels'.format(cor_x_shift[0]), transform = axs.transAxes, color = 'white')
 
 animation = anim.FuncAnimation(fig, update, frames = len(cor_x_shift), interval = 1000/fps_images, blit = True) # Interval is ms/frame (NOT frames per second, or fps)
