@@ -122,8 +122,8 @@ def create_save_proj_shifts(elements_xrf, counts_xrf, theta_xrf, ref_element, co
             counts_new[theta_idx] = ndi.shift(counts[theta_idx], shift = (0, cor_x_shift[x_shift]))
         
         center_of_rotation = tomo.find_center(counts_new, theta_xrf*np.pi/180, tol = 0.05) # COR given with tolerance of ±0.05 pixels
-        
-        print('Performing gridrec for shift = ' + str(cor_x_shift[x_shift]))
+    
+        print('Performing gridrec for projection x-shift = ' + str(cor_x_shift[x_shift]) + '(COR = ' + str(center_of_rotation) + ')')
 
         recon = tomo.recon(counts_new, theta = theta_xrf*np.pi/180, center = center_of_rotation, algorithm = 'gridrec', filter_name = 'ramlak')
 
