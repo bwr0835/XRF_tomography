@@ -61,7 +61,7 @@ n_theta = counts_fe.shape[0] # Number of projection angles (projection images)
 n_slices = counts_fe.shape[1] # Number of rows in a projection image
 n_columns = counts_fe.shape[2] # Number of columns in a projection image
 
-slice_desired_idx = n_slices//2
+slice_desired_idx = 71
 
 if (n_slices % 2) or (n_columns % 2):
     if (n_slices % 2) and (n_columns % 2):
