@@ -1,4 +1,3 @@
-import scipy.ndimage
 import numpy as np, h5py, os, skimage, tkinter as tk, tomopy as tomo, matplotlib as mpl
 
 from skimage import transform as xform, registration as reg
