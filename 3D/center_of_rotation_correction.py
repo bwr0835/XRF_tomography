@@ -152,8 +152,8 @@ elements_xrf, counts_xrf, theta_xrf, dataset_type_xrf = extract_h5_aggregate_xrf
 
 
 
-# create_save_recon_shifts(elements_xrf, counts_xrf, theta_xrf, 'Fe', output_path)
-create_save_proj_shifts(elements_xrf, counts_xrf, theta_xrf, 'Fe', output_path)
+# create_save_recon_shifts(elements_xrf, counts_xrf, theta_xrf, 'Fe', cor_x_shift, output_path)
+create_save_proj_shifts(elements_xrf, counts_xrf, theta_xrf, 'Fe', cor_x_shift, output_path)
 
 # recon_array = np.load(output_path)
 
