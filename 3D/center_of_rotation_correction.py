@@ -100,7 +100,7 @@ recon_array = np.array(recon_array)
 
 fps_images = 25 # Frames per second
 
-fig, axs = plt.subplot()
+fig, axs = plt.subplots()
 
 im = axs.imshow(recon_array[0], animated = True)
 text = axs.text(0.02, 0.02, r'COR shift = {0} pixels'.format(cor_x_shift[0]), transform = axs.transAxes, color = 'white')
