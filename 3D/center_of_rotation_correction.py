@@ -106,7 +106,7 @@ cor_x_shift = np.linspace(-40, 40, 161)
 
 recon_array = np.load(output_path)
 
-slice_desired_idx = 71
+slice_desired_idx = 64
 
 fps_images = 35 # Frames per second
 
