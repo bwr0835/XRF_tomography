@@ -98,7 +98,7 @@ recon_array = np.array(recon_array)
 
 fps_images = 25 # Frames per second
 
-fig, axs = plt.subplot()
+fig, axs = plt.subplots()
 
 slice_desired_idx = n_slices//2
 
