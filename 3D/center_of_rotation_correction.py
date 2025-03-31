@@ -135,11 +135,11 @@ def create_save_proj_shifts(elements_xrf, counts_xrf, theta_xrf, ref_element, co
 
     return
 
-# def update(frame):
-#     im.set_array(recon_array[frame][slice_desired_idx])
-#     text.set_text(r'COR shift = {0} pixels'.format(cor_x_shift[frame]))
+def update(frame):
+    im.set_array(recon_array[frame][slice_desired_idx])
+    text.set_text(r'COR shift = {0} pixels'.format(cor_x_shift[frame]))
 
-#     return im, text
+    return im, text
 
 file_path_xrf = '/home/bwr0835/2_ide_aggregate_xrf.h5'
 output_path = '/home/bwr0835/cor_correction_proj_shift_array.npy'
@@ -153,19 +153,19 @@ elements_xrf, counts_xrf, theta_xrf, dataset_type_xrf = extract_h5_aggregate_xrf
 
 
 # create_save_recon_shifts(elements_xrf, counts_xrf, theta_xrf, 'Fe', cor_x_shift, output_path)
-create_save_proj_shifts(elements_xrf, counts_xrf, theta_xrf, 'Fe', cor_x_shift, output_path)
+# create_save_proj_shifts(elements_xrf, counts_xrf, theta_xrf, 'Fe', cor_x_shift, output_path)
 
-# recon_array = np.load(output_path)
+recon_array = np.load(output_path)
 
-# slice_desired_idx = 64
+slice_desired_idx = 64
 
-# fps_images = 35 # Frames per second
+fps_images = 35 # Frames per second
 
-# fig, axs = plt.subplots()
+fig, axs = plt.subplots()
 
-# im = axs.imshow(recon_array[0][slice_desired_idx], animated = True)
-# text = axs.text(0.02, 0.02, r'COR shift = {0} pixels'.format(cor_x_shift[0]), transform = axs.transAxes, color = 'white')
+im = axs.imshow(recon_array[0][slice_desired_idx], animated = True)
+text = axs.text(0.02, 0.02, r'COR shift = {0} pixels'.format(cor_x_shift[0]), transform = axs.transAxes, color = 'white')
 
-# animation = anim.FuncAnimation(fig, update, frames = len(cor_x_shift), interval = 1000/fps_images, blit = True) # Interval is ms/frame (NOT frames per second, or fps)
+animation = anim.FuncAnimation(fig, update, frames = len(cor_x_shift), interval = 1000/fps_images, blit = True) # Interval is ms/frame (NOT frames per second, or fps)
 
-# plt.show()
+plt.show()
