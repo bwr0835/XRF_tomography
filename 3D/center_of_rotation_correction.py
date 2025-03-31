@@ -77,7 +77,7 @@ if (n_slices % 2) or (n_columns % 2):
         n_columns += 1
 
 cor_x_shift = np.linspace(-20, 20, 81)
-center_of_rotation = tomo.find_center(counts_fe, theta_xrf*np.pi/180)
+center_of_rotation = tomo.find_center(counts_fe, theta_xrf*np.pi/180, tol = 0.05)
 print(center_of_rotation)
 
 # print(center_of_rotation)
@@ -90,7 +90,7 @@ print(center_of_rotation)
     
 #     print('Performing gridrec for shift = ' + str(cor_x_shift[x_shift]))
 
-#     recon = tomo.recon(counts_fe, theta = theta_xrf*np.pi/180, center = center_of_rotation, algorithm = 'gridrec', filter_name = 'ramlak')
+    # recon = tomo.recon(counts_fe, theta = theta_xrf*np.pi/180, center = center_of_rotation, algorithm = 'gridrec', filter_name = 'ramlak')
 
 #     recon_array.append(recon)
 
