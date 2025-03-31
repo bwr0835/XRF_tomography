@@ -45,7 +45,9 @@ def pad_row(array):
 
 def update(frame):
     im.set_array(recon_array[frame])
-    im.set_text(r'COR shift = {0} pixels'.format(cor_x_shift[frame]))
+    text.set_text(r'COR shift = {0} pixels'.format(cor_x_shift[frame]))
+
+    return im, text
 
 file_path_xrf = '/home/bwr0835/2_ide_aggregate_xrf.h5'
 ref_element = 'Fe'
@@ -102,7 +104,7 @@ fps_images = 25 # Frames per second
 
 fig, axs = plt.subplots()
 
-im = axs.imshow(recon_array[0])
+im = axs.imshow(recon_array[0], animated = True)
 text = axs.text(0.02, 0.02, r'COR shift = {0} pixels'.format(cor_x_shift[0]), transform = axs.transAxes, color = 'white')
 
 animation = anim.FuncAnimation(fig, update, frames = len(cor_x_shift), interval = 1000/fps_images, blit = True) # Interval is ms/frame (NOT frames per second, or fps)
