@@ -59,6 +59,8 @@ n_theta = counts_fe.shape[0] # Number of projection angles (projection images)
 n_slices = counts_fe.shape[1] # Number of rows in a projection image
 n_columns = counts_fe.shape[2] # Number of columns in a projection image
 
+slice_desired_idx = n_slices//2
+
 if (n_slices % 2) or (n_columns % 2):
     if (n_slices % 2) and (n_columns % 2):
         xrf_proj_img_array = pad_col_row(counts_fe)
@@ -92,7 +94,7 @@ for x_shift in range(len(cor_x_shift)):
 
     recon = tomo.recon(counts_fe, theta = theta_xrf*np.pi/180, center = center_of_rotation + cor_x_shift[x_shift], algorithm = 'gridrec', filter_name = 'ramlak')
 
-    recon_array.append(recon)
+    recon_array.append(recon[slice_desired_idx])
 
 recon_array = np.array(recon_array)
 
@@ -100,9 +102,7 @@ fps_images = 25 # Frames per second
 
 fig, axs = plt.subplot()
 
-slice_desired_idx = n_slices//2
-
-im = axs.imshow(recon_array[:, slice_desired_idx, :], animated = True)
+im = axs.imshow(recon_array[0], animated = True)
 text = axs.text(0.02, 0.02, r'COR shift = {0} pixels'.format(cor_x_shift[0]), transform = axs.transAxes, color = 'white')
 
 animation = anim.FuncAnimation(fig, update, frames = len(cor_x_shift), interval = 1000/fps_images, blit = True) # Interval is ms/frame (NOT frames per second, or fps)
