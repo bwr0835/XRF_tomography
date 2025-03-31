@@ -78,6 +78,7 @@ if (n_slices % 2) or (n_columns % 2):
 
 cor_x_shift = np.linspace(-20, 20, 81)
 center_of_rotation = tomo.find_center(counts_fe, theta_xrf*np.pi/180)
+print(center_of_rotation)
 
 # print(center_of_rotation)
 
