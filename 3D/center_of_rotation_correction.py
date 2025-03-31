@@ -43,9 +43,9 @@ def pad_row(array):
 
     return array
 
-# def update(frame):
-#     im.set_array(recon_array[:, frame, :])
-#     im.set_text(r'')
+def update(frame):
+    im.set_array(recon_array[:, frame, :])
+    im.set_text(r'')
 
 file_path_xrf = '/home/bwr0835/2_ide_aggregate_xrf.h5'
 ref_element = 'Fe'
@@ -77,29 +77,34 @@ if (n_slices % 2) or (n_columns % 2):
         n_columns += 1
 
 cor_x_shift = np.linspace(-20, 20, 81)
-center_of_rotation = tomo.find_center(counts_fe, theta_xrf*np.pi/180, tol = 0.05)
+center_of_rotation = tomo.find_center(counts_fe, theta_xrf*np.pi/180, tol = 0.05) # COR given with tolerance of ±0.05 pixels
 print(center_of_rotation)
 
 # print(center_of_rotation)
 
-# recon_array = []
+recon_array = []
 
-# for x_shift in range(len(cor_x_shift)):
-#     for theta_idx in range(n_theta):
-#         counts_fe[theta_idx] = ndi.shift(counts_fe[theta_idx], shift = (0, cor_x_shift[x_shift]))
+for x_shift in range(len(cor_x_shift)):
+    # for theta_idx in range(n_theta):
+    #     counts_fe[theta_idx] = ndi.shift(counts_fe[theta_idx], shift = (0, cor_x_shift[x_shift]))
     
-#     print('Performing gridrec for shift = ' + str(cor_x_shift[x_shift]))
+    print('Performing gridrec for shift = ' + str(cor_x_shift[x_shift]))
 
-    # recon = tomo.recon(counts_fe, theta = theta_xrf*np.pi/180, center = center_of_rotation, algorithm = 'gridrec', filter_name = 'ramlak')
+    recon = tomo.recon(counts_fe, theta = theta_xrf*np.pi/180, center = center_of_rotation + cor_x_shift[x_shift], algorithm = 'gridrec', filter_name = 'ramlak')
 
-#     recon_array.append(recon)
+    recon_array.append(recon)
 
-# recon_array = np.array(recon_array)
+recon_array = np.array(recon_array)
 
-# fig, axs = plt.subplot()
+fps_images = 25 # Frames per second
 
-# slice_desired_idx = n_slices//2
+fig, axs = plt.subplot()
 
-# im = axs.imshow(recon_array[:, slice_desired_idx, :], animated = True)
-# text = axs.text(0.02, 0.02, r'COR Shift = {0}'.format(cor_x_shift[0]), transform = axs.transAxes, color = 'white')
+slice_desired_idx = n_slices//2
 
+im = axs.imshow(recon_array[:, slice_desired_idx, :], animated = True)
+text = axs.text(0.02, 0.02, r'COR shift = {0} pixels'.format(cor_x_shift[0]), transform = axs.transAxes, color = 'white')
+
+animation = anim.FuncAnimation(fig, update, frames = len(cor_x_shift), interval = 1000/fps_images, blit = True) # Interval is ms/frame (NOT frames per second, or fps)
+
+plt.show()
