@@ -192,7 +192,7 @@ else:
     xcorr_imgs = []
     shift_rgb_imgs = []
     
-    # recon_text = []
+    recon_text = []
     proj_text = []
 
     text_recon = axs1[0].text(0.02, 0.02, r'Slice 0', transform = axs1[0].transAxes, color = 'white')
@@ -235,8 +235,10 @@ else:
         
         # recon_text.set_text(r'Slice {0}'.format(frame))
         text_recon.set_text(r'Slice {0}'.format(frame))
+        
+        artists.append(text_recon)
 
-        return artists, text_recon
+        # return artists, text_recon
     
     def animate_proj(frame):
         artists = []
