@@ -230,13 +230,13 @@ else:
             recons = recon_data_dict[subdir]
 
             recon_imgs[idx].set_array(recons[frame])
-            
+
             artists.append(recon_imgs[idx])
         
         # recon_text.set_text(r'Slice {0}'.format(frame))
         text_recon.set_text(r'Slice {0}'.format(frame))
 
-        return artists
+        return artists, text_recon
     
     def animate_proj(frame):
         artists = []
