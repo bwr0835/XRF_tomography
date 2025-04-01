@@ -152,14 +152,19 @@ elements_xrf, counts_xrf, theta_xrf, dataset_type_xrf = extract_h5_aggregate_xrf
 
 # create_save_recon_shifts(elements_xrf, counts_xrf, theta_xrf, 'Fe', cor_x_shift, output_path)
 # create_save_proj_shifts(elements_xrf, counts_xrf, theta_xrf, 'Fe', cor_x_shift, output_path)
+print('Loading...')
 
 recon_array = np.load(output_path)
 
+print('Loading finished')
+
 slice_desired_idx = 61
 
-fps_images = 35 # Frames per second
+fps_images = 25 # Frames per second
 
 fig, axs = plt.subplots()
+
+axs.set_title(r'Slice {0}'.format(slice_desired_idx))
 
 im = axs.imshow(recon_array[0][slice_desired_idx], animated = True)
 text = axs.text(0.02, 0.02, r'COR shift = {0} pixels'.format(cor_x_shift[0]), transform = axs.transAxes, color = 'white')
