@@ -182,11 +182,11 @@ else:
 
     anim1 = anim.FuncAnimation(fig1, animate_recon, frames = n_slices, interval = 1000/fps_images, blit = True) # Interval is ms/frame (NOT frames per second, or fps)
  
-    # output_path1 = '/home/bwr0835/recon_gridrec_no_cor_correction.mp4'
-    # writer1 = anim.FFMpegWriter(fps = fps_images, metadata = {'title': 'recon'}, bitrate = 1800, extra_args = ['-vcodec', 'libx264'])
+    output_path1 = '/home/bwr0835/recon_gridrec_no_cor_correction.mp4'
+    writer1 = anim.FFMpegWriter(fps = fps_images, metadata = {'title': 'recon'}, bitrate = 1800, extra_args = ['-vcodec', 'libx264'])
     
-    # print('Saving')
+    print('Saving')
     
-    # anim1.save(output_path1, writer1)
+    anim1.save(output_path1, writer1)
 
     plt.show()
