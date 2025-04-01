@@ -238,7 +238,7 @@ else:
         
         artists.append(text_recon)
 
-        # return artists, text_recon
+        return artists
     
     def animate_proj(frame):
         artists = []
