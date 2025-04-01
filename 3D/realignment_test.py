@@ -409,8 +409,6 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
 
         print('Performing ' + algorithm)
 
-        center_of_rotation = tomo.find_center(aligned_proj[ref_element_idx], theta_array*np.pi/180)
-
         if algorithm == 'gridrec':
             recon = tomo.recon(aligned_proj[ref_element_idx], theta = theta_array*np.pi/180, center = center_of_rotation, algorithm = algorithm, filter_name = 'ramlak')
         
@@ -474,8 +472,6 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
             else:
                 x_shifts_pc[iteration_idx, theta_idx] = x_shifts_pc[iteration_idx - 1, theta_idx] + x_shift_pc
                 y_shifts_pc[iteration_idx, theta_idx] = y_shifts_pc[iteration_idx - 1, theta_idx] + y_shift_pc
-
-        center_of_rotation = tomo.find_center(aligned_proj_test, theta_array*np.pi/180)
 
         recon_test = tomo.recon(aligned_proj_test, theta = theta_array*np.pi/180, center = center_of_rotation, algorithm = algorithm, filter_name = 'ramlak')
 
