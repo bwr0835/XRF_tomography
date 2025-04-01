@@ -373,7 +373,7 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
                     print('Cumulative x shift = ' + str(x_shift))
                     print('Cumulative y shift = ' + str(y_shift))
                     
-                aligned_proj[ref_element_idx, theta_idx, :, :] = ndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx, :, :].copy(), shift = (y_shift, x_shift))
+                aligned_proj[ref_element_idx, theta_idx, :, :] = ndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx, :, :], shift = (y_shift, x_shift))
 
         elif (init_x_shift != 0 or init_y_shift != 0):
             print('Initial x shift: ' + str(init_x_shift))
@@ -381,10 +381,10 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
             
             for theta_idx in range(n_theta):
                 if theta_idx == 0:
-                    aligned_proj[ref_element_idx, theta_idx, :, :] = ndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx, :, :].copy(), shift = (init_y_shift, init_x_shift))
+                    aligned_proj[ref_element_idx, theta_idx, :, :] = ndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx, :, :], shift = (init_y_shift, init_x_shift))
             
                 else:
-                    aligned_proj[ref_element_idx, theta_idx, :, :] = xrf_proj_img_array[ref_element_idx, theta_idx, :, :].copy()          
+                    aligned_proj[ref_element_idx, theta_idx, :, :] = xrf_proj_img_array[ref_element_idx, theta_idx, :, :]          
 
                 # if theta_idx == n_theta//2:
                 #     diff = aligned_proj[ref_element_idx, theta_idx, :, :] - xrf_proj_img_array[ref_element_idx, theta_idx, :, :]
@@ -403,7 +403,7 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
 
                 #     plt.show()
         else:
-            aligned_proj = xrf_proj_img_array.copy()
+            aligned_proj = xrf_proj_img_array
 
         algorithm = 'gridrec'
 
@@ -428,7 +428,7 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
 
         for theta_idx in range(n_theta):
             # y_shift_pc, x_shift_cc, corr_mat_cc = cross_correlate(proj_imgs_from_3d_recon[theta_idx, :, :], aligned_proj[ref_element_idx, theta_idx, :, :]) # Cross-correlation
-            y_shift_pc, x_shift_pc = phase_correlate(proj_imgs_from_3d_recon[theta_idx, :, :], aligned_proj[ref_element_idx, theta_idx, :, :], upsample_factor = 100)
+            y_shift_pc, x_shift_pc = phase_correlate(proj_imgs_from_3d_recon[theta_idx, :, :], ndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx, :, :], shift = (init_y_shift, init_x_shift)), upsample_factor = 100)
  
             x_shift_pc_array[theta_idx] = x_shift_pc
             y_shift_pc_array[theta_idx] = y_shift_pc
@@ -451,12 +451,13 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
                 x_shifts_pc[iteration_idx, theta_idx] = x_shift_pc + init_x_shift
                 y_shifts_pc[iteration_idx, theta_idx] = y_shift_pc + init_y_shift
     
-                aligned_proj_test[theta_idx, :, :] = ndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx, :, :], shift = (y_shift_pc + init_y_shift, x_shift_pc + init_x_shift))
+                # aligned_proj_test[theta_idx, :, :] = ndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx, :, :], shift = (y_shift_pc + init_y_shift, x_shift_pc + init_x_shift))
 
-                yshift, xshift = phase_correlate(proj_imgs_from_3d_recon[theta_idx, :, :], aligned_proj_test[theta_idx, :, :], upsample_factor = 100)
-
-                print('dx: ' + str(xshift))
-                print('dy: ' + str(yshift))
+                # yshift, xshift = phase_correlate(proj_imgs_from_3d_recon[theta_idx, :, :], aligned_proj_test[theta_idx, :, :], upsample_factor = 100)
+                
+                # if theta_idx == 0:
+                #     print('dx: ' + str(xshift))
+                #     print('dy: ' + str(yshift))
                 # yshift, xshift = phase_correlate(proj_imgs_from_3d_recon[theta_idx], aligned_proj_test, upsample_factor = 100)
 
                 # print('x-shift = ' + str(xshift))
@@ -473,21 +474,21 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
                 x_shifts_pc[iteration_idx, theta_idx] = x_shifts_pc[iteration_idx - 1, theta_idx] + x_shift_pc
                 y_shifts_pc[iteration_idx, theta_idx] = y_shifts_pc[iteration_idx - 1, theta_idx] + y_shift_pc
 
-        recon_test = tomo.recon(aligned_proj_test, theta = theta_array*np.pi/180, center = center_of_rotation, algorithm = algorithm, filter_name = 'ramlak')
+        # recon_test = tomo.recon(aligned_proj_test, theta = theta_array*np.pi/180, center = center_of_rotation, algorithm = algorithm, filter_name = 'ramlak')
 
-        for slice_idx in range(n_slices):
-            print('Test slice ' + str(slice_idx + 1) + '/' + str(n_slices))
-            synth_test[:, slice_idx, :] = (skimage.transform.radon(recon_test[slice_idx, :, :], theta = theta_array)).T # This radon transform assumes slices are defined by columns and not rows
+        # for slice_idx in range(n_slices):
+        #     print('Test slice ' + str(slice_idx + 1) + '/' + str(n_slices))
+        #     synth_test[:, slice_idx, :] = (skimage.transform.radon(recon_test[slice_idx, :, :], theta = theta_array)).T # This radon transform assumes slices are defined by columns and not rows
 
-        yshift_test, xshift_test = phase_correlate(synth_test[0], aligned_proj_test[0], upsample_factor = 100)
+        # yshift_test, xshift_test = phase_correlate(synth_test[0], aligned_proj_test[0], upsample_factor = 100)
 
-        print('Test x-shift: ' + str(xshift_test))
-        print('Test y-shift: ' + str(yshift_test))
+        # print('Test x-shift: ' + str(xshift_test))
+        # print('Test y-shift: ' + str(yshift_test))
 
-        fig1, axs1 = plt.subplots(2, 1)
-        axs1[0].imshow(synth_test[0])
-        axs1[1].imshow(aligned_proj_test[0])
-        plt.show()
+        # fig1, axs1 = plt.subplots(2, 1)
+        # axs1[0].imshow(synth_test[0])
+        # axs1[1].imshow(aligned_proj_test[0])
+        # plt.show()
 
         if np.max(np.abs(x_shift_pc_array)) <= eps and np.max(np.abs(y_shift_pc_array)) <= eps:
             print('Number of iterations taken: ' + str(iteration_idx + 1))
