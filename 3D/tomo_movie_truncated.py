@@ -166,7 +166,7 @@ else:
 
     axs1.set_title(r'Recon. Slice (It. 0, No COR Fix)')
    
-    recon_array_zero_iter = recon_data_dict[subdir[0]]
+    recon_array_zero_iter = recon_data_dict[iteration_subdir_array_truncated[0]]
 
     im1 = axs1.imshow(recon_array_zero_iter[0])
     text1 = axs1.text(0.02, 0.02, r'Slice 0', transform = axs1[0].transAxes, color = 'white')
