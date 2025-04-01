@@ -189,4 +189,4 @@ else:
     
     # anim1.save(output_path1, writer1)
 
-    # plt.show()
+    plt.show()
