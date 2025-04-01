@@ -169,7 +169,7 @@ else:
     recon_array_zero_iter = recon_data_dict[iteration_subdir_array_truncated[0]]
 
     im1 = axs1.imshow(recon_array_zero_iter[0])
-    text1 = axs1.text(0.02, 0.02, r'Slice 0', transform = axs1[0].transAxes, color = 'white')
+    text1 = axs1.text(0.02, 0.02, r'Slice 0', transform = axs1.transAxes, color = 'white')
 
     def animate_recon(frame):
         im1.set_array(recon_array_zero_iter[frame])
