@@ -161,8 +161,7 @@ else:
     # plt.plot(theta_array, x_shifts_data[-1, :], 'bo-', label = r'Iteration Index 9')
     # plt.legend()
     
-    # fig1, axs1 = plt.subplots(2, 1)
-    fig1, axs1 = plt.subplots()
+    fig1, axs1 = plt.subplots(2, 1)
     fig2, axs2 = plt.subplots(2, 4)
     fig3, axs3 = plt.subplots()
 
@@ -195,7 +194,7 @@ else:
     
     recon_text = []
     proj_text = []
-    
+
     for idx, subdir in enumerate(iteration_subdir_array_truncated):
         recons = recon_data_dict[subdir]
         exp_projs = actual_proj_data_dict[subdir]
