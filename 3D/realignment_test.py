@@ -452,11 +452,11 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
             if iteration_idx == 0:
                 if theta_idx == 0:
                     x_shifts_pc[iteration_idx, theta_idx] = x_shift_pc + init_x_shift[theta_idx] - 20
-                    y_shifts_pc[iteration_idx, theta_idx] = y_shift_pc + init_y_shift[theta_idx]
+                    y_shifts_pc[iteration_idx, theta_idx] = y_shift_pc + init_y_shift
                 
                 else:
                     x_shifts_pc[iteration_idx, theta_idx] = x_shift_pc + init_x_shift[theta_idx]
-                    y_shifts_pc[iteration_idx, theta_idx] = y_shift_pc + init_y_shift[theta_idx]
+                    y_shifts_pc[iteration_idx, theta_idx] = y_shift_pc + init_y_shift
     
                 # aligned_proj_test[theta_idx, :, :] = ndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx, :, :], shift = (y_shift_pc + init_y_shift, x_shift_pc + init_x_shift))
 
