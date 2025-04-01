@@ -284,11 +284,11 @@ else:
         return artists
 
     anim1 = anim.FuncAnimation(fig1, animate_recon, frames = n_slices, interval = 1000/fps_images, blit = True) # Interval is ms/frame (NOT frames per second, or fps)
-    anim2 = anim.FuncAnimation(fig2, animate_proj, frames = n_theta, interval = 1000/fps_images, blit = True)
-    anim3 = anim.FuncAnimation(fig3, animate_shifts, frames = n_theta, interval = 1000/fps_shifts, blit = False) # "Blitting" not useful since titles are changing
+    # anim2 = anim.FuncAnimation(fig2, animate_proj, frames = n_theta, interval = 1000/fps_images, blit = True)
+    # anim3 = anim.FuncAnimation(fig3, animate_shifts, frames = n_theta, interval = 1000/fps_shifts, blit = False) # "Blitting" not useful since titles are changing
     
     output_path1 = '/home/bwr0835/recon_gridrec_no_cor_correction.mp4'
-    writer1 = anim.FFMpegWriter(fps = fps_images, metadata = {'title': 'recon'})
+    writer1 = anim.FFMpegWriter(fps = fps_images, metadata = {'title': 'recon'}, bitrate = 1800, extra_args = ['-vcodec', 'libx264'])
 
     anim1.save(output_path1, writer1)
 
