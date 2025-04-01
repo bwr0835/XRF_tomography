@@ -293,7 +293,7 @@ else:
     
     print('Saving')
     
-    anim1.save(output_path1, writer1, dpi = 600)
+    anim1.save(output_path1, writer1, dpi = 400)
 
     # plt.show()
 
