@@ -337,7 +337,7 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
 
     reference_projection_imgs = xrf_proj_img_array[ref_element_idx] # These are effectively sinograms for the element of interest (highest contrast -> for realignment purposes)
                                                                     # (n_theta, n_slices -> n_rows, n_columns)
-    center_of_rotation = tomo.find_center(reference_projection_imgs, theta_array*np.pi/180) - 2.5
+    center_of_rotation = tomo.find_center(reference_projection_imgs, theta_array*np.pi/180)
 
     iterations = []
 
@@ -356,7 +356,7 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
     x_shift_pc_array = np.zeros(n_theta)
     y_shift_pc_array = np.zeros(n_theta)
 
-    init_x_shift = -20
+    init_x_shift = -2.5*np.ones(n_theta)
     init_y_shift = 0
     
     for iteration_idx in range(n_iterations):
@@ -375,17 +375,17 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
                     
                 aligned_proj[ref_element_idx, theta_idx, :, :] = ndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx, :, :], shift = (y_shift, x_shift))
 
-        elif (init_x_shift != 0 or init_y_shift != 0):
+        elif (init_x_shift.any() != 0 or init_y_shift != 0):
             print('Initial x shift: ' + str(init_x_shift))
             print('Initial y shift: ' + str(init_y_shift))
             
             for theta_idx in range(n_theta):
                 if theta_idx == 0:
-                    aligned_proj[ref_element_idx, theta_idx, :, :] = ndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx, :, :], shift = (init_y_shift, init_x_shift))
+                    aligned_proj[ref_element_idx, theta_idx, :, :] = ndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx, :, :], shift = (init_y_shift, init_x_shift[theta_idx] - 20))
             
                 else:
                     # aligned_proj[ref_element_idx, theta_idx, :, :] = xrf_proj_img_array[ref_element_idx, theta_idx, :, :]   
-                    aligned_proj[ref_element_idx, theta_idx, :, :] = ndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx, :, :], shift = (init_y_shift, init_x_shift))  
+                    aligned_proj[ref_element_idx, theta_idx, :, :] = ndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx, :, :], shift = (init_y_shift, init_x_shift[theta_idx]))  
 
                 # if theta_idx == n_theta//2:
                 #     diff = aligned_proj[ref_element_idx, theta_idx, :, :] - xrf_proj_img_array[ref_element_idx, theta_idx, :, :]
@@ -428,7 +428,7 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
             # save_recon_slice_npy(proj_slice, iteration_idx, slice_idx, 'gridrec', output_dir_path)
 
         for theta_idx in range(n_theta):
-
+            
             # y_shift_pc, x_shift_cc, corr_mat_cc = cross_correlate(proj_imgs_from_3d_recon[theta_idx, :, :], aligned_proj[ref_element_idx, theta_idx, :, :]) # Cross-correlation
             y_shift_pc, x_shift_pc = phase_correlate(proj_imgs_from_3d_recon[theta_idx, :, :], aligned_proj[ref_element_idx, theta_idx, :, :], upsample_factor = 100)
 
@@ -450,8 +450,13 @@ def iter_reproj(ref_element, element_array, theta_array, xrf_proj_img_array, n_i
                 #     plt.show()
             
             if iteration_idx == 0:
-                x_shifts_pc[iteration_idx, theta_idx] = x_shift_pc + init_x_shift
-                y_shifts_pc[iteration_idx, theta_idx] = y_shift_pc + init_y_shift
+                if theta_idx == 0:
+                    x_shifts_pc[iteration_idx, theta_idx] = x_shift_pc + init_x_shift[theta_idx] - 20
+                    y_shifts_pc[iteration_idx, theta_idx] = y_shift_pc + init_y_shift[theta_idx]
+                
+                else:
+                    x_shifts_pc[iteration_idx, theta_idx] = x_shift_pc + init_x_shift[theta_idx]
+                    y_shifts_pc[iteration_idx, theta_idx] = y_shift_pc + init_y_shift[theta_idx]
     
                 # aligned_proj_test[theta_idx, :, :] = ndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx, :, :], shift = (y_shift_pc + init_y_shift, x_shift_pc + init_x_shift))
 
