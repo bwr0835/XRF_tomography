@@ -510,7 +510,7 @@ def iter_reproj(ref_element,
 # elements_xrf, counts_xrf, theta_xrf, dataset_type_xrf = extract_h5_aggregate_xrf_data(file_path_xrf)
 
 file_path_xrf = '/home/bwr0835/2_ide_aggregate_xrf.h5'
-output_dir_path_base = '/raid/users/roter'
+output_dir_path_base = '/home/bwr0835'
 
 # output_file_name_base = input('Choose a base file name: ')
 output_file_name_base = 'gridrec_10_iter'
