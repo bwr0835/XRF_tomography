@@ -538,7 +538,7 @@ n_theta = counts_xrf.shape[1]
 n_slices = counts_xrf.shape[2]
 
 init_x_shift = np.zeros(n_theta)
-init_x_shift[0] = -50
+init_x_shift[0] = -150
 
 n_desired_iter = 10 # For the reprojection scheme, NOT for reconstruction by itself
 
