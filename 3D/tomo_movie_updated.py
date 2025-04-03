@@ -124,8 +124,6 @@ element_idx_desired = 11 # Fe for this directory
 for theta_idx in range(n_theta):
     aligned_proj_norm = normalize_array(aligned_proj_iter_array[iter_idx_desired][element_idx_desired, theta_idx, :, :])
     synth_proj_norm = normalize_array(synth_proj_iter_array[iter_idx_desired][theta_idx])
-    print(np.shape(aligned_proj_norm))
-    print(np.shape(synth_proj_norm))
     rgb = np.dstack((aligned_proj_norm, np.zeros_like(aligned_proj_norm), synth_proj_norm))
 
     aligned_proj_theta_array_aux.append(aligned_proj_iter_array[iter_idx_desired][element_idx_desired, theta_idx, :, :])
@@ -140,7 +138,7 @@ for iter_idx in range(n_iter):
 
     aligned_proj_iter_array_aux.append(aligned_proj_iter_array[iter_idx][element_idx_desired, theta_idx_desired])
     synth_proj_iter_array_aux.append(synth_proj_iter_array[iter_idx][theta_idx_desired])
-    rgb_proj_iter_array.append(aligned_proj_norm, np.zeros_like(aligned_proj_norm), synth_proj_norm)
+    rgb_proj_iter_array.append(rgb)
     recon_iter_array_aux.append(recon_iter_array[iter_idx][:, slice_idx_desired, :])
 
 for slice_idx in range(n_slices):
