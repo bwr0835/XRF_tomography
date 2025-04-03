@@ -79,34 +79,35 @@ for f in file_array:
     if f == 'aligned_proj_all_elements.npy':
         aligned_proj = np.load(os.path.join(dir_path, f))
     
-    elif 'aligned_proj_array_iter' in f and '.npy' in f:
+    elif 'aligned_proj_array_iter' in f and f.endswith('.npy'):
         full_path = os.path.join(dir_path, f)
 
         aligned_proj_iter_array = np.load(full_path)
 
         # element_idx_desired = full_path.split('_')[-1].split('.')[0] # <directory path>_aligned_proj_array_iter_<desired element>_idx_<desired element index>.npy
 
-    elif 'synth_proj_array_iter' in f and '.npy' in f:
+    elif 'synth_proj_array_iter' in f and f.endswith('.npy'):
         synth_proj_iter_array = np.load(os.path.join(dir_path, f))
 
-    elif 'recon_array_iter' in f and '.npy' in f:
+    elif 'recon_array_iter' in f and f.endswith('npy'):
         recon_iter_array = np.load(os.path.join(dir_path, f))
     
-    elif 'net_x_shifts' in f and '.npy' in f:
+    elif 'net_x_shifts' in f and f.endswith('.npy'):
         net_x_shifts = np.load(os.path.join(dir_path, f))
     
-    elif 'net_y_shifts' in f and '.npy' in f:
+    elif 'net_y_shifts' in f and f.endswith('.npy'):
         net_y_shifts = np.load(os.path.join(dir_path, f))
     
     elif f == 'theta_array.npy':
         theta_array = np.load(os.path.join(dir_path, f))
     
-    # else:
-    #     print('Error: One or more files not found. Exiting...')
+    elif f.endswith('.mp4'):
+        continue
 
-    #     sys.exit()
-    
-    # print(f)
+    else:
+        print('Error: Unable to load one or more files. Exiting...')
+
+        sys.exit()
 
 n_theta = aligned_proj.shape[1]
 n_slices = aligned_proj.shape[2]
