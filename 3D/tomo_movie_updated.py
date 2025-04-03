@@ -105,6 +105,8 @@ for f in file_array:
         print('Error: One or more files not found. Exiting...')
 
         sys.exit()
+    
+    print(f)
 
 n_theta = aligned_proj.shape[1]
 n_slices = aligned_proj.shape[2]
