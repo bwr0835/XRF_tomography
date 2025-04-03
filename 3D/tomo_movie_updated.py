@@ -247,6 +247,8 @@ print('Exporting net shifts (changing thetas) to .mp4 file...')
 
 writer = anim.FFMpegWriter(fps = fps_plots, metadata = {'title': 'recon_slice'}, bitrate = 3500, extra_args = ['-vcodec', 'libx264'])
 
-anim5.save(os.path.join(dir_path, 'recon_slice.mp4'), writer, dpi = 400)
+anim5.save(os.path.join(dir_path, 'net_shifts.mp4'), writer, dpi = 400)
+
+plt.close()
 
 print('Finished')
