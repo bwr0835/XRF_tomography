@@ -359,6 +359,9 @@ def iter_reproj(ref_element,
                 #     y, x = phase_correlate(xrf_proj_img_array[ref_element_idx, theta_idx, :, :], shift, upsample_factor = 50)
 
                 #     print(str(y) + ', ' + str(x))
+        
+        plt.imshow(aligned_proj[ref_element_idx, 0, :, :])
+        plt.show()
 
         aligned_exp_proj_iter_array.append(np.copy(aligned_proj))
     
