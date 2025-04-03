@@ -11,23 +11,23 @@ plt.rcParams['text.latex.preamble'] = r'\usepackage{times}'
 def normalize_array(array):
     return (array - np.nanmin(array))/(np.nanmax(array) - np.nanmin(array))
 
-def update_proj_theta(frame):
-    im1_1.set_data(aligned_proj_theta_array_aux[frame])
-    im1_2.set_data(synth_proj_theta_array_aux[frame])
-    im1_3.set_data(rgb_proj_theta_array[frame])
+# def update_proj_theta(frame):
+#     im1_1.set_data(aligned_proj_theta_array_aux[frame])
+#     im1_2.set_data(synth_proj_theta_array_aux[frame])
+#     im1_3.set_data(rgb_proj_theta_array[frame])
 
-    text_1.set_text(r'$\theta = {0}$'.format(theta_array[frame]))
+#     text_1.set_text(r'$\theta = {0}$'.format(theta_array[frame]))
 
-    return im1_1, im1_2, im1_3, text_1
+#     return im1_1, im1_2, im1_3, text_1
 
-def update_proj_iter(frame):
-    im2_1.set_data(aligned_proj_iter_array_aux[frame])
-    im2_2.set_data(synth_proj_iter_array_aux[frame])
-    im2_3.set_data(rgb_proj_iter_array[frame])
+# def update_proj_iter(frame):
+#     im2_1.set_data(aligned_proj_iter_array_aux[frame])
+#     im2_2.set_data(synth_proj_iter_array_aux[frame])
+#     im2_3.set_data(rgb_proj_iter_array[frame])
 
-    text_2.set_text(r'Iter. {0}'.format(frame))
+#     text_2.set_text(r'Iter. {0}'.format(frame))
 
-    return im2_1, im2_2, im2_3, text_2
+#     return im2_1, im2_2, im2_3, text_2
 
 def update_recon_slice(frame):
     im3.set_data(recon_slice_array_aux[frame])
@@ -36,27 +36,27 @@ def update_recon_slice(frame):
 
     return im3, text_3
 
-def update_recon_iter(frame):
-    im4.set_data(recon_iter_array_aux[frame])
+# def update_recon_iter(frame):
+#     im4.set_data(recon_iter_array_aux[frame])
 
-    text_4.set_text(r'Iter. {0}'.format(frame))
+#     text_4.set_text(r'Iter. {0}'.format(frame))
 
-    return im4, text_4
+#     return im4, text_4
 
-def update_shifts(frame):
-    net_shift_x = net_x_shifts[:, frame]
-    net_shift_y = net_y_shifts[:, frame]
+# def update_shifts(frame):
+#     net_shift_x = net_x_shifts[:, frame]
+#     net_shift_y = net_y_shifts[:, frame]
 
-    curve1.set_ydata(net_shift_x)
-    curve2.set_ydata(net_shift_y)
+#     curve1.set_ydata(net_shift_x)
+#     curve2.set_ydata(net_shift_y)
 
-    min_shift = np.min([np.min(net_shift_x), np.min(net_shift_y)])
-    max_shift = np.max([np.max(net_shift_x), np.max(net_shift_y)])
+#     min_shift = np.min([np.min(net_shift_x), np.min(net_shift_y)])
+#     max_shift = np.max([np.max(net_shift_x), np.max(net_shift_y)])
 
-    axs5.set_ylim(min_shift, max_shift + 0.1)
-    axs5.set_title(r'$\theta = {0}$\textdegree'.format(theta_array[frame]))
+#     axs5.set_ylim(min_shift, max_shift + 0.1)
+#     axs5.set_title(r'$\theta = {0}$\textdegree'.format(theta_array[frame]))
 
-    return curve1, curve2
+#     return curve1, curve2
 
 # root = tk.Tk()
 
@@ -187,7 +187,7 @@ im3 = axs3.imshow(recon_slice_array_aux[0])
 
 # text_1 = axs1[0].text(0.02, 0.02, r'$\theta = {0}$\textdegree'.format(theta_array[0]), transform = axs1[0].transAxes, color = 'white')
 # text_2 = axs2[0].text(0.02, 0.02, r'Iter. 0', transform = axs2[0].transAxes, color = 'white')
-# text_3 = axs3.text(0.02, 0.02, r'Slice 0', transform = axs3.transAxes, color = 'white')
+text_3 = axs3.text(0.02, 0.02, r'Slice 0', transform = axs3.transAxes, color = 'white')
 # text_4 = axs4.text(0.02, 0.02, r'Iter. 0', transform = axs4.transAxes, color = 'white')
 
 # axs1[0].set_title(r'Exp. Proj. (Iter. {0})'.format(iter_idx_desired), color = 'red')
