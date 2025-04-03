@@ -164,7 +164,7 @@ iter_array = np.arange(n_iter)
 fps_imgs = 25 # Frames per second (fps)
 fps_plots = 15
 
-plt.imshow(aligned_proj_iter_array[0][:, 64, :])
+plt.imshow(aligned_proj_iter_array[0][11, :, 64, :])
 plt.show()
 
 # fig1, axs1 = plt.subplots(1, 3) # Aligned experimental projection, synthetic experimental projection, overlays at different angles
