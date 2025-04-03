@@ -1,4 +1,4 @@
-import numpy as np, tkinter as tk, os
+import numpy as np, tkinter as tk, os, sys
 
 from tkinter import filedialog
 
@@ -89,7 +89,7 @@ for f in file_array:
     else:
         print('Error: One or more files not found. Exiting...')
 
-        exit
+        sys.exit()
 
 n_theta = aligned_proj.shape[1]
 n_slices = aligned_proj.shape[2]
