@@ -538,6 +538,8 @@ init_x_shift[0] = -20
 
 n_desired_iter = 2
 
+algorithm = 'gridrec'
+
 cannot_reconstruct_flag = 0
 
 aligned_proj, \
