@@ -58,7 +58,7 @@ root = tk.Tk()
 
 root.withdraw()
 
-dir_path = filedialog.askdirectory(root = root, title = 'Select directory containing alignment NPY files')
+dir_path = filedialog.askdirectory(parent = root, title = 'Select directory containing alignment NPY files')
 
 print('Loading data...')
 
