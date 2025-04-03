@@ -69,7 +69,7 @@ if dir_path == "":
 
 print('Loading data...')
 
-file_array = [f for f in os.listdir(dir_path) if os.path.isfile(f)]
+file_array = [f for f in os.listdir(dir_path) if os.path.isfile(os.path.join(dir_path, f))]
 
 print(file_array)
 
