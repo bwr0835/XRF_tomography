@@ -254,7 +254,7 @@ def iter_reproj(ref_element,
                 init_x_shift = None, 
                 init_y_shift = None, 
                 eps = 0.3, 
-                xrt_proj_img_array = None): # Assuming no initial shift in
+                xrt_proj_img_array = None):
 
     n_elements = xrf_proj_img_array.shape[0] # Number of elements
     n_theta = xrf_proj_img_array.shape[1] # Number of projection angles (projection images)
@@ -294,11 +294,11 @@ def iter_reproj(ref_element,
     recon = np.zeros((n_slices, n_columns, n_columns))
     
     aligned_proj = np.zeros_like(xrf_proj_img_array)
-    aligned_proj_test = np.zeros_like(reference_projection_imgs)
+    # aligned_proj_test = np.zeros_like(reference_projection_imgs)
 
     proj_imgs_from_3d_recon = np.zeros((n_theta, n_slices, n_columns))
     
-    synth_test = np.zeros((n_theta, n_slices, n_columns))
+    # synth_test = np.zeros((n_theta, n_slices, n_columns))
 
     x_shifts_pc = np.zeros((n_iterations, n_theta))
     y_shifts_pc = np.zeros((n_iterations, n_theta))
@@ -388,8 +388,6 @@ def iter_reproj(ref_element,
 
         synth_proj_iter_array.append(proj_imgs_from_3d_recon)
 
-            # save_recon_slice_npy(proj_slice, iteration_idx, slice_idx, 'gridrec', output_dir_path)
-
         for theta_idx in range(n_theta):
             
             # y_shift_pc, x_shift_cc, corr_mat_cc = cross_correlate(proj_imgs_from_3d_recon[theta_idx, :, :], aligned_proj[ref_element_idx, theta_idx, :, :]) # Cross-correlation
@@ -397,10 +395,6 @@ def iter_reproj(ref_element,
 
             x_shift_pc_array[theta_idx] = x_shift_pc
             y_shift_pc_array[theta_idx] = y_shift_pc
-
-            # save_proj_img_npy(proj_imgs_from_3d_recon[theta_idx, :, :], iteration_idx, theta_array[theta_idx], 'synthesized', 'gridrec', output_dir_path)
-            # save_proj_img_npy(aligned_proj[ref_element_idx, theta_idx, :, :], iteration_idx, theta_array[theta_idx], 'experimental', 'gridrec', output_dir_path)
-            # save_proj_img_npy(corr_mat_cc, iteration_idx, theta_array[theta_idx], 'xcorr', 'gridrec', output_dir_path)
 
             if theta_idx % 7 == 0:
                 print('x-shift: ' + str(x_shift_pc[theta_idx]) + ' (Theta = ' + str(theta_array[theta_idx]) + ' degrees')
@@ -475,9 +469,6 @@ def iter_reproj(ref_element,
                         aligned_proj[element_idx, theta_idx, :, :] = ndi.shift(xrf_proj_img_array[element_idx, theta_idx, :, :], shift = (y_shift, x_shift))
             
             print('Done')
-            # save_net_shift_data_npy(x_shifts_pc_new, 'x', algorithm, output_dir_path)
-            # save_net_shift_data_npy(y_shifts_pc_new, 'y', algorithm, output_dir_path)
-            # save_theta_array(theta_array, algorithm, output_dir_path)
         
             break
         
@@ -497,9 +488,6 @@ def iter_reproj(ref_element,
                         aligned_proj[element_idx, theta_idx, :, :] = ndi.shift(xrf_proj_img_array[element_idx, theta_idx, :, :], shift = (y_shift, x_shift))
             
             print('Done')
-            # save_net_shift_data_npy(x_shifts_pc, 'x', 'gridrec', output_dir_path)
-            # save_net_shift_data_npy(y_shifts_pc, 'y', 'gridrec', output_dir_path)
-            # save_theta_array(theta_array, 'gridrec', output_dir_path)
 
     if cannot_reconstruct_flag:
         return
