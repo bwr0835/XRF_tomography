@@ -73,8 +73,6 @@ file_array = [f for f in os.listdir(dir_path) if os.path.isfile(os.path.join(dir
 
 print(file_array)
 
-aligned_proj = None
-
 for f in file_array:
     if f == 'aligned_proj_all_elements.npy':
         aligned_proj = np.load(os.path.join(dir_path, f))
