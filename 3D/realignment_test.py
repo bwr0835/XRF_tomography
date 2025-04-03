@@ -8,8 +8,6 @@ from matplotlib import pyplot as plt, animation as anim
 from tkinter import filedialog
 from pystackreg import StackReg as sr
 
-global cannot_reconstruct_flag
-
 plt.rcParams['text.usetex'] = True
 plt.rcParams['font.family'] = 'serif'
 plt.rcParams['text.latex.preamble'] = r'\usepackage{times}'
@@ -257,6 +255,8 @@ def iter_reproj(ref_element,
                 init_y_shift = None, 
                 eps = 0.3, 
                 xrt_proj_img_array = None):
+
+    global cannot_reconstruct_flag
 
     n_elements = xrf_proj_img_array.shape[0] # Number of elements
     n_theta = xrf_proj_img_array.shape[1] # Number of projection angles (projection images)
