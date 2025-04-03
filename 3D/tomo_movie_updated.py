@@ -69,9 +69,7 @@ if dir_path == "":
 
 print('Loading data...')
 
-file_array = [f for f in os.listdir(dir_path) if os.path.isfile(os.path.join(dir_path, f))]
-
-print(file_array)
+file_array = [f for f in os.listdir(dir_path) if os.path.isfile(os.path.join(dir_path, f))] # Get all contents of directory path and output only files
 
 for f in file_array:
     if f == 'aligned_proj_all_elements.npy':
@@ -122,7 +120,7 @@ for theta_idx in range(n_theta):
     aligned_proj_norm = normalize_array(aligned_proj_iter_array[iter_idx_desired][theta_idx])
     synth_proj_norm = normalize_array(synth_proj_iter_array[iter_idx_desired][theta_idx])
 
-    rgb = np.dstack(aligned_proj_norm, np.zeros_like(aligned_proj_norm), synth_proj_norm)
+    rgb = np.dstack((aligned_proj_norm, np.zeros_like(aligned_proj_norm), synth_proj_norm))
 
     aligned_proj_theta_array_aux.append(aligned_proj_iter_array[iter_idx_desired][theta_idx])
     synth_proj_theta_array_aux.append(synth_proj_iter_array[iter_idx_desired][theta_idx])
@@ -132,7 +130,7 @@ for iter_idx in range(n_iter):
     aligned_proj_norm = normalize_array(aligned_proj_iter_array[iter_idx][theta_idx_desired])
     synth_proj_norm = normalize_array(synth_proj_iter_array[iter_idx][theta_idx_desired])
 
-    rgb = np.dstack(aligned_proj_norm, np.zeros_like(aligned_proj_norm), synth_proj_norm)
+    rgb = np.dstack((aligned_proj_norm, np.zeros_like(aligned_proj_norm), synth_proj_norm))
 
     aligned_proj_iter_array_aux.append(aligned_proj_iter_array[iter_idx][theta_idx_desired])
     synth_proj_iter_array_aux.append(synth_proj_iter_array[iter_idx][theta_idx_desired])
