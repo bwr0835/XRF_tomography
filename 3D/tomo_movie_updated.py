@@ -151,7 +151,7 @@ for iter_idx in range(n_iter):
 for slice_idx in range(n_slices):
     recon_slice_array_aux.append(recon_iter_array[iter_idx_desired][slice_idx])
 
-aligned_proj_theta_array_aux = np.array(aligned_proj_iter_array_aux)
+aligned_proj_theta_array_aux = np.array(aligned_proj_theta_array_aux)
 aligned_proj_iter_array_aux = np.array(aligned_proj_iter_array_aux)
 synth_proj_theta_array_aux = np.array(synth_proj_theta_array_aux)
 synth_proj_iter_array_aux = np.array(synth_proj_iter_array_aux)
@@ -213,7 +213,7 @@ axs5.set_xlim(0, n_iter - 1)
 axs4.set_title(r'Slice {0}'.format(slice_idx_desired))
 axs5.set_title('Iteration 0')
 
-anim1 = anim.FuncAnimation(fig1, update_proj_theta, frames = n_theta, interval = 1000/fps_imgs, blit = True)
+anim1 = anim.FuncAnimation(fig1, update_proj_theta, frames = n_theta, interval = 1000/fps_imgs, blit = True) # Interval is in ms --> interval = (1/fps)*1000
 anim2 = anim.FuncAnimation(fig2, update_proj_iter, frames = n_iter, interval = 1000/fps_imgs, blit = True)
 anim3 = anim.FuncAnimation(fig3, update_recon_slice, frames = n_slices, interval = 1000/fps_imgs, blit = True)
 anim4 = anim.FuncAnimation(fig4, update_recon_iter, frames = n_iter, interval = 1000/fps_imgs, blit = True)
