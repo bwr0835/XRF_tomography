@@ -148,9 +148,14 @@ def extract_h5_aggregate_xrf_data(file_path):
     elements = elements_h5[()]
     dataset_type = dataset_type_h5[()]
 
+    theta_idx_sorted = np.argsort(theta) # Get indices for angles for sorting them in ascending order
+
+    theta_sorted = theta[theta_idx_sorted]
+    counts_sorted = counts[:, theta_sorted, :, :]
+
     elements_string = [element.decode() for element in elements]
 
-    return elements_string, counts, theta, dataset_type.decode()
+    return elements_string, counts_sorted, theta_sorted, dataset_type.decode()
 
 # def extract_h5_aggregate_xrt_data(file_path):
 #     h5 = h5py.File(file_path, 'r')

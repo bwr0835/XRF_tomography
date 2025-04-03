@@ -1,0 +1,199 @@
+import numpy as np, tkinter as tk, os
+
+from tkinter import filedialog
+
+from matplotlib import pyplot as plt, animation as anim
+
+def normalize_array(array):
+    return (array - np.nanmin(array))/(np.nanmax(array) - np.nanmin(array))
+
+def update_proj_theta(frame):
+    im1_1.set_data(aligned_proj_theta_array_aux[frame])
+    im1_2.set_data(synth_proj_theta_array_aux[frame])
+    im1_3.set_data(rgb_proj_theta_array[frame])
+
+    text_1.set_text(r'$\theta = {0}$'.format(theta_array[frame]))
+
+    return im1_1, im1_2, im1_3, text_1
+
+def update_proj_iter(frame):
+    im2_1.set_data(aligned_proj_iter_array_aux[frame])
+    im2_2.set_data(synth_proj_iter_array_aux[frame])
+    im2_3.set_data(rgb_proj_iter_array[frame])
+
+    text_2.set_text(r'Iter. {0}'.format(frame))
+
+    return im2_1, im2_2, im2_3, text_2
+
+def update_recon_slice(frame):
+    im3.set_data(recon_slice_array_aux[frame])
+
+    text_3.set_text(r'Slice {0}'.format(frame))
+
+    return im3, text_3
+
+def update_recon_iter(frame):
+    im4.set_data(recon_iter_array_aux[frame])
+
+    text_4.set_text(r'Iter. {0}'.format(frame))
+
+    return im4, text_4
+
+def update_shifts(frame):
+    net_shift_x = net_x_shifts[:, frame]
+    net_shift_y = net_y_shifts[:, frame]
+
+    curve1.set_ydata(net_shift_x)
+    curve2.set_ydata(net_shift_y)
+
+    min_shift = np.min([np.min(net_shift_x), np.min(net_shift_y)])
+    max_shift = np.max([np.max(net_shift_x), np.max(net_shift_y)])
+
+    axs5.set_ylim(min_shift, max_shift + 0.1)
+    axs5.set_title(r'$\theta = {0}$\textdegree'.format(theta_array[frame]))
+
+    return curve1, curve2
+
+root = tk.Tk()
+
+root.withdraw()
+
+dir_path = filedialog.askdirectory(root = root, title = 'Select directory containing alignment NPY files')
+
+print('Loading data...')
+
+file_array = [f for f in os.listdir(dir_path) if os.path.isfile(f)]
+
+for f in file_array:
+    if f == 'aligned_proj_all_elements.npy':
+        aligned_proj = np.load(os.path.join(dir_path, f))
+    
+    elif 'aligned_proj_array_iter' in f and '.npy' in f:
+        aligned_proj_iter_array = np.load(os.path.join(dir_path, f))
+
+    elif 'synth_proj_array_iter' in f and '.npy' in f:
+        synth_proj_iter_array = np.load(os.path.join(dir_path, f))
+
+    elif 'recon_array_iter' in f and '.npy' in f:
+        recon_iter_array = np.load(os.path.join(dir_path, f))
+    
+    elif 'net_x_shifts' in f and '.npy' in f:
+        net_x_shifts = np.load(os.path.join(dir_path, f))
+    
+    elif 'net_y_shifts' in f and '.npy' in f:
+        net_y_shifts = np.load(os.path.join(dir_path, f))
+    
+    elif f == 'theta_array.npy':
+        theta_array = np.load(os.path.join(dir_path, f))
+    
+    else:
+        print('Error: One or more files not found. Exiting...')
+
+        exit
+
+n_theta = aligned_proj.shape[1]
+n_slices = aligned_proj.shape[2]
+
+n_iter = len(aligned_proj_iter_array)
+
+aligned_proj_theta_array_aux = []
+aligned_proj_iter_array_aux = []
+synth_proj_theta_array_aux = []
+synth_proj_iter_array_aux = []
+rgb_proj_theta_array = []
+rgb_proj_iter_array = []
+recon_slice_array_aux = []
+recon_iter_array_aux = []
+
+theta_idx_desired = 0
+iter_idx_desired = 0
+slice_idx_desired = 64
+
+for theta_idx in range(n_theta):
+    aligned_proj_norm = normalize_array(aligned_proj_iter_array[iter_idx_desired][theta_idx])
+    synth_proj_norm = normalize_array(synth_proj_iter_array[iter_idx_desired][theta_idx])
+
+    rgb = np.dstack(aligned_proj_norm, np.zeros_like(aligned_proj_norm), synth_proj_norm)
+
+    aligned_proj_theta_array_aux.append(aligned_proj_iter_array[iter_idx_desired][theta_idx])
+    synth_proj_theta_array_aux.append(synth_proj_iter_array[iter_idx_desired][theta_idx])
+    rgb_proj_theta_array.append(rgb)
+    
+for iter_idx in range(n_iter):
+    aligned_proj_norm = normalize_array(aligned_proj_iter_array[iter_idx][theta_idx_desired])
+    synth_proj_norm = normalize_array(synth_proj_iter_array[iter_idx][theta_idx_desired])
+
+    rgb = np.dstack(aligned_proj_norm, np.zeros_like(aligned_proj_norm), synth_proj_norm)
+
+    aligned_proj_iter_array_aux.append(aligned_proj_iter_array[iter_idx][theta_idx_desired])
+    synth_proj_iter_array_aux.append(synth_proj_iter_array[iter_idx][theta_idx_desired])
+    rgb_proj_iter_array.append(aligned_proj_norm, np.zeros_like(aligned_proj_norm), synth_proj_norm)
+    recon_iter_array_aux.append(recon_iter_array[iter_idx][:, slice_idx_desired, :])
+
+for slice_idx in range(n_slices):
+    recon_slice_array_aux.append(recon_iter_array[iter_idx_desired][:, slice_idx, :])
+
+aligned_proj_theta_array_aux = np.array(aligned_proj_iter_array_aux)
+aligned_proj_iter_array_aux = np.array(aligned_proj_iter_array_aux)
+synth_proj_theta_array_aux = np.array(synth_proj_theta_array_aux)
+synth_proj_iter_array_aux = np.array(synth_proj_iter_array_aux)
+rgb_proj_theta_array = np.array(rgb_proj_theta_array)
+rgb_proj_iter_array = np.array(rgb_proj_iter_array)
+recon_slice_array_aux = np.array(recon_slice_array_aux)
+recon_iter_array_aux = np.array(recon_iter_array_aux)
+
+print('Generating figures')
+
+iter_array = np.arange(n_iter)
+
+fps_imgs = 25 # Frames per second (fps)
+fps_plots = 15
+
+fig1, axs1 = plt.subplots(1, 3) # Aligned experimental projection, synthetic experimental projection, overlays at different angles
+fig2, axs2 = plt.subplots(1, 3) # Same as above, but for different iterations - use first projection angle
+fig3, axs3 = plt.subplots() # Reconstructed object for different slices (use first iteration?)
+fig4, axs4 = plt.subplots() # Reconstructed object for different iteration (use slice index 68?)
+fig5, axs5 = plt.subplots()
+
+im1_1 = axs1[0].imshow(aligned_proj_iter_array_aux[0])
+im1_2 = axs1[1].imshow(synth_proj_iter_array_aux[0])
+im1_3 = axs1[2].imshow(rgb_proj_iter_array[0])
+
+im2_1 = axs2[0].imshow(aligned_proj_iter_array_aux[0])
+im2_2 = axs2[1].imshow(synth_proj_iter_array_aux[0])
+im2_3 = axs2[2].imshow(rgb_proj_theta_array[0])
+
+im3 = axs3.imshow(recon_slice_array_aux[0])
+
+im4 = axs4.imshow(recon_iter_array_aux[0])
+
+curve1, = axs3.plot(iter_array, net_x_shifts[0, :], 'k-o', markersize = 3, label = r'$\Delta x$')
+curve2, = axs3.plot(iter_array, net_y_shifts[0, :], 'r-o', markersize = 3, label = r'$\Delta y$')
+
+text_1 = axs1[0].text(0.02, 0.02, r'$\theta = {0}$\textdegree'.format(theta_array[0]), transform = axs1[0].transAxes, color = 'white')
+text_2 = axs2[0].text(0.02, 0.02, r'Iter. 0', transform = axs2[0].transAxes, color = 'white')
+text_3 = axs3[0].text(0.02, 0.02, r'Slice 0', transform = axs3[0].transAxes, color = 'white')
+text_4 = axs4[0].text(0.02, 0.02, r'Iter. 0', transform = axs4[0].transAxes, color = 'white')
+
+axs1[0].set_title(r'Exp. Proj. (Iter. {0})'.format(iter_idx_desired), color = 'red')
+axs1[1].set_title(r'Synth. Proj.', color = 'blue')
+axs1[2].set_title(r'Overlay')
+
+axs2[0].set_title(r'Exp. Proj. ($\theta = {0}$\textdegree)'.format(theta_array[theta_idx_desired]), color = 'red')
+axs2[1].set_title(r'Synth. Proj.', color = 'blue')
+axs2[2].set_title(r'Overlay')
+
+axs5.set_title(r'\theta = {0}'.format(theta_array[0]))
+axs5.set_xlabel(r'Iteration index $i$')
+axs5.set_ylabel(r'Net shift')
+axs5.legend(frameon = False)
+axs5.set_xlim(0, n_iter - 1)
+
+axs4.set_title(r'Slice {0}'.format(slice_idx_desired))
+
+axs5.set_title('Iteration 0')
+
+anim1 = anim.FuncAnimation(fig1, update_proj_theta, )
+
+print('Exporting animated figures to .mp4 files')
+
