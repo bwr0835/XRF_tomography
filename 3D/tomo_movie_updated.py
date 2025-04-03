@@ -193,7 +193,41 @@ axs4.set_title(r'Slice {0}'.format(slice_idx_desired))
 
 axs5.set_title('Iteration 0')
 
-anim1 = anim.FuncAnimation(fig1, update_proj_theta, )
+anim1 = anim.FuncAnimation(fig1, update_proj_theta, frames = n_theta, interval = 1000/fps_imgs, blit = True)
+anim2 = anim.FuncAnimation(fig2, update_proj_iter, frames = n_iter, interval = 1000/fps_imgs, blit = True)
+anim3 = anim.FuncAnimation(fig3, update_recon_slice, frames = n_slices, interval = 1000/fps_imgs, blit = True)
+anim4 = anim.FuncAnimation(fig4, update_recon_iter, frames = n_iter, interval = 1000/fps_imgs, blit = True)
+anim5 = anim.FuncAnimation(fig5, update_shifts, frames = n_theta, interval = 1000/fps_imgs, blit = False)
 
-print('Exporting animated figures to .mp4 files')
+print('Exporting projections (changing thetas) to .mp4 file...')
+
+writer = anim.FFMpegWriter(fps = fps_imgs, metadata = {'title': 'proj_theta'}, bitrate = 3500, extra_args = ['-vcodec', 'libx264'])
+
+anim1.save(os.path.join(dir_path, 'proj_theta'), writer, dpi = 400)
+
+print('Exporting projections (changing iterations) to .mp4 file...')
+
+writer = anim.FFMpegWriter(fps = fps_imgs, metadata = {'title': 'proj_iter'}, bitrate = 3500, extra_args = ['-vcodec', 'libx264'])
+
+anim2.save(os.path.join(dir_path, 'proj_iter'), writer, dpi = 400)
+
+print('Exporting reconstructions (changing slices) to .mp4 file...')
+
+writer = anim.FFMpegWriter(fps = fps_imgs, metadata = {'title': 'recon_slice'}, bitrate = 3500, extra_args = ['-vcodec', 'libx264'])
+
+anim3.save(os.path.join(dir_path, 'recon_slice'), writer, dpi = 400)
+
+print('Exporting reconstructions (changing iterations) to .mp4 file...')
+
+writer = anim.FFMpegWriter(fps = fps_imgs, metadata = {'title': 'recon_iter'}, bitrate = 3500, extra_args = ['-vcodec', 'libx264'])
+
+anim4.save(os.path.join(dir_path, 'recon_iter'), writer, dpi = 400)
+
+print('Exporting net shifts (changing thetas) to .mp4 file...')
+
+writer = anim.FFMpegWriter(fps = fps_plots, metadata = {'title': 'recon_slice'}, bitrate = 3500, extra_args = ['-vcodec', 'libx264'])
+
+anim5.save(os.path.join(dir_path, 'recon_slice'), writer, dpi = 400)
+
+print('Finished')
 
