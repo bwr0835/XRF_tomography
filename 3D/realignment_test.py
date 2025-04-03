@@ -337,7 +337,7 @@ def iter_reproj(ref_element,
                     print('Cumulative y shift = ' + str(net_y_shift))
                     
                 aligned_proj[ref_element_idx, theta_idx, :, :] = ndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx, :, :], shift = (net_y_shift, net_x_shift))
-
+        
         else:
             print('Initial x shift: ' + str(init_x_shift))
             print('Initial y shift: ' + str(init_y_shift))
@@ -362,8 +362,9 @@ def iter_reproj(ref_element,
         
         # plt.imshow(aligned_proj[ref_element_idx, 0, :, :])
         # plt.show()
+        center_of_rotation = tomo.find_center(aligned_proj[ref_element_idx], theta_array*np.pi/180)
 
-        aligned_exp_proj_iter_array.append(np.copy(aligned_proj))
+        aligned_exp_proj_iter_array.append(np.copy(aligned_proj[ref_element_idx]))
     
         print('Performing ' + algorithm)
 
@@ -513,7 +514,7 @@ file_path_xrf = '/home/bwr0835/2_ide_aggregate_xrf.h5'
 output_dir_path_base = '/home/bwr0835'
 
 # output_file_name_base = input('Choose a base file name: ')
-output_file_name_base = 'gridrec_10_iter'
+output_file_name_base = 'gridrec_5_iter_cor_iteratively_updated'
 
 if output_file_name_base == '':
     print('No output base file name chosen. Ending program...')
@@ -564,11 +565,11 @@ else:
 
     np.save(os.path.join(full_output_dir_path, 'theta_array.npy'), theta_xrf)
     np.save(os.path.join(full_output_dir_path, 'aligned_proj_all_elements.npy'), aligned_proj)
-    np.save(os.path.join(full_output_dir_path, 'aligned_proj_array_iter_' + desired_element + '_idx_' + str(desired_element_idx) + '.npy'), aligned_proj_iter_array)
-    np.save(os.path.join(full_output_dir_path, 'synth_proj_array_iter_' + desired_element + '_idx_' + str(desired_element_idx) + '.npy'), synth_proj_iter_array)
-    np.save(os.path.join(full_output_dir_path, 'recon_array_iter_' + desired_element + '_idx_' + str(desired_element_idx) + '.npy'), recon_iter_array)
-    np.save(os.path.join(full_output_dir_path, 'net_x_shifts_' + desired_element + '_idx_' + str(desired_element_idx) + '.npy'), net_x_shifts)
-    np.save(os.path.join(full_output_dir_path, 'net_y_shifts_' + desired_element + '_idx_' + str(desired_element_idx) + '.npy'), net_y_shifts)
+    np.save(os.path.join(full_output_dir_path, 'aligned_proj_array_iter_' + desired_element + '.npy'), aligned_proj_iter_array)
+    np.save(os.path.join(full_output_dir_path, 'synth_proj_array_iter_' + desired_element + '.npy'), synth_proj_iter_array)
+    np.save(os.path.join(full_output_dir_path, 'recon_array_iter_' + desired_element + '.npy'), recon_iter_array)
+    np.save(os.path.join(full_output_dir_path, 'net_x_shifts_' + desired_element + '.npy'), net_x_shifts)
+    np.save(os.path.join(full_output_dir_path, 'net_y_shifts_' + desired_element + '.npy'), net_y_shifts)
 
     # with open(os.path.join(full_output_dir_path, 'net_x_shifts.csv'), 'w') as f:
     #     writer = csv.writer(f)
