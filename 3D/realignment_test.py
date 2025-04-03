@@ -520,13 +520,13 @@ if output_file_name_base == '':
 
 # file_path_xrt = ''
 
-try:
-    elements_xrf, counts_xrf, theta_xrf, dataset_type_xrf = extract_h5_aggregate_xrf_data(file_path_xrf)
+# try:
+elements_xrf, counts_xrf, theta_xrf, dataset_type_xrf = extract_h5_aggregate_xrf_data(file_path_xrf)
 
-except:
-    print('Cannot upload HDF5 file. Check file structure.')
+# except:
+#     print('Cannot upload HDF5 file. Check file structure. Ending...')
 
-    sys.exit()
+    # sys.exit()
 
 desired_element = 'Fe'
 # output_dir_path = filedialog.askdirectory(parent = root, title = "Choose directory to output NPY files to.")
