@@ -529,6 +529,7 @@ except:
     sys.exit()
 
 desired_element = 'Fe'
+desired_element_idx = elements_xrf.index(desired_element)
 # output_dir_path = filedialog.askdirectory(parent = root, title = "Choose directory to output NPY files to.")
 n_theta = counts_xrf.shape[1]
 n_slices = counts_xrf.shape[2]
@@ -559,11 +560,11 @@ else:
 
     np.save(os.path.join(full_output_dir_path, 'theta_array.npy'), theta_xrf)
     np.save(os.path.join(full_output_dir_path, 'aligned_proj_all_elements.npy'), aligned_proj)
-    np.save(os.path.join(full_output_dir_path, 'aligned_proj_array_iter_' + desired_element + '.npy'), aligned_proj_iter_array)
-    np.save(os.path.join(full_output_dir_path, 'synth_proj_array_iter_' + desired_element + '.npy'), synth_proj_iter_array)
-    np.save(os.path.join(full_output_dir_path, 'recon_array_iter_' + desired_element + '.npy'), recon_iter_array)
-    np.save(os.path.join(full_output_dir_path, 'net_x_shifts_' + desired_element + '.npy'), net_x_shifts)
-    np.save(os.path.join(full_output_dir_path, 'net_y_shifts_' + desired_element + '.npy'), net_y_shifts)
+    np.save(os.path.join(full_output_dir_path, 'aligned_proj_array_iter_' + desired_element + '_idx_' + desired_element_idx + '.npy'), aligned_proj_iter_array)
+    np.save(os.path.join(full_output_dir_path, 'synth_proj_array_iter_' + desired_element + '_idx_' + desired_element_idx + '.npy'), synth_proj_iter_array)
+    np.save(os.path.join(full_output_dir_path, 'recon_array_iter_' + desired_element + '_idx_' + desired_element_idx + '.npy'), recon_iter_array)
+    np.save(os.path.join(full_output_dir_path, 'net_x_shifts_' + desired_element + '_idx_' + desired_element_idx + '.npy'), net_x_shifts)
+    np.save(os.path.join(full_output_dir_path, 'net_y_shifts_' + desired_element + '_idx_' + desired_element_idx + '.npy'), net_y_shifts)
 
     # with open(os.path.join(full_output_dir_path, 'net_x_shifts.csv'), 'w') as f:
     #     writer = csv.writer(f)
