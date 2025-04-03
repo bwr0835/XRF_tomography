@@ -117,8 +117,8 @@ iter_idx_desired = 0
 slice_idx_desired = 64
 
 for theta_idx in range(n_theta):
-    aligned_proj_norm = normalize_array(aligned_proj_iter_array[iter_idx_desired][theta_idx])
-    synth_proj_norm = normalize_array(synth_proj_iter_array[iter_idx_desired][theta_idx])
+    aligned_proj_norm = normalize_array(aligned_proj_iter_array[iter_idx_desired][theta_idx, :, :])
+    synth_proj_norm = normalize_array(synth_proj_iter_array[iter_idx_desired][theta_idx, :, :])
 
     rgb = np.dstack((aligned_proj_norm, np.zeros_like(aligned_proj_norm), synth_proj_norm))
 
