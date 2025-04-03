@@ -29,12 +29,12 @@ def normalize_array(array):
 
 #     return im2_1, im2_2, im2_3, text_2
 
-# def update_recon_slice(frame):
-#     im3.set_data(recon_slice_array_aux[frame])
+def update_recon_slice(frame):
+    im3.set_data(recon_slice_array_aux[frame])
 
-#     text_3.set_text(r'Slice {0}'.format(frame))
+    text_3.set_text(r'Slice {0}'.format(frame))
 
-#     return im3, text_3
+    return im3, text_3
 
 # def update_recon_iter(frame):
 #     im4.set_data(recon_iter_array_aux[frame])
@@ -143,10 +143,10 @@ for iter_idx in range(n_iter):
     aligned_proj_iter_array_aux.append(aligned_proj_iter_array[iter_idx][element_idx_desired, theta_idx_desired])
     synth_proj_iter_array_aux.append(synth_proj_iter_array[iter_idx][theta_idx_desired])
     rgb_proj_iter_array.append(rgb)
-    recon_iter_array_aux.append(recon_iter_array[iter_idx][:, slice_idx_desired, :])
+    recon_iter_array_aux.append(recon_iter_array[iter_idx][slice_idx_desired])
 
 for slice_idx in range(n_slices):
-    recon_slice_array_aux.append(recon_iter_array[iter_idx_desired][:, slice_idx, :])
+    recon_slice_array_aux.append(recon_iter_array[iter_idx_desired][slice_idx])
 
 aligned_proj_theta_array_aux = np.array(aligned_proj_iter_array_aux)
 aligned_proj_iter_array_aux = np.array(aligned_proj_iter_array_aux)
@@ -164,12 +164,9 @@ iter_array = np.arange(n_iter)
 fps_imgs = 25 # Frames per second (fps)
 fps_plots = 15
 
-plt.imshow(aligned_proj_iter_array[0][11, 0, :, :])
-plt.show()
-
 # fig1, axs1 = plt.subplots(1, 3) # Aligned experimental projection, synthetic experimental projection, overlays at different angles
 # fig2, axs2 = plt.subplots(1, 3) # Same as above, but for different iterations - use first projection angle
-# fig3, axs3 = plt.subplots() # Reconstructed object for different slices (use first iteration?)
+fig3, axs3 = plt.subplots() # Reconstructed object for different slices (use first iteration?)
 # fig4, axs4 = plt.subplots() # Reconstructed object for different iteration (use slice index 68?)
 # fig5, axs5 = plt.subplots()
 
@@ -181,7 +178,7 @@ plt.show()
 # im2_2 = axs2[1].imshow(synth_proj_iter_array_aux[0])
 # im2_3 = axs2[2].imshow(rgb_proj_theta_array[0])
 
-# im3 = axs3.imshow(recon_slice_array_aux[0])
+im3 = axs3.imshow(recon_slice_array_aux[0])
 
 # im4 = axs4.imshow(recon_iter_array_aux[0])
 
@@ -190,7 +187,7 @@ plt.show()
 
 # text_1 = axs1[0].text(0.02, 0.02, r'$\theta = {0}$\textdegree'.format(theta_array[0]), transform = axs1[0].transAxes, color = 'white')
 # text_2 = axs2[0].text(0.02, 0.02, r'Iter. 0', transform = axs2[0].transAxes, color = 'white')
-# text_3 = axs3.text(0.02, 0.02, r'Slice 0', transform = axs3.transAxes, color = 'white')
+text_3 = axs3.text(0.02, 0.02, r'Slice 0', transform = axs3.transAxes, color = 'white')
 # text_4 = axs4.text(0.02, 0.02, r'Iter. 0', transform = axs4.transAxes, color = 'white')
 
 # axs1[0].set_title(r'Exp. Proj. (Iter. {0})'.format(iter_idx_desired), color = 'red')
@@ -201,7 +198,7 @@ plt.show()
 # axs2[1].set_title(r'Synth. Proj.', color = 'blue')
 # axs2[2].set_title(r'Overlay')
 
-# axs3.set_title(r'Recon')
+axs3.set_title(r'Reconstruction (Iter. {0})'.format(iter_idx_desired))
 
 # axs5.set_title(r'\theta = {0}'.format(theta_array[0]))
 # axs5.set_xlabel(r'Iteration index $i$')
@@ -215,7 +212,7 @@ plt.show()
 
 # anim1 = anim.FuncAnimation(fig1, update_proj_theta, frames = n_theta, interval = 1000/fps_imgs, blit = True)
 # anim2 = anim.FuncAnimation(fig2, update_proj_iter, frames = n_iter, interval = 1000/fps_imgs, blit = True)
-# anim3 = anim.FuncAnimation(fig3, update_recon_slice, frames = n_slices, interval = 1000/fps_imgs, blit = True)
+anim3 = anim.FuncAnimation(fig3, update_recon_slice, frames = n_slices, interval = 1000/fps_imgs, blit = True)
 # anim4 = anim.FuncAnimation(fig4, update_recon_iter, frames = n_iter, interval = 1000/fps_imgs, blit = True)
 # anim5 = anim.FuncAnimation(fig5, update_shifts, frames = n_theta, interval = 1000/fps_imgs, blit = False)
 plt.show()
