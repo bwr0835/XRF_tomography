@@ -4,6 +4,10 @@ from tkinter import filedialog
 
 from matplotlib import pyplot as plt, animation as anim
 
+plt.rcParams['text.usetex'] = True
+plt.rcParams['font.family'] = 'serif'
+plt.rcParams['text.latex.preamble'] = r'\usepackage{times}'
+
 def normalize_array(array):
     return (array - np.nanmin(array))/(np.nanmax(array) - np.nanmin(array))
 
@@ -160,31 +164,31 @@ iter_array = np.arange(n_iter)
 fps_imgs = 25 # Frames per second (fps)
 fps_plots = 15
 
-fig1, axs1 = plt.subplots(1, 3) # Aligned experimental projection, synthetic experimental projection, overlays at different angles
-fig2, axs2 = plt.subplots(1, 3) # Same as above, but for different iterations - use first projection angle
+# fig1, axs1 = plt.subplots(1, 3) # Aligned experimental projection, synthetic experimental projection, overlays at different angles
+# fig2, axs2 = plt.subplots(1, 3) # Same as above, but for different iterations - use first projection angle
 fig3, axs3 = plt.subplots() # Reconstructed object for different slices (use first iteration?)
-fig4, axs4 = plt.subplots() # Reconstructed object for different iteration (use slice index 68?)
-fig5, axs5 = plt.subplots()
+# fig4, axs4 = plt.subplots() # Reconstructed object for different iteration (use slice index 68?)
+# fig5, axs5 = plt.subplots()
 
-im1_1 = axs1[0].imshow(aligned_proj_iter_array_aux[0])
-im1_2 = axs1[1].imshow(synth_proj_iter_array_aux[0])
-im1_3 = axs1[2].imshow(rgb_proj_iter_array[0])
+# im1_1 = axs1[0].imshow(aligned_proj_iter_array_aux[0])
+# im1_2 = axs1[1].imshow(synth_proj_iter_array_aux[0])
+# im1_3 = axs1[2].imshow(rgb_proj_iter_array[0])
 
-im2_1 = axs2[0].imshow(aligned_proj_iter_array_aux[0])
-im2_2 = axs2[1].imshow(synth_proj_iter_array_aux[0])
-im2_3 = axs2[2].imshow(rgb_proj_theta_array[0])
+# im2_1 = axs2[0].imshow(aligned_proj_iter_array_aux[0])
+# im2_2 = axs2[1].imshow(synth_proj_iter_array_aux[0])
+# im2_3 = axs2[2].imshow(rgb_proj_theta_array[0])
 
 im3 = axs3.imshow(recon_slice_array_aux[0])
 
-im4 = axs4.imshow(recon_iter_array_aux[0])
+# im4 = axs4.imshow(recon_iter_array_aux[0])
 
-curve1, = axs3.plot(iter_array, net_x_shifts[:, 0], 'k-o', markersize = 3, label = r'$\Delta x$')
-curve2, = axs3.plot(iter_array, net_y_shifts[:, 0], 'r-o', markersize = 3, label = r'$\Delta y$')
+# curve1, = axs3.plot(iter_array, net_x_shifts[:, 0], 'k-o', markersize = 3, label = r'$\Delta x$')
+# curve2, = axs3.plot(iter_array, net_y_shifts[:, 0], 'r-o', markersize = 3, label = r'$\Delta y$')
 
-text_1 = axs1[0].text(0.02, 0.02, r'$\theta = {0}$\textdegree'.format(theta_array[0]), transform = axs1[0].transAxes, color = 'white')
-text_2 = axs2[0].text(0.02, 0.02, r'Iter. 0', transform = axs2[0].transAxes, color = 'white')
-text_3 = axs3.text(0.02, 0.02, r'Slice 0', transform = axs3.transAxes, color = 'white')
-text_4 = axs4.text(0.02, 0.02, r'Iter. 0', transform = axs4.transAxes, color = 'white')
+# text_1 = axs1[0].text(0.02, 0.02, r'$\theta = {0}$\textdegree'.format(theta_array[0]), transform = axs1[0].transAxes, color = 'white')
+# text_2 = axs2[0].text(0.02, 0.02, r'Iter. 0', transform = axs2[0].transAxes, color = 'white')
+# text_3 = axs3.text(0.02, 0.02, r'Slice 0', transform = axs3.transAxes, color = 'white')
+# text_4 = axs4.text(0.02, 0.02, r'Iter. 0', transform = axs4.transAxes, color = 'white')
 
 # axs1[0].set_title(r'Exp. Proj. (Iter. {0})'.format(iter_idx_desired), color = 'red')
 # axs1[1].set_title(r'Synth. Proj.', color = 'blue')
