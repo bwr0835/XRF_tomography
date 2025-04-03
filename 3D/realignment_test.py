@@ -286,7 +286,7 @@ def iter_reproj(ref_element,
 
     reference_projection_imgs = xrf_proj_img_array[ref_element_idx] # These are effectively sinograms for the element of interest (highest contrast -> for realignment purposes)
                                                                     # (n_theta, n_slices -> n_rows, n_columns)
-    # center_of_rotation = tomo.find_center(reference_projection_imgs, theta_array*np.pi/180)
+    center_of_rotation = tomo.find_center(reference_projection_imgs, theta_array*np.pi/180)
 
     iterations = []
     recon_iter_array = []
@@ -514,7 +514,7 @@ file_path_xrf = '/home/bwr0835/2_ide_aggregate_xrf.h5'
 output_dir_path_base = '/home/bwr0835'
 
 # output_file_name_base = input('Choose a base file name: ')
-output_file_name_base = 'gridrec_5_iter_cor_iteratively_updated'
+output_file_name_base = 'gridrec_5_iter_cor_iteratively_updated_1'
 
 if output_file_name_base == '':
     print('No output base file name chosen. Ending program...')
@@ -540,7 +540,7 @@ n_theta = counts_xrf.shape[1]
 n_slices = counts_xrf.shape[2]
 
 init_x_shift = np.zeros(n_theta)
-init_x_shift[0] = -50
+# init_x_shift[0] = -50
 
 n_desired_iter = 5 # For the reprojection scheme, NOT for reconstruction by itself
 
