@@ -183,62 +183,64 @@ curve2, = axs3.plot(iter_array, net_y_shifts[:, 0], 'r-o', markersize = 3, label
 
 text_1 = axs1[0].text(0.02, 0.02, r'$\theta = {0}$\textdegree'.format(theta_array[0]), transform = axs1[0].transAxes, color = 'white')
 text_2 = axs2[0].text(0.02, 0.02, r'Iter. 0', transform = axs2[0].transAxes, color = 'white')
-text_3 = axs3[0].text(0.02, 0.02, r'Slice 0', transform = axs3[0].transAxes, color = 'white')
-text_4 = axs4[0].text(0.02, 0.02, r'Iter. 0', transform = axs4[0].transAxes, color = 'white')
+text_3 = axs3.text(0.02, 0.02, r'Slice 0', transform = axs3.transAxes, color = 'white')
+text_4 = axs4.text(0.02, 0.02, r'Iter. 0', transform = axs4.transAxes, color = 'white')
 
-axs1[0].set_title(r'Exp. Proj. (Iter. {0})'.format(iter_idx_desired), color = 'red')
-axs1[1].set_title(r'Synth. Proj.', color = 'blue')
-axs1[2].set_title(r'Overlay')
+# axs1[0].set_title(r'Exp. Proj. (Iter. {0})'.format(iter_idx_desired), color = 'red')
+# axs1[1].set_title(r'Synth. Proj.', color = 'blue')
+# axs1[2].set_title(r'Overlay')
 
-axs2[0].set_title(r'Exp. Proj. ($\theta = {0}$\textdegree)'.format(theta_array[theta_idx_desired]), color = 'red')
-axs2[1].set_title(r'Synth. Proj.', color = 'blue')
-axs2[2].set_title(r'Overlay')
+# axs2[0].set_title(r'Exp. Proj. ($\theta = {0}$\textdegree)'.format(theta_array[theta_idx_desired]), color = 'red')
+# axs2[1].set_title(r'Synth. Proj.', color = 'blue')
+# axs2[2].set_title(r'Overlay')
 
-axs5.set_title(r'\theta = {0}'.format(theta_array[0]))
-axs5.set_xlabel(r'Iteration index $i$')
-axs5.set_ylabel(r'Net shift')
-axs5.legend(frameon = False)
-axs5.set_xlim(0, n_iter - 1)
+axs3.set_title(r'Recon')
 
-axs4.set_title(r'Slice {0}'.format(slice_idx_desired))
+# axs5.set_title(r'\theta = {0}'.format(theta_array[0]))
+# axs5.set_xlabel(r'Iteration index $i$')
+# axs5.set_ylabel(r'Net shift')
+# axs5.legend(frameon = False)
+# axs5.set_xlim(0, n_iter - 1)
 
-axs5.set_title('Iteration 0')
+# axs4.set_title(r'Slice {0}'.format(slice_idx_desired))
 
-anim1 = anim.FuncAnimation(fig1, update_proj_theta, frames = n_theta, interval = 1000/fps_imgs, blit = True)
-anim2 = anim.FuncAnimation(fig2, update_proj_iter, frames = n_iter, interval = 1000/fps_imgs, blit = True)
+# axs5.set_title('Iteration 0')
+
+# anim1 = anim.FuncAnimation(fig1, update_proj_theta, frames = n_theta, interval = 1000/fps_imgs, blit = True)
+# anim2 = anim.FuncAnimation(fig2, update_proj_iter, frames = n_iter, interval = 1000/fps_imgs, blit = True)
 anim3 = anim.FuncAnimation(fig3, update_recon_slice, frames = n_slices, interval = 1000/fps_imgs, blit = True)
-anim4 = anim.FuncAnimation(fig4, update_recon_iter, frames = n_iter, interval = 1000/fps_imgs, blit = True)
-anim5 = anim.FuncAnimation(fig5, update_shifts, frames = n_theta, interval = 1000/fps_imgs, blit = False)
+# anim4 = anim.FuncAnimation(fig4, update_recon_iter, frames = n_iter, interval = 1000/fps_imgs, blit = True)
+# anim5 = anim.FuncAnimation(fig5, update_shifts, frames = n_theta, interval = 1000/fps_imgs, blit = False)
+plt.show()
+# print('Exporting projections (changing thetas) to .mp4 file...')
 
-print('Exporting projections (changing thetas) to .mp4 file...')
+# writer = anim.FFMpegWriter(fps = fps_imgs, metadata = {'title': 'proj_theta'}, bitrate = 3500, extra_args = ['-vcodec', 'libx264'])
 
-writer = anim.FFMpegWriter(fps = fps_imgs, metadata = {'title': 'proj_theta'}, bitrate = 3500, extra_args = ['-vcodec', 'libx264'])
+# anim1.save(os.path.join(dir_path, 'proj_theta'), writer, dpi = 400)
 
-anim1.save(os.path.join(dir_path, 'proj_theta'), writer, dpi = 400)
+# print('Exporting projections (changing iterations) to .mp4 file...')
 
-print('Exporting projections (changing iterations) to .mp4 file...')
+# writer = anim.FFMpegWriter(fps = fps_imgs, metadata = {'title': 'proj_iter'}, bitrate = 3500, extra_args = ['-vcodec', 'libx264'])
 
-writer = anim.FFMpegWriter(fps = fps_imgs, metadata = {'title': 'proj_iter'}, bitrate = 3500, extra_args = ['-vcodec', 'libx264'])
+# anim2.save(os.path.join(dir_path, 'proj_iter'), writer, dpi = 400)
 
-anim2.save(os.path.join(dir_path, 'proj_iter'), writer, dpi = 400)
+# print('Exporting reconstructions (changing slices) to .mp4 file...')
 
-print('Exporting reconstructions (changing slices) to .mp4 file...')
+# writer = anim.FFMpegWriter(fps = fps_imgs, metadata = {'title': 'recon_slice'}, bitrate = 3500, extra_args = ['-vcodec', 'libx264'])
 
-writer = anim.FFMpegWriter(fps = fps_imgs, metadata = {'title': 'recon_slice'}, bitrate = 3500, extra_args = ['-vcodec', 'libx264'])
+# anim3.save(os.path.join(dir_path, 'recon_slice'), writer, dpi = 400)
 
-anim3.save(os.path.join(dir_path, 'recon_slice'), writer, dpi = 400)
+# print('Exporting reconstructions (changing iterations) to .mp4 file...')
 
-print('Exporting reconstructions (changing iterations) to .mp4 file...')
+# writer = anim.FFMpegWriter(fps = fps_imgs, metadata = {'title': 'recon_iter'}, bitrate = 3500, extra_args = ['-vcodec', 'libx264'])
 
-writer = anim.FFMpegWriter(fps = fps_imgs, metadata = {'title': 'recon_iter'}, bitrate = 3500, extra_args = ['-vcodec', 'libx264'])
+# anim4.save(os.path.join(dir_path, 'recon_iter'), writer, dpi = 400)
 
-anim4.save(os.path.join(dir_path, 'recon_iter'), writer, dpi = 400)
+# print('Exporting net shifts (changing thetas) to .mp4 file...')
 
-print('Exporting net shifts (changing thetas) to .mp4 file...')
+# writer = anim.FFMpegWriter(fps = fps_plots, metadata = {'title': 'recon_slice'}, bitrate = 3500, extra_args = ['-vcodec', 'libx264'])
 
-writer = anim.FFMpegWriter(fps = fps_plots, metadata = {'title': 'recon_slice'}, bitrate = 3500, extra_args = ['-vcodec', 'libx264'])
+# anim5.save(os.path.join(dir_path, 'recon_slice'), writer, dpi = 400)
 
-anim5.save(os.path.join(dir_path, 'recon_slice'), writer, dpi = 400)
-
-print('Finished')
+# print('Finished')
 
