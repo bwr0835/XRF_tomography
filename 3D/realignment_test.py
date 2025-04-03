@@ -360,7 +360,7 @@ def iter_reproj(ref_element,
 
                 #     print(str(y) + ', ' + str(x))
 
-        aligned_exp_proj_iter_array.append(aligned_proj)
+        aligned_exp_proj_iter_array.append(np.copy(aligned_proj))
     
         print('Performing ' + algorithm)
 
@@ -535,7 +535,7 @@ n_theta = counts_xrf.shape[1]
 n_slices = counts_xrf.shape[2]
 
 init_x_shift = np.zeros(n_theta)
-init_x_shift[0] = -75
+init_x_shift[0] = -50
 
 n_desired_iter = 10 # For the reprojection scheme, NOT for reconstruction by itself
 
