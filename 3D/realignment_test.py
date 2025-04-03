@@ -397,8 +397,8 @@ def iter_reproj(ref_element,
             y_shift_pc_array[theta_idx] = y_shift_pc
 
             if theta_idx % 7 == 0:
-                print('x-shift: ' + str(x_shift_pc[theta_idx]) + ' (Theta = ' + str(theta_array[theta_idx]) + ' degrees')
-                print('y-shift: ' + str(y_shift_pc[theta_idx]))
+                print('x-shift: ' + str(x_shift_pc) + ' (Theta = ' + str(theta_array[theta_idx]) + ' degrees')
+                print('y-shift: ' + str(y_shift_pc))
 
                 # if theta_idx == 0:
                 #     fig1, axs1 = plt.subplots(2, 1)
