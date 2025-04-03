@@ -178,8 +178,8 @@ im3 = axs3.imshow(recon_slice_array_aux[0])
 
 im4 = axs4.imshow(recon_iter_array_aux[0])
 
-curve1, = axs3.plot(iter_array, net_x_shifts[0, :], 'k-o', markersize = 3, label = r'$\Delta x$')
-curve2, = axs3.plot(iter_array, net_y_shifts[0, :], 'r-o', markersize = 3, label = r'$\Delta y$')
+curve1, = axs3.plot(iter_array, net_x_shifts[:, 0], 'k-o', markersize = 3, label = r'$\Delta x$')
+curve2, = axs3.plot(iter_array, net_y_shifts[:, 0], 'r-o', markersize = 3, label = r'$\Delta y$')
 
 text_1 = axs1[0].text(0.02, 0.02, r'$\theta = {0}$\textdegree'.format(theta_array[0]), transform = axs1[0].transAxes, color = 'white')
 text_2 = axs2[0].text(0.02, 0.02, r'Iter. 0', transform = axs2[0].transAxes, color = 'white')
