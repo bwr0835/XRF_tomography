@@ -151,7 +151,7 @@ def extract_h5_aggregate_xrf_data(file_path):
     theta_idx_sorted = np.argsort(theta) # Get indices for angles for sorting them in ascending order
 
     theta_sorted = theta[theta_idx_sorted]
-    counts_sorted = counts[:, theta_sorted, :, :]
+    counts_sorted = counts[:, theta_idx_sorted, :, :]
 
     elements_string = [element.decode() for element in elements]
 
