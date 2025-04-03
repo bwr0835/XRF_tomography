@@ -329,14 +329,14 @@ def iter_reproj(ref_element,
         
         if iteration_idx > 0:
             for theta_idx in range(n_theta):
-                x_shift = x_shifts_pc[iteration_idx - 1, theta_idx] # Cumulative shift
-                y_shift = y_shifts_pc[iteration_idx - 1, theta_idx]
+                net_x_shift = x_shifts_pc[iteration_idx - 1, theta_idx] # Cumulative shift
+                net_y_shift = y_shifts_pc[iteration_idx - 1, theta_idx]
 
                 if theta_idx % 7 == 0:
-                    print('Cumulative x shift = ' + str(x_shift))
-                    print('Cumulative y shift = ' + str(y_shift))
+                    print('Cumulative x shift = ' + str(net_x_shift))
+                    print('Cumulative y shift = ' + str(net_y_shift))
                     
-                aligned_proj[ref_element_idx, theta_idx, :, :] = ndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx, :, :], shift = (y_shift, x_shift))
+                aligned_proj[ref_element_idx, theta_idx, :, :] = ndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx, :, :], shift = (net_y_shift, net_x_shift))
 
         else:
             print('Initial x shift: ' + str(init_x_shift))
@@ -360,8 +360,8 @@ def iter_reproj(ref_element,
 
                 #     print(str(y) + ', ' + str(x))
         
-        plt.imshow(aligned_proj[ref_element_idx, 0, :, :])
-        plt.show()
+        # plt.imshow(aligned_proj[ref_element_idx, 0, :, :])
+        # plt.show()
 
         aligned_exp_proj_iter_array.append(np.copy(aligned_proj))
     
@@ -389,7 +389,7 @@ def iter_reproj(ref_element,
 
             proj_imgs_from_3d_recon[:, slice_idx, :] = (skimage.transform.radon(proj_slice, theta = theta_array)).T # This radon transform assumes slices are defined by columns and not rows
 
-        synth_proj_iter_array.append(proj_imgs_from_3d_recon)
+        synth_proj_iter_array.append(np.copy(proj_imgs_from_3d_recon))
 
         for theta_idx in range(n_theta):
             
@@ -512,7 +512,8 @@ def iter_reproj(ref_element,
 file_path_xrf = '/home/bwr0835/2_ide_aggregate_xrf.h5'
 output_dir_path_base = '/raid/users/roter'
 
-output_file_name_base = input('Choose a base file name: ')
+# output_file_name_base = input('Choose a base file name: ')
+output_file_name_base = 'gridrec_10_iter'
 
 if output_file_name_base == '':
     print('No output base file name chosen. Ending program...')
@@ -538,7 +539,7 @@ n_theta = counts_xrf.shape[1]
 n_slices = counts_xrf.shape[2]
 
 init_x_shift = np.zeros(n_theta)
-init_x_shift[0] = -150
+init_x_shift[0] = -50
 
 n_desired_iter = 10 # For the reprojection scheme, NOT for reconstruction by itself
 
