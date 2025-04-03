@@ -547,7 +547,7 @@ net_x_shifts, \
 net_y_shifts, \
 aligned_proj_iter_array, \
 recon_iter_array, \
-synth_proj_iter_array = iter_reproj(desired_element, elements_xrf, theta_xrf, counts_xrf, n_desired_iter, init_x_shift = init_x_shift)
+synth_proj_iter_array = iter_reproj(desired_element, elements_xrf, theta_xrf, counts_xrf, n_desired_iter, algorithm, init_x_shift = init_x_shift)
 
 if cannot_reconstruct_flag:
     print('Cannot reconstruct. Check algorithm.')
