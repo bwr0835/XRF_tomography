@@ -220,30 +220,30 @@ print('Exporting projections (changing thetas) to .mp4 file...')
 
 writer = anim.FFMpegWriter(fps = fps_imgs, metadata = {'title': 'proj_theta'}, bitrate = 3500, extra_args = ['-vcodec', 'libx264'])
 
-anim1.save(os.path.join(dir_path, 'proj_theta'), writer, dpi = 400)
+anim1.save(os.path.join(dir_path, 'proj_theta.mp4'), writer, dpi = 400)
 
 print('Exporting projections (changing iterations) to .mp4 file...')
 
 writer = anim.FFMpegWriter(fps = fps_imgs, metadata = {'title': 'proj_iter'}, bitrate = 3500, extra_args = ['-vcodec', 'libx264'])
 
-anim2.save(os.path.join(dir_path, 'proj_iter'), writer, dpi = 400)
+anim2.save(os.path.join(dir_path, 'proj_iter.mp4'), writer, dpi = 400)
 
 print('Exporting reconstructions (changing slices) to .mp4 file...')
 
 writer = anim.FFMpegWriter(fps = fps_imgs, metadata = {'title': 'recon_slice'}, bitrate = 3500, extra_args = ['-vcodec', 'libx264'])
 
-anim3.save(os.path.join(dir_path, 'recon_slice'), writer, dpi = 400)
+anim3.save(os.path.join(dir_path, 'recon_slice.mp4'), writer, dpi = 400)
 
 print('Exporting reconstructions (changing iterations) to .mp4 file...')
 
 writer = anim.FFMpegWriter(fps = fps_imgs, metadata = {'title': 'recon_iter'}, bitrate = 3500, extra_args = ['-vcodec', 'libx264'])
 
-anim4.save(os.path.join(dir_path, 'recon_iter'), writer, dpi = 400)
+anim4.save(os.path.join(dir_path, 'recon_iter.mp4'), writer, dpi = 400)
 
 print('Exporting net shifts (changing thetas) to .mp4 file...')
 
 writer = anim.FFMpegWriter(fps = fps_plots, metadata = {'title': 'recon_slice'}, bitrate = 3500, extra_args = ['-vcodec', 'libx264'])
 
-anim5.save(os.path.join(dir_path, 'recon_slice'), writer, dpi = 400)
+anim5.save(os.path.join(dir_path, 'recon_slice.mp4'), writer, dpi = 400)
 
 print('Finished')
