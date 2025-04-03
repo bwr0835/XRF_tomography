@@ -101,12 +101,12 @@ for f in file_array:
     elif f == 'theta_array.npy':
         theta_array = np.load(os.path.join(dir_path, f))
     
-    else:
-        print('Error: One or more files not found. Exiting...')
+    # else:
+    #     print('Error: One or more files not found. Exiting...')
 
-        sys.exit()
+    #     sys.exit()
     
-    print(f)
+    # print(f)
 
 n_theta = aligned_proj.shape[1]
 n_slices = aligned_proj.shape[2]
