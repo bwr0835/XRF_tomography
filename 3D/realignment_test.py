@@ -8,6 +8,8 @@ from matplotlib import pyplot as plt, animation as anim
 from tkinter import filedialog
 from pystackreg import StackReg as sr
 
+global cannot_reconstruct_flag
+
 plt.rcParams['text.usetex'] = True
 plt.rcParams['font.family'] = 'serif'
 plt.rcParams['text.latex.preamble'] = r'\usepackage{times}'
@@ -359,9 +361,7 @@ def iter_reproj(ref_element,
                 #     print(str(y) + ', ' + str(x))
 
         aligned_exp_proj_iter_array.append(aligned_proj)
-        
-        algorithm = 'gridrec'
-
+    
         print('Performing ' + algorithm)
 
         if algorithm == 'gridrec':
