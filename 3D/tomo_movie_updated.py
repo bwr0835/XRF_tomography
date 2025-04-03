@@ -71,6 +71,8 @@ print('Loading data...')
 
 file_array = [f for f in os.listdir(dir_path) if os.path.isfile(f)]
 
+print(file_array)
+
 aligned_proj = None
 
 for f in file_array:
