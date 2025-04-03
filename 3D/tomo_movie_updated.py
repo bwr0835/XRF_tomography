@@ -136,7 +136,7 @@ for theta_idx in range(n_theta):
     aligned_proj_theta_array_aux.append(aligned_proj_iter_array[iter_idx_desired][element_idx_desired, theta_idx, :, :])
     synth_proj_theta_array_aux.append(synth_proj_iter_array[iter_idx_desired][theta_idx])
     rgb_proj_theta_array.append(rgb)
-    
+
 for iter_idx in range(n_iter):
     aligned_proj_norm = normalize_array(aligned_proj_iter_array[iter_idx][element_idx_desired, theta_idx_desired])
     synth_proj_norm = normalize_array(synth_proj_iter_array[iter_idx][theta_idx_desired])
@@ -173,13 +173,13 @@ fig3, axs3 = plt.subplots() # Reconstructed object for different slices (use fir
 fig4, axs4 = plt.subplots() # Reconstructed object for different iteration (use slice index 68?)
 fig5, axs5 = plt.subplots()
 
-im1_1 = axs1[0].imshow(aligned_proj_iter_array_aux[0])
-im1_2 = axs1[1].imshow(synth_proj_iter_array_aux[0])
-im1_3 = axs1[2].imshow(rgb_proj_iter_array[0])
+im1_1 = axs1[0].imshow(aligned_proj_theta_array_aux[0])
+im1_2 = axs1[1].imshow(synth_proj_theta_array_aux[0])
+im1_3 = axs1[2].imshow(rgb_proj_theta_array[0])
 
 im2_1 = axs2[0].imshow(aligned_proj_iter_array_aux[0])
 im2_2 = axs2[1].imshow(synth_proj_iter_array_aux[0])
-im2_3 = axs2[2].imshow(rgb_proj_theta_array[0])
+im2_3 = axs2[2].imshow(rgb_proj_iter_array[0])
 
 im3 = axs3.imshow(recon_slice_array_aux[0])
 
