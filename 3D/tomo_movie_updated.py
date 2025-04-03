@@ -182,8 +182,8 @@ im3 = axs3.imshow(recon_slice_array_aux[0])
 
 im4 = axs4.imshow(recon_iter_array_aux[0])
 
-curve1, = axs3.plot(iter_array, net_x_shifts[:, 0], 'k-o', markersize = 3, label = r'$\Delta x$')
-curve2, = axs3.plot(iter_array, net_y_shifts[:, 0], 'r-o', markersize = 3, label = r'$\Delta y$')
+curve1, = axs5.plot(iter_array, net_x_shifts[:, 0], 'k-o', markersize = 3, label = r'$\Delta x$')
+curve2, = axs5.plot(iter_array, net_y_shifts[:, 0], 'r-o', markersize = 3, label = r'$\Delta y$')
 
 text_1 = axs1[0].text(0.02, 0.02, r'$\theta = {0}$\textdegree'.format(theta_array[0]), transform = axs1[0].transAxes, color = 'white')
 text_2 = axs2[0].text(0.02, 0.02, r'Iter. 0', transform = axs2[0].transAxes, color = 'white')
@@ -199,6 +199,7 @@ axs2[1].set_title(r'Synth. Proj.', color = 'blue')
 axs2[2].set_title(r'Overlay')
 
 axs3.set_title(r'Reconstruction (Iter. {0})'.format(iter_idx_desired))
+axs4.set_title(r'Reconstruction (Slice {0})'.format(slice_idx_desired))
 
 axs5.set_title(r'\theta = {0}'.format(theta_array[0]))
 axs5.set_xlabel(r'Iteration index $i$')
@@ -207,7 +208,6 @@ axs5.legend(frameon = False)
 axs5.set_xlim(0, n_iter - 1)
 
 axs4.set_title(r'Slice {0}'.format(slice_idx_desired))
-
 axs5.set_title('Iteration 0')
 
 anim1 = anim.FuncAnimation(fig1, update_proj_theta, frames = n_theta, interval = 1000/fps_imgs, blit = True)
