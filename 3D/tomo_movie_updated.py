@@ -54,11 +54,18 @@ def update_shifts(frame):
 
     return curve1, curve2
 
-root = tk.Tk()
+# root = tk.Tk()
 
-root.withdraw()
+# root.withdraw()
 
-dir_path = filedialog.askdirectory(parent = root, title = 'Select directory containing alignment NPY files')
+# dir_path = filedialog.askdirectory(parent = root, title = 'Select directory containing alignment NPY files')
+
+dir_path = '/raid/users/roter/iter_reproj/gridrec_10_iter'
+
+if dir_path == "":
+    print('No directory chosen. Exiting...')
+
+    sys.exit()
 
 print('Loading data...')
 
