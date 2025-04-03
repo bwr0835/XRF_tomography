@@ -541,7 +541,7 @@ n_slices = counts_xrf.shape[2]
 init_x_shift = np.zeros(n_theta)
 init_x_shift[0] = -50
 
-n_desired_iter = 10 # For the reprojection scheme, NOT for reconstruction by itself
+n_desired_iter = 5 # For the reprojection scheme, NOT for reconstruction by itself
 
 algorithm = 'gridrec'
 
@@ -564,11 +564,11 @@ else:
 
     np.save(os.path.join(full_output_dir_path, 'theta_array.npy'), theta_xrf)
     np.save(os.path.join(full_output_dir_path, 'aligned_proj_all_elements.npy'), aligned_proj)
-    np.save(os.path.join(full_output_dir_path, 'aligned_proj_array_iter_' + desired_element + '_idx_' + desired_element_idx + '.npy'), aligned_proj_iter_array)
-    np.save(os.path.join(full_output_dir_path, 'synth_proj_array_iter_' + desired_element + '_idx_' + desired_element_idx + '.npy'), synth_proj_iter_array)
-    np.save(os.path.join(full_output_dir_path, 'recon_array_iter_' + desired_element + '_idx_' + desired_element_idx + '.npy'), recon_iter_array)
-    np.save(os.path.join(full_output_dir_path, 'net_x_shifts_' + desired_element + '_idx_' + desired_element_idx + '.npy'), net_x_shifts)
-    np.save(os.path.join(full_output_dir_path, 'net_y_shifts_' + desired_element + '_idx_' + desired_element_idx + '.npy'), net_y_shifts)
+    np.save(os.path.join(full_output_dir_path, 'aligned_proj_array_iter_' + desired_element + '_idx_' + str(desired_element_idx) + '.npy'), aligned_proj_iter_array)
+    np.save(os.path.join(full_output_dir_path, 'synth_proj_array_iter_' + desired_element + '_idx_' + str(desired_element_idx) + '.npy'), synth_proj_iter_array)
+    np.save(os.path.join(full_output_dir_path, 'recon_array_iter_' + desired_element + '_idx_' + str(desired_element_idx) + '.npy'), recon_iter_array)
+    np.save(os.path.join(full_output_dir_path, 'net_x_shifts_' + desired_element + '_idx_' + str(desired_element_idx) + '.npy'), net_x_shifts)
+    np.save(os.path.join(full_output_dir_path, 'net_y_shifts_' + desired_element + '_idx_' + str(desired_element_idx) + '.npy'), net_y_shifts)
 
     # with open(os.path.join(full_output_dir_path, 'net_x_shifts.csv'), 'w') as f:
     #     writer = csv.writer(f)
