@@ -1,4 +1,4 @@
-import numpy as np, h5py, os, skimage, tkinter as tk, tomopy as tomo, matplotlib as mpl, csv
+import numpy as np, h5py, os, sys, skimage, tkinter as tk, tomopy as tomo, csv
 
 from skimage import transform as xform, registration as reg
 from scipy import ndimage as ndi
@@ -514,7 +514,7 @@ output_file_name_base = input('Choose a base file name: ')
 if output_file_name_base == '':
     print('No output base file name chosen. Ending program...')
 
-    exit
+    sys.exit()
 
 # create_aggregate_xrf_h5(file_path_array, file_path_xrf, synchrotron = 'aps')
 
@@ -526,7 +526,7 @@ try:
 except:
     print('Cannot upload HDF5 file. Check file structure.')
 
-    exit
+    sys.exit()
 
 desired_element = 'Fe'
 # output_dir_path = filedialog.askdirectory(parent = root, title = "Choose directory to output NPY files to.")
