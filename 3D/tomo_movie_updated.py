@@ -213,7 +213,7 @@ anim1 = anim.FuncAnimation(fig1, update_proj_theta, frames = n_theta, interval =
 anim2 = anim.FuncAnimation(fig2, update_proj_iter, frames = n_iter, interval = 1000/fps_imgs, blit = True)
 anim3 = anim.FuncAnimation(fig3, update_recon_slice, frames = n_slices, interval = 1000/fps_imgs, blit = True)
 anim4 = anim.FuncAnimation(fig4, update_recon_iter, frames = n_iter, interval = 1000/fps_imgs, blit = True)
-anim5 = anim.FuncAnimation(fig5, update_shifts, frames = n_theta, interval = 1000/fps_imgs, blit = False)
+anim5 = anim.FuncAnimation(fig5, update_shifts, frames = n_theta, interval = 1000/fps_plots, blit = False)
 
 print('Exporting projections (changing thetas) to .mp4 file...')
 
