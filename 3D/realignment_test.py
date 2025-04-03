@@ -520,13 +520,13 @@ if output_file_name_base == '':
 
 # file_path_xrt = ''
 
-# try:
-elements_xrf, counts_xrf, theta_xrf, dataset_type_xrf = extract_h5_aggregate_xrf_data(file_path_xrf)
+try:
+    elements_xrf, counts_xrf, theta_xrf, dataset_type_xrf = extract_h5_aggregate_xrf_data(file_path_xrf)
 
-# except:
-#     print('Cannot upload HDF5 file. Check file structure. Ending...')
+except:
+    print('Cannot upload HDF5 file. Check file structure. Ending...')
 
-    # sys.exit()
+    sys.exit()
 
 desired_element = 'Fe'
 # output_dir_path = filedialog.askdirectory(parent = root, title = "Choose directory to output NPY files to.")
@@ -536,7 +536,7 @@ n_slices = counts_xrf.shape[2]
 init_x_shift = np.zeros(n_theta)
 init_x_shift[0] = -20
 
-n_desired_iter = 2 # For the reprojection scheme, NOT for reconstruction by itself
+n_desired_iter = 10 # For the reprojection scheme, NOT for reconstruction by itself
 
 algorithm = 'gridrec'
 
