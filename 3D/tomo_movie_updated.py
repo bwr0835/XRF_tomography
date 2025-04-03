@@ -64,7 +64,7 @@ def update_shifts(frame):
 
 # dir_path = filedialog.askdirectory(parent = root, title = 'Select directory containing alignment NPY files')
 
-dir_path = '/home/bwr0835/iter_reproj/gridrec_10_iter'
+dir_path = '/home/bwr0835/iter_reproj/gridrec_5_iter_cor_iteratively_updated'
 
 if dir_path == "":
     print('No directory chosen. Exiting...')
