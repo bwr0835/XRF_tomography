@@ -286,7 +286,7 @@ def iter_reproj(ref_element,
 
     reference_projection_imgs = xrf_proj_img_array[ref_element_idx] # These are effectively sinograms for the element of interest (highest contrast -> for realignment purposes)
                                                                     # (n_theta, n_slices -> n_rows, n_columns)
-    # center_of_rotation = tomo.find_center(reference_projection_imgs, theta_array*np.pi/180)
+    center_of_rotation = tomo.find_center(reference_projection_imgs, theta_array*np.pi/180)
 
     iterations = []
     recon_iter_array = []
@@ -362,7 +362,6 @@ def iter_reproj(ref_element,
         
         # plt.imshow(aligned_proj[ref_element_idx, 0, :, :])
         # plt.show()
-        center_of_rotation = tomo.find_center(aligned_proj[ref_element_idx], theta_array*np.pi/180)
 
         aligned_exp_proj_iter_array.append(np.copy(aligned_proj[ref_element_idx]))
     
