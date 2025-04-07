@@ -1,4 +1,4 @@
-import numpy as np, tkinter as tk, os, sys
+import numpy as np, tkinter as tk, os, sys, imageio as iio
 
 from tkinter import filedialog
 
@@ -11,52 +11,65 @@ plt.rcParams['text.latex.preamble'] = r'\usepackage{times}'
 def normalize_array(array):
     return (array - np.nanmin(array))/(np.nanmax(array) - np.nanmin(array))
 
-def update_proj_theta(frame):
-    im1_1.set_data(aligned_proj_theta_array_aux[frame])
-    im1_2.set_data(synth_proj_theta_array_aux[frame])
-    im1_3.set_data(rgb_proj_theta_array[frame])
+def create_gif(tiff_filename_array, output_filepath, fps):
+    writer = iio.get_writer(output_filepath, mode = 'I', duration = 1/fps)
+    
+    for filename in tiff_filename_array:
+        img = iio.imread(filename)
 
-    text_1.set_text(r'$\theta = {0}$'.format(theta_array[frame]))
+        writer.append_data(img)
+    
+    writer.close()
 
-    return im1_1, im1_2, im1_3, text_1
+    for filename in tiff_filename_array:
+        os.remove(filename)
+        
+# def update_proj_theta(frame):
+#     im1_1.set_data(aligned_proj_theta_array_aux[frame])
+#     im1_2.set_data(synth_proj_theta_array_aux[frame])
+#     im1_3.set_data(rgb_proj_theta_array[frame])
 
-def update_proj_iter(frame):
-    im2_1.set_data(aligned_proj_iter_array_aux[frame])
-    im2_2.set_data(synth_proj_iter_array_aux[frame])
-    im2_3.set_data(rgb_proj_iter_array[frame])
+#     text_1.set_text(r'$\theta = {0}$'.format(theta_array[frame]))
 
-    text_2.set_text(r'Iter. {0}'.format(frame))
+#     return im1_1, im1_2, im1_3, text_1
 
-    return im2_1, im2_2, im2_3, text_2
+# def update_proj_iter(frame):
+#     im2_1.set_data(aligned_proj_iter_array_aux[frame])
+#     im2_2.set_data(synth_proj_iter_array_aux[frame])
+#     im2_3.set_data(rgb_proj_iter_array[frame])
 
-def update_recon_slice(frame):
-    im3.set_data(recon_slice_array_aux[frame])
+#     text_2.set_text(r'Iter. {0}'.format(frame))
 
-    text_3.set_text(r'Slice {0}'.format(frame))
+#     # return im2_1, im2_2, im2_3, text_2
 
-    return im3, text_3
+# def update_recon_slice(frame):
+#     im3.set_data(recon_slice_array_aux[frame])
 
-def update_recon_iter(frame):
-    im4.set_data(recon_iter_array_aux[frame])
+#     text_3.set_text(r'Slice {0}'.format(frame))
 
-    text_4.set_text(r'Iter. {0}'.format(frame))
+#     # return im3, text_3
 
-    return im4, text_4
+# def update_recon_iter(frame):
+#     im4.set_data(recon_iter_array_aux[frame])
 
-def update_shifts(frame):
-    net_shift_x = net_x_shifts[:, frame]
-    net_shift_y = net_y_shifts[:, frame]
+#     text_4.set_text(r'Iter. {0}'.format(frame))
 
-    curve1.set_ydata(net_shift_x)
-    curve2.set_ydata(net_shift_y)
+#     # return im4, text_4
 
-    min_shift = np.min([np.min(net_shift_x), np.min(net_shift_y)])
-    max_shift = np.max([np.max(net_shift_x), np.max(net_shift_y)])
+# def update_shifts(frame):
+#     net_shift_x = net_x_shifts[:, frame]
+#     net_shift_y = net_y_shifts[:, frame]
 
-    axs5.set_ylim(min_shift, max_shift + 0.1)
-    axs5.set_title(r'$\theta = {0}$\textdegree'.format(theta_array[frame]))
+#     curve1.set_ydata(net_shift_x)
+#     curve2.set_ydata(net_shift_y)
 
-    return curve1, curve2
+#     min_shift = np.min([np.min(net_shift_x), np.min(net_shift_y)])
+#     max_shift = np.max([np.max(net_shift_x), np.max(net_shift_y)])
+
+#     axs5.set_ylim(min_shift, max_shift + 0.1)
+#     axs5.set_title(r'$\theta = {0}$\textdegree'.format(theta_array[frame]))
+
+#     return curve1, curve2
 
 # root = tk.Tk()
 
@@ -64,7 +77,7 @@ def update_shifts(frame):
 
 # dir_path = filedialog.askdirectory(parent = root, title = 'Select directory containing alignment NPY files')
 
-dir_path = '/home/bwr0835/iter_reproj/gridrec_5_iter_cor_iteratively_updated_1'
+dir_path = '/home/bwr0835/iter_reproj/gridrec_5_iter_cor_iteratively_updated'
 
 if dir_path == "":
     print('No directory chosen. Exiting...')
@@ -118,6 +131,11 @@ rgb_proj_theta_array = []
 rgb_proj_iter_array = []
 recon_slice_array_aux = []
 recon_iter_array_aux = []
+tiff_array_1 = []
+tiff_array_2 = []
+tiff_array_3 = []
+tiff_array_4 = []
+tiff_array_5 = []
 
 theta_idx_desired = 0
 iter_idx_desired = 0
@@ -209,42 +227,114 @@ axs5.set_xlim(0, n_iter - 1)
 axs4.set_title(r'Slice {0}'.format(slice_idx_desired))
 axs5.set_title('Iteration 0')
 
-anim1 = anim.FuncAnimation(fig1, update_proj_theta, frames = n_theta, interval = 1000/fps_imgs, blit = True) # Interval is in ms --> interval = (1/fps)*1000
-anim2 = anim.FuncAnimation(fig2, update_proj_iter, frames = n_iter, interval = 1000/fps_imgs, blit = True)
-anim3 = anim.FuncAnimation(fig3, update_recon_slice, frames = n_slices, interval = 1000/fps_imgs, blit = True)
-anim4 = anim.FuncAnimation(fig4, update_recon_iter, frames = n_iter, interval = 1000/fps_imgs, blit = True)
-anim5 = anim.FuncAnimation(fig5, update_shifts, frames = n_theta, interval = 1000/fps_plots, blit = False)
+for theta_idx in range(n_theta):
+    im1_1.set_data(aligned_proj_theta_array_aux[theta_array])
+    im1_2.set_data(synth_proj_theta_array_aux[theta_array])
+    im1_3.set_data(rgb_proj_theta_array[theta_array])
 
-print('Exporting projections (changing thetas) to .mp4 file...')
+    text_1.set_text(r'$\theta = {0}$'.format(theta_array[theta_array]))
 
-writer = anim.FFMpegWriter(fps = fps_imgs, metadata = {'title': 'proj_theta'}, bitrate = 3500, extra_args = ['-vcodec', 'libx264', '-loglevel', 'debug'])
+    net_shift_x = net_x_shifts[:, theta_idx]
+    net_shift_y = net_y_shifts[:, theta_idx]
 
-anim1.save(os.path.join(dir_path, 'proj_theta.mp4'), writer, dpi = 400)
+    curve1.set_ydata(net_shift_x)
+    curve2.set_ydata(net_shift_y)
 
-print('Exporting projections (changing iterations) to .mp4 file...')
+    min_shift = np.min([np.min(net_shift_x), np.min(net_shift_y)])
+    max_shift = np.max([np.max(net_shift_x), np.max(net_shift_y)])
 
-writer = anim.FFMpegWriter(fps = fps_imgs, metadata = {'title': 'proj_iter'}, bitrate = 3500, extra_args = ['-vcodec', 'libx264', '-loglevel', 'debug'])
+    axs5.set_ylim(min_shift, max_shift + 0.1)
+    axs5.set_title(r'$\theta = {0}$\textdegree'.format(theta_array[theta_idx]))
 
-anim2.save(os.path.join(dir_path, 'proj_iter.mp4'), writer, dpi = 400)
+    filename_1 = os.path.join(dir_path, f'proj_theta{theta_idx:03d}.tiff')
+    filename_5 = os.path.join(dir_path, f'net_shifts{theta_idx:03d}.tiff')
 
-print('Exporting reconstructions (changing slices) to .mp4 file...')
+    fig1.savefig(filename_1, dpi = 400)
+    fig5.savefig(filename_5, dpi = 400)
 
-writer = anim.FFMpegWriter(fps = fps_imgs, metadata = {'title': 'recon_slice'}, bitrate = 3500, extra_args = ['-vcodec', 'libx264', '-loglevel', 'debug'])
+    tiff_array_1.append(filename_1)
+    tiff_array_5.append(filename_5)
 
-anim3.save(os.path.join(dir_path, 'recon_slice.mp4'), writer, dpi = 400)
+plt.close(fig1)
+plt.close(fig5)
 
-print('Exporting reconstructions (changing iterations) to .mp4 file...')
+for slice_idx in range(n_slices):
+    im3.set_data(recon_slice_array_aux[slice_idx])
 
-writer = anim.FFMpegWriter(fps = fps_imgs, metadata = {'title': 'recon_iter'}, bitrate = 3500, extra_args = ['-vcodec', 'libx264', '-loglevel', 'debug'])
+    text_3.set_text(r'Slice {0}'.format(slice_idx))
 
-anim4.save(os.path.join(dir_path, 'recon_iter.mp4'), writer, dpi = 400)
+    filename_3 = os.path.join(dir_path, f'recon_slice_{slice_idx:03d}.tiff')
 
-print('Exporting net shifts (changing thetas) to .mp4 file...')
+    fig3.savefig(filename_3, dpi = 400)
 
-writer = anim.FFMpegWriter(fps = fps_plots, metadata = {'title': 'recon_slice'}, bitrate = 3500, extra_args = ['-vcodec', 'libx264', '-loglevel', 'debug'])
+    tiff_array_3.append(filename_3)
 
-anim5.save(os.path.join(dir_path, 'net_shifts.mp4'), writer, dpi = 400)
+plt.close(fig3)
 
-print('Finished')
+for iter_idx in range(n_iter):
+    im2_1.set_data(aligned_proj_iter_array_aux[iter_idx])
+    im2_2.set_data(synth_proj_iter_array_aux[iter_idx])
+    im2_3.set_data(rgb_proj_iter_array[iter_idx])
 
-plt.show()
+    im4.set_data(recon_iter_array_aux[iter_idx])
+
+    text_2.set_text(r'Iter. {0}'.format(iter_idx))
+    text_4.set_text(r'Iter. {0}'.format(iter_idx))
+
+    filename_2 = os.path.join(dir_path, f'proj_iter_{iter_idx:03d}.tiff')
+    filename_4 = os.path.join(dir_path, f'recon_iter_{iter_idx:03d}.tiff')
+
+    fig2.savefig(filename_2, dpi = 400)
+    fig4.savefig(filename_4, dpi = 400)
+
+    tiff_array_2.append(filename_2)
+    tiff_array_4.append(filename_4)
+
+plt.close(fig2)
+plt.close(fig4)
+
+create_gif(tiff_array_1, os.path.join(dir_path, 'proj_theta.gif'), fps = 25)
+create_gif(tiff_array_2, os.path.join(dir_path, 'proj_iter.gif'), fps = 25)
+create_gif(tiff_array_3, os.path.join(dir_path, 'recon_slice.gif'), fps = 25)
+create_gif(tiff_array_4, os.path.join(dir_path, 'recon_iter.gif'), fps = 25)
+create_gif(tiff_array_5, os.path.join(dir_path, 'net_shifts.gif'), fps = 15)
+
+# anim1 = anim.FuncAnimation(fig1, update_proj_theta, frames = n_theta, interval = 1000/fps_imgs, blit = True) # Interval is in ms --> interval = (1/fps)*1000
+# anim2 = anim.FuncAnimation(fig2, update_proj_iter, frames = n_iter, interval = 1000/fps_imgs, blit = True)
+# anim3 = anim.FuncAnimation(fig3, update_recon_slice, frames = n_slices, interval = 1000/fps_imgs, blit = True)
+# anim4 = anim.FuncAnimation(fig4, update_recon_iter, frames = n_iter, interval = 1000/fps_imgs, blit = True)
+# anim5 = anim.FuncAnimation(fig5, update_shifts, frames = n_theta, interval = 1000/fps_plots, blit = False)
+
+# print('Exporting projections (changing thetas) to .mp4 file...')
+
+# writer = anim.FFMpegWriter(fps = fps_imgs, metadata = {'title': 'proj_theta'}, bitrate = 3500, extra_args = ['-vcodec', 'libx264', '-loglevel', 'debug'])
+
+# anim1.save(os.path.join(dir_path, 'proj_theta.mp4'), writer, dpi = 400)
+
+# print('Exporting projections (changing iterations) to .mp4 file...')
+
+# writer = anim.FFMpegWriter(fps = fps_imgs, metadata = {'title': 'proj_iter'}, bitrate = 3500, extra_args = ['-vcodec', 'libx264', '-loglevel', 'debug'])
+
+# anim2.save(os.path.join(dir_path, 'proj_iter.mp4'), writer, dpi = 400)
+
+# print('Exporting reconstructions (changing slices) to .mp4 file...')
+
+# writer = anim.FFMpegWriter(fps = fps_imgs, metadata = {'title': 'recon_slice'}, bitrate = 3500, extra_args = ['-vcodec', 'libx264', '-loglevel', 'debug'])
+
+# anim3.save(os.path.join(dir_path, 'recon_slice.mp4'), writer, dpi = 400)
+
+# print('Exporting reconstructions (changing iterations) to .mp4 file...')
+
+# writer = anim.FFMpegWriter(fps = fps_imgs, metadata = {'title': 'recon_iter'}, bitrate = 3500, extra_args = ['-vcodec', 'libx264', '-loglevel', 'debug'])
+
+# anim4.save(os.path.join(dir_path, 'recon_iter.mp4'), writer, dpi = 400)
+
+# print('Exporting net shifts (changing thetas) to .mp4 file...')
+
+# writer = anim.FFMpegWriter(fps = fps_plots, metadata = {'title': 'recon_slice'}, bitrate = 3500, extra_args = ['-vcodec', 'libx264', '-loglevel', 'debug'])
+
+# anim5.save(os.path.join(dir_path, 'net_shifts.mp4'), writer, dpi = 400)
+
+# print('Finished')
+
+# plt.show()
