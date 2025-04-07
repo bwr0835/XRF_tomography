@@ -228,11 +228,11 @@ axs4.set_title(r'Slice {0}'.format(slice_idx_desired))
 axs5.set_title('Iteration 0')
 
 for theta_idx in range(n_theta):
-    im1_1.set_data(aligned_proj_theta_array_aux[theta_array])
-    im1_2.set_data(synth_proj_theta_array_aux[theta_array])
-    im1_3.set_data(rgb_proj_theta_array[theta_array])
+    im1_1.set_data(aligned_proj_theta_array_aux[theta_idx])
+    im1_2.set_data(synth_proj_theta_array_aux[theta_idx])
+    im1_3.set_data(rgb_proj_theta_array[theta_idx])
 
-    text_1.set_text(r'$\theta = {0}$'.format(theta_array[theta_array]))
+    text_1.set_text(r'$\theta = {0}$'.format(theta_array[theta_idx]))
 
     net_shift_x = net_x_shifts[:, theta_idx]
     net_shift_y = net_y_shifts[:, theta_idx]
@@ -293,11 +293,27 @@ for iter_idx in range(n_iter):
 plt.close(fig2)
 plt.close(fig4)
 
+print('Creating projection GIF (changing thetas)')
+
 create_gif(tiff_array_1, os.path.join(dir_path, 'proj_theta.gif'), fps = 25)
+
+print('Creating projection GIF (changing iteration)')
+
 create_gif(tiff_array_2, os.path.join(dir_path, 'proj_iter.gif'), fps = 25)
+
+print('Creating reconstruction GIF (changing slice)')
+
 create_gif(tiff_array_3, os.path.join(dir_path, 'recon_slice.gif'), fps = 25)
+
+print('Creating reconstruction GIF (changing iteration)')
+
 create_gif(tiff_array_4, os.path.join(dir_path, 'recon_iter.gif'), fps = 25)
+
+print('Creating net shift GIF (changing theta)')
+
 create_gif(tiff_array_5, os.path.join(dir_path, 'net_shifts.gif'), fps = 15)
+
+print('Done')
 
 # anim1 = anim.FuncAnimation(fig1, update_proj_theta, frames = n_theta, interval = 1000/fps_imgs, blit = True) # Interval is in ms --> interval = (1/fps)*1000
 # anim2 = anim.FuncAnimation(fig2, update_proj_iter, frames = n_iter, interval = 1000/fps_imgs, blit = True)
