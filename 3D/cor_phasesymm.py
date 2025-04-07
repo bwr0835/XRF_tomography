@@ -114,7 +114,7 @@ if (n_slices % 2) or (n_columns % 2):
 
 theta_sum = np.zeros((n_slices, n_columns))
 
-proj_list = [counts[n_theta, :, :] for slice_idx in range(n_theta)]
+proj_list = [counts[theta_idx, :, :] for theta_idx in range(n_theta)]
 
 for proj in proj_list:
     theta_sum += proj
