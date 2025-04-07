@@ -114,7 +114,7 @@ if (n_slices % 2) or (n_columns % 2):
 
 reflection_pair_idx_array_1 = create_ref_pair_theta_idx_array(np.array([-22, 158]), theta_xrf)
 
-theta_sum = counts_xrf[ref_element_idx, reflection_pair_idx_array_1[0], :, :].T + counts_xrf[ref_element_idx, reflection_pair_idx_array_1[1], :, :].T
+theta_sum = counts_xrf[ref_element_idx, reflection_pair_idx_array_1[0], :, :] + counts_xrf[ref_element_idx, reflection_pair_idx_array_1[1], :, :]
 
 center_of_rotation = rot_center(theta_sum)
 
