@@ -122,7 +122,7 @@ for proj in proj_list:
 
 # theta_sum = counts_xrf[ref_element_idx, reflection_pair_idx_array_1[0], :, :] + counts_xrf[ref_element_idx, reflection_pair_idx_array_1[1], :, :]
 
-center_of_rotation = rot_center(theta_sum.T)
+center_of_rotation = rot_center(theta_sum)
 
 print(center_of_rotation)
 
