@@ -112,11 +112,17 @@ if (n_slices % 2) or (n_columns % 2):
 
         n_columns += 1
 
-reflection_pair_idx_array_1 = create_ref_pair_theta_idx_array(np.array([-22, 158]), theta_xrf)
+theta_sum = np.zeros((n_slices, n_columns))
 
-theta_sum = counts_xrf[ref_element_idx, reflection_pair_idx_array_1[0], :, :] + counts_xrf[ref_element_idx, reflection_pair_idx_array_1[1], :, :]
+proj_list = [counts[n_theta, :, :] for slice_idx in range(n_theta)]
 
-center_of_rotation = rot_center(theta_sum)
+for proj in proj_list:
+    theta_sum += proj
+# reflection_pair_idx_array_1 = create_ref_pair_theta_idx_array(np.array([-22, 158]), theta_xrf)
+
+# theta_sum = counts_xrf[ref_element_idx, reflection_pair_idx_array_1[0], :, :] + counts_xrf[ref_element_idx, reflection_pair_idx_array_1[1], :, :]
+
+center_of_rotation = rot_center(theta_sum.T)
 
 print(center_of_rotation)
 
