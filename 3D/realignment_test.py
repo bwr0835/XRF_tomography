@@ -326,7 +326,9 @@ def iter_reproj(ref_element,
     for proj in proj_list:
         theta_sum += proj
 
-    center_of_rotation = rot_center(theta_sum)                            # (n_theta, n_slices -> n_rows, n_columns)
+    center_of_rotation = rot_center(theta_sum)
+
+    print('Center of rotation = ' + str(round_correct(center_of_rotation, ndec = 2)))
     # center_of_rotation = tomo.find_center(reference_projection_imgs, theta_array*np.pi/180)
 
     iterations = []
