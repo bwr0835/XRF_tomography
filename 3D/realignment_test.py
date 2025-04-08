@@ -194,6 +194,38 @@ def pad_row(array):
 
     return array
 
+def rot_center(theta_sum):
+    """
+    Code written by E. Vacek (2021): 
+    https://github.com/everettvacek/PhaseSymmetry/blob/master/PhaseSymmetry.py
+
+    Calculates the center of rotation of a sinogram.
+
+    Parameters
+    ----------
+    thetasum: array-like
+        The 2D theta-sum array (z,theta).
+
+    Returns
+    -------
+    COR: float
+        The center of rotation.
+    """
+    T = fft.rfft(theta_sum.ravel())
+    
+    # Get components of the AC spatial frequency for axis perpendicular to rotation axis.
+    
+    imag = T[theta_sum.shape[0]].imag
+    real = T[theta_sum.shape[0]].real
+    
+    # Get phase of thetasum and return center of rotation.
+    
+    phase = np.arctan2(imag*np.sign(real), real*np.sign(real)) 
+    
+    COR = theta_sum.shape[-1]*(1 - phase/np.pi)/2
+
+    return COR
+
 def cross_correlate(recon_proj, orig_proj):
     # Credit goes to Fabricio Marin and the XRFTomo GUI
 
@@ -285,8 +317,16 @@ def iter_reproj(ref_element,
     print(xrf_proj_img_array.shape)
 
     reference_projection_imgs = xrf_proj_img_array[ref_element_idx] # These are effectively sinograms for the element of interest (highest contrast -> for realignment purposes)
-                                                                    # (n_theta, n_slices -> n_rows, n_columns)
-    center_of_rotation = tomo.find_center(reference_projection_imgs, theta_array*np.pi/180)
+    
+    theta_sum = np.zeros((n_slices, n_columns))
+
+    proj_list = [reference_projection_imgs[theta_idx, :, :] for theta_idx in range(n_theta)]
+
+    for proj in proj_list:
+        theta_sum += proj
+
+    center_of_rotation = rot_center(theta_sum)                            # (n_theta, n_slices -> n_rows, n_columns)
+    # center_of_rotation = tomo.find_center(reference_projection_imgs, theta_array*np.pi/180)
 
     iterations = []
     recon_iter_array = []
@@ -513,7 +553,7 @@ file_path_xrf = '/home/bwr0835/2_ide_aggregate_xrf.h5'
 output_dir_path_base = '/home/bwr0835'
 
 # output_file_name_base = input('Choose a base file name: ')
-output_file_name_base = 'gridrec_5_iter_cor_iteratively_updated_1'
+output_file_name_base = 'gridrec_5_iter_cor_thetasum_test'
 
 if output_file_name_base == '':
     print('No output base file name chosen. Ending program...')
