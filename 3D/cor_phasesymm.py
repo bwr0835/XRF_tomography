@@ -122,7 +122,7 @@ reflection_pair_idx_array_1 = create_ref_pair_theta_idx_array(np.array([-22, 158
 
 theta_sum = counts_xrf[ref_element_idx, reflection_pair_idx_array_1[0], :, :] + counts_xrf[ref_element_idx, reflection_pair_idx_array_1[1], :, :]
 
-center_of_rotation = rot_center(np.rot90(theta_sum, k = 1))
+center_of_rotation = rot_center(np.rot90(np.flip(theta_sum, axis = 1), k = 1))
 
 print(center_of_rotation)
 
