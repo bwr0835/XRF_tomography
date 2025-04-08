@@ -3,6 +3,7 @@ import numpy as np, h5py, os, sys, skimage, tkinter as tk, tomopy as tomo, csv
 from skimage import transform as xform, registration as reg
 from scipy import ndimage as ndi
 from numpy.fft import fft, ifft, fftshift, ifftshift, fftfreq, fftn, ifftn, fft2, ifft2
+from scipy.fft import rfft
 from h5_util import extract_h5_aggregate_xrf_data, create_aggregate_xrf_h5
 from matplotlib import pyplot as plt, animation as anim
 from tkinter import filedialog
@@ -211,7 +212,7 @@ def rot_center(theta_sum):
     COR: float
         The center of rotation.
     """
-    T = fft.rfft(theta_sum.ravel())
+    T = rfft(theta_sum.ravel())
     
     # Get components of the AC spatial frequency for axis perpendicular to rotation axis.
     
