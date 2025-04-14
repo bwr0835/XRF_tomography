@@ -5,7 +5,7 @@ from scipy import ndimage as ndi
 from matplotlib import pyplot as plt, animation as anim
 from tkinter import filedialog as fd
 from h5_util import extract_h5_aggregate_xrf_data
-from scipy import rfft
+from scipy import fft
 
 plt.rcParams['text.usetex'] = True
 plt.rcParams['font.family'] = 'serif'
@@ -70,7 +70,7 @@ def rot_center(theta_sum):
     if theta_sum.ndim == 1:
         theta_sum = theta_sum[None, :]
     
-    T = rfft(theta_sum, axis = 1)
+    T = fft.rfft(theta_sum, axis = 1)
 
     n_slices = theta_sum.shape[0]
     n_columns = theta_sum.shape[1]
