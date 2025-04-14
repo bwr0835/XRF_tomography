@@ -95,22 +95,22 @@ n_theta = counts.shape[0] # Number of projection angles (projection images)
 n_slices = counts.shape[1] # Number of rows in a projection image
 n_columns = counts.shape[2] # Number of columns in a projection image
 
-# if (n_slices % 2) or (n_columns % 2):
-#     if (n_slices % 2) and (n_columns % 2):
-#         counts = pad_col_row(counts)
+if (n_slices % 2) or (n_columns % 2):
+    if (n_slices % 2) and (n_columns % 2):
+        counts = pad_col_row(counts)
             
-#         n_slices += 1
-#         n_columns += 1
+        n_slices += 1
+        n_columns += 1
         
-#     elif n_slices % 2:
-#         counts = pad_row(counts)
+    elif n_slices % 2:
+        counts = pad_row(counts)
 
-#         n_slices += 1
+        n_slices += 1
 
-#     else:
-#         counts = pad_col(counts)
+    else:
+        counts = pad_col(counts)
 
-#         n_columns += 1
+        n_columns += 1
 
 print(counts.shape)
 # theta_sum = np.zeros((n_slices, n_columns))
