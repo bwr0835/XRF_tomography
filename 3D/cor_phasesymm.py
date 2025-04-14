@@ -123,7 +123,7 @@ theta_sum = np.zeros((n_slices, n_columns))
 reflection_pair_idx_array_1 = create_ref_pair_theta_idx_array(np.array([-22, 158]), theta_xrf)
 
 for slice_idx in range(n_slices):
-    theta_sum[slice_idx, :] = counts_xrf[ref_element_idx, reflection_pair_idx_array_1[0], slice_idx, :] + counts_xrf[ref_element_idx, reflection_pair_idx_array_1[1], slice_idx, :]
+    theta_sum[slice_idx, :] = counts[reflection_pair_idx_array_1[0], slice_idx, :] + counts[reflection_pair_idx_array_1[1], slice_idx, :]
 
 center_of_rotation = rot_center(theta_sum)
 
