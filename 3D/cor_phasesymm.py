@@ -138,7 +138,7 @@ reflection_pair_idx_array_1 = create_ref_pair_theta_idx_array(np.array([-22, 158
 for slice_idx in range(n_slices):
     theta_sum[slice_idx, :] = counts[reflection_pair_idx_array_1[0], slice_idx, :] + counts[reflection_pair_idx_array_1[1], slice_idx, :]
 
-theta_sum = (counts[reflection_pair_idx_array_1[0], :, :] + counts[reflection_pair_idx_array_1[1], :, :])
+theta_sum = (counts[reflection_pair_idx_array_1[0], :, :] + counts[reflection_pair_idx_array_1[1], :, :]).T
 # theta_sum = np.tile(theta_sum, (n_slices, n_columns))
 # theta_sum = counts[:, 0, :]
 
