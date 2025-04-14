@@ -328,7 +328,7 @@ def iter_reproj(ref_element,
 
     # center_of_rotation = rot_center(theta_sum)
 
-    center_of_rotation = tomo.find_center(reference_projection_imgs, theta_array*np.pi/180, tol = 0.1)
+    center_of_rotation = tomo.find_center(reference_projection_imgs, theta_array*np.pi/180, tol = 0.1)[0]
     print('Center of rotation = ' + str(round_correct(center_of_rotation, ndec = 2)) + ' (Projection image geometric center: ' + str(n_columns/2) + ')')
 
     cor_diff = center_of_rotation - n_columns/2
@@ -336,7 +336,7 @@ def iter_reproj(ref_element,
     print('Center of rotation error = ' + str(round_correct(cor_diff, ndec = 2)))
     print('Correcting for center of rotation error...')
 
-    for element_idx in n_elements:
+    for element_idx in range(n_elements):
         for theta_idx in range(n_theta):
             xrf_proj_img_array[element_idx, theta_idx, :, :] = ndi.shift(xrf_proj_img_array[element_idx, theta_idx, :, :], shift = (0, cor_diff))
 
