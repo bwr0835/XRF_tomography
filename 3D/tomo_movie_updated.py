@@ -77,7 +77,7 @@ def create_gif(tiff_filename_array, output_filepath, fps):
 
 # dir_path = filedialog.askdirectory(parent = root, title = 'Select directory containing alignment NPY files')
 
-dir_path = '/home/bwr0835/iter_reproj/gridrec_5_iter_cor_thetasum_test'
+dir_path = '/home/bwr0835/iter_reproj/gridrec_5_iter_tomopy_cor_correction_padding'
 
 if dir_path == "":
     print('No directory chosen. Exiting...')
