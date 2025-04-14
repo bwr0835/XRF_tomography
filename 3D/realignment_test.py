@@ -326,21 +326,21 @@ def iter_reproj(ref_element,
     # for proj in proj_list:
     #     theta_sum += proj
 
-    theta_sum = np.sum(reference_projection_imgs, axis = 0)
+    # theta_sum = np.sum(reference_projection_imgs, axis = 0)
 
-    center_of_rotation = rot_center(theta_sum)
+    # center_of_rotation = rot_center(theta_sum)
 
     # center_of_rotation = tomo.find_center(reference_projection_imgs, theta_array*np.pi/180, init = n_columns/2, tol = 0.1)[0]
-    print('Center of rotation = ' + str(round_correct(center_of_rotation, ndec = 2)) + ' (Projection image geometric center: ' + str(n_columns/2) + ')')
+    # print('Center of rotation = ' + str(round_correct(center_of_rotation, ndec = 2)) + ' (Projection image geometric center: ' + str(n_columns/2) + ')')
 
-    cor_diff = center_of_rotation - n_columns/2
+    # cor_diff = center_of_rotation - n_columns/2
 
-    print('Center of rotation error = ' + str(round_correct(cor_diff, ndec = 2)))
-    print('Correcting for center of rotation error...')
+    # # print('Center of rotation error = ' + str(round_correct(cor_diff, ndec = 2)))
+    # print('Correcting for center of rotation error...')
 
-    for element_idx in range(n_elements):
-        for theta_idx in range(n_theta):
-            xrf_proj_img_array[element_idx, theta_idx, :, :] = ndi.shift(xrf_proj_img_array[element_idx, theta_idx, :, :], shift = (0, cor_diff))
+    # for element_idx in range(n_elements):
+    #     for theta_idx in range(n_theta):
+    #         xrf_proj_img_array[element_idx, theta_idx, :, :] = ndi.shift(xrf_proj_img_array[element_idx, theta_idx, :, :], shift = (0, cor_diff))
 
     iterations = []
     recon_iter_array = []
@@ -418,6 +418,18 @@ def iter_reproj(ref_element,
         
         # plt.imshow(aligned_proj[ref_element_idx, 0, :, :])
         # plt.show()
+
+        center_of_rotation = tomo.find_center(aligned_proj[ref_element_idx], theta_array*np.pi/180, init = n_columns/2, tol = 0.1)[0]
+        print('Center of rotation = ' + str(round_correct(center_of_rotation, ndec = 2)) + ' (Projection image geometric center: ' + str(n_columns/2) + ')')
+
+        cor_diff = center_of_rotation - n_columns/2
+
+    # print('Center of rotation error = ' + str(round_correct(cor_diff, ndec = 2)))
+        # print('Correcting for center of rotation error...')
+
+        for element_idx in range(n_elements):
+            for theta_idx in range(n_theta):
+                aligned_proj[element_idx, theta_idx, :, :] = ndi.shift(aligned_proj[element_idx, theta_idx, :, :], shift = (0, cor_diff))
 
         aligned_exp_proj_iter_array.append(np.copy(aligned_proj[ref_element_idx]))
     

@@ -60,7 +60,7 @@ def rot_center(theta_sum):
     Parameters
     ----------
     thetasum: array-like
-        1D or 2D theta-sum array (z,t).
+        2D theta-sum array (z,t).
 
     Returns
     -------
