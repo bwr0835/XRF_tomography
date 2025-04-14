@@ -125,7 +125,7 @@ print(counts.shape)
 
 # center_of_rotation = rot_center(np.rot90(np.flip(theta_sum, axis = 1), k = 1))
 
-center_of_rotation = tomo.find_center(counts, theta_xrf*np.pi/180, tol = 0.01)
+center_of_rotation = tomo.find_center(counts, theta_xrf*np.pi/180, tol = 0.1)
 
 print(center_of_rotation)
 
