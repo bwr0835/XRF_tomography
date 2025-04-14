@@ -142,7 +142,7 @@ reflection_pair_idx_array_1 = create_ref_pair_theta_idx_array(np.array([-22, 158
 # theta_sum = np.tile(theta_sum, (n_slices, n_columns))
 # theta_sum = counts[:, 0, :]
 
-theta_sum = np.sum(counts[reflection_pair_idx_array_1, :, :], axis = 0)
+theta_sum = np.sum(counts, axis = 0)
 
 center_of_rotation = rot_center(theta_sum)
 
