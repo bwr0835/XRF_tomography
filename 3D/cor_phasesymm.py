@@ -5,7 +5,7 @@ from scipy import ndimage as ndi
 from matplotlib import pyplot as plt, animation as anim
 from tkinter import filedialog as fd
 from h5_util import extract_h5_aggregate_xrf_data
-from scipy import fft
+from scipy import rfft
 
 plt.rcParams['text.usetex'] = True
 plt.rcParams['font.family'] = 'serif'
@@ -60,25 +60,38 @@ def rot_center(theta_sum):
     Parameters
     ----------
     thetasum: array-like
-        The 2D theta-sum array (z,theta).
+        1D or 2D theta-sum array (z,t).
 
     Returns
     -------
     COR: float
         The center of rotation.
     """
-    T = fft.rfft(theta_sum.ravel())
+    if theta_sum.ndim == 1:
+        theta_sum = theta_sum[None, :]
     
-    # Get components of the AC spatial frequency for axis perpendicular to rotation axis.
+    T = rfft(theta_sum, axis = 1)
+
+    n_slices = theta_sum.shape[0]
+    n_columns = theta_sum.shape[1]
+
+    real, imag = T[:, 1].real, T[:, 1].imag
     
-    imag = T[theta_sum.shape[0]].imag
-    real = T[theta_sum.shape[0]].real
+    # In a sinogram, a feature may be more positive or less positive than the background (i.e. X-ray fluorescence vs. X-ray absorption contrast).
+    # This can mess with T_phase --> multiply real, imag. components by sign function
+    # T = rfft(theta_sum.ravel())
+    
+    # # Get components of the AC spatial frequency for axis perpendicular to rotation axis.
+    
+    # imag = T[theta_sum.shape[0]].imag
+    # real = T[theta_sum.shape[0]].real
     
     # Get phase of thetasum and return center of rotation.
     
-    phase = np.arctan2(imag*np.sign(real), real*np.sign(real)) 
+    phase = (np.arctan2(imag*np.sign(real), real*np.sign(real)) )[n_slices//2]
     
-    COR = theta_sum.shape[-1]*(1 - phase/np.pi)/2
+    COR = n_columns*(1 - phase/np.pi)/2
+    # COR = theta_sum.shape[-1]*(1 - phase/np.pi)/2
 
     return COR
 
@@ -125,7 +138,7 @@ reflection_pair_idx_array_1 = create_ref_pair_theta_idx_array(np.array([-22, 158
 # for slice_idx in range(n_slices):
     # theta_sum[slice_idx, :] = counts[reflection_pair_idx_array_1[0], slice_idx, :] + counts[reflection_pair_idx_array_1[1], slice_idx, :]
 
-theta_sum = (counts[reflection_pair_idx_array_1[0], :, :] + counts[reflection_pair_idx_array_1[1], :, :]).T
+# theta_sum = (counts[reflection_pair_idx_array_1[0], :, :] + counts[reflection_pair_idx_array_1[1], :, :]).T
 # theta_sum = np.tile(theta_sum, (n_slices, n_columns))
 # theta_sum = counts[:, 0, :]
 

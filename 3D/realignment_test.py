@@ -339,8 +339,6 @@ def iter_reproj(ref_element,
     for element_idx in range(n_elements):
         for theta_idx in range(n_theta):
             xrf_proj_img_array[element_idx, theta_idx, :, :] = ndi.shift(xrf_proj_img_array[element_idx, theta_idx, :, :], shift = (0, cor_diff))
-    
-    print(tomo.find_center(xrf_proj_img_array[ref_element_idx], theta_array*np.pi/180, tol = 0.1)[0])
 
     iterations = []
     recon_iter_array = []
