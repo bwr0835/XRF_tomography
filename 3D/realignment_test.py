@@ -317,19 +317,28 @@ def iter_reproj(ref_element,
     
     print(xrf_proj_img_array.shape)
 
-    reference_projection_imgs = xrf_proj_img_array[ref_element_idx] # These are effectively sinograms for the element of interest (highest contrast -> for realignment purposes)
+    reference_projection_imgs = xrf_proj_img_array[ref_element_idx].copy() # These are effectively sinograms for the element of interest (highest contrast -> for realignment purposes)
     
-    theta_sum = np.zeros((n_slices, n_columns))
+    # theta_sum = np.zeros((n_slices, n_columns))
 
-    proj_list = [reference_projection_imgs[theta_idx, :, :] for theta_idx in range(n_theta)]
+    # proj_list = [reference_projection_imgs[theta_idx, :, :] for theta_idx in range(n_theta)]
 
-    for proj in proj_list:
-        theta_sum += proj
+    # for proj in proj_list:
+    #     theta_sum += proj
 
-    center_of_rotation = rot_center(theta_sum)
+    # center_of_rotation = rot_center(theta_sum)
 
-    print('Center of rotation = ' + str(round_correct(center_of_rotation, ndec = 2)))
-    # center_of_rotation = tomo.find_center(reference_projection_imgs, theta_array*np.pi/180)
+    center_of_rotation = tomo.find_center(reference_projection_imgs, theta_array*np.pi/180, tol = 0.1)
+    print('Center of rotation = ' + str(round_correct(center_of_rotation, ndec = 2)) + ' (Projection image geometric center: ' + str(n_columns/2) + ')')
+
+    cor_diff = center_of_rotation - n_columns/2
+
+    print('Center of rotation error = ' + str(round_correct(cor_diff, ndec = 2)))
+    print('Correcting for center of rotation error...')
+
+    for element_idx in n_elements:
+        for theta_idx in range(n_theta):
+            xrf_proj_img_array[element_idx, theta_idx, :, :] = ndi.shift(xrf_proj_img_array[element_idx, theta_idx, :, :], shift = (0, cor_diff))
 
     iterations = []
     recon_iter_array = []
@@ -364,6 +373,8 @@ def iter_reproj(ref_element,
         
         if np.isscalar(init_y_shift):
             init_y_shift *= np.ones(n_theta)
+
+    print('Performing iterative projection...')
 
     for iteration_idx in range(n_iterations):
         print('Iteration ' + str(iteration_idx + 1) + '/' + str(n_iterations))
@@ -556,7 +567,7 @@ file_path_xrf = '/home/bwr0835/2_ide_aggregate_xrf.h5'
 output_dir_path_base = '/home/bwr0835'
 
 # output_file_name_base = input('Choose a base file name: ')
-output_file_name_base = 'gridrec_5_iter_cor_thetasum_test'
+output_file_name_base = 'gridrec_5_iter_tomopy_cor_correction_padding'
 
 if output_file_name_base == '':
     print('No output base file name chosen. Ending program...')
