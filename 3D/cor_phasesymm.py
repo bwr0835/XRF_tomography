@@ -142,6 +142,8 @@ reflection_pair_idx_array_1 = create_ref_pair_theta_idx_array(np.array([-22, 158
 # theta_sum = np.tile(theta_sum, (n_slices, n_columns))
 # theta_sum = counts[:, 0, :]
 
+theta_sum = np.sum(counts, axis = 1)
+
 center_of_rotation = rot_center(theta_sum)
 
 # center_of_rotation = tomo.find_center(counts, theta_xrf*np.pi/180, tol = 0.1)
