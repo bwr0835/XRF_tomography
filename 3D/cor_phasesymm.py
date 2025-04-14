@@ -67,24 +67,24 @@ def rot_center(theta_sum):
     COR: float
         The center of rotation.
     """
-    if theta_sum.ndim == 1:
-        theta_sum = theta_sum[None, :]
+    # if theta_sum.ndim == 1:
+    #     theta_sum = theta_sum[None, :]
     
-    T = fft.rfft(theta_sum, axis = 1)
+    # T = fft.rfft(theta_sum, axis = 1)
 
-    n_slices = theta_sum.shape[0]
-    n_columns = theta_sum.shape[1]
+    # n_slices = theta_sum.shape[0]
+    # n_columns = theta_sum.shape[1]
 
-    real, imag = T[:, 1].real, T[:, 1].imag
+    # real, imag = T[:, 1].real, T[:, 1].imag
     
     # In a sinogram, a feature may be more positive or less positive than the background (i.e. X-ray fluorescence vs. X-ray absorption contrast).
     # This can mess with T_phase --> multiply real, imag. components by sign function
-    # T = rfft(theta_sum.ravel())
+    T = fft.rfft(theta_sum.ravel())
     
     # # Get components of the AC spatial frequency for axis perpendicular to rotation axis.
     
-    # imag = T[theta_sum.shape[0]].imag
-    # real = T[theta_sum.shape[0]].real
+    imag = T[theta_sum.shape[0]].imag
+    real = T[theta_sum.shape[0]].real
     
     # Get phase of thetasum and return center of rotation.
     
@@ -142,7 +142,7 @@ reflection_pair_idx_array_1 = create_ref_pair_theta_idx_array(np.array([-22, 158
 # theta_sum = np.tile(theta_sum, (n_slices, n_columns))
 # theta_sum = counts[:, 0, :]
 
-theta_sum = np.sum(counts, axis = 1)
+theta_sum = np.sum(counts, axis = 0)
 
 center_of_rotation = rot_center(theta_sum)
 
