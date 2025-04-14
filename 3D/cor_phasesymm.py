@@ -88,7 +88,7 @@ def rot_center(theta_sum):
     
     # Get phase of thetasum and return center of rotation.
     
-    phase = (np.arctan2(imag*np.sign(real), real*np.sign(real)) )[n_slices//2]
+    phase = (np.arctan2(imag*np.sign(real), real*np.sign(real)))
     
     COR = n_columns*(1 - phase/np.pi)/2
     # COR = theta_sum.shape[-1]*(1 - phase/np.pi)/2
