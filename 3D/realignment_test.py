@@ -328,7 +328,7 @@ def iter_reproj(ref_element,
 
     # center_of_rotation = rot_center(theta_sum)
 
-    center_of_rotation = tomo.find_center(reference_projection_imgs, theta_array*np.pi/180, tol = 0.1)[0]
+    center_of_rotation = tomo.find_center(reference_projection_imgs, theta_array*np.pi/180, init = n_columns/2, tol = 0.1)[0]
     print('Center of rotation = ' + str(round_correct(center_of_rotation, ndec = 2)) + ' (Projection image geometric center: ' + str(n_columns/2) + ')')
 
     cor_diff = center_of_rotation - n_columns/2
