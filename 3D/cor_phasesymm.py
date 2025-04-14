@@ -113,7 +113,7 @@ n_columns = counts.shape[2] # Number of columns in a projection image
 #         n_columns += 1
 
 print(counts.shape)
-theta_sum = np.zeros((n_slices, n_columns))
+# theta_sum = np.zeros((n_slices, n_columns))
 
 # proj_list = [counts[theta_idx, :, :] for theta_idx in range(n_theta)]
 
@@ -122,8 +122,10 @@ theta_sum = np.zeros((n_slices, n_columns))
 
 reflection_pair_idx_array_1 = create_ref_pair_theta_idx_array(np.array([-22, 158]), theta_xrf)
 
-for slice_idx in range(n_slices):
-    theta_sum[slice_idx, :] = counts[reflection_pair_idx_array_1[0], slice_idx, :] + counts[reflection_pair_idx_array_1[1], slice_idx, :]
+# for slice_idx in range(n_slices):
+    # theta_sum[slice_idx, :] = counts[reflection_pair_idx_array_1[0], slice_idx, :] + counts[reflection_pair_idx_array_1[1], slice_idx, :]
+
+theta_sum = counts[reflection_pair_idx_array_1[0], :, :] + counts[reflection_pair_idx_array_1[1], :, :]
 
 center_of_rotation = rot_center(theta_sum)
 
