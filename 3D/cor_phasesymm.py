@@ -113,19 +113,21 @@ if (n_slices % 2) or (n_columns % 2):
         n_columns += 1
 
 print(counts.shape)
-# theta_sum = np.zeros((n_slices, n_columns))
+theta_sum = np.zeros((n_slices, n_columns))
 
-# # proj_list = [counts[theta_idx, :, :] for theta_idx in range(n_theta)]
+# proj_list = [counts[theta_idx, :, :] for theta_idx in range(n_theta)]
 
-# # for proj in proj_list:
-# #     theta_sum += proj
-# reflection_pair_idx_array_1 = create_ref_pair_theta_idx_array(np.array([-22, 158]), theta_xrf)
+# for proj in proj_list:
+#     theta_sum += proj
 
-# theta_sum = counts_xrf[ref_element_idx, reflection_pair_idx_array_1[0], :, :] + counts_xrf[ref_element_idx, reflection_pair_idx_array_1[1], :, :]
+reflection_pair_idx_array_1 = create_ref_pair_theta_idx_array(np.array([-22, 158]), theta_xrf)
 
-# center_of_rotation = rot_center(np.rot90(np.flip(theta_sum, axis = 1), k = 1))
+for slice_idx in range(n_slices):
+    theta_sum[slice_idx, :] = counts_xrf[ref_element_idx, reflection_pair_idx_array_1[0], slice_idx, :] + counts_xrf[ref_element_idx, reflection_pair_idx_array_1[1], slice_idx, :]
 
-center_of_rotation = tomo.find_center(counts, theta_xrf*np.pi/180, tol = 0.1)
+center_of_rotation = rot_center(theta_sum)
+
+# center_of_rotation = tomo.find_center(counts, theta_xrf*np.pi/180, tol = 0.1)
 
 print(center_of_rotation)
 
