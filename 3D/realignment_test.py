@@ -619,7 +619,7 @@ file_path_xrf = '/home/bwr0835/2_ide_aggregate_xrf.h5'
 output_dir_path_base = '/home/bwr0835'
 
 # output_file_name_base = input('Choose a base file name: ')
-output_file_name_base = 'gridrec_5_iter_tomopy_cor_correction_padding'
+output_file_name_base = 'gridrec_5_iter_vacek_cor_correction_padding_-22_deg_158_deg'
 
 if output_file_name_base == '':
     print('No output base file name chosen. Ending program...')
