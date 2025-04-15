@@ -408,7 +408,7 @@ def iter_reproj(ref_element,
     reflection_pair_idx_array = create_ref_pair_theta_idx_array(cor_desired_angles, theta_xrf)
 
     for slice_idx in range(n_slices):
-        sino = ref_element_idx[:, slice_idx, :]
+        sino = reference_projection_imgs[:, slice_idx, :]
 
         slice_proj_angle_1 = sino[reflection_pair_idx_array[0], :]
         slice_proj_angle_2 = sino[reflection_pair_idx_array[1], :]
