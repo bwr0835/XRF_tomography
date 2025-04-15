@@ -228,7 +228,7 @@ animation = anim.FuncAnimation(fig, update, frames = len(cor_x_shift), interval 
 
 # plt.show()
 
-output_path1 = '/home/bwr0835/recon_gridrec_cor_correction_cor_shift.mp4'
+output_path1 = '/home/bwr0835/vacek_alg_recon_gridrec_cor_correction_proj_shift.mp4'
 writer1 = anim.FFMpegWriter(fps = fps_images, metadata = {'title': 'recon'}, bitrate = 3500, extra_args = ['-vcodec', 'libx264'])
     
 print('Saving')
