@@ -160,7 +160,7 @@ def create_save_proj_shifts(elements_xrf, counts_xrf, theta_xrf, ref_element, co
     reflection_pair_idx_array = create_ref_pair_theta_idx_array(np.array([-22, 158]), theta_xrf)
 
     for slice_idx in range(n_slices):
-        sino = counts[ref_element_idx, :, slice_idx, :]
+        sino = counts[:, slice_idx, :]
 
         slice_proj_angle_1 = sino[reflection_pair_idx_array[0], :]
         slice_proj_angle_2 = sino[reflection_pair_idx_array[1], :]
