@@ -180,7 +180,7 @@ def create_save_proj_shifts(elements_xrf, counts_xrf, theta_xrf, ref_element, co
 
         recon = tomo.recon(counts_new, theta = theta_xrf*np.pi/180, center = center_of_rotation_new, algorithm = 'gridrec', filter_name = 'ramlak')
 
-        recon_array.append(recon)
+        recon_array.append(recon.copy())
 
     recon_array = np.array(recon_array)
 
