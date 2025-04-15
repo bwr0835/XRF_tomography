@@ -110,7 +110,7 @@ for f in file_array:
     elif f == 'theta_array.npy':
         theta_array = np.load(os.path.join(dir_path, f))
     
-    elif f.endswith('.mp4'):
+    elif f.endswith('.mp4') or f.endswith('.gif'):
         continue
 
     else:
