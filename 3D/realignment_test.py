@@ -402,10 +402,9 @@ def iter_reproj(ref_element,
     # print('Center of rotation = ' + str(round_correct(center_of_rotation, ndec = 2)) + ' (Projection image geometric center: ' + str(n_columns/2) + ')')
 
     # cor_diff = center_of_rotation - n_columns/2
-
-    theta_sum = np.zeros((n_slices, n_columns))
-
     reflection_pair_idx_array = create_ref_pair_theta_idx_array(cor_desired_angles, theta_xrf)
+    
+    theta_sum = np.zeros((n_slices, n_columns))
 
     for slice_idx in range(n_slices):
         sino = reference_projection_imgs[:, slice_idx, :]
@@ -415,9 +414,9 @@ def iter_reproj(ref_element,
 
         theta_sum[slice_idx, :] = slice_proj_angle_1 + slice_proj_angle_2
         
-    center_of_rotation = rot_center(theta_sum) 
+        center_of_rotation = rot_center(theta_sum) 
 
-    cor_diff = center_of_rotation - n_columns/2
+        cor_diff = center_of_rotation - n_columns/2
     
     print('Center of rotation: ' + str(round_correct(center_of_rotation, ndec = 2)))
     print('Center of rotation error = ' + str(round_correct(cor_diff, ndec = 2)))
@@ -428,16 +427,6 @@ def iter_reproj(ref_element,
             xrf_proj_img_array[element_idx, theta_idx, :, :] = ndi.shift(xrf_proj_img_array[element_idx, theta_idx, :, :], shift = (0, -cor_diff))
     
     center_of_rotation -= cor_diff
-
-    for slice_idx in range(n_slices):
-        sino = xrf_proj_img_array[ref_element_idx, :, slice_idx, :]
-
-        slice_proj_angle_1 = sino[reflection_pair_idx_array[0], :]
-        slice_proj_angle_2 = sino[reflection_pair_idx_array[1], :]
-
-        theta_sum[slice_idx, :] = slice_proj_angle_1 + slice_proj_angle_2
-    
-    print(rot_center(theta_sum))
 
     print('Performing iterative projection...')
 
@@ -456,18 +445,7 @@ def iter_reproj(ref_element,
                     print('Cumulative y shift = ' + str(net_y_shift))
                     
                 aligned_proj[ref_element_idx, theta_idx, :, :] = ndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx, :, :], shift = (net_y_shift, net_x_shift))
-       
-            for slice_idx in range(n_slices):
-                sino = aligned_proj[ref_element_idx, :, slice_idx, :]
 
-                slice_proj_angle_1 = sino[reflection_pair_idx_array[0], :]
-                slice_proj_angle_2 = sino[reflection_pair_idx_array[1], :]
-
-                theta_sum[slice_idx, :] = slice_proj_angle_1 + slice_proj_angle_2
-        
-            center_of_rotation_test = rot_center(theta_sum)
-            print(center_of_rotation_test)
-        
         else:
             print('Initial x shift: ' + str(init_x_shift))
             print('Initial y shift: ' + str(init_y_shift))
@@ -492,8 +470,28 @@ def iter_reproj(ref_element,
         
         # plt.imshow(aligned_proj[ref_element_idx, 0, :, :])
         # plt.show()
+        if init_x_shift.any() or iteration_idx > 0: # If there is at least one projection with an initial x-shift
+            for slice_idx in range(n_slices):
+                sino = reference_projection_imgs[:, slice_idx, :]
 
-        aligned_exp_proj_iter_array.append(np.copy(aligned_proj[ref_element_idx]))
+                slice_proj_angle_1 = sino[reflection_pair_idx_array[0], :]
+                slice_proj_angle_2 = sino[reflection_pair_idx_array[1], :]
+
+                theta_sum[slice_idx, :] = slice_proj_angle_1 + slice_proj_angle_2
+        
+                center_of_rotation = rot_center(theta_sum) 
+
+                cor_diff = center_of_rotation - n_columns/2
+    
+            print('Center of rotation: ' + str(round_correct(center_of_rotation, ndec = 2)))
+            print('Center of rotation error = ' + str(round_correct(cor_diff, ndec = 2)))
+            print('Incorporating an x-shift of ' + str(round_correct(cor_diff, ndec = 2)) + ' to all projections to correct for COR offset...') 
+
+            for element_idx in range(n_elements):
+                for theta_idx in range(n_theta):
+                    xrf_proj_img_array[element_idx, theta_idx, :, :] = ndi.shift(xrf_proj_img_array[element_idx, theta_idx, :, :], shift = (0, -cor_diff))
+    
+            center_of_rotation -= cor_diff
     
         print('Performing ' + algorithm)
 
