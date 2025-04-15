@@ -258,6 +258,9 @@ for theta_idx in range(n_theta):
     im1_1.set_data(aligned_proj_theta_array_aux[theta_idx])
     im1_2.set_data(synth_proj_theta_array_aux[theta_idx])
     im1_3.set_data(rgb_proj_theta_array[theta_idx])
+    im1_4.set_data(aligned_proj_theta_array_aux_2[theta_idx])
+    im1_5.set_data(synth_proj_theta_array_aux_2[theta_idx])
+    im1_6.set_data(rgb_proj_theta_array_2[theta_idx])
 
     text_1.set_text(r'$\theta = {0}$'.format(theta_array[theta_idx]))
 
