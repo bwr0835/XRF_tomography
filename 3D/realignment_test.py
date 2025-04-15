@@ -426,6 +426,8 @@ def iter_reproj(ref_element,
     for element_idx in range(n_elements):
         for theta_idx in range(n_theta):
             xrf_proj_img_array[element_idx, theta_idx, :, :] = ndi.shift(xrf_proj_img_array[element_idx, theta_idx, :, :], shift = (0, -cor_diff))
+    
+    center_of_rotation -= cor_diff
 
     for slice_idx in range(n_slices):
         sino = xrf_proj_img_array[ref_element_idx, :, slice_idx, :]
