@@ -174,6 +174,10 @@ def create_save_proj_shifts(elements_xrf, counts_xrf, theta_xrf, ref_element, co
         for theta_idx in range(n_theta):
             counts_new[theta_idx] = ndi.shift(counts[theta_idx], shift = (0, cor_x_shift[x_shift]))
         
+        if x_shift % 10 == 0:
+            plt.imshow(counts_new)
+            plt.show()
+
         center_of_rotation_new = center_of_rotation + cor_x_shift[x_shift]
     
         print('Performing gridrec for projection x-shift = ' + str(cor_x_shift[x_shift]) + ' (COR = ' + str(center_of_rotation_new) + ')')
@@ -224,7 +228,7 @@ text = axs.text(0.02, 0.02, r'COR shift = {0} pixels'.format(cor_x_shift[0]), tr
 
 animation = anim.FuncAnimation(fig, update, frames = len(cor_x_shift), interval = 1000/fps_images, blit = True) # Interval is ms/frame (NOT frames per second, or fps)
 
-plt.show()
+# plt.show()
 
 # output_path1 = '/home/bwr0835/vacek_alg_recon_gridrec_cor_correction_proj_shift.mp4'
 # writer1 = anim.FFMpegWriter(fps = fps_images, metadata = {'title': 'recon'}, bitrate = 3500, extra_args = ['-vcodec', 'libx264'])
