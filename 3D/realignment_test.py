@@ -472,7 +472,7 @@ def iter_reproj(ref_element,
         # plt.show()
         if init_x_shift.any() or iteration_idx > 0: # If there is at least one projection with an initial x-shift
             for slice_idx in range(n_slices):
-                sino = reference_projection_imgs[:, slice_idx, :]
+                sino = aligned_proj[ref_element_idx, :, slice_idx, :]
 
                 slice_proj_angle_1 = sino[reflection_pair_idx_array[0], :]
                 slice_proj_angle_2 = sino[reflection_pair_idx_array[1], :]
@@ -489,7 +489,7 @@ def iter_reproj(ref_element,
 
             for element_idx in range(n_elements):
                 for theta_idx in range(n_theta):
-                    xrf_proj_img_array[element_idx, theta_idx, :, :] = ndi.shift(xrf_proj_img_array[element_idx, theta_idx, :, :], shift = (0, -cor_diff))
+                    aligned_proj[element_idx, theta_idx, :, :] = ndi.shift(aligned_proj[element_idx, theta_idx, :, :], shift = (0, -cor_diff))
     
             center_of_rotation -= cor_diff
     
