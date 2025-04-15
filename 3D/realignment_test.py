@@ -448,12 +448,23 @@ def iter_reproj(ref_element,
             for theta_idx in range(n_theta):
                 net_x_shift = x_shifts_pc[iteration_idx - 1, theta_idx] # Cumulative shift
                 net_y_shift = y_shifts_pc[iteration_idx - 1, theta_idx]
-
+    
                 if theta_idx % 7 == 0:
                     print('Cumulative x shift = ' + str(net_x_shift))
                     print('Cumulative y shift = ' + str(net_y_shift))
                     
                 aligned_proj[ref_element_idx, theta_idx, :, :] = ndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx, :, :], shift = (net_y_shift, net_x_shift))
+       
+            for slice_idx in range(n_slices):
+                sino = aligned_proj[ref_element_idx, :, slice_idx, :]
+
+                slice_proj_angle_1 = sino[reflection_pair_idx_array[0], :]
+                slice_proj_angle_2 = sino[reflection_pair_idx_array[1], :]
+
+                theta_sum[slice_idx, :] = slice_proj_angle_1 + slice_proj_angle_2
+        
+            center_of_rotation_test = rot_center(theta_sum)
+            print(center_of_rotation_test)
         
         else:
             print('Initial x shift: ' + str(init_x_shift))
