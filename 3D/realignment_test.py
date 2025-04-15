@@ -421,7 +421,7 @@ def iter_reproj(ref_element,
     
     print('Center of rotation: ' + str(round_correct(center_of_rotation, ndec = 2)))
     print('Center of rotation error = ' + str(round_correct(cor_diff, ndec = 2)))
-    print('Incorporating an initial x-shift of ' + str(round_correct(cor_diff, dec = 2)) + ' to all projections to correct for COR offset...') 
+    print('Incorporating an initial x-shift of ' + str(round_correct(cor_diff, ndec = 2)) + ' to all projections to correct for COR offset...') 
 
     init_x_shift += cor_diff
 
