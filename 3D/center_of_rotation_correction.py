@@ -170,9 +170,7 @@ def create_save_proj_shifts(elements_xrf, counts_xrf, theta_xrf, ref_element, co
     center_of_rotation = rot_center(theta_sum)
     # center_of_rotation = tomo.find_center(counts_new, theta_xrf*np.pi/180, tol = 0.05) # COR given with tolerance of ±0.05 pixels
 
-    for x_shift in range(len(cor_x_shift)):
-        center_of_rotation_new = 0
-        
+    for x_shift in range(len(cor_x_shift)):    
         for theta_idx in range(n_theta):
             counts_new[theta_idx] = ndi.shift(counts[theta_idx], shift = (0, cor_x_shift[x_shift]))
         
@@ -213,7 +211,7 @@ recon_array = np.load(output_path)
 
 print('Loading finished')
 
-slice_desired_idx = 64
+slice_desired_idx = 61
 
 fps_images = 25 # Frames per second
 
