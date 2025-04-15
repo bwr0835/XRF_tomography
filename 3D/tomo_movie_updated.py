@@ -124,12 +124,16 @@ n_slices = aligned_proj.shape[2]
 n_iter = len(aligned_proj_iter_array)
 
 aligned_proj_theta_array_aux = []
+aligned_proj_theta_array_aux_2 = []
 aligned_proj_iter_array_aux = []
 synth_proj_theta_array_aux = []
+synth_proj_theta_array_aux_2 = []
 synth_proj_iter_array_aux = []
 rgb_proj_theta_array = []
+rgb_proj_theta_array_2 = []
 rgb_proj_iter_array = []
 recon_slice_array_aux = []
+recon_slice_array_aux_2 = []
 recon_iter_array_aux = []
 tiff_array_1 = []
 tiff_array_2 = []
@@ -137,19 +141,33 @@ tiff_array_3 = []
 tiff_array_4 = []
 tiff_array_5 = []
 
+iter_array = np.arange(n_iter)
+
 theta_idx_desired = 0
 iter_idx_desired = 0
+iter_idx_final = iter_array[-1]
 slice_idx_desired = 64
 element_idx_desired = 11 # Fe for this directory
 
 for theta_idx in range(n_theta):
+    aligned_proj_theta_array_aux.append(aligned_proj_iter_array[iter_idx_desired][theta_idx])
+    aligned_proj_theta_array_aux_2.append(aligned_proj_iter_array[-1][theta_idx])
+    synth_proj_theta_array_aux.append(synth_proj_iter_array[iter_idx_desired][theta_idx])
+    synth_proj_theta_array_aux_2.append(synth_proj_iter_array[-1][theta_idx])
+
     aligned_proj_norm = normalize_array(aligned_proj_iter_array[iter_idx_desired][theta_idx])
     synth_proj_norm = normalize_array(synth_proj_iter_array[iter_idx_desired][theta_idx])
+
     rgb = np.dstack((aligned_proj_norm, np.zeros_like(aligned_proj_norm), synth_proj_norm))
 
-    aligned_proj_theta_array_aux.append(aligned_proj_iter_array[iter_idx_desired][theta_idx])
-    synth_proj_theta_array_aux.append(synth_proj_iter_array[iter_idx_desired][theta_idx])
     rgb_proj_theta_array.append(rgb)
+
+    aligned_proj_norm = normalize_array(aligned_proj_iter_array[-1][theta_idx])
+    synth_proj_norm = normalize_array(synth_proj_iter_array[-1][theta_idx])
+
+    rgb = np.dstack((aligned_proj_norm, np.zeros_like(aligned_proj_norm), synth_proj_norm))
+    
+    rgb_proj_theta_array_2.append(rgb)
 
 for iter_idx in range(n_iter):
     aligned_proj_norm = normalize_array(aligned_proj_iter_array[iter_idx][theta_idx_desired])
@@ -164,6 +182,7 @@ for iter_idx in range(n_iter):
 
 for slice_idx in range(n_slices):
     recon_slice_array_aux.append(recon_iter_array[iter_idx_desired][slice_idx])
+    recon_slice_array_aux_2.append(recon_iter_array[-1][slice_idx])
 
 aligned_proj_theta_array_aux = np.array(aligned_proj_theta_array_aux)
 aligned_proj_iter_array_aux = np.array(aligned_proj_iter_array_aux)
@@ -176,46 +195,54 @@ recon_iter_array_aux = np.array(recon_iter_array_aux)
 
 print('Generating figures')
 
-iter_array = np.arange(n_iter)
-
 fps_imgs = 25 # Frames per second (fps)
 fps_plots = 15
 
-fig1, axs1 = plt.subplots(1, 3) # Aligned experimental projection, synthetic experimental projection, overlays at different angles
+fig1, axs1 = plt.subplots(2, 3) # Aligned experimental projection, synthetic experimental projection, overlays at different angles
 fig2, axs2 = plt.subplots(1, 3) # Same as above, but for different iterations - use first projection angle
-fig3, axs3 = plt.subplots() # Reconstructed object for different slices (use first iteration?)
-fig4, axs4 = plt.subplots() # Reconstructed object for different iteration (use slice index 68?)
+fig3, axs3 = plt.subplots(1, 2) # Reconstructed object for different slices (use first and final iteration)
+fig4, axs4 = plt.subplots() # Reconstructed object for different iteration (use slice index 64?)
 fig5, axs5 = plt.subplots()
 
-im1_1 = axs1[0].imshow(aligned_proj_theta_array_aux[0])
-im1_2 = axs1[1].imshow(synth_proj_theta_array_aux[0])
-im1_3 = axs1[2].imshow(rgb_proj_theta_array[0])
+im1_1 = axs1[0, 0].imshow(aligned_proj_theta_array_aux[0])
+im1_2 = axs1[0, 1].imshow(synth_proj_theta_array_aux[0])
+im1_3 = axs1[0, 2].imshow(rgb_proj_theta_array[0])
+im1_4 = axs1[1, 0].imshow(aligned_proj_theta_array_aux_2[0])
+im1_5 = axs1[1, 1].imshow(synth_proj_theta_array_aux_2[0])
+im1_6 = axs1[1, 2].imshow(rgb_proj_theta_array_2[0])
 
 im2_1 = axs2[0].imshow(aligned_proj_iter_array_aux[0])
 im2_2 = axs2[1].imshow(synth_proj_iter_array_aux[0])
 im2_3 = axs2[2].imshow(rgb_proj_iter_array[0])
 
-im3 = axs3.imshow(recon_slice_array_aux[0])
+im3_1 = axs3[0].imshow(recon_slice_array_aux[0])
+im3_2 = axs3[1].imshow(recon_slice_array_aux_2[0])
 
 im4 = axs4.imshow(recon_iter_array_aux[0])
 
 curve1, = axs5.plot(iter_array, net_x_shifts[:, 0], 'k-o', markersize = 3, label = r'$\Delta x$')
 curve2, = axs5.plot(iter_array, net_y_shifts[:, 0], 'r-o', markersize = 3, label = r'$\Delta y$')
 
-text_1 = axs1[0].text(0.02, 0.02, r'$\theta = {0}$\textdegree'.format(theta_array[0]), transform = axs1[0].transAxes, color = 'white')
+text_1 = axs1[0, 0].text(0.02, 0.02, r'$\theta = {0}$\textdegree'.format(theta_array[0]), transform = axs1[0, 0].transAxes, color = 'white')
 text_2 = axs2[0].text(0.02, 0.02, r'Iter. 0', transform = axs2[0].transAxes, color = 'white')
-text_3 = axs3.text(0.02, 0.02, r'Slice 0', transform = axs3.transAxes, color = 'white')
+text_3 = axs3[0].text(0.02, 0.02, r'Slice 0', transform = axs3[0].transAxes, color = 'white')
 text_4 = axs4.text(0.02, 0.02, r'Iter. 0', transform = axs4.transAxes, color = 'white')
 
-axs1[0].set_title(r'Exp. Proj. (Iter. {0})'.format(iter_idx_desired), color = 'red')
-axs1[1].set_title(r'Synth. Proj.', color = 'blue')
-axs1[2].set_title(r'Overlay')
+axs1[0, 0].set_title(r'Exp. Proj. (Iter. {0})'.format(iter_idx_desired), color = 'red')
+axs1[0, 1].set_title(r'Synth. Proj.', color = 'blue')
+axs1[0, 2].set_title(r'Overlay')
+
+axs1[1, 0].set_title(r'Exp. Proj. (Iter. {0})'.format(iter_idx_final), color = 'red')
+axs1[1, 1].set_title(r'Synth. Proj.', color = 'blue')
+axs1[1, 2].set_title(r'Overlay')
 
 axs2[0].set_title(r'Exp. Proj. ($\theta = {0}$\textdegree)'.format(theta_array[theta_idx_desired]), color = 'red')
 axs2[1].set_title(r'Synth. Proj.', color = 'blue')
 axs2[2].set_title(r'Overlay')
 
-axs3.set_title(r'Reconstruction (Iter. {0})'.format(iter_idx_desired))
+axs3[0].set_title(r'Reconstruction (Iter. {0})'.format(iter_idx_desired))
+axs3[1].set_title(r'Reconstruction (Iter. {0})'.format(iter_idx_final))
+
 axs4.set_title(r'Reconstruction (Slice {0})'.format(slice_idx_desired))
 
 axs5.set_title(r'\theta = {0}'.format(theta_array[0]))
@@ -259,7 +286,8 @@ plt.close(fig1)
 plt.close(fig5)
 
 for slice_idx in range(n_slices):
-    im3.set_data(recon_slice_array_aux[slice_idx])
+    im3_1.set_data(recon_slice_array_aux[slice_idx])
+    im3_2.set_data(recon_slice_array_aux_2[slice_idx])
 
     text_3.set_text(r'Slice {0}'.format(slice_idx))
 
