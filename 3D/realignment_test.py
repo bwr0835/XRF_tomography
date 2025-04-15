@@ -384,18 +384,18 @@ def iter_reproj(ref_element,
             init_y_shift *= np.ones(n_theta)
 
     if np.any(~np.isin(cor_desired_angles, theta_array)): # If there is at least one angle not in the list of projection angles provided:
-        print('Error: At least one angle is not in the provided list of projection angles.')
+        print('Error: At least one angle is not in the provided list of projection angles. Exiting...')
 
         cannot_reconstruct_flag = 1
 
-        return
+        sys.exit()
 
-    if (np.abs(cor_desired_angles[0] - cor_desired_angles[1])) > 3:
-        print('Error: Angles cannot be more than 3 degrees apart')
+    if (np.abs(cor_desired_angles[0] - cor_desired_angles[1]) > 183) or (np.abs(cor_desired_angles[0] - cor_desired_angles[1]) < 177):
+        print('Error: Angles cannot be more than 3 degrees apart. Exiting...')
 
         cannot_reconstruct_flag = 1
 
-        return
+        sys.exit()
     
     # center_of_rotation = tomo.find_center(aligned_proj[ref_element_idx], theta_array*np.pi/180, init = n_columns/2, tol = 0.1)[0]
         
