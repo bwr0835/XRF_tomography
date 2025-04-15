@@ -1,7 +1,7 @@
 import numpy as np, tomopy as tomo, tkinter as tk, matplotlib as mpl
 
 from skimage import transform as xform
-from scipy import ndimage as ndi
+from scipy import ndimage as ndi, fft
 from matplotlib import pyplot as plt, animation as anim
 from tkinter import filedialog as fd
 from h5_util import extract_h5_aggregate_xrf_data
@@ -43,6 +43,44 @@ def pad_row(array):
 
     return array
 
+def rot_center(theta_sum):
+    """
+    Code written by E. Vacek (2021): 
+    https://github.com/everettvacek/PhaseSymmetry/blob/master/PhaseSymmetry.py
+
+    Calculates the center of rotation of a sinogram.
+
+    Parameters
+    ----------
+    thetasum: array-like
+        The 2D theta-sum array (z,theta).
+
+    Returns
+    -------
+    COR: float
+        The center of rotation.
+    """
+    T = fft.rfft(theta_sum.ravel())
+    
+    # Get components of the AC spatial frequency for axis perpendicular to rotation axis.
+    
+    imag = T[theta_sum.shape[0]].imag
+    real = T[theta_sum.shape[0]].real
+    
+    # Get phase of thetasum and return center of rotation.
+    
+    phase = np.arctan2(imag*np.sign(real), real*np.sign(real)) 
+    
+    COR = theta_sum.shape[-1]*(1 - phase/np.pi)/2
+
+    return COR
+
+def create_ref_pair_theta_idx_array(ref_pair_theta_array, theta_array):
+    ref_pair_theta_idx_1 = np.where(theta_array == ref_pair_theta_array[0])[0]
+    ref_pair_theta_idx_2 = np.where(theta_array == ref_pair_theta_array[1])[0]
+
+    return np.array([ref_pair_theta_idx_1, ref_pair_theta_idx_2])
+
 def create_save_recon_shifts(elements_xrf, counts_xrf, theta_xrf, ref_element, cor_x_shift, output_path):
     ref_element_idx = elements_xrf.index(ref_element)
     counts = counts_xrf[ref_element_idx]
@@ -74,7 +112,7 @@ def create_save_recon_shifts(elements_xrf, counts_xrf, theta_xrf, ref_element, c
 
     for x_shift in range(len(cor_x_shift)):
         for theta_idx in range(n_theta):
-            counts_fe[theta_idx] = ndi.shift(counts_fe[theta_idx], shift = (0, cor_x_shift[x_shift]))
+            counts[theta_idx] = ndi.shift(counts[theta_idx], shift = (0, cor_x_shift[x_shift]))
     
         print('Performing gridrec for shift = ' + str(cor_x_shift[x_shift]))
 
@@ -115,18 +153,34 @@ def create_save_proj_shifts(elements_xrf, counts_xrf, theta_xrf, ref_element, co
             n_columns += 1
 
     counts_new = np.zeros_like(counts)
+    theta_sum = np.zeros((n_slices, n_columns))
 
     recon_array = []
 
+    reflection_pair_idx_array = create_ref_pair_theta_idx_array(np.array([-22, 158]), theta_xrf)
+
+    for slice_idx in range(n_slices):
+        sino = counts[ref_element_idx, :, slice_idx, :]
+
+        slice_proj_angle_1 = sino[reflection_pair_idx_array[0], :]
+        slice_proj_angle_2 = sino[reflection_pair_idx_array[1], :]
+
+        theta_sum[slice_idx, :] = slice_proj_angle_1 + slice_proj_angle_2
+        
+    center_of_rotation = rot_center(theta_sum)
+    # center_of_rotation = tomo.find_center(counts_new, theta_xrf*np.pi/180, tol = 0.05) # COR given with tolerance of ±0.05 pixels
+
     for x_shift in range(len(cor_x_shift)):
+        center_of_rotation_new = 0
+        
         for theta_idx in range(n_theta):
             counts_new[theta_idx] = ndi.shift(counts[theta_idx], shift = (0, cor_x_shift[x_shift]))
         
-        center_of_rotation = tomo.find_center(counts_new, theta_xrf*np.pi/180, tol = 0.05) # COR given with tolerance of ±0.05 pixels
+        center_of_rotation_new = center_of_rotation + cor_x_shift
     
-        print('Performing gridrec for projection x-shift = ' + str(cor_x_shift[x_shift]) + '(COR = ' + str(center_of_rotation) + ')')
+        print('Performing gridrec for projection x-shift = ' + str(cor_x_shift[x_shift]) + '(COR = ' + str(center_of_rotation_new) + ')')
 
-        recon = tomo.recon(counts_new, theta = theta_xrf*np.pi/180, center = center_of_rotation, algorithm = 'gridrec', filter_name = 'ramlak')
+        recon = tomo.recon(counts_new, theta = theta_xrf*np.pi/180, center = center_of_rotation_new, algorithm = 'gridrec', filter_name = 'ramlak')
 
         recon_array.append(recon)
 
@@ -143,8 +197,8 @@ def update(frame):
     return im, text
 
 file_path_xrf = '/home/bwr0835/2_ide_aggregate_xrf.h5'
-# output_path = '/home/bwr0835/cor_correction_proj_shift_array.npy'
-output_path = '/home/bwr0835/cor_correction_cor_shift_array.npy'
+output_path = '/home/bwr0835/vacek_alg_cor_correction_proj_shift_array.npy'
+# output_path = '/home/bwr0835/cor_correction_cor_shift_array.npy'
 ref_element = 'Fe'
 
 cor_x_shift = np.linspace(-40, 40, 161)
@@ -152,14 +206,14 @@ cor_x_shift = np.linspace(-40, 40, 161)
 elements_xrf, counts_xrf, theta_xrf, dataset_type_xrf = extract_h5_aggregate_xrf_data(file_path_xrf)
 
 # create_save_recon_shifts(elements_xrf, counts_xrf, theta_xrf, 'Fe', cor_x_shift, output_path)
-# create_save_proj_shifts(elements_xrf, counts_xrf, theta_xrf, 'Fe', cor_x_shift, output_path)
+create_save_proj_shifts(elements_xrf, counts_xrf, theta_xrf, 'Fe', cor_x_shift, output_path)
 print('Loading...')
 
 recon_array = np.load(output_path)
 
 print('Loading finished')
 
-slice_desired_idx = 61
+slice_desired_idx = 64
 
 fps_images = 25 # Frames per second
 
@@ -172,13 +226,13 @@ text = axs.text(0.02, 0.02, r'COR shift = {0} pixels'.format(cor_x_shift[0]), tr
 
 animation = anim.FuncAnimation(fig, update, frames = len(cor_x_shift), interval = 1000/fps_images, blit = True) # Interval is ms/frame (NOT frames per second, or fps)
 
-plt.show()
+# plt.show()
 
-# output_path1 = '/home/bwr0835/recon_gridrec_cor_correction_cor_shift.mp4'
-# writer1 = anim.FFMpegWriter(fps = fps_images, metadata = {'title': 'recon'}, bitrate = 3500, extra_args = ['-vcodec', 'libx264'])
+output_path1 = '/home/bwr0835/recon_gridrec_cor_correction_cor_shift.mp4'
+writer1 = anim.FFMpegWriter(fps = fps_images, metadata = {'title': 'recon'}, bitrate = 3500, extra_args = ['-vcodec', 'libx264'])
     
-# print('Saving')
+print('Saving')
     
-# animation.save(output_path1, writer1, dpi = 600)
+animation.save(output_path1, writer1, dpi = 600)
 
 # plt.show()

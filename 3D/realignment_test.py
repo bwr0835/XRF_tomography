@@ -296,8 +296,6 @@ def iter_reproj(ref_element,
                 eps = 0.3, 
                 xrt_proj_img_array = None):
 
-    global cannot_reconstruct_flag
-
     n_elements = xrf_proj_img_array.shape[0] # Number of elements
     n_theta = xrf_proj_img_array.shape[1] # Number of projection angles (projection images)
     n_slices = xrf_proj_img_array.shape[2] # Number of rows in a projection image
@@ -386,14 +384,10 @@ def iter_reproj(ref_element,
     if np.any(~np.isin(cor_desired_angles, theta_array)): # If there is at least one angle not in the list of projection angles provided:
         print('Error: At least one angle is not in the provided list of projection angles. Exiting...')
 
-        cannot_reconstruct_flag = 1
-
         sys.exit()
 
     if (np.abs(cor_desired_angles[0] - cor_desired_angles[1]) > 183) or (np.abs(cor_desired_angles[0] - cor_desired_angles[1]) < 177):
         print('Error: Angles cannot be more than 3 degrees apart. Exiting...')
-
-        cannot_reconstruct_flag = 1
 
         sys.exit()
     
@@ -502,11 +496,9 @@ def iter_reproj(ref_element,
             recon = tomo.recon(aligned_proj[ref_element_idx], theta = theta_array*np.pi/180, center = center_of_rotation, algorithm = 'mlem', num_iter = 60)
         
         else:
-            print('Error: Algorithm not available.')
+            print('Error: Algorithm not available. Exiting...')
             
-            cannot_reconstruct_flag = 1
-
-            break
+            sys.exit()
         
         recon_iter_array.append(recon)
 
@@ -588,6 +580,7 @@ def iter_reproj(ref_element,
         if np.max(np.abs(x_shift_pc_array)) <= eps and np.max(np.abs(y_shift_pc_array)) <= eps:
             print('Number of iterations taken: ' + str(iteration_idx + 1))
             print('Shifting other elements...')
+            
             iterations = np.array(iterations)
            
             x_shifts_pc_new = x_shifts_pc[:len(iterations)]
@@ -621,9 +614,6 @@ def iter_reproj(ref_element,
                         aligned_proj[element_idx, theta_idx, :, :] = ndi.shift(xrf_proj_img_array[element_idx, theta_idx, :, :], shift = (y_shift, x_shift))
             
             print('Done')
-
-    if cannot_reconstruct_flag:
-        return
 
     aligned_exp_proj_iter_array = np.array(aligned_exp_proj_iter_array)
     synth_proj_iter_array = np.array(synth_proj_iter_array)
@@ -676,8 +666,6 @@ cor_desired_angles = np.array([-22, 158])
 
 algorithm = 'gridrec'
 
-cannot_reconstruct_flag = 0
-
 aligned_proj, \
 net_x_shifts, \
 net_y_shifts, \
@@ -691,11 +679,6 @@ synth_proj_iter_array = iter_reproj(desired_element,
                                     n_desired_iter,
                                     cor_desired_angles, 
                                     init_x_shift = init_x_shift)
-
-if cannot_reconstruct_flag:
-    print('Cannot reconstruct. Exiting...')
-
-    sys.exit()
 
 print('Saving files...')
 
