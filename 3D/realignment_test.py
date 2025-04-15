@@ -407,7 +407,7 @@ def iter_reproj(ref_element,
 
     reflection_pair_idx_array = create_ref_pair_theta_idx_array(cor_desired_angles, theta_xrf)
 
-    for slice_idx in n_slices:
+    for slice_idx in range(n_slices):
         sino = ref_element_idx[:, slice_idx, :]
 
         slice_proj_angle_1 = sino[reflection_pair_idx_array[0], :]
@@ -418,6 +418,7 @@ def iter_reproj(ref_element,
     center_of_rotation = rot_center(theta_sum) 
 
     cor_diff = center_of_rotation - n_columns/2
+    
     print('Center of rotation: ' + str(round_correct(center_of_rotation, ndec = 2)))
     print('Center of rotation error = ' + str(round_correct(cor_diff, ndec = 2)))
     print('Incorporating an initial x-shift of ' + str(round_correct(cor_diff, dec = 2)) + ' to all projections to correct for COR offset...') 
