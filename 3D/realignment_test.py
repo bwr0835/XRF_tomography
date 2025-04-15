@@ -195,6 +195,12 @@ def pad_row(array):
 
     return array
 
+def create_ref_pair_theta_idx_array(ref_pair_theta_array, theta_array):
+    ref_pair_theta_idx_1 = np.where(theta_array == ref_pair_theta_array[0])[0]
+    ref_pair_theta_idx_2 = np.where(theta_array == ref_pair_theta_array[1])[0]
+
+    return np.array([ref_pair_theta_idx_1, ref_pair_theta_idx_2])
+
 def rot_center(theta_sum):
     """
     Code written by E. Vacek (2021): 
@@ -284,8 +290,9 @@ def iter_reproj(ref_element,
                 xrf_proj_img_array,
                 algorithm, 
                 n_iterations,
+                cor_desired_angles, # A numpy array
                 init_x_shift = None, 
-                init_y_shift = None, 
+                init_y_shift = None,
                 eps = 0.3, 
                 xrt_proj_img_array = None):
 
@@ -376,6 +383,47 @@ def iter_reproj(ref_element,
         if np.isscalar(init_y_shift):
             init_y_shift *= np.ones(n_theta)
 
+    if np.any(~np.isin(cor_desired_angles, theta_array)): # If there is at least one angle not in the list of projection angles provided:
+        print('Error: At least one angle is not in the provided list of projection angles.')
+
+        cannot_reconstruct_flag = 1
+
+        return
+
+    if (np.abs(cor_desired_angles[0] - cor_desired_angles[1])) > 3:
+        print('Error: Angles cannot be more than 3 degrees apart')
+
+        cannot_reconstruct_flag = 1
+
+        return
+    
+    # center_of_rotation = tomo.find_center(aligned_proj[ref_element_idx], theta_array*np.pi/180, init = n_columns/2, tol = 0.1)[0]
+        
+    # print('Center of rotation = ' + str(round_correct(center_of_rotation, ndec = 2)) + ' (Projection image geometric center: ' + str(n_columns/2) + ')')
+
+    # cor_diff = center_of_rotation - n_columns/2
+
+    theta_sum = np.zeros((n_slices, n_columns))
+
+    reflection_pair_idx_array = create_ref_pair_theta_idx_array(cor_desired_angles, theta_xrf)
+
+    for slice_idx in n_slices:
+        sino = ref_element_idx[:, slice_idx, :]
+
+        slice_proj_angle_1 = sino[reflection_pair_idx_array[0], :]
+        slice_proj_angle_2 = sino[reflection_pair_idx_array[1], :]
+
+        theta_sum[slice_idx, :] = slice_proj_angle_1 + slice_proj_angle_2
+        
+    center_of_rotation = rot_center(theta_sum) 
+
+    cor_diff = center_of_rotation - n_columns/2
+    print('Center of rotation: ' + str(round_correct(center_of_rotation, ndec = 2)))
+    print('Center of rotation error = ' + str(round_correct(cor_diff, ndec = 2)))
+    print('Incorporating an initial x-shift of ' + str(round_correct(cor_diff, dec = 2)) + ' to all projections to correct for COR offset...') 
+
+    init_x_shift += cor_diff
+
     print('Performing iterative projection...')
 
     for iteration_idx in range(n_iterations):
@@ -419,18 +467,6 @@ def iter_reproj(ref_element,
         # plt.imshow(aligned_proj[ref_element_idx, 0, :, :])
         # plt.show()
 
-        center_of_rotation = tomo.find_center(aligned_proj[ref_element_idx], theta_array*np.pi/180, init = n_columns/2, tol = 0.1)[0]
-        print('Center of rotation = ' + str(round_correct(center_of_rotation, ndec = 2)) + ' (Projection image geometric center: ' + str(n_columns/2) + ')')
-
-        cor_diff = center_of_rotation - n_columns/2
-
-    # print('Center of rotation error = ' + str(round_correct(cor_diff, ndec = 2)))
-        # print('Correcting for center of rotation error...')
-
-        for element_idx in range(n_elements):
-            for theta_idx in range(n_theta):
-                aligned_proj[element_idx, theta_idx, :, :] = ndi.shift(aligned_proj[element_idx, theta_idx, :, :], shift = (0, cor_diff))
-
         aligned_exp_proj_iter_array.append(np.copy(aligned_proj[ref_element_idx]))
     
         print('Performing ' + algorithm)
@@ -442,6 +478,8 @@ def iter_reproj(ref_element,
             recon = tomo.recon(aligned_proj[ref_element_idx], theta = theta_array*np.pi/180, center = center_of_rotation, algorithm = 'mlem', num_iter = 60)
         
         else:
+            print('Error: Algorithm not available.')
+            
             cannot_reconstruct_flag = 1
 
             break
@@ -581,7 +619,7 @@ file_path_xrf = '/home/bwr0835/2_ide_aggregate_xrf.h5'
 output_dir_path_base = '/home/bwr0835'
 
 # output_file_name_base = input('Choose a base file name: ')
-output_file_name_base = 'gridrec_5_iter_tomopy_dynamic_cor_correction_padding_apr_14'
+output_file_name_base = 'gridrec_5_iter_tomopy_cor_correction_padding'
 
 if output_file_name_base == '':
     print('No output base file name chosen. Ending program...')
@@ -610,6 +648,7 @@ init_x_shift = np.zeros(n_theta)
 # init_x_shift[0] = -50
 
 n_desired_iter = 5 # For the reprojection scheme, NOT for reconstruction by itself
+cor_desired_angles = np.array([-22, 158])
 
 algorithm = 'gridrec'
 
@@ -620,23 +659,31 @@ net_x_shifts, \
 net_y_shifts, \
 aligned_proj_iter_array, \
 recon_iter_array, \
-synth_proj_iter_array = iter_reproj(desired_element, elements_xrf, theta_xrf, counts_xrf, algorithm, n_desired_iter, init_x_shift = init_x_shift)
+synth_proj_iter_array = iter_reproj(desired_element, 
+                                    elements_xrf, 
+                                    theta_xrf, 
+                                    counts_xrf, 
+                                    algorithm, 
+                                    n_desired_iter,
+                                    cor_desired_angles, 
+                                    init_x_shift = init_x_shift)
 
 if cannot_reconstruct_flag:
-    print('Cannot reconstruct. Check algorithm.')
+    print('Cannot reconstruct. Exiting...')
 
-else:
-    full_output_dir_path = os.path.join(output_dir_path_base, 'iter_reproj', output_file_name_base)
+    sys.exit()
 
-    os.makedirs(full_output_dir_path, exist_ok = True)
+full_output_dir_path = os.path.join(output_dir_path_base, 'iter_reproj', output_file_name_base)
 
-    np.save(os.path.join(full_output_dir_path, 'theta_array.npy'), theta_xrf)
-    np.save(os.path.join(full_output_dir_path, 'aligned_proj_all_elements.npy'), aligned_proj)
-    np.save(os.path.join(full_output_dir_path, 'aligned_proj_array_iter_' + desired_element + '.npy'), aligned_proj_iter_array)
-    np.save(os.path.join(full_output_dir_path, 'synth_proj_array_iter_' + desired_element + '.npy'), synth_proj_iter_array)
-    np.save(os.path.join(full_output_dir_path, 'recon_array_iter_' + desired_element + '.npy'), recon_iter_array)
-    np.save(os.path.join(full_output_dir_path, 'net_x_shifts_' + desired_element + '.npy'), net_x_shifts)
-    np.save(os.path.join(full_output_dir_path, 'net_y_shifts_' + desired_element + '.npy'), net_y_shifts)
+os.makedirs(full_output_dir_path, exist_ok = True)
+
+np.save(os.path.join(full_output_dir_path, 'theta_array.npy'), theta_xrf)
+np.save(os.path.join(full_output_dir_path, 'aligned_proj_all_elements.npy'), aligned_proj)
+np.save(os.path.join(full_output_dir_path, 'aligned_proj_array_iter_' + desired_element + '.npy'), aligned_proj_iter_array)
+np.save(os.path.join(full_output_dir_path, 'synth_proj_array_iter_' + desired_element + '.npy'), synth_proj_iter_array)
+np.save(os.path.join(full_output_dir_path, 'recon_array_iter_' + desired_element + '.npy'), recon_iter_array)
+np.save(os.path.join(full_output_dir_path, 'net_x_shifts_' + desired_element + '.npy'), net_x_shifts)
+np.save(os.path.join(full_output_dir_path, 'net_y_shifts_' + desired_element + '.npy'), net_y_shifts)
 
     # with open(os.path.join(full_output_dir_path, 'net_x_shifts.csv'), 'w') as f:
     #     writer = csv.writer(f)

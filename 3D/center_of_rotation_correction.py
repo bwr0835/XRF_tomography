@@ -73,13 +73,14 @@ def create_save_recon_shifts(elements_xrf, counts_xrf, theta_xrf, ref_element, c
     recon_array = []
 
     for x_shift in range(len(cor_x_shift)):
-        # for theta_idx in range(n_theta):
-        #     counts_fe[theta_idx] = ndi.shift(counts_fe[theta_idx], shift = (0, cor_x_shift[x_shift]))
+        for theta_idx in range(n_theta):
+            counts_fe[theta_idx] = ndi.shift(counts_fe[theta_idx], shift = (0, cor_x_shift[x_shift]))
     
         print('Performing gridrec for shift = ' + str(cor_x_shift[x_shift]))
 
-        recon = tomo.recon(counts, theta = theta_xrf*np.pi/180, center = center_of_rotation + cor_x_shift[x_shift], algorithm = 'gridrec', filter_name = 'ramlak')
-
+        # recon = tomo.recon(counts, theta = theta_xrf*np.pi/180, center = center_of_rotation + cor_x_shift[x_shift], algorithm = 'gridrec', filter_name = 'ramlak')
+        recon = tomo.recon(counts, theta = theta_xrf*np.pi/180, center = center_of_rotation, algorithm = 'gridrec', filter_name = 'ramlak')
+        
         recon_array.append(recon)
 
     recon_array = np.array(recon_array)
@@ -171,11 +172,13 @@ text = axs.text(0.02, 0.02, r'COR shift = {0} pixels'.format(cor_x_shift[0]), tr
 
 animation = anim.FuncAnimation(fig, update, frames = len(cor_x_shift), interval = 1000/fps_images, blit = True) # Interval is ms/frame (NOT frames per second, or fps)
 
-output_path1 = '/home/bwr0835/recon_gridrec_cor_correction_cor_shift.mp4'
-writer1 = anim.FFMpegWriter(fps = fps_images, metadata = {'title': 'recon'}, bitrate = 3500, extra_args = ['-vcodec', 'libx264'])
+plt.show()
+
+# output_path1 = '/home/bwr0835/recon_gridrec_cor_correction_cor_shift.mp4'
+# writer1 = anim.FFMpegWriter(fps = fps_images, metadata = {'title': 'recon'}, bitrate = 3500, extra_args = ['-vcodec', 'libx264'])
     
-print('Saving')
+# print('Saving')
     
-animation.save(output_path1, writer1, dpi = 600)
+# animation.save(output_path1, writer1, dpi = 600)
 
 # plt.show()
