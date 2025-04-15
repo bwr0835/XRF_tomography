@@ -175,6 +175,7 @@ def create_save_proj_shifts(elements_xrf, counts_xrf, theta_xrf, ref_element, co
             counts_new[theta_idx] = ndi.shift(counts[theta_idx], shift = (0, cor_x_shift[x_shift]))
         
         if x_shift % 10 == 0:
+            plt.clf()
             plt.imshow(counts_new[theta_idx])
             plt.show()
 
