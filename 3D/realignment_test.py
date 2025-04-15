@@ -421,11 +421,13 @@ def iter_reproj(ref_element,
     
     print('Center of rotation: ' + str(round_correct(center_of_rotation, ndec = 2)))
     print('Center of rotation error = ' + str(round_correct(cor_diff, ndec = 2)))
-    # print('Incorporating an x-shift of ' + str(round_correct(cor_diff, ndec = 2)) + ' to all projections to correct for COR offset...') 
+    print('Incorporating an x-shift of ' + str(round_correct(cor_diff, ndec = 2)) + ' to all projections to correct for COR offset...') 
 
     for element_idx in range(n_elements):
         for theta_idx in range(n_theta):
             xrf_proj_img_array[element_idx, theta_idx, :, :] = ndi.shift(xrf_proj_img_array[element_idx, theta_idx, :, :], shift = (0, -cor_diff))
+
+    center_of_rotation -= cor_diff
 
     print('Performing iterative projection...')
 
