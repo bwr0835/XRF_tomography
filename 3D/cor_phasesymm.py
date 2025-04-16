@@ -60,38 +60,38 @@ def rot_center(theta_sum):
     Parameters
     ----------
     thetasum: array-like
-        2D theta-sum array (z,t).
+        2D theta-sum array (z,theta).
 
     Returns
     -------
     COR: float
         The center of rotation.
     """
-    # if theta_sum.ndim == 1:
-    #     theta_sum = theta_sum[None, :]
-    
-    # T = fft.rfft(theta_sum, axis = 1)
+    if theta_sum.ndim == 1:
+        T = fft.rfft(theta_sum)
 
     # n_slices = theta_sum.shape[0]
-    # n_columns = theta_sum.shape[1]
+        n_columns = len(theta_sum)
 
-    # real, imag = T[:, 1].real, T[:, 1].imag
+        real, imag = T[-1].real, T[-1].imag
+
     
     # In a sinogram, a feature may be more positive or less positive than the background (i.e. X-ray fluorescence vs. X-ray absorption contrast).
     # This can mess with T_phase --> multiply real, imag. components by sign function
-    T = fft.rfft(theta_sum.ravel())
+    else:
+        T = fft.rfft(theta_sum.ravel())
     
-    # # Get components of the AC spatial frequency for axis perpendicular to rotation axis.
+        # # Get components of the AC spatial frequency for axis perpendicular to rotation axis.
     
-    imag = T[theta_sum.shape[0]].imag
-    real = T[theta_sum.shape[0]].real
+        imag = T[theta_sum.shape[0]].imag
+        real = T[theta_sum.shape[0]].real
     
-    # Get phase of thetasum and return center of rotation.
+        # Get phase of thetasum and return center of rotation.
     
     phase = (np.arctan2(imag*np.sign(real), real*np.sign(real)))
     
     COR = n_columns*(1 - phase/np.pi)/2
-    # COR = theta_sum.shape[-1]*(1 - phase/np.pi)/2
+        # COR = theta_sum.shape[-1]*(1 - phase/np.pi)/2
 
     return COR
 
@@ -126,7 +126,7 @@ if (n_slices % 2) or (n_columns % 2):
         n_columns += 1
 
 print(counts.shape)
-theta_sum = np.zeros((n_slices, n_columns)).T
+# theta_sum = np.zeros((n_slices, n_columns))
 
 # proj_list = [counts[theta_idx, :, :] for theta_idx in range(n_theta)]
 
@@ -135,17 +135,24 @@ theta_sum = np.zeros((n_slices, n_columns)).T
 
 reflection_pair_idx_array_1 = create_ref_pair_theta_idx_array(np.array([-22, 158]), theta_xrf)
 
+sino = counts[:, n_slices//2, :]
+
+slice_proj_neg_22 = sino[reflection_pair_idx_array_1[0], :]
+slice_proj_158 = sino[reflection_pair_idx_array_1[1], :]
+
+theta_sum = slice_proj_158 + slice_proj_neg_22
+
 # for slice_idx in range(n_slices):
     # theta_sum[slice_idx, :] = counts[reflection_pair_idx_array_1[0], slice_idx, :] + counts[reflection_pair_idx_array_1[1], slice_idx, :]
 
-for slice_idx in range(n_slices):
+# for slice_idx in range(n_slices):
 
-    sino = counts[:, slice_idx, :].T
+#     sino = counts[:, slice_idx, :]
 
-    slice_proj_neg_22 = sino[reflection_pair_idx_array_1[0], :].reshape(-1, 1)
-    slice_proj_158 = sino[reflection_pair_idx_array_1[1], :].reshape(-1, 1)
+#     slice_proj_neg_22 = sino[reflection_pair_idx_array_1[0], :]
+#     slice_proj_158 = sino[reflection_pair_idx_array_1[1], :]
 
-    theta_sum[:, slice_idx] = slice_proj_neg_22 + slice_proj_158
+#     theta_sum[slice_idx, :] = slice_proj_neg_22 + slice_proj_158
 
 # theta_sum = proj_neg_22 + proj_158
 
