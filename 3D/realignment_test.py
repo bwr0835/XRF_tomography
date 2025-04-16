@@ -391,11 +391,11 @@ def iter_reproj(ref_element,
 
     #     sys.exit()
     
-    center_of_rotation = tomo.find_center(reference_projection_imgs, theta_array*np.pi/180, init = n_columns/2, tol = 0.05)[0]
+    center_of_rotation = tomo.find_center(reference_projection_imgs, theta_array*np.pi/180, tol = 0.05)[0]
         
-    # print('Center of rotation = ' + str(round_correct(center_of_rotation, ndec = 2)) + ' (Projection image geometric center: ' + str(n_columns/2) + ')')
+    print('Center of rotation = ' + str(round_correct(center_of_rotation, ndec = 2)) + ' (Projection image geometric center: ' + str(n_columns/2) + ')')
 
-    # cor_diff = center_of_rotation - n_columns/2
+    cor_diff = center_of_rotation - n_columns/2
     # reflection_pair_idx_array = create_ref_pair_theta_idx_array(cor_desired_angles, theta_xrf)
     
     # theta_sum = np.zeros((n_slices, n_columns))
@@ -412,15 +412,17 @@ def iter_reproj(ref_element,
 
         # cor_diff = center_of_rotation - n_columns/2
     
-    # print('Center of rotation: ' + str(round_correct(center_of_rotation, ndec = 2)))
-    # print('Center of rotation error = ' + str(round_correct(cor_diff, ndec = 2)))
-    # print('Incorporating an x-shift of ' + str(round_correct(cor_diff, ndec = 2)) + ' to all projections to correct for COR offset...') 
+    print('Center of rotation: ' + str(round_correct(center_of_rotation, ndec = 2)))
+    print('Center of rotation error = ' + str(round_correct(cor_diff, ndec = 2)))
+    print('Incorporating an x-shift of ' + str(round_correct(cor_diff, ndec = 2)) + ' to all projections to correct for COR offset...') 
 
-    # for element_idx in range(n_elements):
-        # for theta_idx in range(n_theta):
-            # xrf_proj_img_array[element_idx, theta_idx, :, :] = ndi.shift(xrf_proj_img_array[element_idx, theta_idx, :, :], shift = (0, -cor_diff))
+    for element_idx in range(n_elements):
+        for theta_idx in range(n_theta):
+            xrf_proj_img_array[element_idx, theta_idx, :, :] = ndi.shift(xrf_proj_img_array[element_idx, theta_idx, :, :], shift = (0, -cor_diff))
     
-    # center_of_rotation -= cor_diff
+    center_of_rotation = tomo.find_center(reference_projection_imgs, theta_array*np.pi/180, tol = 0.05)[0]
+
+    print('COR after shifting all projection images by ' + str(round_correct(cor_diff, ndec = 2)) + ': ' + str(round_correct(center_of_rotation, ndec = 2)))
 
     print('Performing iterative projection...')
 
@@ -446,6 +448,10 @@ def iter_reproj(ref_element,
             
             for theta_idx in range(n_theta):
                aligned_proj[ref_element_idx, theta_idx, :, :] = ndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx, :, :], shift = (init_y_shift[theta_idx], init_x_shift[theta_idx]))  
+        
+        cor_new = tomo.find_center(aligned_proj[ref_element_idx], theta_array*np.pi/180, tol = 0.05)[0]
+
+        print('COR after attempting to shift for jitter = ' + str(round_correct(cor_new, ndec = 2)))
 
         aligned_exp_proj_iter_array.append(aligned_proj[ref_element_idx])
 
@@ -636,7 +642,7 @@ output_dir_path_base = '/home/bwr0835'
 
 # output_file_name_base = input('Choose a base file name: ')
 # output_file_name_base = 'gridrec_5_iter_vacek_cor_and_shift_correction_padding_-22_deg_158_deg'
-output_file_name_base = 'gridrec_5_iter_tomopy_cor_alg_no_cor_related_shifting_padding_04_16_2025'
+output_file_name_base = 'gridrec_5_iter_tomopy_cor_alg_proj_shift_cor_correction_padding_04_16_2025'
 
 if output_file_name_base == '':
     print('No output base file name chosen. Ending program...')
