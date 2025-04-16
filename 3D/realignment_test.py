@@ -391,7 +391,7 @@ def iter_reproj(ref_element,
 
     #     sys.exit()
     
-    center_of_rotation = tomo.find_center(reference_projection_imgs, theta_array*np.pi/180, tol = 0.05)[0]
+    center_of_rotation = tomo.find_center(reference_projection_imgs, theta_array*np.pi/180, tol = 0.05, ind = n_slices//2)[0]
 
     cor_diff = center_of_rotation - n_columns/2
     # reflection_pair_idx_array = create_ref_pair_theta_idx_array(cor_desired_angles, theta_xrf)
@@ -421,7 +421,7 @@ def iter_reproj(ref_element,
     
     reference_projection_imgs = xrf_proj_img_array[element_idx].copy()
 
-    center_of_rotation = tomo.find_center(reference_projection_imgs, theta_array*np.pi/180, tol = 0.05)[0]
+    center_of_rotation = tomo.find_center(reference_projection_imgs, theta_array*np.pi/180, ind = n_slices//2, tol = 0.05)[0]
 
     print('COR after shifting all projection images by ' + str(round_correct(cor_diff, ndec = 2)) + ': ' + str(round_correct(center_of_rotation, ndec = 2)))
 
@@ -450,7 +450,7 @@ def iter_reproj(ref_element,
             for theta_idx in range(n_theta):
                aligned_proj[ref_element_idx, theta_idx, :, :] = ndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx, :, :], shift = (init_y_shift[theta_idx], init_x_shift[theta_idx]))  
         
-        cor_new = tomo.find_center(aligned_proj[ref_element_idx], theta_array*np.pi/180, tol = 0.05)[0]
+        cor_new = tomo.find_center(aligned_proj[ref_element_idx], theta_array*np.pi/180, ind = n_slices//2, tol = 0.05)[0]
 
         print('COR after attempting to shift for jitter = ' + str(round_correct(cor_new, ndec = 2)))
 
