@@ -122,6 +122,7 @@ n_theta = aligned_proj.shape[1]
 n_slices = aligned_proj.shape[2]
 
 n_iter = len(aligned_proj_iter_array)
+print(n_iter)
 
 aligned_proj_theta_array_aux = []
 aligned_proj_theta_array_aux_2 = []
