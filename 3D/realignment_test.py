@@ -447,6 +447,8 @@ def iter_reproj(ref_element,
             for theta_idx in range(n_theta):
                aligned_proj[ref_element_idx, theta_idx, :, :] = ndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx, :, :], shift = (init_y_shift[theta_idx], init_x_shift[theta_idx]))  
 
+        aligned_exp_proj_iter_array.append(aligned_proj[ref_element_idx])
+
                 # if theta_idx == n_theta//2:
                 #     diff = aligned_proj[ref_element_idx, theta_idx, :, :] - xrf_proj_img_array[ref_element_idx, theta_idx, :, :]
                     

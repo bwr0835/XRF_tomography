@@ -121,7 +121,7 @@ for f in file_array:
 n_theta = aligned_proj.shape[1]
 n_slices = aligned_proj.shape[2]
 
-print(aligned_proj.shape)
+print(aligned_proj_iter_array)
 
 n_iter = len(aligned_proj_iter_array)
 print(n_iter)
