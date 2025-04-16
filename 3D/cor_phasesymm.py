@@ -126,7 +126,7 @@ if (n_slices % 2) or (n_columns % 2):
         n_columns += 1
 
 print(counts.shape)
-theta_sum = np.zeros((n_slices, n_columns))
+# theta_sum = np.zeros((n_slices, n_columns))
 
 # proj_list = [counts[theta_idx, :, :] for theta_idx in range(n_theta)]
 
@@ -138,14 +138,20 @@ reflection_pair_idx_array_1 = create_ref_pair_theta_idx_array(np.array([-22, 158
 # for slice_idx in range(n_slices):
     # theta_sum[slice_idx, :] = counts[reflection_pair_idx_array_1[0], slice_idx, :] + counts[reflection_pair_idx_array_1[1], slice_idx, :]
 
-for slice_idx in range(n_slices):
+# for slice_idx in range(n_slices):
 
-    sino = counts[:, slice_idx, :]
+#     sino = counts[:, slice_idx, :]
 
-    slice_proj_neg_22 = sino[reflection_pair_idx_array_1[0], :]
-    slice_proj_158 = sino[reflection_pair_idx_array_1[1], :]
+#     slice_proj_neg_22 = sino[reflection_pair_idx_array_1[0], :]
+#     slice_proj_158 = sino[reflection_pair_idx_array_1[1], :]
 
-    theta_sum[slice_idx, :] = slice_proj_neg_22 + slice_proj_158
+#     theta_sum[slice_idx, :] = slice_proj_neg_22 + slice_proj_158
+
+
+proj_neg_22 = counts[reflection_pair_idx_array_1[0]]
+proj_158 = counts[reflection_pair_idx_array_1[1]]
+
+theta_sum = proj_neg_22 + proj_158
 
 # theta_sum = proj_neg_22 + proj_158
 
