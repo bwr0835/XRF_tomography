@@ -322,7 +322,7 @@ def iter_reproj(ref_element,
     
     print(xrf_proj_img_array.shape)
 
-    reference_projection_imgs = xrf_proj_img_array[ref_element_idx].copy() # These are effectively sinograms for the element of interest (highest contrast -> for realignment purposes)
+    reference_projection_imgs = xrf_proj_img_array[ref_element_idx] # These are effectively sinograms for the element of interest (highest contrast -> for realignment purposes)
     
     # theta_sum = np.zeros((n_slices, n_columns))
 
@@ -419,6 +419,8 @@ def iter_reproj(ref_element,
         for theta_idx in range(n_theta):
             xrf_proj_img_array[element_idx, theta_idx, :, :] = ndi.shift(xrf_proj_img_array[element_idx, theta_idx, :, :], shift = (0, -cor_diff))
     
+    reference_projection_imgs = xrf_proj_img_array[element_idx].copy()
+
     center_of_rotation = tomo.find_center(reference_projection_imgs, theta_array*np.pi/180, tol = 0.05)[0]
 
     print('COR after shifting all projection images by ' + str(round_correct(cor_diff, ndec = 2)) + ': ' + str(round_correct(center_of_rotation, ndec = 2)))
