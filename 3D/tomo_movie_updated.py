@@ -142,6 +142,7 @@ tiff_array_4 = []
 tiff_array_5 = []
 
 iter_array = np.arange(n_iter)
+print(iter_array)
 
 theta_idx_desired = 0
 iter_idx_desired = 0
