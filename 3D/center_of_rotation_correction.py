@@ -174,18 +174,19 @@ def create_save_proj_shifts(elements_xrf, counts_xrf, theta_xrf, ref_element, co
         for theta_idx in range(n_theta):
             counts_new[theta_idx] = ndi.shift(counts[theta_idx], shift = (0, cor_x_shift[x_shift]))
 
-        center_of_rotation_new = center_of_rotation + cor_x_shift[x_shift]
-    
-        print('Performing gridrec for projection x-shift = ' + str(cor_x_shift[x_shift]) + ' (COR = ' + str(center_of_rotation_new) + ')')
+        # center_of_rotation_new = center_of_rotation + cor_x_shift[x_shift]
 
-        recon = tomo.recon(counts_new, theta = theta_xrf*np.pi/180, center = center_of_rotation_new, algorithm = 'gridrec', filter_name = 'ramlak')
+        print('Performing gridrec for projection x-shift = ' + str(cor_x_shift[x_shift]))
+        # print('Performing gridrec for projection x-shift = ' + str(cor_x_shift[x_shift]) + ' (COR = ' + str(center_of_rotation_new) + ')')
+
+        recon = tomo.recon(counts_new, theta = theta_xrf*np.pi/180, center = center_of_rotation, algorithm = 'gridrec', filter_name = 'ramlak')
         
         if x_shift % 20 == 0:
             plt.clf()
             plt.imshow(recon[64])
             plt.show()
 
-        recon_array.append(recon.copy())
+        recon_array.append(recon)
 
     recon_array = np.array(recon_array)
 
