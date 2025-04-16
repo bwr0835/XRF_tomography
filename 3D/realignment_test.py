@@ -392,8 +392,6 @@ def iter_reproj(ref_element,
     #     sys.exit()
     
     center_of_rotation = tomo.find_center(reference_projection_imgs, theta_array*np.pi/180, tol = 0.05)[0]
-        
-    print('COR = ' + str(round_correct(center_of_rotation, ndec = 2)) + ' (Projection image geometric center: ' + str(n_columns/2) + ')')
 
     cor_diff = center_of_rotation - n_columns/2
     # reflection_pair_idx_array = create_ref_pair_theta_idx_array(cor_desired_angles, theta_xrf)
@@ -413,6 +411,7 @@ def iter_reproj(ref_element,
         # cor_diff = center_of_rotation - n_columns/2
     
     print('Center of rotation: ' + str(round_correct(center_of_rotation, ndec = 2)))
+    print('Geometric center: ' + str(n_columns/2))
     print('Center of rotation error = ' + str(round_correct(cor_diff, ndec = 2)))
     print('Incorporating an x-shift of ' + str(round_correct(cor_diff, ndec = 2)) + ' to all projections to correct for COR offset...') 
 
