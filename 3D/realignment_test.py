@@ -381,46 +381,46 @@ def iter_reproj(ref_element,
         if np.isscalar(init_y_shift):
             init_y_shift *= np.ones(n_theta)
 
-    if np.any(~np.isin(cor_desired_angles, theta_array)): # If there is at least one angle not in the list of projection angles provided:
-        print('Error: At least one angle is not in the provided list of projection angles. Exiting...')
+    # if np.any(~np.isin(cor_desired_angles, theta_array)): # If there is at least one angle not in the list of projection angles provided:
+    #     print('Error: At least one angle is not in the provided list of projection angles. Exiting...')
 
-        sys.exit()
+    #     sys.exit()
 
-    if (np.abs(cor_desired_angles[0] - cor_desired_angles[1]) > 183) or (np.abs(cor_desired_angles[0] - cor_desired_angles[1]) < 177):
-        print('Error: Angles cannot be more than 3 degrees apart. Exiting...')
+    # if (np.abs(cor_desired_angles[0] - cor_desired_angles[1]) > 183) or (np.abs(cor_desired_angles[0] - cor_desired_angles[1]) < 177):
+    #     print('Error: Angles cannot be more than 3 degrees apart. Exiting...')
 
-        sys.exit()
+    #     sys.exit()
     
-    # center_of_rotation = tomo.find_center(aligned_proj[ref_element_idx], theta_array*np.pi/180, init = n_columns/2, tol = 0.1)[0]
+    center_of_rotation = tomo.find_center(reference_projection_imgs, theta_array*np.pi/180, init = n_columns/2, tol = 0.05)[0]
         
     # print('Center of rotation = ' + str(round_correct(center_of_rotation, ndec = 2)) + ' (Projection image geometric center: ' + str(n_columns/2) + ')')
 
     # cor_diff = center_of_rotation - n_columns/2
-    reflection_pair_idx_array = create_ref_pair_theta_idx_array(cor_desired_angles, theta_xrf)
+    # reflection_pair_idx_array = create_ref_pair_theta_idx_array(cor_desired_angles, theta_xrf)
     
-    theta_sum = np.zeros((n_slices, n_columns))
+    # theta_sum = np.zeros((n_slices, n_columns))
 
-    for slice_idx in range(n_slices):
-        sino = reference_projection_imgs[:, slice_idx, :]
+    # for slice_idx in range(n_slices):
+        # sino = reference_projection_imgs[:, slice_idx, :]
 
-        slice_proj_angle_1 = sino[reflection_pair_idx_array[0], :]
-        slice_proj_angle_2 = sino[reflection_pair_idx_array[1], :]
+        # slice_proj_angle_1 = sino[reflection_pair_idx_array[0], :]
+        # slice_proj_angle_2 = sino[reflection_pair_idx_array[1], :]
 
-        theta_sum[slice_idx, :] = slice_proj_angle_1 + slice_proj_angle_2
+        # theta_sum[slice_idx, :] = slice_proj_angle_1 + slice_proj_angle_2
         
-        center_of_rotation = rot_center(theta_sum) 
+        # center_of_rotation = rot_center(theta_sum) 
 
-        cor_diff = center_of_rotation - n_columns/2
+        # cor_diff = center_of_rotation - n_columns/2
     
-    print('Center of rotation: ' + str(round_correct(center_of_rotation, ndec = 2)))
-    print('Center of rotation error = ' + str(round_correct(cor_diff, ndec = 2)))
-    print('Incorporating an x-shift of ' + str(round_correct(cor_diff, ndec = 2)) + ' to all projections to correct for COR offset...') 
+    # print('Center of rotation: ' + str(round_correct(center_of_rotation, ndec = 2)))
+    # print('Center of rotation error = ' + str(round_correct(cor_diff, ndec = 2)))
+    # print('Incorporating an x-shift of ' + str(round_correct(cor_diff, ndec = 2)) + ' to all projections to correct for COR offset...') 
 
-    for element_idx in range(n_elements):
-        for theta_idx in range(n_theta):
-            xrf_proj_img_array[element_idx, theta_idx, :, :] = ndi.shift(xrf_proj_img_array[element_idx, theta_idx, :, :], shift = (0, -cor_diff))
+    # for element_idx in range(n_elements):
+        # for theta_idx in range(n_theta):
+            # xrf_proj_img_array[element_idx, theta_idx, :, :] = ndi.shift(xrf_proj_img_array[element_idx, theta_idx, :, :], shift = (0, -cor_diff))
     
-    center_of_rotation -= cor_diff
+    # center_of_rotation -= cor_diff
 
     print('Performing iterative projection...')
 
@@ -464,28 +464,28 @@ def iter_reproj(ref_element,
         
         # plt.imshow(aligned_proj[ref_element_idx, 0, :, :])
         # plt.show()
-        if init_x_shift.any() or iteration_idx > 0: # If there is at least one projection with an initial x-shift
-            for slice_idx in range(n_slices):
-                sino = aligned_proj[ref_element_idx, :, slice_idx, :]
+        # if init_x_shift.any() or iteration_idx > 0: # If there is at least one projection with an initial x-shift
+            # for slice_idx in range(n_slices):
+            #     sino = aligned_proj[ref_element_idx, :, slice_idx, :]
 
-                slice_proj_angle_1 = sino[reflection_pair_idx_array[0], :]
-                slice_proj_angle_2 = sino[reflection_pair_idx_array[1], :]
+            #     slice_proj_angle_1 = sino[reflection_pair_idx_array[0], :]
+            #     slice_proj_angle_2 = sino[reflection_pair_idx_array[1], :]
 
-                theta_sum[slice_idx, :] = slice_proj_angle_1 + slice_proj_angle_2
+            #     theta_sum[slice_idx, :] = slice_proj_angle_1 + slice_proj_angle_2
         
-                center_of_rotation = rot_center(theta_sum) 
+            #     center_of_rotation = rot_center(theta_sum) 
 
-                cor_diff = center_of_rotation - n_columns/2
+            #     cor_diff = center_of_rotation - n_columns/2
     
-            print('Center of rotation: ' + str(round_correct(center_of_rotation, ndec = 2)))
-            print('Center of rotation error = ' + str(round_correct(cor_diff, ndec = 2)))
-            print('Incorporating an x-shift of ' + str(round_correct(cor_diff, ndec = 2)) + ' to all projections to correct for COR offset...') 
+            # print('Center of rotation: ' + str(round_correct(center_of_rotation, ndec = 2)))
+            # print('Center of rotation error = ' + str(round_correct(cor_diff, ndec = 2)))
+            # print('Incorporating an x-shift of ' + str(round_correct(cor_diff, ndec = 2)) + ' to all projections to correct for COR offset...') 
 
-            for element_idx in range(n_elements):
-                for theta_idx in range(n_theta):
-                    aligned_proj[element_idx, theta_idx, :, :] = ndi.shift(aligned_proj[element_idx, theta_idx, :, :], shift = (0, -cor_diff))
+            # for element_idx in range(n_elements):
+            #     for theta_idx in range(n_theta):
+            #         aligned_proj[element_idx, theta_idx, :, :] = ndi.shift(aligned_proj[element_idx, theta_idx, :, :], shift = (0, -cor_diff))
     
-            center_of_rotation -= cor_diff
+            # center_of_rotation -= cor_diff
     
         print('Performing ' + algorithm)
 
@@ -633,7 +633,8 @@ file_path_xrf = '/home/bwr0835/2_ide_aggregate_xrf.h5'
 output_dir_path_base = '/home/bwr0835'
 
 # output_file_name_base = input('Choose a base file name: ')
-output_file_name_base = 'gridrec_5_iter_vacek_cor_and_shift_correction_padding_-22_deg_158_deg'
+# output_file_name_base = 'gridrec_5_iter_vacek_cor_and_shift_correction_padding_-22_deg_158_deg'
+output_file_name_base = 'gridrec_5_iter_tomopy_cor_alg_no_cor_related_shifting_padding_04_16_2025'
 
 if output_file_name_base == '':
     print('No output base file name chosen. Ending program...')
