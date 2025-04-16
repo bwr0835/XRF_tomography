@@ -417,7 +417,7 @@ def iter_reproj(ref_element,
 
     for element_idx in range(n_elements):
         for theta_idx in range(n_theta):
-            xrf_proj_img_array[element_idx, theta_idx, :, :] = ndi.shift(xrf_proj_img_array[element_idx, theta_idx, :, :], shift = (0, cor_diff))
+            xrf_proj_img_array[element_idx, theta_idx, :, :] = ndi.shift(xrf_proj_img_array[element_idx, theta_idx, :, :], shift = (0, -cor_diff))
     
     reference_projection_imgs = xrf_proj_img_array[element_idx].copy()
 
