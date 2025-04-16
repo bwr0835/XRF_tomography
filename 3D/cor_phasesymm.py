@@ -145,7 +145,7 @@ for slice_idx in range(n_slices):
     slice_proj_neg_22 = sino[reflection_pair_idx_array_1[0], :].T
     slice_proj_158 = sino[reflection_pair_idx_array_1[1], :].T
 
-    theta_sum[slice_idx, :] = slice_proj_neg_22 + slice_proj_158
+    theta_sum[:, slice_idx] = slice_proj_neg_22 + slice_proj_158
 
 # theta_sum = proj_neg_22 + proj_158
 
