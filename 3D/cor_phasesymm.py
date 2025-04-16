@@ -82,7 +82,8 @@ def rot_center(theta_sum):
         T = fft.rfft(theta_sum.ravel())
     
         # # Get components of the AC spatial frequency for axis perpendicular to rotation axis.
-    
+        n_columns = theta_sum.shape[-1]
+        
         imag = T[theta_sum.shape[0]].imag
         real = T[theta_sum.shape[0]].real
     
