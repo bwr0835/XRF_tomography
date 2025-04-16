@@ -134,7 +134,10 @@ print(counts.shape)
 # for proj in proj_list:
 #     theta_sum += proj
 
-reflection_pair_idx_array_1 = create_ref_pair_theta_idx_array(np.array([-22, 158]), theta_xrf)
+# angle_pair = np.array([-22, 158])
+angle_pair = np.array([23, -156])
+
+reflection_pair_idx_array_1 = create_ref_pair_theta_idx_array(angle_pair, theta_xrf)
 
 sino = counts[:, n_slices//2, :]
 
