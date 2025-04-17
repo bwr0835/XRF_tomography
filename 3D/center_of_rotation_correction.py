@@ -172,9 +172,9 @@ def create_save_proj_shifts(elements_xrf, counts_xrf, theta_xrf, ref_element, co
 
     for x_shift in range(len(cor_x_shift)):    
         for theta_idx in range(n_theta):
-            counts_new[theta_idx] = ndi.shift(counts[theta_idx], shift = (0, cor_x_shift[x_shift]))
+            counts_new[theta_idx] = ndi.shift(counts[theta_idx].copy(), shift = (0, cor_x_shift[x_shift]))
 
-        center_of_rotation = tomo.find_center(counts, theta_xrf*np.pi/180, tol = 0.05)
+        center_of_rotation = tomo.find_center(counts, theta_xrf*np.pi/180, tol = 0.05)[0]
         
         print('Performing gridrec for projection x-shift = ' + str(cor_x_shift[x_shift]) + ' (COR = ' + str(center_of_rotation) + ')')
 
