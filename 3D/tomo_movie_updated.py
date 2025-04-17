@@ -115,6 +115,9 @@ for f in file_array:
 
     elif f.endswith('.mp4') or f.endswith('.gif'):
         continue
+    
+    elif f.endswith('.tiff'):
+        os.remove(os.path.join(dir_path, f))
 
     else:
         print('Error: Unable to load one or more files. Exiting...')
