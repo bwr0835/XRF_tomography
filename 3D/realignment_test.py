@@ -442,20 +442,20 @@ def iter_reproj(ref_element,
                     print('Cumulative x shift = ' + str(net_x_shift))
                     print('Cumulative y shift = ' + str(net_y_shift))
                     
-                aligned_proj[ref_element_idx, theta_idx, :, :] = ndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx, :, :], shift = (net_y_shift, net_x_shift))
+                aligned_proj[ref_element_idx, theta_idx, :, :] = ndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx, :, :].copy(), shift = (net_y_shift, net_x_shift))
 
         else:
             print('Initial x shift: ' + str(init_x_shift))
             print('Initial y shift: ' + str(init_y_shift))
             
             for theta_idx in range(n_theta):
-               aligned_proj[ref_element_idx, theta_idx, :, :] = ndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx, :, :], shift = (init_y_shift[theta_idx], init_x_shift[theta_idx]))  
+               aligned_proj[ref_element_idx, theta_idx, :, :] = ndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx, :, :].copy(), shift = (init_y_shift[theta_idx], init_x_shift[theta_idx]))  
         
-        cor_new = tomo.find_center(aligned_proj[ref_element_idx], theta_array*np.pi/180, ind = n_slices//2, tol = 0.05)[0]
+        cor = tomo.find_center(aligned_proj[ref_element_idx], theta_array*np.pi/180, ind = n_slices//2, tol = 0.05)[0]
 
-        cor_array.append(cor_new)
+        cor_array.append(cor)
 
-        print('COR after attempting to shift for jitter = ' + str(round_correct(cor_new, ndec = 2)))
+        print('COR after attempting to shift for jitter = ' + str(round_correct(cor, ndec = 2)))
 
         aligned_exp_proj_iter_array.append(aligned_proj[ref_element_idx])
 
@@ -519,7 +519,7 @@ def iter_reproj(ref_element,
         for slice_idx in range(n_slices):
             print('Slice ' + str(slice_idx + 1) + '/' + str(n_slices))
             
-            proj_slice = recon[slice_idx, :, :]
+            proj_slice = recon[slice_idx]
 
             proj_imgs_from_3d_recon[:, slice_idx, :] = (skimage.transform.radon(proj_slice, theta = theta_array)).T # This radon transform assumes slices are defined by columns and not rows
 
@@ -528,7 +528,7 @@ def iter_reproj(ref_element,
         for theta_idx in range(n_theta):
             
             # y_shift_pc, x_shift_cc, corr_mat_cc = cross_correlate(proj_imgs_from_3d_recon[theta_idx, :, :], aligned_proj[ref_element_idx, theta_idx, :, :]) # Cross-correlation
-            y_shift_pc, x_shift_pc = phase_correlate(proj_imgs_from_3d_recon[theta_idx, :, :], aligned_proj[ref_element_idx, theta_idx, :, :], upsample_factor = 100)
+            y_shift_pc, x_shift_pc = phase_correlate(proj_imgs_from_3d_recon[theta_idx], aligned_proj[ref_element_idx, theta_idx, :, :], upsample_factor = 100)
 
             x_shift_pc_array[theta_idx] = x_shift_pc
             y_shift_pc_array[theta_idx] = y_shift_pc
