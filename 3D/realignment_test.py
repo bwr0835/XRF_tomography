@@ -351,6 +351,7 @@ def iter_reproj(ref_element,
     recon_iter_array = []
     aligned_exp_proj_iter_array = []
     synth_proj_iter_array = []
+    cor_array = []
 
     recon = np.zeros((n_slices, n_columns, n_columns))
     
@@ -413,7 +414,7 @@ def iter_reproj(ref_element,
     print('Center of rotation: ' + str(round_correct(center_of_rotation, ndec = 2)))
     print('Geometric center: ' + str(n_columns/2))
     print('Center of rotation error = ' + str(round_correct(cor_diff, ndec = 2)))
-    print('Incorporating an x-shift of ' + str(round_correct(cor_diff, ndec = 2)) + ' to all projections to correct for COR offset...') 
+    print('Incorporating an x-shift of ' + str(-1*round_correct(cor_diff, ndec = 2)) + ' to all projections to correct for COR offset...') 
 
     for element_idx in range(n_elements):
         for theta_idx in range(n_theta):
@@ -451,6 +452,8 @@ def iter_reproj(ref_element,
                aligned_proj[ref_element_idx, theta_idx, :, :] = ndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx, :, :], shift = (init_y_shift[theta_idx], init_x_shift[theta_idx]))  
         
         cor_new = tomo.find_center(aligned_proj[ref_element_idx], theta_array*np.pi/180, ind = n_slices//2, tol = 0.05)[0]
+
+        cor_array.append(cor_new)
 
         print('COR after attempting to shift for jitter = ' + str(round_correct(cor_new, ndec = 2)))
 
@@ -627,8 +630,9 @@ def iter_reproj(ref_element,
     aligned_exp_proj_iter_array = np.array(aligned_exp_proj_iter_array)
     synth_proj_iter_array = np.array(synth_proj_iter_array)
     recon_iter_array = np.array(recon_iter_array)
+    cor_array = np.array(cor_array)
     
-    return aligned_proj, x_shifts_pc_new, y_shifts_pc_new, aligned_exp_proj_iter_array, recon_iter_array, synth_proj_iter_array
+    return aligned_proj, cor_array, x_shifts_pc_new, y_shifts_pc_new, aligned_exp_proj_iter_array, recon_iter_array, synth_proj_iter_array
 
 # root = tk.Tk()
     
@@ -643,7 +647,7 @@ output_dir_path_base = '/home/bwr0835'
 
 # output_file_name_base = input('Choose a base file name: ')
 # output_file_name_base = 'gridrec_5_iter_vacek_cor_and_shift_correction_padding_-22_deg_158_deg'
-output_file_name_base = 'gridrec_5_iter_tomopy_cor_alg_proj_shift_cor_correction_padding_04_16_2025'
+output_file_name_base = 'gridrec_5_iter_tomopy_cor_alg_no_cor_correction_padding_04_17_2025'
 
 if output_file_name_base == '':
     print('No output base file name chosen. Ending program...')
@@ -677,6 +681,7 @@ cor_desired_angles = np.array([-22, 158])
 algorithm = 'gridrec'
 
 aligned_proj, \
+centers_of_rotation, \
 net_x_shifts, \
 net_y_shifts, \
 aligned_proj_iter_array, \
@@ -698,6 +703,7 @@ os.makedirs(full_output_dir_path, exist_ok = True)
 
 np.save(os.path.join(full_output_dir_path, 'theta_array.npy'), theta_xrf)
 np.save(os.path.join(full_output_dir_path, 'aligned_proj_all_elements.npy'), aligned_proj)
+np.save(os.path.join(full_output_dir_path, 'cor_shifts.npy'), centers_of_rotation)
 np.save(os.path.join(full_output_dir_path, 'aligned_proj_array_iter_' + desired_element + '.npy'), aligned_proj_iter_array)
 np.save(os.path.join(full_output_dir_path, 'synth_proj_array_iter_' + desired_element + '.npy'), synth_proj_iter_array)
 np.save(os.path.join(full_output_dir_path, 'recon_array_iter_' + desired_element + '.npy'), recon_iter_array)

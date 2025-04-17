@@ -110,6 +110,9 @@ for f in file_array:
     elif f == 'theta_array.npy':
         theta_array = np.load(os.path.join(dir_path, f))
     
+    elif f == 'cor_shifts.npy':
+        cor_shifts = np.load(os.path.join(dir_path, f))
+
     elif f.endswith('.mp4') or f.endswith('.gif'):
         continue
 
@@ -143,6 +146,7 @@ tiff_array_2 = []
 tiff_array_3 = []
 tiff_array_4 = []
 tiff_array_5 = []
+tiff_array_7 = []
 
 iter_array = np.arange(n_iter)
 print(iter_array)
@@ -206,7 +210,9 @@ fig1, axs1 = plt.subplots(2, 3) # Aligned experimental projection, synthetic exp
 fig2, axs2 = plt.subplots(1, 3) # Same as above, but for different iterations - use first projection angle
 fig3, axs3 = plt.subplots(1, 2) # Reconstructed object for different slices (use first and final iteration)
 fig4, axs4 = plt.subplots() # Reconstructed object for different iteration (use slice index 64?)
-fig5, axs5 = plt.subplots()
+fig5, axs5 = plt.subplots() # x- and y-shifts as function of iteration index
+fig6, axs6 = plt.subplots() # Center of rotation as function of iteration index
+fig7, axs7 = plt.subplots() # Net shifts as function of angle for each slice
 
 im1_1 = axs1[0, 0].imshow(aligned_proj_theta_array_aux[0])
 im1_2 = axs1[0, 1].imshow(synth_proj_theta_array_aux[0])
@@ -226,6 +232,9 @@ im4 = axs4.imshow(recon_iter_array_aux[0])
 
 curve1, = axs5.plot(iter_array, net_x_shifts[:, 0], 'k-o', markersize = 3, label = r'$\Delta x$')
 curve2, = axs5.plot(iter_array, net_y_shifts[:, 0], 'r-o', markersize = 3, label = r'$\Delta y$')
+curve3, = axs6.plot(iter_array, cor_shifts, 'k-o', markersize = 3)
+curve4, = axs7.plot(theta_array, net_x_shifts[0, :], 'k-o', markersize = 3, label = r'$\Delta x$')
+curve5, = axs7.plot(theta_array, net_y_shifts[0, :], 'k-o', markersize = 3, label = r'$\Delta y$')
 
 text_1 = axs1[0, 0].text(0.02, 0.02, r'$\theta = {0}$\textdegree'.format(theta_array[0]), transform = axs1[0, 0].transAxes, color = 'white')
 text_2 = axs2[0].text(0.02, 0.02, r'Iter. 0', transform = axs2[0].transAxes, color = 'white')
@@ -249,14 +258,21 @@ axs3[1].set_title(r'Reconstruction (Iter. {0})'.format(iter_idx_final))
 
 axs4.set_title(r'Reconstruction (Slice {0})'.format(slice_idx_desired))
 
+axs5.set_xlim(0, n_iter - 1)
 axs5.set_title(r'\theta = {0}'.format(theta_array[0]))
 axs5.set_xlabel(r'Iteration index $i$')
 axs5.set_ylabel(r'Net shift')
 axs5.legend(frameon = False)
-axs5.set_xlim(0, n_iter - 1)
 
-axs4.set_title(r'Slice {0}'.format(slice_idx_desired))
-axs5.set_title('Iteration 0')
+axs6.set_xlim(0, n_iter - 1)
+axs6.set_ylim(np.min(cor_shifts), np.max(cor_shifts))
+axs6.set_xlabel(r'Iteration index $i$')
+axs6.set_ylabel(r'Center of rotation')
+
+axs7.set_xlim(np.min(theta_array), np.max(theta_array))
+axs7.set_xlabel(r'$\theta$')
+axs7.set_ylabel(r'Net shift')
+axs7.legend(frameon = False)
 
 for theta_idx in range(n_theta):
     im1_1.set_data(aligned_proj_theta_array_aux[theta_idx])
@@ -281,7 +297,10 @@ for theta_idx in range(n_theta):
     axs5.set_title(r'$\theta = {0}$\textdegree'.format(theta_array[theta_idx]))
 
     filename_1 = os.path.join(dir_path, f'proj_theta{theta_idx:03d}.tiff')
-    filename_5 = os.path.join(dir_path, f'net_shifts{theta_idx:03d}.tiff')
+    filename_5 = os.path.join(dir_path, f'net_net_shifts_theta_{theta_idx:03d}.tiff')
+
+    fig1.tight_layout()
+    fig5.tight_layout()
 
     fig1.savefig(filename_1, dpi = 400)
     fig5.savefig(filename_5, dpi = 400)
@@ -300,6 +319,8 @@ for slice_idx in range(n_slices):
 
     filename_3 = os.path.join(dir_path, f'recon_slice_{slice_idx:03d}.tiff')
 
+    fig3.tight_layout()
+    
     fig3.savefig(filename_3, dpi = 400)
 
     tiff_array_3.append(filename_3)
@@ -307,46 +328,79 @@ for slice_idx in range(n_slices):
 plt.close(fig3)
 
 for iter_idx in range(n_iter):
+    net_shift_x = net_x_shifts[iter_idx, :]
+    net_shift_y = net_y_shifts[iter_idx, :]
+
+    min_shift = np.min([np.min(net_shift_x), np.min(net_shift_y)])
+    max_shift = np.max([np.max(net_shift_x), np.max(net_shift_y)])
+
     im2_1.set_data(aligned_proj_iter_array_aux[iter_idx])
     im2_2.set_data(synth_proj_iter_array_aux[iter_idx])
     im2_3.set_data(rgb_proj_iter_array[iter_idx])
 
     im4.set_data(recon_iter_array_aux[iter_idx])
+    
+    curve4.set_data(net_shift_x)
+    curve5.set_data(net_shift_y)
 
     text_2.set_text(r'Iter. {0}'.format(iter_idx))
     text_4.set_text(r'Iter. {0}'.format(iter_idx))
 
+    axs7.set_ylim(min_shift, max_shift + 0.1)
+    axs7.set_title(r'Iteration {0}'.format(iter_idx))
+
     filename_2 = os.path.join(dir_path, f'proj_iter_{iter_idx:03d}.tiff')
     filename_4 = os.path.join(dir_path, f'recon_iter_{iter_idx:03d}.tiff')
+    filename_7 = os.path.join(dir_path, f'net_shifts_iter_{iter_idx:03d}.tiff')
 
+    fig2.tight_layout()
+    fig4.tight_layout()
+    fig7.tight_layout()
+    
     fig2.savefig(filename_2, dpi = 400)
     fig4.savefig(filename_4, dpi = 400)
+    fig7.savefig(filename_7, dpi = 400)
 
     tiff_array_2.append(filename_2)
     tiff_array_4.append(filename_4)
+    tiff_array_7.append(filename_7)
 
 plt.close(fig2)
 plt.close(fig4)
+plt.close(fig7)
 
-print('Creating projection GIF (changing thetas)')
+print('Saving COR plot...')
+
+filename_6 = os.path.join(dir_path, 'cor_shifts.svg')
+
+fig6.tight_layout()
+fig6.savefig(filename_6)
+
+plt.close(fig6)
+
+print('Creating projection GIF (changing thetas)...')
 
 create_gif(tiff_array_1, os.path.join(dir_path, 'proj_theta.gif'), fps = 25)
 
-print('Creating projection GIF (changing iteration)')
+print('Creating projection GIF (changing iteration)...')
 
 create_gif(tiff_array_2, os.path.join(dir_path, 'proj_iter.gif'), fps = 25)
 
-print('Creating reconstruction GIF (changing slice)')
+print('Creating reconstruction GIF (changing slice)...')
 
 create_gif(tiff_array_3, os.path.join(dir_path, 'recon_slice.gif'), fps = 25)
 
-print('Creating reconstruction GIF (changing iteration)')
+print('Creating reconstruction GIF (changing iteration)...')
 
 create_gif(tiff_array_4, os.path.join(dir_path, 'recon_iter.gif'), fps = 25)
 
-print('Creating net shift GIF (changing theta)')
+print('Creating net shift GIF (changing theta)...')
 
-create_gif(tiff_array_5, os.path.join(dir_path, 'net_shifts.gif'), fps = 15)
+create_gif(tiff_array_5, os.path.join(dir_path, 'net_shifts_theta.gif'), fps = 15)
+
+print('Creating net shift GIF (changing iteration)...')
+
+create_gif(tiff_array_7, os.path.join(dir_path, 'net_shifts_iter.gif'), fps = 15)
 
 print('Done')
 
