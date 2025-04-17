@@ -185,7 +185,7 @@ def create_save_proj_shifts(elements_xrf, counts_xrf, theta_xrf, ref_element, co
         #     plt.imshow(recon[64])
         #     plt.show()
 
-        recon_array.append(recon.copy())
+        recon_array.append(recon)
 
     recon_array = np.array(recon_array)
 
