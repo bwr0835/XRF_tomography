@@ -159,21 +159,23 @@ def create_save_proj_shifts(elements_xrf, counts_xrf, theta_xrf, ref_element, co
 
     reflection_pair_idx_array = create_ref_pair_theta_idx_array(np.array([-22, 158]), theta_xrf)
 
-    for slice_idx in range(n_slices):
-        sino = counts[:, slice_idx, :]
+    # for slice_idx in range(n_slices):
+    #     sino = counts[:, slice_idx, :]
 
-        slice_proj_angle_1 = sino[reflection_pair_idx_array[0], :]
-        slice_proj_angle_2 = sino[reflection_pair_idx_array[1], :]
+    #     slice_proj_angle_1 = sino[reflection_pair_idx_array[0], :]
+    #     slice_proj_angle_2 = sino[reflection_pair_idx_array[1], :]
 
-        theta_sum[slice_idx, :] = slice_proj_angle_1 + slice_proj_angle_2
+    #     theta_sum[slice_idx, :] = slice_proj_angle_1 + slice_proj_angle_2
         
-    center_of_rotation = rot_center(theta_sum)
-    # center_of_rotation = tomo.find_center(counts_new, theta_xrf*np.pi/180, tol = 0.05) # COR given with tolerance of ±0.05 pixels
+    # center_of_rotation = rot_center(theta_sum)
+    # center_of_rotation = tomo.find_center(counts, theta_xrf*np.pi/180, tol = 0.05) # COR given with tolerance of ±0.05 pixels
 
     for x_shift in range(len(cor_x_shift)):    
         for theta_idx in range(n_theta):
             counts_new[theta_idx] = ndi.shift(counts[theta_idx], shift = (0, cor_x_shift[x_shift]))
-    
+
+        center_of_rotation = tomo.find_center(counts, theta_xrf*np.pi/180, tol = 0.05)
+        
         print('Performing gridrec for projection x-shift = ' + str(cor_x_shift[x_shift]) + ' (COR = ' + str(center_of_rotation) + ')')
 
         recon = tomo.recon(counts_new, theta = theta_xrf*np.pi/180, center = center_of_rotation, algorithm = 'gridrec', filter_name = 'ramlak')
