@@ -419,11 +419,11 @@ def iter_reproj(ref_element,
         for theta_idx in range(n_theta):
             xrf_proj_img_array[element_idx, theta_idx, :, :] = ndi.shift(xrf_proj_img_array[element_idx, theta_idx, :, :], shift = (0, -cor_diff))
     
-    reference_projection_imgs = xrf_proj_img_array[element_idx].copy()
+    reference_projection_imgs = xrf_proj_img_array[ref_element_idx].copy()
 
     center_of_rotation = tomo.find_center(reference_projection_imgs, theta_array*np.pi/180, ind = n_slices//2, tol = 0.05)[0]
 
-    print('COR after shifting all projection images by ' + str(round_correct(cor_diff, ndec = 2)) + ': ' + str(round_correct(center_of_rotation, ndec = 2)))
+    print('COR after shifting all projection images by ' + str(-1*round_correct(cor_diff, ndec = 2)) + ': ' + str(round_correct(center_of_rotation, ndec = 2)))
 
     print('Performing iterative projection...')
 
