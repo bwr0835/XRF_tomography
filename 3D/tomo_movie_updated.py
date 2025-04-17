@@ -339,8 +339,8 @@ for iter_idx in range(n_iter):
 
     im4.set_data(recon_iter_array_aux[iter_idx])
     
-    curve4.set_data(net_shift_x)
-    curve5.set_data(net_shift_y)
+    curve4.set_ydata(net_shift_x)
+    curve5.set_ydata(net_shift_y)
 
     text_2.set_text(r'Iter. {0}'.format(iter_idx))
     text_4.set_text(r'Iter. {0}'.format(iter_idx))
