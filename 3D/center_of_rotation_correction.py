@@ -194,7 +194,7 @@ def create_save_proj_shifts(elements_xrf, counts_xrf, theta_xrf, ref_element, co
     return
 
 def update(frame):
-    im.set_array(recon_array[frame][slice_desired_idx])
+    im.set_data(recon_array[frame][slice_desired_idx])
     text.set_text(r'COR shift = {0} pixels'.format(cor_x_shift[frame]))
 
     return im, text
