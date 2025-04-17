@@ -124,10 +124,7 @@ for f in file_array:
 n_theta = aligned_proj.shape[1]
 n_slices = aligned_proj.shape[2]
 
-print(aligned_proj_iter_array)
-
 n_iter = len(aligned_proj_iter_array)
-print(n_iter)
 
 aligned_proj_theta_array_aux = []
 aligned_proj_theta_array_aux_2 = []
@@ -149,7 +146,6 @@ tiff_array_5 = []
 tiff_array_7 = []
 
 iter_array = np.arange(n_iter)
-print(iter_array)
 
 theta_idx_desired = 0
 iter_idx_desired = 0
@@ -201,7 +197,7 @@ rgb_proj_iter_array = np.array(rgb_proj_iter_array)
 recon_slice_array_aux = np.array(recon_slice_array_aux)
 recon_iter_array_aux = np.array(recon_iter_array_aux)
 
-print('Generating figures')
+print('Generating figures...')
 
 fps_imgs = 25 # Frames per second (fps)
 fps_plots = 15
