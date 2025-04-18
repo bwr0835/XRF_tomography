@@ -451,11 +451,11 @@ def iter_reproj(ref_element,
             for theta_idx in range(n_theta):
                aligned_proj[ref_element_idx, theta_idx, :, :] = ndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx, :, :].copy(), shift = (init_y_shift[theta_idx], init_x_shift[theta_idx]))  
         
-        cor = tomo.find_center(aligned_proj[ref_element_idx], theta_array*np.pi/180, ind = n_slices//2, tol = 0.05)[0]
+        center_of_rotation = tomo.find_center(aligned_proj[ref_element_idx], theta_array*np.pi/180, ind = n_slices//2, tol = 0.05)[0]
 
-        cor_array.append(cor)
+        cor_array.append(center_of_rotation)
 
-        print('COR after attempting to shift for jitter = ' + str(round_correct(cor, ndec = 2)))
+        print('COR after attempting to shift for jitter = ' + str(round_correct(center_of_rotation, ndec = 2)))
 
         aligned_exp_proj_iter_array.append(aligned_proj[ref_element_idx])
 
@@ -505,7 +505,7 @@ def iter_reproj(ref_element,
             recon = tomo.recon(aligned_proj[ref_element_idx], theta = theta_array*np.pi/180, center = center_of_rotation, algorithm = algorithm, filter_name = 'ramlak')
         
         elif algorithm == 'mlem':
-            recon = tomo.recon(aligned_proj[ref_element_idx], theta = theta_array*np.pi/180, center = center_of_rotation, algorithm = 'mlem', num_iter = 60)
+            recon = tomo.recon(aligned_proj[ref_element_idx], theta = theta_array*np.pi/180, center = center_of_rotation, algorithm = algorithm, num_iter = 60)
         
         else:
             print('Error: Algorithm not available. Exiting...')
