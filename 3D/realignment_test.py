@@ -196,8 +196,8 @@ def pad_row(array):
     return array
 
 def create_ref_pair_theta_idx_array(ref_pair_theta_array, theta_array):
-    ref_pair_theta_idx_1 = np.where(theta_array == ref_pair_theta_array[0])[0]
-    ref_pair_theta_idx_2 = np.where(theta_array == ref_pair_theta_array[1])[0]
+    ref_pair_theta_idx_1 = np.where(theta_array == ref_pair_theta_array[0])[0][0]
+    ref_pair_theta_idx_2 = np.where(theta_array == ref_pair_theta_array[1])[0][0]
 
     return np.array([ref_pair_theta_idx_1, ref_pair_theta_idx_2])
 
@@ -392,7 +392,14 @@ def iter_reproj(ref_element,
 
     #     sys.exit()
     
-    center_of_rotation = tomo.find_center(reference_projection_imgs, theta_array*np.pi/180, tol = 0.05, ind = n_slices//2)[0]
+    # center_of_rotation = tomo.find_center(reference_projection_imgs, theta_array*np.pi/180, tol = 0.05)[0]
+    ref_pair_theta_idx_array = create_ref_pair_theta_idx_array(cor_desired_angles, theta_array)
+
+    proj_neg_22 = np.flip(reference_projection_imgs[ref_pair_theta_idx_array[0]], axis = 1)
+    # proj_158_ref = np.flip(reference_projection_imgs[ref_pair_theta_idx_array[1]], axis = 1)
+    proj_158_ref = reference_projection_imgs[ref_pair_theta_idx_array[1]]
+
+    center_of_rotation = tomo.find_center_pc(proj1 = proj_158_ref, proj2 = proj_neg_22, tol = 0.05)
 
     cor_diff = center_of_rotation - n_columns/2
     # reflection_pair_idx_array = create_ref_pair_theta_idx_array(cor_desired_angles, theta_xrf)
@@ -422,9 +429,15 @@ def iter_reproj(ref_element,
     
     reference_projection_imgs = xrf_proj_img_array[ref_element_idx].copy()
 
-    center_of_rotation = tomo.find_center(reference_projection_imgs, theta_array*np.pi/180, ind = n_slices//2, tol = 0.05)[0]
+    proj_neg_22 = np.flip(reference_projection_imgs[ref_pair_theta_idx_array[0]], axis = 1)
+    # proj_158_ref = np.flip(reference_projection_imgs[ref_pair_theta_idx_array[1]], axis = 1)
+    proj_158_ref = reference_projection_imgs[ref_pair_theta_idx_array[1]]
 
-    print('COR after shifting all projection images by ' + str(-1*round_correct(cor_diff, ndec = 2)) + ': ' + str(round_correct(center_of_rotation, ndec = 2)))
+    center_of_rotation_new = tomo.find_center_pc(proj1 = proj_158_ref, proj2 = proj_neg_22, tol = 0.05)
+
+    # center_of_rotation = tomo.find_center(reference_projection_imgs, theta_array*np.pi/180, tol = 0.05)[0]
+
+    print('COR after shifting all projection images by ' + str(-1*round_correct(cor_diff, ndec = 2)) + ': ' + str(round_correct(center_of_rotation_new, ndec = 2)))
 
     print('Performing iterative projection...')
 
@@ -442,16 +455,19 @@ def iter_reproj(ref_element,
                     print('Cumulative x shift = ' + str(net_x_shift))
                     print('Cumulative y shift = ' + str(net_y_shift))
                     
-                aligned_proj[ref_element_idx, theta_idx, :, :] = ndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx, :, :].copy(), shift = (net_y_shift, net_x_shift))
+                aligned_proj[ref_element_idx, theta_idx, :, :] = ndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx, :, :], shift = (net_y_shift, net_x_shift))
 
         else:
             print('Initial x shift: ' + str(init_x_shift))
             print('Initial y shift: ' + str(init_y_shift))
             
             for theta_idx in range(n_theta):
-               aligned_proj[ref_element_idx, theta_idx, :, :] = ndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx, :, :].copy(), shift = (init_y_shift[theta_idx], init_x_shift[theta_idx]))  
+               aligned_proj[ref_element_idx, theta_idx, :, :] = ndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx, :, :], shift = (init_y_shift[theta_idx], init_x_shift[theta_idx]))  
         
-        center_of_rotation = tomo.find_center(aligned_proj[ref_element_idx], theta_array*np.pi/180, ind = n_slices//2, tol = 0.05)[0]
+        # proj_neg_22 = aligned_proj[ref_element_idx, ref_pair_theta_idx_array[0], :, :]
+        # proj_158_ref = np.flip(reference_projection_imgs[ref_pair_theta_idx_array[1]], axis = 0)
+        center_of_rotation = tomo.find_center(aligned_proj[ref_element_idx], theta_array*np.pi/180, tol = 0.05)[0]
+        # center_of_rotation = tomo.find_center_pc(proj1 = proj_neg_22, proj2 = proj_158_ref, tol = 0.05)
 
         cor_array.append(center_of_rotation)
 
@@ -502,7 +518,7 @@ def iter_reproj(ref_element,
         print('Performing ' + algorithm)
 
         if algorithm == 'gridrec':
-            recon = tomo.recon(aligned_proj[ref_element_idx], theta = theta_array*np.pi/180, center = center_of_rotation, algorithm = algorithm, filter_name = 'ramlak')
+            recon = tomo.recon(aligned_proj[ref_element_idx], theta = theta_array*np.pi/180, center = center_of_rotation, algorithm = algorithm)
         
         elif algorithm == 'mlem':
             recon = tomo.recon(aligned_proj[ref_element_idx], theta = theta_array*np.pi/180, center = center_of_rotation, algorithm = algorithm, num_iter = 60)
