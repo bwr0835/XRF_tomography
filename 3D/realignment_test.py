@@ -359,7 +359,7 @@ def iter_reproj(ref_element,
     # aligned_proj_test = np.zeros_like(reference_projection_imgs)
 
     proj_imgs_from_3d_recon = np.zeros((n_theta, n_slices, n_columns))
-    
+   
     # synth_test = np.zeros((n_theta, n_slices, n_columns))
 
     x_shifts_pc = np.zeros((n_iterations, n_theta))
@@ -537,8 +537,13 @@ def iter_reproj(ref_element,
             
             proj_slice = recon[slice_idx]
 
-            proj_imgs_from_3d_recon[:, slice_idx, :] = (skimage.transform.radon(proj_slice, theta_array, circle = False)).T # This radon transform assumes slices are defined by columns and not rows
+            sinogram = (skimage.transform.radon(proj_slice, theta_array, circle = False)).T # This radon transform assumes slices are defined by columns and not rows
 
+            scan_pos_offset = (sinogram.shape[0] - n_columns)//2
+
+            proj_imgs_from_3d_recon[:, slice_idx, :] = sinogram[:, scan_pos_offset:(scan_pos_offset + sinogram.shape[0])]
+            # proj_imgs_from_3d_recon[:, slice_idx, :] = (skimage.transform.radon(proj_slice, theta_array, circle = False)).T # This radon transform assumes slices are defined by columns and not rows
+        
         synth_proj_iter_array.append(np.copy(proj_imgs_from_3d_recon))
 
         for theta_idx in range(n_theta):
