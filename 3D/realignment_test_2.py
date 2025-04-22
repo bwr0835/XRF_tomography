@@ -387,6 +387,8 @@ def iter_reproj(ref_element,
         recon_array.append(recon)
 
         for slice_idx in range(n_slices):
+            print(f'Slice {slice_idx + 1}/{n_slices}')
+
             sinogram = (xform.radon(recon[slice_idx].copy(), theta_array)).T
 
             synth_proj[:, slice_idx, :] = sinogram
