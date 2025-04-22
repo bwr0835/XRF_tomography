@@ -372,12 +372,14 @@ def iter_reproj(ref_element,
                 aligned_proj[theta_idx] = ndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx], shift = (net_y_shift, net_x_shift))
 
         aligned_exp_proj_array.append(aligned_proj)
+        
         print(aligned_proj.shape)
+        
         if algorithm == 'gridrec':
-            recon = tomo.recon(aligned_proj, theta_array, center_of_rotation, algorithm = algorithm)
+            recon = tomo.recon(aligned_proj, theta_array*np.pi/180, center_of_rotation, algorithm = algorithm)
         
         elif algorithm == 'mlem':
-            recon = tomo.recon(aligned_proj, theta_array, center_of_rotation, algorithm, num_iter = 60)
+            recon = tomo.recon(aligned_proj, theta_array*np.pi/180, center_of_rotation, algorithm, num_iter = 60)
 
         else:
             print('Error: Algorithm not available. Exiting...')
