@@ -539,9 +539,9 @@ def iter_reproj(ref_element,
 
             sinogram = (skimage.transform.radon(proj_slice, theta_array, circle = False)).T # This radon transform assumes slices are defined by columns and not rows
 
-            scan_pos_offset = (sinogram.shape[0] - n_columns)//2
+            scan_pos_offset = (sinogram.shape[1] - n_columns)//2
 
-            proj_imgs_from_3d_recon[:, slice_idx, :] = sinogram[:, scan_pos_offset:(scan_pos_offset + sinogram.shape[0])]
+            proj_imgs_from_3d_recon[:, slice_idx, :] = sinogram[:, scan_pos_offset:(scan_pos_offset + sinogram.shape[1])]
             # proj_imgs_from_3d_recon[:, slice_idx, :] = (skimage.transform.radon(proj_slice, theta_array, circle = False)).T # This radon transform assumes slices are defined by columns and not rows
         
         synth_proj_iter_array.append(np.copy(proj_imgs_from_3d_recon))
