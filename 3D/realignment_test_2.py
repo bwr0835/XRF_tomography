@@ -362,14 +362,18 @@ def iter_reproj(ref_element,
             
         else:
             for theta_idx in range(n_theta):
-                net_x_shift = net_x_shifts_pc[i - 1, theta_idx]
-                net_y_shift = net_y_shifts_pc[i - 1, theta_idx]
+                # net_x_shift = net_x_shifts_pc[i - 1, theta_idx]
+                # net_y_shift = net_y_shifts_pc[i - 1, theta_idx]
+
+                dx_current = dx_array_pc[theta_idx].copy()
+                dy_current = dy_array_pc[theta_idx].copy()
+                
                 
                 if (theta_idx % 7) == 0:
                     print(f'Shifting projection by net x shift = {round_correct(net_x_shift, ndec = 3)} (theta = {round_correct(theta_array[theta_idx], ndec = 1)})...')
                     print(f'Shifting projection by net y shift = {round_correct(net_y_shift, ndec = 3)}...')
 
-                aligned_proj[theta_idx] = ndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx], shift = (net_y_shift, net_x_shift))
+                aligned_proj[theta_idx] = ndi.shift(aligned_proj[theta_idx], shift = (dy_current, dx_current))
 
         aligned_exp_proj_array.append(aligned_proj)
         
