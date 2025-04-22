@@ -396,7 +396,7 @@ def iter_reproj(ref_element,
         synth_proj_array.append(synth_proj)
 
         for theta_idx in range(n_theta):
-            dy, dx = phase_correlate(synth_proj[theta_idx], aligned_proj[theta_idx])
+            dy, dx = phase_correlate(synth_proj[theta_idx], aligned_proj[theta_idx], upsample_factor = 100)
 
             dx_array_pc[theta_idx] = dx
             dy_array_pc[theta_idx] = dy
