@@ -319,8 +319,8 @@ def iter_reproj(ref_element,
     for theta_idx_pair in theta_idx_pairs:
         print(np.array([theta_array[theta_idx_pair[0]], theta_array[theta_idx_pair[1]]]))
 
-    center_of_rotation_array = np.array([tomo.find_center_pc(xrf_proj_img_array[ref_element_idx, theta_idx_pair[0]], 
-                                                             xrf_proj_img_array[ref_element_idx, theta_idx_pair[1]], 
+    center_of_rotation_array = np.array([tomo.find_center_pc(xrf_proj_img_array[ref_element_idx, theta_idx_pair[1]], 
+                                                             xrf_proj_img_array[ref_element_idx, theta_idx_pair[0]], 
                                                              tol = 0.01) for theta_idx_pair in theta_idx_pairs]) 
                                                           # The second image is flipped about the vertical axis within the TomoPy function
     
