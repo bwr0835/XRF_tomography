@@ -359,7 +359,7 @@ def iter_reproj(ref_element,
     # aligned_proj_test = np.zeros_like(reference_projection_imgs)
 
     proj_imgs_from_3d_recon = np.zeros((n_theta, n_slices, n_columns))
-   
+    
     # synth_test = np.zeros((n_theta, n_slices, n_columns))
 
     x_shifts_pc = np.zeros((n_iterations, n_theta))
@@ -464,14 +464,14 @@ def iter_reproj(ref_element,
             for theta_idx in range(n_theta):
                aligned_proj[ref_element_idx, theta_idx, :, :] = ndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx, :, :], shift = (init_y_shift[theta_idx], init_x_shift[theta_idx]))  
         
-        proj_neg_22 = np.flip(aligned_proj[ref_element_idx, ref_pair_theta_idx_array[0], :, :], axis = 1)
-        proj_158_ref = reference_projection_imgs[ref_pair_theta_idx_array[1]]
-        # center_of_rotation = tomo.find_center(aligned_proj[ref_element_idx], theta_array*np.pi/180, tol = 0.05)[0]
-        center_of_rotation_new = tomo.find_center_pc(proj1 = proj_neg_22, proj2 = proj_158_ref, tol = 0.05)
+        # proj_neg_22 = aligned_proj[ref_element_idx, ref_pair_theta_idx_array[0], :, :]
+        # proj_158_ref = np.flip(reference_projection_imgs[ref_pair_theta_idx_array[1]], axis = 0)
+        center_of_rotation = tomo.find_center(aligned_proj[ref_element_idx], theta_array*np.pi/180, tol = 0.05)[0]
+        # center_of_rotation = tomo.find_center_pc(proj1 = proj_neg_22, proj2 = proj_158_ref, tol = 0.05)
 
         cor_array.append(center_of_rotation)
 
-        print('COR after attempting to shift for jitter = ' + str(round_correct(center_of_rotation_new, ndec = 2)))
+        print('COR after attempting to shift for jitter = ' + str(round_correct(center_of_rotation, ndec = 2)))
 
         aligned_exp_proj_iter_array.append(aligned_proj[ref_element_idx])
 
@@ -537,13 +537,8 @@ def iter_reproj(ref_element,
             
             proj_slice = recon[slice_idx]
 
-            sinogram = (skimage.transform.radon(proj_slice, theta_array, circle = False)).T # This radon transform assumes slices are defined by columns and not rows
-            print(sinogram.shape)
-            scan_pos_offset = (sinogram.shape[1] - n_columns)//2
+            proj_imgs_from_3d_recon[:, slice_idx, :] = (skimage.transform.radon(proj_slice, theta_array)).T # This radon transform assumes slices are defined by columns and not rows
 
-            proj_imgs_from_3d_recon[:, slice_idx, :] = sinogram[:, scan_pos_offset:(scan_pos_offset + n_columns)]
-            # proj_imgs_from_3d_recon[:, slice_idx, :] = (skimage.transform.radon(proj_slice, theta_array, circle = False)).T # This radon transform assumes slices are defined by columns and not rows
-        
         synth_proj_iter_array.append(np.copy(proj_imgs_from_3d_recon))
 
         for theta_idx in range(n_theta):
