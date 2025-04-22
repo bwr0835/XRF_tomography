@@ -316,11 +316,14 @@ def iter_reproj(ref_element,
 
     theta_idx_pairs = find_theta_combos(theta_array, dtheta = 1)
 
+    for theta_idx_pair in theta_idx_pairs:
+        print(np.array([theta_array[theta_idx_pair[0]], theta_array[theta_idx_pair[0]]]))
+
     center_of_rotation_array = np.array([tomo.find_center_pc(xrf_proj_img_array[ref_element_idx, theta_idx_pair[0]], 
                                                              xrf_proj_img_array[ref_element_idx, theta_idx_pair[1]], 
                                                              tol = 0.01) for theta_idx_pair in theta_idx_pairs]) 
                                                           # The second image is flipped about the vertical axis within the TomoPy function
-   
+    
     center_of_rotation = np.mean(center_of_rotation_array)
 
     plt.plot(np.arange(len(center_of_rotation_array)), center_of_rotation_array, 'o', markersize = 3)
@@ -333,7 +336,7 @@ def iter_reproj(ref_element,
     offset = center_of_rotation - center_geom
 
     print(f'Center of rotation via phase cross-correlation: {round_correct(center_of_rotation, ndec = 3)}')
-    print(f'Geometric center: f{center_geom}')
+    print(f'Geometric center: {center_geom}')
     print(f'Center of rotation error: {offset}')
     print(f'Incorporating x-shift = {-offset} to all projection images...')
 
