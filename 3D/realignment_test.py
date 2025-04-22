@@ -537,7 +537,7 @@ def iter_reproj(ref_element,
             
             proj_slice = recon[slice_idx]
 
-            proj_imgs_from_3d_recon[:, slice_idx, :] = (skimage.transform.radon(proj_slice, theta = theta_array)).T # This radon transform assumes slices are defined by columns and not rows
+            proj_imgs_from_3d_recon[:, slice_idx, :] = (skimage.transform.radon(proj_slice, theta_array, circle = False)).T # This radon transform assumes slices are defined by columns and not rows
 
         synth_proj_iter_array.append(np.copy(proj_imgs_from_3d_recon))
 
