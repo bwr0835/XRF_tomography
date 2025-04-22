@@ -464,14 +464,14 @@ def iter_reproj(ref_element,
             for theta_idx in range(n_theta):
                aligned_proj[ref_element_idx, theta_idx, :, :] = ndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx, :, :], shift = (init_y_shift[theta_idx], init_x_shift[theta_idx]))  
         
-        # proj_neg_22 = aligned_proj[ref_element_idx, ref_pair_theta_idx_array[0], :, :]
-        # proj_158_ref = np.flip(reference_projection_imgs[ref_pair_theta_idx_array[1]], axis = 0)
-        center_of_rotation = tomo.find_center(aligned_proj[ref_element_idx], theta_array*np.pi/180, tol = 0.05)[0]
-        # center_of_rotation = tomo.find_center_pc(proj1 = proj_neg_22, proj2 = proj_158_ref, tol = 0.05)
+        proj_neg_22 = np.flip(aligned_proj[ref_element_idx, ref_pair_theta_idx_array[0], :, :], axis = 1)
+        proj_158_ref = reference_projection_imgs[ref_pair_theta_idx_array[1]]
+        # center_of_rotation = tomo.find_center(aligned_proj[ref_element_idx], theta_array*np.pi/180, tol = 0.05)[0]
+        center_of_rotation_new = tomo.find_center_pc(proj1 = proj_neg_22, proj2 = proj_158_ref, tol = 0.05)
 
         cor_array.append(center_of_rotation)
 
-        print('COR after attempting to shift for jitter = ' + str(round_correct(center_of_rotation, ndec = 2)))
+        print('COR after attempting to shift for jitter = ' + str(round_correct(center_of_rotation_new, ndec = 2)))
 
         aligned_exp_proj_iter_array.append(aligned_proj[ref_element_idx])
 
