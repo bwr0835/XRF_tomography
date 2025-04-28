@@ -182,11 +182,17 @@ def edge_gauss_filter(image, sigma, alpha, nx, ny):
     
     return (image + dc_value)
 
-def find_theta_combos(theta_array, dtheta):
-    theta_array_idx_pairs = list(combos(np.arange(len(theta_array)), 2)) # Generate a list of all pairs of theta_array indices
+def find_theta_combos(theta_array_deg, dtheta):
+    '''
+    
+    Make sure angles are in degrees!
+
+    '''
+
+    theta_array_idx_pairs = list(combos(np.arange(len(theta_array_deg)), 2)) # Generate a list of all pairs of theta_array indices
 
     valid_theta_idx_pairs = [(theta_idx_1, theta_idx_2) for theta_idx_1, theta_idx_2 in theta_array_idx_pairs 
-                             if (180 - dtheta <= np.abs(theta_array[theta_idx_1] - theta_array[theta_idx_2]) <= 180 + dtheta)]
+                             if (180 - dtheta <= np.abs(theta_array_deg[theta_idx_1] - theta_array_deg[theta_idx_2]) <= 180 + dtheta)]
                             # Compound inequality syntax is acceptable in Python
 
     return valid_theta_idx_pairs

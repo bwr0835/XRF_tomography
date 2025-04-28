@@ -1,12 +1,27 @@
 import numpy as np, tkinter as tk, os, sys, imageio as iio
 
 from tkinter import filedialog
-
-from matplotlib import pyplot as plt, animation as anim
+from matplotlib import pyplot as plt
+from itertools import combinations as combos
 
 plt.rcParams['text.usetex'] = True
 plt.rcParams['font.family'] = 'serif'
 plt.rcParams['text.latex.preamble'] = r'\usepackage{times}'
+
+def find_theta_combos(theta_array_deg, dtheta):
+    '''
+    
+    Make sure angles are in degrees!
+
+    '''
+
+    theta_array_idx_pairs = list(combos(np.arange(len(theta_array_deg)), 2)) # Generate a list of all pairs of theta_array indices
+
+    valid_theta_idx_pairs = [(theta_idx_1, theta_idx_2) for theta_idx_1, theta_idx_2 in theta_array_idx_pairs 
+                             if (180 - dtheta <= np.abs(theta_array_deg[theta_idx_1] - theta_array_deg[theta_idx_2]) <= 180 + dtheta)]
+                            # Compound inequality syntax is acceptable in Python
+
+    return valid_theta_idx_pairs
 
 def normalize_array(array):
     return (array - np.nanmin(array))/(np.nanmax(array) - np.nanmin(array))
@@ -77,7 +92,7 @@ def create_gif(tiff_filename_array, output_filepath, fps):
 
 # dir_path = filedialog.askdirectory(parent = root, title = 'Select directory containing alignment NPY files')
 
-dir_path = '/home/bwr0835/iter_reproj/gridrec_5_iter_tomopy_cor_alg_no_cor_correction_padding_04_17_2025'
+dir_path = '/home/bwr0835/iter_reproj/gridrec_5_iter_tomopy_cor_phase_corr_w_padding_04_28_2025'
 
 if dir_path == "":
     print('No directory chosen. Exiting...')
@@ -110,8 +125,8 @@ for f in file_array:
     elif f == 'theta_array.npy':
         theta_array = np.load(os.path.join(dir_path, f))
     
-    elif f == 'cor_shifts.npy':
-        cor_shifts = np.load(os.path.join(dir_path, f))
+    # elif f == 'cor_shifts.npy':
+    #     cor_shifts = np.load(os.path.join(dir_path, f))
 
     elif f.endswith('.mp4') or f.endswith('.gif'):
         continue
@@ -126,6 +141,7 @@ for f in file_array:
 
 n_theta = aligned_proj.shape[1]
 n_slices = aligned_proj.shape[2]
+n_columns = aligned_proj.shape[3]
 
 n_iter = len(aligned_proj_iter_array)
 
@@ -147,14 +163,21 @@ tiff_array_3 = []
 tiff_array_4 = []
 tiff_array_5 = []
 tiff_array_7 = []
+tiff_array_8 = []
+tiff_array_9 = []
+tiff_array_10 = []
 
 iter_array = np.arange(n_iter)
+scan_pos_array = np.arange(n_columns)
 
 theta_idx_desired = 0
 iter_idx_desired = 0
 iter_idx_final = iter_array[-1]
-slice_idx_desired = 64
+# slice_idx_desired = 64
+slice_idx_desired = n_slices//2
 element_idx_desired = 11 # Fe for this directory
+
+theta_idx_pairs = find_theta_combos(theta_array, dtheta = 1)
 
 for theta_idx in range(n_theta):
     aligned_proj_theta_array_aux.append(aligned_proj_iter_array[iter_idx_desired][theta_idx])
@@ -200,6 +223,9 @@ rgb_proj_iter_array = np.array(rgb_proj_iter_array)
 recon_slice_array_aux = np.array(recon_slice_array_aux)
 recon_iter_array_aux = np.array(recon_iter_array_aux)
 
+# exp_slice_proj_iter_array = np.array([aligned_proj_iter_array_aux[iter_idx][theta_idx_desired, slice_idx_desired] for iter_idx in range(n_iter)])
+# synth_slice_proj_iter_array = np.array([synth_proj_iter_array_aux[iter_idx][theta_idx_desired, slice_idx_desired] for iter_idx in range(n_iter)])
+
 print('Generating figures...')
 
 fps_imgs = 25 # Frames per second (fps)
@@ -210,8 +236,11 @@ fig2, axs2 = plt.subplots(1, 3) # Same as above, but for different iterations - 
 fig3, axs3 = plt.subplots(1, 2) # Reconstructed object for different slices (use first and final iteration)
 fig4, axs4 = plt.subplots() # Reconstructed object for different iteration (use slice index 64?)
 fig5, axs5 = plt.subplots() # x- and y-shifts as function of iteration index
-fig6, axs6 = plt.subplots() # Center of rotation as function of iteration index
+# fig6, axs6 = plt.subplots() # Center of rotation as function of iteration index
 fig7, axs7 = plt.subplots() # Net shifts as function of angle for each slice
+fig8, axs8 = plt.subplots()
+fig9, axs9 = plt.subplots(2, 1)
+fig10, axs10 = plt.subplots()
 
 im1_1 = axs1[0, 0].imshow(aligned_proj_theta_array_aux[0])
 im1_2 = axs1[0, 1].imshow(synth_proj_theta_array_aux[0])
@@ -231,9 +260,17 @@ im4 = axs4.imshow(recon_iter_array_aux[0])
 
 curve1, = axs5.plot(iter_array, net_x_shifts[:, 0], 'k-o', markersize = 3, label = r'$\Delta x$')
 curve2, = axs5.plot(iter_array, net_y_shifts[:, 0], 'r-o', markersize = 3, label = r'$\Delta y$')
-curve3, = axs6.plot(iter_array, cor_shifts, 'k-o', markersize = 3)
+# curve3, = axs6.plot(iter_array, cor_shifts, 'k-o', markersize = 3)
 curve4, = axs7.plot(theta_array, net_x_shifts[0, :], 'k-o', markersize = 3, label = r'$\Delta x$')
 curve5, = axs7.plot(theta_array, net_y_shifts[0, :], 'k-o', markersize = 3, label = r'$\Delta y$')
+curve6, = axs8.plot(scan_pos_array, aligned_proj_iter_array_aux[0][slice_idx_desired], label = r'Measured')
+curve7, = axs8.plot(scan_pos_array, synth_proj_iter_array_aux[0][slice_idx_desired], label = r'Reprojected')
+curve8, = axs9[0].plot(scan_pos_array, aligned_proj_theta_array_aux[0][slice_idx_desired], label = r'Measured')
+curve9, = axs9[0].plot(scan_pos_array, synth_proj_theta_array_aux[0][slice_idx_desired], label = r'Reprojected')
+curve10, = axs9[1].plot(scan_pos_array, aligned_proj_theta_array_aux_2[0][slice_idx_desired], label = r'Measured')
+curve11, = axs9[1].plot(scan_pos_array, synth_proj_theta_array_aux_2[0][slice_idx_desired], label = r'Reprojected')
+curve12, = axs10.plot(scan_pos_array, aligned_proj_theta_array_aux[theta_idx_pairs[0][0]][slice_idx_desired], label = r'$\theta = {0}$\textdegree'.format(theta_array[theta_idx_pairs[0][0]]))
+curve13, = axs10.plot(scan_pos_array, aligned_proj_theta_array_aux[theta_idx_pairs[0][1]][slice_idx_desired], label = r'$\theta = {0}$\textdegree'.format(theta_array[theta_idx_pairs[0][1]]))
 
 text_1 = axs1[0, 0].text(0.02, 0.02, r'$\theta = {0}$\textdegree'.format(theta_array[0]), transform = axs1[0, 0].transAxes, color = 'white')
 text_2 = axs2[0].text(0.02, 0.02, r'Iter. 0', transform = axs2[0].transAxes, color = 'white')
@@ -263,15 +300,42 @@ axs5.set_xlabel(r'Iteration index $i$')
 axs5.set_ylabel(r'Net shift')
 axs5.legend(frameon = False)
 
-axs6.set_xlim(0, n_iter - 1)
-axs6.set_ylim(np.min(cor_shifts), np.max(cor_shifts))
-axs6.set_xlabel(r'Iteration index $i$')
-axs6.set_ylabel(r'Center of rotation')
+# axs6.set_xlim(0, n_iter - 1)
+# axs6.set_ylim(np.min(cor_shifts), np.max(cor_shifts))
+# axs6.set_xlabel(r'Iteration index $i$')
+# axs6.set_ylabel(r'Center of rotation')
 
 axs7.set_xlim(np.min(theta_array), np.max(theta_array))
 axs7.set_xlabel(r'$\theta$')
 axs7.set_ylabel(r'Net shift')
 axs7.legend(frameon = False)
+
+axs8.set_xlim(0, n_columns - 1)
+axs8.set_xlabel(r'Scan position index')
+axs8.set_ylabel(r'Intensity (a.u.)')
+axs8.legend(frameon = False)
+
+fig8.suptitle(r'$\theta = {0}$\textdegree; Slice index {1}'.format(theta_array[theta_idx_desired], slice_idx_desired))
+
+axs9[0].set_xlim(0, n_columns - 1)
+axs9[0].set_title(r'Iteration index 0')
+axs9[0].set_xlabel(r'Scan position index')
+axs9[0].set_ylabel(r'Intensity (a.u.)')
+axs9[0].legend(frameon = False)
+
+axs9[1].set_xlim(0, n_columns - 1)
+axs9[1].set_title(r'Iteration index {0}'.format(n_iter - 1))
+axs9[1].set_xlabel(r'Scan position index')
+axs9[1].set_ylabel(r'Intensity (a.u.)')
+axs9[1].legend(frameon = False)
+
+fig9.suptitle(r'$\theta = {0}$\textdegree; Slice index {1}'.format(theta_array[0], slice_idx_desired))
+
+axs10.set_xlim(0, n_columns - 1)
+axs10.set_title(r'Iteration index 0; Slice index {0}'.format(slice_idx_desired))
+axs10.set_xlabel(r'Scan position index')
+axs10.set_ylabel(r'Intensity (a.u.)')
+axs10.legend(frameon = False)
 
 for theta_idx in range(n_theta):
     im1_1.set_data(aligned_proj_theta_array_aux[theta_idx])
@@ -286,8 +350,22 @@ for theta_idx in range(n_theta):
     net_shift_x = net_x_shifts[:, theta_idx]
     net_shift_y = net_y_shifts[:, theta_idx]
 
+    exp_slice_proj_intensity_theta_iter_1 = aligned_proj_theta_array_aux[theta_idx][slice_idx_desired]
+    exp_slice_proj_intensity_theta_iter_final = aligned_proj_theta_array_aux_2[theta_idx][slice_idx_desired]
+    synth_slice_proj_intensity_theta_iter_1 = synth_proj_theta_array_aux[theta_idx][slice_idx_desired]
+    synth_slice_proj_intensity_theta_iter_final = synth_proj_theta_array_aux_2[theta_idx][slice_idx_desired]
+
     curve1.set_ydata(net_shift_x)
     curve2.set_ydata(net_shift_y)
+    curve8.set_ydata(exp_slice_proj_intensity_theta_iter_1)
+    curve9.set_ydata(synth_slice_proj_intensity_theta_iter_1)
+    curve10.set_ydata(exp_slice_proj_intensity_theta_iter_final)
+    curve11.set_ydata(synth_slice_proj_intensity_theta_iter_final)
+
+    min_intensity_theta_iter_1 = np.min([np.min(exp_slice_proj_intensity_theta_iter_1), np.min(synth_slice_proj_intensity_theta_iter_1)])
+    min_intensity_theta_iter_final = np.min([np.min(exp_slice_proj_intensity_theta_iter_final), np.min(synth_slice_proj_intensity_theta_iter_final)])
+    max_intensity_theta_iter_1 = np.max([np.max(exp_slice_proj_intensity_theta_iter_1), np.max(synth_slice_proj_intensity_theta_iter_1)])
+    max_intensity_theta_iter_final = np.max([np.max(exp_slice_proj_intensity_theta_iter_final), np.max(synth_slice_proj_intensity_theta_iter_final)])
 
     min_shift = np.min([np.min(net_shift_x), np.min(net_shift_y)])
     max_shift = np.max([np.max(net_shift_x), np.max(net_shift_y)])
@@ -295,20 +373,30 @@ for theta_idx in range(n_theta):
     axs5.set_ylim(min_shift, max_shift + 0.1)
     axs5.set_title(r'$\theta = {0}$\textdegree'.format(theta_array[theta_idx]))
 
+    axs9[0].set_ylim(min_intensity_theta_iter_1, max_intensity_theta_iter_1)
+    axs9[1].set_ylim(min_intensity_theta_iter_final, max_intensity_theta_iter_final)
+
+    fig9.suptitle(r'$\theta = {0}$\textdegree; Slice index {1}'.format(theta_array[theta_idx], slice_idx_desired))
+
     filename_1 = os.path.join(dir_path, f'proj_theta{theta_idx:03d}.tiff')
     filename_5 = os.path.join(dir_path, f'net_net_shifts_theta_{theta_idx:03d}.tiff')
+    filename_9 = os.path.join(dir_path, f'slice_proj_theta_{theta_idx:03d}.tiff')
 
     fig1.tight_layout()
     fig5.tight_layout()
+    fig9.tight_layout()
 
     fig1.savefig(filename_1, dpi = 400)
     fig5.savefig(filename_5, dpi = 400)
+    fig9.savefig(filename_9, dpi = 400)
 
     tiff_array_1.append(filename_1)
     tiff_array_5.append(filename_5)
+    tiff_array_9.append(filename_9)
 
 plt.close(fig1)
 plt.close(fig5)
+plt.close(fig9)
 
 for slice_idx in range(n_slices):
     im3_1.set_data(recon_slice_array_aux[slice_idx])
@@ -333,6 +421,12 @@ for iter_idx in range(n_iter):
     min_shift = np.min([np.min(net_shift_x), np.min(net_shift_y)])
     max_shift = np.max([np.max(net_shift_x), np.max(net_shift_y)])
 
+    exp_slice_proj_intensity = aligned_proj_iter_array_aux[iter_idx][slice_idx_desired]
+    synth_slice_proj_intensity = synth_proj_iter_array_aux[iter_idx][slice_idx_desired]
+
+    min_intensity = np.min([np.min(exp_slice_proj_intensity), np.min(synth_slice_proj_intensity)])
+    max_intensity = np.max([np.max(exp_slice_proj_intensity), np.max(synth_slice_proj_intensity)])
+
     im2_1.set_data(aligned_proj_iter_array_aux[iter_idx])
     im2_2.set_data(synth_proj_iter_array_aux[iter_idx])
     im2_3.set_data(rgb_proj_iter_array[iter_idx])
@@ -341,41 +435,69 @@ for iter_idx in range(n_iter):
     
     curve4.set_ydata(net_shift_x)
     curve5.set_ydata(net_shift_y)
+    curve6.set_ydata(exp_slice_proj_intensity)
+    curve7.set_ydata(synth_slice_proj_intensity)
 
     text_2.set_text(r'Iter. {0}'.format(iter_idx))
     text_4.set_text(r'Iter. {0}'.format(iter_idx))
 
     axs7.set_ylim(min_shift, max_shift + 0.1)
     axs7.set_title(r'Iteration {0}'.format(iter_idx))
+    
+    axs8.set_ylim(min_intensity, max_intensity + 0.1)
+    axs8.set_title(r'Iteration {0}'.format(iter_idx))
 
     filename_2 = os.path.join(dir_path, f'proj_iter_{iter_idx:03d}.tiff')
     filename_4 = os.path.join(dir_path, f'recon_iter_{iter_idx:03d}.tiff')
     filename_7 = os.path.join(dir_path, f'net_shifts_iter_{iter_idx:03d}.tiff')
+    filename_8 = os.path.join(dir_path, f'slice_proj_iter_{iter_idx:03d}.tiff')
 
     fig2.tight_layout()
     fig4.tight_layout()
     fig7.tight_layout()
+    fig8.tight_layout()
     
     fig2.savefig(filename_2, dpi = 400)
     fig4.savefig(filename_4, dpi = 400)
     fig7.savefig(filename_7, dpi = 400)
+    fig8.savefig(filename_8, dpi = 400)
 
     tiff_array_2.append(filename_2)
     tiff_array_4.append(filename_4)
     tiff_array_7.append(filename_7)
+    tiff_array_8.append(filename_8)
 
 plt.close(fig2)
 plt.close(fig4)
 plt.close(fig7)
+plt.close(fig8)
 
-print('Saving COR plot...')
+for theta_pair_idx in range(len(theta_idx_pairs)):
+    exp_slice_proj_intensity_theta_1 = aligned_proj_theta_array_aux[theta_idx_pairs[theta_pair_idx][0]][slice_idx_desired]
+    exp_slice_proj_intensity_theta_2 = aligned_proj_theta_array_aux[theta_idx_pairs[theta_pair_idx][1]][slice_idx_desired]
 
-filename_6 = os.path.join(dir_path, 'cor_shifts.svg')
+    min_slice_proj_intensity = np.min([np.min(exp_slice_proj_intensity_theta_1), np.min(exp_slice_proj_intensity_theta_2)])
+    max_slice_proj_intensity = np.max([np.max(exp_slice_proj_intensity_theta_1), np.max(exp_slice_proj_intensity_theta_2)])
 
-fig6.tight_layout()
-fig6.savefig(filename_6)
+    curve12.set_ydata(exp_slice_proj_intensity_theta_1, label = r'$\theta = {0}$\textdegree'.format(theta_array[theta_idx_pairs[theta_pair_idx][0]]))
+    curve13.set_ydata(exp_slice_proj_intensity_theta_2, label = r'$\theta = {0}$\textdegree'.format(theta_array[theta_idx_pairs[theta_pair_idx][1]]))
 
-plt.close(fig6)
+    axs10.set_ylim(min_slice_proj_intensity, max_slice_proj_intensity)
+
+    filename_10 = os.path.join(dir_path, f'slice_proj_theta_pair_{theta_pair_idx:03d}.tiff')
+
+    tiff_array_10.append(filename_10)
+
+plt.close(fig10)
+
+# print('Saving COR plot...')
+
+# filename_6 = os.path.join(dir_path, 'cor_shifts.svg')
+
+# fig6.tight_layout()
+# fig6.savefig(filename_6)
+
+# plt.close(fig6)
 
 print('Creating projection GIF (changing thetas)...')
 
@@ -400,6 +522,14 @@ create_gif(tiff_array_5, os.path.join(dir_path, 'net_shifts_theta.gif'), fps = 1
 print('Creating net shift GIF (changing iteration)...')
 
 create_gif(tiff_array_7, os.path.join(dir_path, 'net_shifts_iter.gif'), fps = 15)
+
+print('Creating slice projection GIF (changing iteration)...')
+
+create_gif(tiff_array_8, os.path.join(dir_path, 'slice_proj_iter.gif'), fps = 15)
+
+print('Creating slice projection GIF (changing theta)...')
+
+create_gif(tiff_array_9, os.path.join(dir_path, 'slice_proj_theta.gif'), fps = 15)
 
 print('Done')
 
