@@ -482,8 +482,8 @@ for theta_pair_idx in range(len(theta_idx_pairs)):
     min_slice_proj_intensity = np.min([np.min(exp_slice_proj_intensity_theta_1), np.min(exp_slice_proj_intensity_theta_2)])
     max_slice_proj_intensity = np.max([np.max(exp_slice_proj_intensity_theta_1), np.max(exp_slice_proj_intensity_theta_2)])
 
-    curve12.set_ydata(exp_slice_proj_intensity_theta_1, label = r'$\theta = {0}$\textdegree'.format(theta_array[theta_idx_pairs[theta_pair_idx][0]]))
-    curve13.set_ydata(exp_slice_proj_intensity_theta_2, label = r'$\theta = {0}$\textdegree'.format(theta_array[theta_idx_pairs[theta_pair_idx][1]]))
+    curve12.set_ydata(exp_slice_proj_intensity_theta_1)
+    curve13.set_ydata(exp_slice_proj_intensity_theta_2)
 
     axs10.set_ylim(min_slice_proj_intensity, max_slice_proj_intensity)
 
