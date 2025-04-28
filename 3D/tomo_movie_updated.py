@@ -147,10 +147,16 @@ n_iter = len(aligned_proj_iter_array)
 
 aligned_proj_theta_array_aux = []
 aligned_proj_theta_array_aux_2 = []
+aligned_proj_theta_array_aux_red = []
+aligned_proj_theta_array_aux_2_red = []
 aligned_proj_iter_array_aux = []
+aligned_proj_iter_array_aux_red = []
 synth_proj_theta_array_aux = []
+synth_proj_theta_array_aux_blue = []
 synth_proj_theta_array_aux_2 = []
+synth_proj_theta_array_aux_2_blue = []
 synth_proj_iter_array_aux = []
+synth_proj_iter_array_aux_blue = []
 rgb_proj_theta_array = []
 rgb_proj_theta_array_2 = []
 rgb_proj_iter_array = []
@@ -180,15 +186,20 @@ element_idx_desired = 11 # Fe for this directory
 theta_idx_pairs = find_theta_combos(theta_array, dtheta = 1)
 
 for theta_idx in range(n_theta):
+    aligned_proj_theta_array_aux.append(aligned_proj_iter_array[iter_idx_desired][theta_idx])
+    aligned_proj_theta_array_aux_2.append(aligned_proj_iter_array[-1][theta_idx])
+    synth_proj_theta_array_aux.append(synth_proj_iter_array[iter_idx_desired][theta_idx])
+    synth_proj_theta_array_aux_2.append(synth_proj_iter_array[-1][theta_idx])
+
     aligned_proj_norm = normalize_array(aligned_proj_iter_array[iter_idx_desired][theta_idx])
     synth_proj_norm = normalize_array(synth_proj_iter_array[iter_idx_desired][theta_idx])
 
     aligned_proj_red = np.dstack((aligned_proj_norm, np.zeros_like(aligned_proj_norm), np.zeros_like(aligned_proj_norm)))
     synth_proj_blue = np.dstack((np.zeros_like(aligned_proj_norm), np.zeros_like(aligned_proj_norm), synth_proj_norm))
     rgb = np.dstack((aligned_proj_norm, np.zeros_like(aligned_proj_norm), synth_proj_norm))
-    
-    aligned_proj_theta_array_aux.append(aligned_proj_red)
-    synth_proj_theta_array_aux.append(synth_proj_blue)
+
+    aligned_proj_theta_array_aux_red.append(aligned_proj_red)
+    synth_proj_theta_array_aux_blue.append(synth_proj_blue)
     rgb_proj_theta_array.append(rgb)
 
     aligned_proj_norm = normalize_array(aligned_proj_iter_array[-1][theta_idx])
@@ -198,8 +209,8 @@ for theta_idx in range(n_theta):
     synth_proj_blue = np.dstack((np.zeros_like(aligned_proj_norm), np.zeros_like(aligned_proj_norm), synth_proj_norm))
     rgb = np.dstack((aligned_proj_norm, np.zeros_like(aligned_proj_norm), synth_proj_norm))
     
-    aligned_proj_theta_array_aux_2.append(aligned_proj_red)
-    synth_proj_theta_array_aux_2.append(synth_proj_blue)
+    aligned_proj_theta_array_aux_2_red.append(aligned_proj_red)
+    synth_proj_theta_array_aux_2_blue.append(synth_proj_blue)
     rgb_proj_theta_array_2.append(rgb)
 
 for iter_idx in range(n_iter):
@@ -210,8 +221,10 @@ for iter_idx in range(n_iter):
     synth_proj_blue = np.dstack((np.zeros_like(aligned_proj_norm), np.zeros_like(aligned_proj_norm), synth_proj_norm))
     rgb = np.dstack((aligned_proj_norm, np.zeros_like(aligned_proj_norm), synth_proj_norm))
 
-    aligned_proj_iter_array_aux.append(aligned_proj_red)
-    synth_proj_iter_array_aux.append(synth_proj_blue)
+    aligned_proj_iter_array_aux.append(aligned_proj_iter_array[iter_idx][theta_idx_desired])
+    aligned_proj_iter_array_aux_red.append(aligned_proj_red)
+    synth_proj_iter_array_aux.append(synth_proj_iter_array[iter_idx][theta_idx_desired])
+    synth_proj_iter_array_aux_blue.append(synth_proj_blue)
     rgb_proj_iter_array.append(rgb)
     recon_iter_array_aux.append(recon_iter_array[iter_idx][slice_idx_desired])
 
@@ -220,8 +233,13 @@ for slice_idx in range(n_slices):
     recon_slice_array_aux_2.append(recon_iter_array[-1][slice_idx])
 
 aligned_proj_theta_array_aux = np.array(aligned_proj_theta_array_aux)
+aligned_proj_theta_array_aux_red = np.array(aligned_proj_theta_array_aux_red)
+aligned_proj_theta_array_aux_2_red = np.array(aligned_proj_theta_array_aux_2_red)
 aligned_proj_iter_array_aux = np.array(aligned_proj_iter_array_aux)
+aligned_proj_iter_array_aux_red = np.array(aligned_proj_iter_array_aux_red)
 synth_proj_theta_array_aux = np.array(synth_proj_theta_array_aux)
+synth_proj_theta_array_aux_blue = np.array(synth_proj_theta_array_aux_blue)
+synth_proj_theta_array_aux_2_blue = np.array(synth_proj_theta_array_aux_2_blue)
 synth_proj_iter_array_aux = np.array(synth_proj_iter_array_aux)
 rgb_proj_theta_array = np.array(rgb_proj_theta_array)
 rgb_proj_iter_array = np.array(rgb_proj_iter_array)
@@ -247,15 +265,15 @@ fig8, axs8 = plt.subplots()
 fig9, axs9 = plt.subplots(2, 1)
 fig10, axs10 = plt.subplots()
 
-im1_1 = axs1[0, 0].imshow(aligned_proj_theta_array_aux[0])
-im1_2 = axs1[0, 1].imshow(synth_proj_theta_array_aux[0])
+im1_1 = axs1[0, 0].imshow(aligned_proj_theta_array_aux_red[0])
+im1_2 = axs1[0, 1].imshow(synth_proj_theta_array_aux_blue[0])
 im1_3 = axs1[0, 2].imshow(rgb_proj_theta_array[0])
-im1_4 = axs1[1, 0].imshow(aligned_proj_theta_array_aux_2[0])
-im1_5 = axs1[1, 1].imshow(synth_proj_theta_array_aux_2[0])
+im1_4 = axs1[1, 0].imshow(aligned_proj_theta_array_aux_2_red[0])
+im1_5 = axs1[1, 1].imshow(synth_proj_theta_array_aux_2_blue[0])
 im1_6 = axs1[1, 2].imshow(rgb_proj_theta_array_2[0])
 
-im2_1 = axs2[0].imshow(aligned_proj_iter_array_aux[0])
-im2_2 = axs2[1].imshow(synth_proj_iter_array_aux[0])
+im2_1 = axs2[0].imshow(aligned_proj_iter_array_aux_red[0])
+im2_2 = axs2[1].imshow(synth_proj_iter_array_aux_blue[0])
 im2_3 = axs2[2].imshow(rgb_proj_iter_array[0])
 
 im3_1 = axs3[0].imshow(recon_slice_array_aux[0])
