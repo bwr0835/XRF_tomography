@@ -476,16 +476,20 @@ plt.close(fig8)
 for theta_pair_idx in range(len(theta_idx_pairs)):
     legend_10.remove()
 
-    exp_slice_proj_intensity_theta_1 = aligned_proj_theta_array_aux[theta_idx_pairs[theta_pair_idx][0]][slice_idx_desired]
-    exp_slice_proj_intensity_theta_2 = aligned_proj_theta_array_aux[theta_idx_pairs[theta_pair_idx][1]][slice_idx_desired]
+    theta_idx_1 = theta_idx_pairs[theta_pair_idx][0]
+    theta_idx_2 = theta_idx_pairs[theta_pair_idx][1]
+
+    exp_slice_proj_intensity_theta_1 = aligned_proj_theta_array_aux[theta_idx_1][slice_idx_desired]
+    exp_slice_proj_intensity_theta_2 = aligned_proj_theta_array_aux[theta_idx_2][slice_idx_desired]
 
     min_slice_proj_intensity = np.min([np.min(exp_slice_proj_intensity_theta_1), np.min(exp_slice_proj_intensity_theta_2)])
     max_slice_proj_intensity = np.max([np.max(exp_slice_proj_intensity_theta_1), np.max(exp_slice_proj_intensity_theta_2)])
 
     curve12.set_ydata(exp_slice_proj_intensity_theta_1)
-    curve12.set_label(r'$')
+    curve12.set_label(r'$\theta = {0}$\textdegree'.format(theta_array[theta_idx_1]))
+    
     curve13.set_ydata(exp_slice_proj_intensity_theta_2)
-
+    curve13.set_label(r'$\theta = {0}$\textdegree'.format(theta_array[theta_idx_2]))
 
     axs10.set_ylim(min_slice_proj_intensity, max_slice_proj_intensity)
 
