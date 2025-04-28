@@ -379,7 +379,7 @@ def iter_reproj(ref_element,
 
                 aligned_proj[theta_idx] = ndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx], shift = (net_y_shift, net_x_shift))
 
-        aligned_exp_proj_array.append(aligned_proj)
+        aligned_exp_proj_array.append(aligned_proj.copy())
 
         print(aligned_proj.shape)
 
@@ -516,12 +516,12 @@ synth_proj_array, \
 recon_array, \
 net_x_shifts, \
 net_y_shifts = iter_reproj(desired_element, 
-                                  elements_xrf, 
-                                  theta_xrf, 
-                                  counts_xrf, 
-                                  algorithm, 
-                                  n_desired_iter,
-                                  init_x_shift = init_x_shift)
+                           elements_xrf, 
+                           theta_xrf, 
+                           counts_xrf, 
+                           algorithm, 
+                           n_desired_iter,
+                           init_x_shift = init_x_shift)
 
 print('Saving files...')
 
