@@ -263,14 +263,14 @@ curve2, = axs5.plot(iter_array, net_y_shifts[:, 0], 'r-o', markersize = 3, label
 # curve3, = axs6.plot(iter_array, cor_shifts, 'k-o', markersize = 3)
 curve4, = axs7.plot(theta_array, net_x_shifts[0, :], 'k-o', markersize = 3, label = r'$\Delta x$')
 curve5, = axs7.plot(theta_array, net_y_shifts[0, :], 'k-o', markersize = 3, label = r'$\Delta y$')
-curve6, = axs8.plot(scan_pos_array, aligned_proj_iter_array_aux[0][slice_idx_desired], label = r'Measured')
-curve7, = axs8.plot(scan_pos_array, synth_proj_iter_array_aux[0][slice_idx_desired], label = r'Reprojected')
-curve8, = axs9[0].plot(scan_pos_array, aligned_proj_theta_array_aux[0][slice_idx_desired], label = r'Measured')
-curve9, = axs9[0].plot(scan_pos_array, synth_proj_theta_array_aux[0][slice_idx_desired], label = r'Reprojected')
-curve10, = axs9[1].plot(scan_pos_array, aligned_proj_theta_array_aux_2[0][slice_idx_desired], label = r'Measured')
-curve11, = axs9[1].plot(scan_pos_array, synth_proj_theta_array_aux_2[0][slice_idx_desired], label = r'Reprojected')
-curve12, = axs10.plot(scan_pos_array, aligned_proj_theta_array_aux[theta_idx_pairs[0][0]][slice_idx_desired], label = r'$\theta = {0}$\textdegree'.format(theta_array[theta_idx_pairs[0][0]]))
-curve13, = axs10.plot(scan_pos_array, aligned_proj_theta_array_aux[theta_idx_pairs[0][1]][slice_idx_desired], label = r'$\theta = {0}$\textdegree'.format(theta_array[theta_idx_pairs[0][1]]))
+curve6, = axs8.plot(scan_pos_array, aligned_proj_iter_array_aux[0][slice_idx_desired], 'k', label = r'Measured')
+curve7, = axs8.plot(scan_pos_array, synth_proj_iter_array_aux[0][slice_idx_desired], 'r', label = r'Reprojected')
+curve8, = axs9[0].plot(scan_pos_array, aligned_proj_theta_array_aux[0][slice_idx_desired], 'k', label = r'Measured')
+curve9, = axs9[0].plot(scan_pos_array, synth_proj_theta_array_aux[0][slice_idx_desired], 'r', label = r'Reprojected')
+curve10, = axs9[1].plot(scan_pos_array, aligned_proj_theta_array_aux_2[0][slice_idx_desired], 'k', label = r'Measured')
+curve11, = axs9[1].plot(scan_pos_array, synth_proj_theta_array_aux_2[0][slice_idx_desired], 'r', label = r'Reprojected')
+curve12, = axs10.plot(scan_pos_array, aligned_proj_theta_array_aux[theta_idx_pairs[0][0]][slice_idx_desired], 'k', label = r'$\theta = {0}$\textdegree'.format(theta_array[theta_idx_pairs[0][0]]))
+curve13, = axs10.plot(scan_pos_array, aligned_proj_theta_array_aux[theta_idx_pairs[0][1]][slice_idx_desired], 'r', label = r'$\theta = {0}$\textdegree'.format(theta_array[theta_idx_pairs[0][1]]))
 
 text_1 = axs1[0, 0].text(0.02, 0.02, r'$\theta = {0}$\textdegree'.format(theta_array[0]), transform = axs1[0, 0].transAxes, color = 'white')
 text_2 = axs2[0].text(0.02, 0.02, r'Iter. 0', transform = axs2[0].transAxes, color = 'white')
@@ -335,7 +335,8 @@ axs10.set_xlim(0, n_columns - 1)
 axs10.set_title(r'Iteration index 0; Slice index {0}'.format(slice_idx_desired))
 axs10.set_xlabel(r'Scan position index')
 axs10.set_ylabel(r'Intensity (a.u.)')
-axs10.legend(frameon = False)
+
+legend_10 = axs10.legend(frameon = False)
 
 for theta_idx in range(n_theta):
     im1_1.set_data(aligned_proj_theta_array_aux[theta_idx])
@@ -473,6 +474,8 @@ plt.close(fig7)
 plt.close(fig8)
 
 for theta_pair_idx in range(len(theta_idx_pairs)):
+    legend_10.remove()
+
     exp_slice_proj_intensity_theta_1 = aligned_proj_theta_array_aux[theta_idx_pairs[theta_pair_idx][0]][slice_idx_desired]
     exp_slice_proj_intensity_theta_2 = aligned_proj_theta_array_aux[theta_idx_pairs[theta_pair_idx][1]][slice_idx_desired]
 
@@ -483,6 +486,8 @@ for theta_pair_idx in range(len(theta_idx_pairs)):
     curve13.set_ydata(exp_slice_proj_intensity_theta_2, label = r'$\theta = {0}$\textdegree'.format(theta_array[theta_idx_pairs[theta_pair_idx][1]]))
 
     axs10.set_ylim(min_slice_proj_intensity, max_slice_proj_intensity)
+
+    legend_10 = axs10.legend(frameon = False)
 
     filename_10 = os.path.join(dir_path, f'slice_proj_theta_pair_{theta_pair_idx:03d}.tiff')
 
