@@ -326,10 +326,10 @@ def iter_reproj(ref_element,
     
     center_of_rotation = np.mean(center_of_rotation_array)
 
-    plt.plot(np.arange(len(center_of_rotation_array)), center_of_rotation_array, 'o', markersize = 3)
-    plt.plot(np.arange(len(center_of_rotation_array)), center_of_rotation*np.ones(len(center_of_rotation_array)))
+    # plt.plot(np.arange(len(center_of_rotation_array)), center_of_rotation_array, 'o', markersize = 3)
+    # plt.plot(np.arange(len(center_of_rotation_array)), center_of_rotation*np.ones(len(center_of_rotation_array)))
 
-    plt.show()
+    # plt.show()
         
     center_geom = (n_columns - 1)/2
     
@@ -342,7 +342,7 @@ def iter_reproj(ref_element,
 
     for element_idx in range(n_elements):
         for theta_idx in range(n_theta):
-            xrf_proj_img_array[element_idx, theta_idx] = ndi.shift(xrf_proj_img_array[element_idx, theta_idx], shift = (0, -offset), order = 1)
+            xrf_proj_img_array[element_idx, theta_idx] = ndi.shift(xrf_proj_img_array[element_idx, theta_idx], shift = (0, -offset))
 
     center_of_rotation_array = np.array([tomo.find_center_pc(xrf_proj_img_array[ref_element_idx, theta_idx_pair[0]], 
                                                     xrf_proj_img_array[ref_element_idx, theta_idx_pair[1]], 
@@ -360,7 +360,7 @@ def iter_reproj(ref_element,
 
         if i == 0:
             for theta_idx in range(n_theta):
-                aligned_proj[theta_idx] = ndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx], shift = (init_y_shift, init_x_shift), order = 1)
+                aligned_proj[theta_idx] = ndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx], shift = (init_y_shift, init_x_shift))
             
         else:
             for theta_idx in range(n_theta):
@@ -371,11 +371,19 @@ def iter_reproj(ref_element,
                     print(f'Shifting projection by net x shift = {round_correct(net_x_shift, ndec = 3)} (theta = {round_correct(theta_array[theta_idx], ndec = 1)})...')
                     print(f'Shifting projection by net y shift = {round_correct(net_y_shift, ndec = 3)}...')
 
-                aligned_proj[theta_idx] = ndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx], shift = (net_y_shift, net_x_shift), order = 1)
+                aligned_proj[theta_idx] = ndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx], shift = (net_y_shift, net_x_shift))
 
         aligned_exp_proj_array.append(aligned_proj)
-        
+
         print(aligned_proj.shape)
+
+        center_of_rotation_array_new = np.array([tomo.find_center_pc(aligned_proj[ref_element_idx, theta_idx_pair[0]], 
+                                                    aligned_proj[ref_element_idx, theta_idx_pair[1]], 
+                                                    tol = 0.01) for theta_idx_pair in theta_idx_pairs])
+    
+        center_of_rotation_new = np.mean(center_of_rotation_array_new)
+        
+        print(f'Center of rotation after shifting: {round_correct(center_of_rotation_new, ndec = 3)}')
         
         if algorithm == 'gridrec':
             recon = tomo.recon(aligned_proj, theta_array*np.pi/180, center_of_rotation, algorithm = algorithm)
@@ -431,7 +439,7 @@ def iter_reproj(ref_element,
                     net_x_shift = net_x_shifts_pc_new[i]
                     net_y_shift = net_y_shifts_pc_new[i]
 
-                    aligned_proj_total[element_idx, theta_idx] = ndi.shift(xrf_proj_img_array[element_idx, theta_idx], shift = (net_y_shift, net_x_shift), order = 1)
+                    aligned_proj_total[element_idx, theta_idx] = ndi.shift(xrf_proj_img_array[element_idx, theta_idx], shift = (net_y_shift, net_x_shift))
             
             print('Done')
 
@@ -449,7 +457,7 @@ def iter_reproj(ref_element,
                     net_x_shift = net_x_shifts_pc_new[i, theta_idx]
                     net_y_shift = net_y_shifts_pc_new[i, theta_idx]
                         
-                    aligned_proj_total[element_idx, theta_idx] = ndi.shift(xrf_proj_img_array[element_idx, theta_idx], shift = (net_y_shift, net_x_shift), order = 1)
+                    aligned_proj_total[element_idx, theta_idx] = ndi.shift(xrf_proj_img_array[element_idx, theta_idx], shift = (net_y_shift, net_x_shift))
 
             print('Done')
 
@@ -464,7 +472,7 @@ output_dir_path_base = '/home/bwr0835'
 
 # output_file_name_base = input('Choose a base file name: ')
 # output_file_name_base = 'gridrec_5_iter_vacek_cor_and_shift_correction_padding_-22_deg_158_deg'
-output_file_name_base = 'gridrec_5_iter_tomopy_cor_alg_no_cor_correction_padding_04_17_2025'
+output_file_name_base = 'gridrec_5_iter_tomopy_cor_phase_corr_w_padding_04_28_2025'
 
 if output_file_name_base == '':
     print('No output base file name chosen. Ending program...')
