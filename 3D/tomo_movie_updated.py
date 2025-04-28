@@ -497,6 +497,8 @@ for theta_pair_idx in range(len(theta_idx_pairs)):
 
     filename_10 = os.path.join(dir_path, f'slice_proj_theta_pair_{theta_pair_idx:03d}.tiff')
 
+    fig10.savefig(filename_10, dpi = 400)
+
     tiff_array_10.append(filename_10)
 
 plt.close(fig10)
