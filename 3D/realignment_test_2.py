@@ -377,8 +377,8 @@ def iter_reproj(ref_element,
 
         print(aligned_proj.shape)
 
-        center_of_rotation_array_new = np.array([tomo.find_center_pc(aligned_proj[ref_element_idx, theta_idx_pair[0]], 
-                                                    aligned_proj[ref_element_idx, theta_idx_pair[1]], 
+        center_of_rotation_array_new = np.array([tomo.find_center_pc(aligned_proj[theta_idx_pair[0]], 
+                                                    aligned_proj[theta_idx_pair[1]], 
                                                     tol = 0.01) for theta_idx_pair in theta_idx_pairs])
     
         center_of_rotation_new = np.mean(center_of_rotation_array_new)
