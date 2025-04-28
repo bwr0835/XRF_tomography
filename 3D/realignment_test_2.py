@@ -411,7 +411,7 @@ def iter_reproj(ref_element,
 
             synth_proj[:, slice_idx, :] = sinogram
         
-        synth_proj_array.append(synth_proj)
+        synth_proj_array.append(synth_proj.copy())
 
         for theta_idx in range(n_theta):
             dy, dx = phase_correlate(synth_proj[theta_idx], aligned_proj[theta_idx], upsample_factor = 100)
