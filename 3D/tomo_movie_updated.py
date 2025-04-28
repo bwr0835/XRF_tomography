@@ -180,33 +180,38 @@ element_idx_desired = 11 # Fe for this directory
 theta_idx_pairs = find_theta_combos(theta_array, dtheta = 1)
 
 for theta_idx in range(n_theta):
-    aligned_proj_theta_array_aux.append(aligned_proj_iter_array[iter_idx_desired][theta_idx])
-    aligned_proj_theta_array_aux_2.append(aligned_proj_iter_array[-1][theta_idx])
-    synth_proj_theta_array_aux.append(synth_proj_iter_array[iter_idx_desired][theta_idx])
-    synth_proj_theta_array_aux_2.append(synth_proj_iter_array[-1][theta_idx])
-
     aligned_proj_norm = normalize_array(aligned_proj_iter_array[iter_idx_desired][theta_idx])
     synth_proj_norm = normalize_array(synth_proj_iter_array[iter_idx_desired][theta_idx])
 
+    aligned_proj_red = np.dstack((aligned_proj_norm, np.zeros_like(aligned_proj_norm), np.zeros_like(aligned_proj_norm)))
+    synth_proj_blue = np.dstack((np.zeros_like(aligned_proj_norm), np.zeros_like(aligned_proj_norm), synth_proj_norm))
     rgb = np.dstack((aligned_proj_norm, np.zeros_like(aligned_proj_norm), synth_proj_norm))
-
+    
+    aligned_proj_theta_array_aux.append(aligned_proj_red)
+    synth_proj_theta_array_aux.append(synth_proj_blue)
     rgb_proj_theta_array.append(rgb)
 
     aligned_proj_norm = normalize_array(aligned_proj_iter_array[-1][theta_idx])
     synth_proj_norm = normalize_array(synth_proj_iter_array[-1][theta_idx])
 
+    aligned_proj_red = np.dstack((aligned_proj_norm, np.zeros_like(aligned_proj_norm), np.zeros_like(aligned_proj_norm)))
+    synth_proj_blue = np.dstack((np.zeros_like(aligned_proj_norm), np.zeros_like(aligned_proj_norm), synth_proj_norm))
     rgb = np.dstack((aligned_proj_norm, np.zeros_like(aligned_proj_norm), synth_proj_norm))
     
+    aligned_proj_theta_array_aux_2.append(aligned_proj_red)
+    synth_proj_theta_array_aux_2.append(synth_proj_blue)
     rgb_proj_theta_array_2.append(rgb)
 
 for iter_idx in range(n_iter):
     aligned_proj_norm = normalize_array(aligned_proj_iter_array[iter_idx][theta_idx_desired])
     synth_proj_norm = normalize_array(synth_proj_iter_array[iter_idx][theta_idx_desired])
 
+    aligned_proj_red = np.dstack((aligned_proj_norm, np.zeros_like(aligned_proj_norm), np.zeros_like(aligned_proj_norm)))
+    synth_proj_blue = np.dstack((np.zeros_like(aligned_proj_norm), np.zeros_like(aligned_proj_norm), synth_proj_norm))
     rgb = np.dstack((aligned_proj_norm, np.zeros_like(aligned_proj_norm), synth_proj_norm))
 
-    aligned_proj_iter_array_aux.append(aligned_proj_iter_array[iter_idx][theta_idx_desired])
-    synth_proj_iter_array_aux.append(synth_proj_iter_array[iter_idx][theta_idx_desired])
+    aligned_proj_iter_array_aux.append(aligned_proj_red)
+    synth_proj_iter_array_aux.append(synth_proj_blue)
     rgb_proj_iter_array.append(rgb)
     recon_iter_array_aux.append(recon_iter_array[iter_idx][slice_idx_desired])
 
