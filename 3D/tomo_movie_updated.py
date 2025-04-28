@@ -242,94 +242,94 @@ fig8, axs8 = plt.subplots()
 fig9, axs9 = plt.subplots(2, 1)
 fig10, axs10 = plt.subplots()
 
-# im1_1 = axs1[0, 0].imshow(aligned_proj_theta_array_aux[0])
-# im1_2 = axs1[0, 1].imshow(synth_proj_theta_array_aux[0])
-# im1_3 = axs1[0, 2].imshow(rgb_proj_theta_array[0])
-# im1_4 = axs1[1, 0].imshow(aligned_proj_theta_array_aux_2[0])
-# im1_5 = axs1[1, 1].imshow(synth_proj_theta_array_aux_2[0])
-# im1_6 = axs1[1, 2].imshow(rgb_proj_theta_array_2[0])
+im1_1 = axs1[0, 0].imshow(aligned_proj_theta_array_aux[0])
+im1_2 = axs1[0, 1].imshow(synth_proj_theta_array_aux[0])
+im1_3 = axs1[0, 2].imshow(rgb_proj_theta_array[0])
+im1_4 = axs1[1, 0].imshow(aligned_proj_theta_array_aux_2[0])
+im1_5 = axs1[1, 1].imshow(synth_proj_theta_array_aux_2[0])
+im1_6 = axs1[1, 2].imshow(rgb_proj_theta_array_2[0])
 
-# im2_1 = axs2[0].imshow(aligned_proj_iter_array_aux[0])
-# im2_2 = axs2[1].imshow(synth_proj_iter_array_aux[0])
-# im2_3 = axs2[2].imshow(rgb_proj_iter_array[0])
+im2_1 = axs2[0].imshow(aligned_proj_iter_array_aux[0])
+im2_2 = axs2[1].imshow(synth_proj_iter_array_aux[0])
+im2_3 = axs2[2].imshow(rgb_proj_iter_array[0])
 
-# im3_1 = axs3[0].imshow(recon_slice_array_aux[0])
-# im3_2 = axs3[1].imshow(recon_slice_array_aux_2[0])
+im3_1 = axs3[0].imshow(recon_slice_array_aux[0])
+im3_2 = axs3[1].imshow(recon_slice_array_aux_2[0])
 
-# im4 = axs4.imshow(recon_iter_array_aux[0])
+im4 = axs4.imshow(recon_iter_array_aux[0])
 
-# curve1, = axs5.plot(iter_array, net_x_shifts[:, 0], 'k-o', markersize = 3, label = r'$\Delta x$')
-# curve2, = axs5.plot(iter_array, net_y_shifts[:, 0], 'r-o', markersize = 3, label = r'$\Delta y$')
-# # curve3, = axs6.plot(iter_array, cor_shifts, 'k-o', markersize = 3)
-# curve4, = axs7.plot(theta_array, net_x_shifts[0, :], 'k-o', markersize = 3, label = r'$\Delta x$')
-# curve5, = axs7.plot(theta_array, net_y_shifts[0, :], 'k-o', markersize = 3, label = r'$\Delta y$')
-# curve6, = axs8.plot(scan_pos_array, aligned_proj_iter_array_aux[0][slice_idx_desired], 'k', label = r'Measured')
-# curve7, = axs8.plot(scan_pos_array, synth_proj_iter_array_aux[0][slice_idx_desired], 'r', label = r'Reprojected')
-# curve8, = axs9[0].plot(scan_pos_array, aligned_proj_theta_array_aux[0][slice_idx_desired], 'k', label = r'Measured')
-# curve9, = axs9[0].plot(scan_pos_array, synth_proj_theta_array_aux[0][slice_idx_desired], 'r', label = r'Reprojected')
-# curve10, = axs9[1].plot(scan_pos_array, aligned_proj_theta_array_aux_2[0][slice_idx_desired], 'k', label = r'Measured')
-# curve11, = axs9[1].plot(scan_pos_array, synth_proj_theta_array_aux_2[0][slice_idx_desired], 'r', label = r'Reprojected')
+curve1, = axs5.plot(iter_array, net_x_shifts[:, 0], 'k-o', markersize = 3, label = r'$\Delta x$')
+curve2, = axs5.plot(iter_array, net_y_shifts[:, 0], 'r-o', markersize = 3, label = r'$\Delta y$')
+# curve3, = axs6.plot(iter_array, cor_shifts, 'k-o', markersize = 3)
+curve4, = axs7.plot(theta_array, net_x_shifts[0, :], 'k-o', markersize = 3, label = r'$\Delta x$')
+curve5, = axs7.plot(theta_array, net_y_shifts[0, :], 'k-o', markersize = 3, label = r'$\Delta y$')
+curve6, = axs8.plot(scan_pos_array, aligned_proj_iter_array_aux[0][slice_idx_desired], 'k', label = r'Measured')
+curve7, = axs8.plot(scan_pos_array, synth_proj_iter_array_aux[0][slice_idx_desired], 'r', label = r'Reprojected')
+curve8, = axs9[0].plot(scan_pos_array, aligned_proj_theta_array_aux[0][slice_idx_desired], 'k', label = r'Measured')
+curve9, = axs9[0].plot(scan_pos_array, synth_proj_theta_array_aux[0][slice_idx_desired], 'r', label = r'Reprojected')
+curve10, = axs9[1].plot(scan_pos_array, aligned_proj_theta_array_aux_2[0][slice_idx_desired], 'k', label = r'Measured')
+curve11, = axs9[1].plot(scan_pos_array, synth_proj_theta_array_aux_2[0][slice_idx_desired], 'r', label = r'Reprojected')
 curve12, = axs10.plot(scan_pos_array, aligned_proj_theta_array_aux[theta_idx_pairs[0][0]][slice_idx_desired], 'k', label = r'$\theta = {0}$\textdegree'.format(theta_array[theta_idx_pairs[0][0]]))
 curve13, = axs10.plot(scan_pos_array, aligned_proj_theta_array_aux[theta_idx_pairs[0][1]][slice_idx_desired], 'r', label = r'$\theta = {0}$\textdegree'.format(theta_array[theta_idx_pairs[0][1]]))
 
-# text_1 = axs1[0, 0].text(0.02, 0.02, r'$\theta = {0}$\textdegree'.format(theta_array[0]), transform = axs1[0, 0].transAxes, color = 'white')
-# text_2 = axs2[0].text(0.02, 0.02, r'Iter. 0', transform = axs2[0].transAxes, color = 'white')
-# text_3 = axs3[0].text(0.02, 0.02, r'Slice 0', transform = axs3[0].transAxes, color = 'white')
-# text_4 = axs4.text(0.02, 0.02, r'Iter. 0', transform = axs4.transAxes, color = 'white')
+text_1 = axs1[0, 0].text(0.02, 0.02, r'$\theta = {0}$\textdegree'.format(theta_array[0]), transform = axs1[0, 0].transAxes, color = 'white')
+text_2 = axs2[0].text(0.02, 0.02, r'Iter. 0', transform = axs2[0].transAxes, color = 'white')
+text_3 = axs3[0].text(0.02, 0.02, r'Slice 0', transform = axs3[0].transAxes, color = 'white')
+text_4 = axs4.text(0.02, 0.02, r'Iter. 0', transform = axs4.transAxes, color = 'white')
 
-# axs1[0, 0].set_title(r'Exp. Proj. (Iter. {0})'.format(iter_idx_desired), color = 'red')
-# axs1[0, 1].set_title(r'Synth. Proj.', color = 'blue')
-# axs1[0, 2].set_title(r'Overlay')
+axs1[0, 0].set_title(r'Exp. Proj. (Iter. {0})'.format(iter_idx_desired), color = 'red')
+axs1[0, 1].set_title(r'Synth. Proj.', color = 'blue')
+axs1[0, 2].set_title(r'Overlay')
 
-# axs1[1, 0].set_title(r'Exp. Proj. (Iter. {0})'.format(iter_idx_final), color = 'red')
-# axs1[1, 1].set_title(r'Synth. Proj.', color = 'blue')
-# axs1[1, 2].set_title(r'Overlay')
+axs1[1, 0].set_title(r'Exp. Proj. (Iter. {0})'.format(iter_idx_final), color = 'red')
+axs1[1, 1].set_title(r'Synth. Proj.', color = 'blue')
+axs1[1, 2].set_title(r'Overlay')
 
-# axs2[0].set_title(r'Exp. Proj. ($\theta = {0}$\textdegree)'.format(theta_array[theta_idx_desired]), color = 'red')
-# axs2[1].set_title(r'Synth. Proj.', color = 'blue')
-# axs2[2].set_title(r'Overlay')
+axs2[0].set_title(r'Exp. Proj. ($\theta = {0}$\textdegree)'.format(theta_array[theta_idx_desired]), color = 'red')
+axs2[1].set_title(r'Synth. Proj.', color = 'blue')
+axs2[2].set_title(r'Overlay')
 
-# axs3[0].set_title(r'Reconstruction (Iter. {0})'.format(iter_idx_desired))
-# axs3[1].set_title(r'Reconstruction (Iter. {0})'.format(iter_idx_final))
+axs3[0].set_title(r'Reconstruction (Iter. {0})'.format(iter_idx_desired))
+axs3[1].set_title(r'Reconstruction (Iter. {0})'.format(iter_idx_final))
 
-# axs4.set_title(r'Reconstruction (Slice {0})'.format(slice_idx_desired))
+axs4.set_title(r'Reconstruction (Slice {0})'.format(slice_idx_desired))
 
-# axs5.set_xlim(0, n_iter - 1)
-# axs5.set_title(r'\theta = {0}'.format(theta_array[0]))
-# axs5.set_xlabel(r'Iteration index $i$')
-# axs5.set_ylabel(r'Net shift')
-# axs5.legend(frameon = False)
+axs5.set_xlim(0, n_iter - 1)
+axs5.set_title(r'\theta = {0}'.format(theta_array[0]))
+axs5.set_xlabel(r'Iteration index $i$')
+axs5.set_ylabel(r'Net shift')
+axs5.legend(frameon = False)
 
-# # axs6.set_xlim(0, n_iter - 1)
-# # axs6.set_ylim(np.min(cor_shifts), np.max(cor_shifts))
-# # axs6.set_xlabel(r'Iteration index $i$')
-# # axs6.set_ylabel(r'Center of rotation')
+# axs6.set_xlim(0, n_iter - 1)
+# axs6.set_ylim(np.min(cor_shifts), np.max(cor_shifts))
+# axs6.set_xlabel(r'Iteration index $i$')
+# axs6.set_ylabel(r'Center of rotation')
 
-# axs7.set_xlim(np.min(theta_array), np.max(theta_array))
-# axs7.set_xlabel(r'$\theta$')
-# axs7.set_ylabel(r'Net shift')
-# axs7.legend(frameon = False)
+axs7.set_xlim(np.min(theta_array), np.max(theta_array))
+axs7.set_xlabel(r'$\theta$')
+axs7.set_ylabel(r'Net shift')
+axs7.legend(frameon = False)
 
-# axs8.set_xlim(0, n_columns - 1)
-# axs8.set_xlabel(r'Scan position index')
-# axs8.set_ylabel(r'Intensity (a.u.)')
-# axs8.legend(frameon = False)
+axs8.set_xlim(0, n_columns - 1)
+axs8.set_xlabel(r'Scan position index')
+axs8.set_ylabel(r'Intensity (a.u.)')
+axs8.legend(frameon = False)
 
-# fig8.suptitle(r'$\theta = {0}$\textdegree; Slice index {1}'.format(theta_array[theta_idx_desired], slice_idx_desired))
+fig8.suptitle(r'$\theta = {0}$\textdegree; Slice index {1}'.format(theta_array[theta_idx_desired], slice_idx_desired))
 
-# axs9[0].set_xlim(0, n_columns - 1)
-# axs9[0].set_title(r'Iteration index 0')
-# axs9[0].set_xlabel(r'Scan position index')
-# axs9[0].set_ylabel(r'Intensity (a.u.)')
-# axs9[0].legend(frameon = False)
+axs9[0].set_xlim(0, n_columns - 1)
+axs9[0].set_title(r'Iteration index 0')
+axs9[0].set_xlabel(r'Scan position index')
+axs9[0].set_ylabel(r'Intensity (a.u.)')
+axs9[0].legend(frameon = False)
 
-# axs9[1].set_xlim(0, n_columns - 1)
-# axs9[1].set_title(r'Iteration index {0}'.format(n_iter - 1))
-# axs9[1].set_xlabel(r'Scan position index')
-# axs9[1].set_ylabel(r'Intensity (a.u.)')
-# axs9[1].legend(frameon = False)
+axs9[1].set_xlim(0, n_columns - 1)
+axs9[1].set_title(r'Iteration index {0}'.format(n_iter - 1))
+axs9[1].set_xlabel(r'Scan position index')
+axs9[1].set_ylabel(r'Intensity (a.u.)')
+axs9[1].legend(frameon = False)
 
-# fig9.suptitle(r'$\theta = {0}$\textdegree; Slice index {1}'.format(theta_array[0], slice_idx_desired))
+fig9.suptitle(r'$\theta = {0}$\textdegree; Slice index {1}'.format(theta_array[0], slice_idx_desired))
 
 axs10.set_xlim(0, n_columns - 1)
 axs10.set_title(r'Iteration index 0; Slice index {0}'.format(slice_idx_desired))
@@ -338,140 +338,140 @@ axs10.set_ylabel(r'Intensity (a.u.)')
 
 legend_10 = axs10.legend(frameon = False)
 
-# for theta_idx in range(n_theta):
-#     im1_1.set_data(aligned_proj_theta_array_aux[theta_idx])
-#     im1_2.set_data(synth_proj_theta_array_aux[theta_idx])
-#     im1_3.set_data(rgb_proj_theta_array[theta_idx])
-#     im1_4.set_data(aligned_proj_theta_array_aux_2[theta_idx])
-#     im1_5.set_data(synth_proj_theta_array_aux_2[theta_idx])
-#     im1_6.set_data(rgb_proj_theta_array_2[theta_idx])
+for theta_idx in range(n_theta):
+    im1_1.set_data(aligned_proj_theta_array_aux[theta_idx])
+    im1_2.set_data(synth_proj_theta_array_aux[theta_idx])
+    im1_3.set_data(rgb_proj_theta_array[theta_idx])
+    im1_4.set_data(aligned_proj_theta_array_aux_2[theta_idx])
+    im1_5.set_data(synth_proj_theta_array_aux_2[theta_idx])
+    im1_6.set_data(rgb_proj_theta_array_2[theta_idx])
 
-#     text_1.set_text(r'$\theta = {0}$'.format(theta_array[theta_idx]))
+    text_1.set_text(r'$\theta = {0}$'.format(theta_array[theta_idx]))
 
-#     net_shift_x = net_x_shifts[:, theta_idx]
-#     net_shift_y = net_y_shifts[:, theta_idx]
+    net_shift_x = net_x_shifts[:, theta_idx]
+    net_shift_y = net_y_shifts[:, theta_idx]
 
-#     exp_slice_proj_intensity_theta_iter_1 = aligned_proj_theta_array_aux[theta_idx][slice_idx_desired]
-#     exp_slice_proj_intensity_theta_iter_final = aligned_proj_theta_array_aux_2[theta_idx][slice_idx_desired]
-#     synth_slice_proj_intensity_theta_iter_1 = synth_proj_theta_array_aux[theta_idx][slice_idx_desired]
-#     synth_slice_proj_intensity_theta_iter_final = synth_proj_theta_array_aux_2[theta_idx][slice_idx_desired]
+    exp_slice_proj_intensity_theta_iter_1 = aligned_proj_theta_array_aux[theta_idx][slice_idx_desired]
+    exp_slice_proj_intensity_theta_iter_final = aligned_proj_theta_array_aux_2[theta_idx][slice_idx_desired]
+    synth_slice_proj_intensity_theta_iter_1 = synth_proj_theta_array_aux[theta_idx][slice_idx_desired]
+    synth_slice_proj_intensity_theta_iter_final = synth_proj_theta_array_aux_2[theta_idx][slice_idx_desired]
 
-#     curve1.set_ydata(net_shift_x)
-#     curve2.set_ydata(net_shift_y)
-#     curve8.set_ydata(exp_slice_proj_intensity_theta_iter_1)
-#     curve9.set_ydata(synth_slice_proj_intensity_theta_iter_1)
-#     curve10.set_ydata(exp_slice_proj_intensity_theta_iter_final)
-#     curve11.set_ydata(synth_slice_proj_intensity_theta_iter_final)
+    curve1.set_ydata(net_shift_x)
+    curve2.set_ydata(net_shift_y)
+    curve8.set_ydata(exp_slice_proj_intensity_theta_iter_1)
+    curve9.set_ydata(synth_slice_proj_intensity_theta_iter_1)
+    curve10.set_ydata(exp_slice_proj_intensity_theta_iter_final)
+    curve11.set_ydata(synth_slice_proj_intensity_theta_iter_final)
 
-#     min_intensity_theta_iter_1 = np.min([np.min(exp_slice_proj_intensity_theta_iter_1), np.min(synth_slice_proj_intensity_theta_iter_1)])
-#     min_intensity_theta_iter_final = np.min([np.min(exp_slice_proj_intensity_theta_iter_final), np.min(synth_slice_proj_intensity_theta_iter_final)])
-#     max_intensity_theta_iter_1 = np.max([np.max(exp_slice_proj_intensity_theta_iter_1), np.max(synth_slice_proj_intensity_theta_iter_1)])
-#     max_intensity_theta_iter_final = np.max([np.max(exp_slice_proj_intensity_theta_iter_final), np.max(synth_slice_proj_intensity_theta_iter_final)])
+    min_intensity_theta_iter_1 = np.min([np.min(exp_slice_proj_intensity_theta_iter_1), np.min(synth_slice_proj_intensity_theta_iter_1)])
+    min_intensity_theta_iter_final = np.min([np.min(exp_slice_proj_intensity_theta_iter_final), np.min(synth_slice_proj_intensity_theta_iter_final)])
+    max_intensity_theta_iter_1 = np.max([np.max(exp_slice_proj_intensity_theta_iter_1), np.max(synth_slice_proj_intensity_theta_iter_1)])
+    max_intensity_theta_iter_final = np.max([np.max(exp_slice_proj_intensity_theta_iter_final), np.max(synth_slice_proj_intensity_theta_iter_final)])
 
-#     min_shift = np.min([np.min(net_shift_x), np.min(net_shift_y)])
-#     max_shift = np.max([np.max(net_shift_x), np.max(net_shift_y)])
+    min_shift = np.min([np.min(net_shift_x), np.min(net_shift_y)])
+    max_shift = np.max([np.max(net_shift_x), np.max(net_shift_y)])
 
-#     axs5.set_ylim(min_shift, max_shift + 0.1)
-#     axs5.set_title(r'$\theta = {0}$\textdegree'.format(theta_array[theta_idx]))
+    axs5.set_ylim(min_shift, max_shift + 0.1)
+    axs5.set_title(r'$\theta = {0}$\textdegree'.format(theta_array[theta_idx]))
 
-#     axs9[0].set_ylim(min_intensity_theta_iter_1, max_intensity_theta_iter_1)
-#     axs9[1].set_ylim(min_intensity_theta_iter_final, max_intensity_theta_iter_final)
+    axs9[0].set_ylim(min_intensity_theta_iter_1, max_intensity_theta_iter_1)
+    axs9[1].set_ylim(min_intensity_theta_iter_final, max_intensity_theta_iter_final)
 
-#     fig9.suptitle(r'$\theta = {0}$\textdegree; Slice index {1}'.format(theta_array[theta_idx], slice_idx_desired))
+    fig9.suptitle(r'$\theta = {0}$\textdegree; Slice index {1}'.format(theta_array[theta_idx], slice_idx_desired))
 
-#     filename_1 = os.path.join(dir_path, f'proj_theta{theta_idx:03d}.tiff')
-#     filename_5 = os.path.join(dir_path, f'net_net_shifts_theta_{theta_idx:03d}.tiff')
-#     filename_9 = os.path.join(dir_path, f'slice_proj_theta_{theta_idx:03d}.tiff')
+    filename_1 = os.path.join(dir_path, f'proj_theta{theta_idx:03d}.tiff')
+    filename_5 = os.path.join(dir_path, f'net_net_shifts_theta_{theta_idx:03d}.tiff')
+    filename_9 = os.path.join(dir_path, f'slice_proj_theta_{theta_idx:03d}.tiff')
 
-#     fig1.tight_layout()
-#     fig5.tight_layout()
-#     fig9.tight_layout()
+    fig1.tight_layout()
+    fig5.tight_layout()
+    fig9.tight_layout()
 
-#     fig1.savefig(filename_1, dpi = 400)
-#     fig5.savefig(filename_5, dpi = 400)
-#     fig9.savefig(filename_9, dpi = 400)
+    fig1.savefig(filename_1, dpi = 400)
+    fig5.savefig(filename_5, dpi = 400)
+    fig9.savefig(filename_9, dpi = 400)
 
-#     tiff_array_1.append(filename_1)
-#     tiff_array_5.append(filename_5)
-#     tiff_array_9.append(filename_9)
+    tiff_array_1.append(filename_1)
+    tiff_array_5.append(filename_5)
+    tiff_array_9.append(filename_9)
 
-# plt.close(fig1)
-# plt.close(fig5)
-# plt.close(fig9)
+plt.close(fig1)
+plt.close(fig5)
+plt.close(fig9)
 
-# for slice_idx in range(n_slices):
-#     im3_1.set_data(recon_slice_array_aux[slice_idx])
-#     im3_2.set_data(recon_slice_array_aux_2[slice_idx])
+for slice_idx in range(n_slices):
+    im3_1.set_data(recon_slice_array_aux[slice_idx])
+    im3_2.set_data(recon_slice_array_aux_2[slice_idx])
 
-#     text_3.set_text(r'Slice {0}'.format(slice_idx))
+    text_3.set_text(r'Slice {0}'.format(slice_idx))
 
-#     filename_3 = os.path.join(dir_path, f'recon_slice_{slice_idx:03d}.tiff')
+    filename_3 = os.path.join(dir_path, f'recon_slice_{slice_idx:03d}.tiff')
 
-#     fig3.tight_layout()
+    fig3.tight_layout()
     
-#     fig3.savefig(filename_3, dpi = 400)
+    fig3.savefig(filename_3, dpi = 400)
 
-#     tiff_array_3.append(filename_3)
+    tiff_array_3.append(filename_3)
 
-# plt.close(fig3)
+plt.close(fig3)
 
-# for iter_idx in range(n_iter):
-#     net_shift_x = net_x_shifts[iter_idx, :]
-#     net_shift_y = net_y_shifts[iter_idx, :]
+for iter_idx in range(n_iter):
+    net_shift_x = net_x_shifts[iter_idx, :]
+    net_shift_y = net_y_shifts[iter_idx, :]
 
-#     min_shift = np.min([np.min(net_shift_x), np.min(net_shift_y)])
-#     max_shift = np.max([np.max(net_shift_x), np.max(net_shift_y)])
+    min_shift = np.min([np.min(net_shift_x), np.min(net_shift_y)])
+    max_shift = np.max([np.max(net_shift_x), np.max(net_shift_y)])
 
-#     exp_slice_proj_intensity = aligned_proj_iter_array_aux[iter_idx][slice_idx_desired]
-#     synth_slice_proj_intensity = synth_proj_iter_array_aux[iter_idx][slice_idx_desired]
+    exp_slice_proj_intensity = aligned_proj_iter_array_aux[iter_idx][slice_idx_desired]
+    synth_slice_proj_intensity = synth_proj_iter_array_aux[iter_idx][slice_idx_desired]
 
-#     min_intensity = np.min([np.min(exp_slice_proj_intensity), np.min(synth_slice_proj_intensity)])
-#     max_intensity = np.max([np.max(exp_slice_proj_intensity), np.max(synth_slice_proj_intensity)])
+    min_intensity = np.min([np.min(exp_slice_proj_intensity), np.min(synth_slice_proj_intensity)])
+    max_intensity = np.max([np.max(exp_slice_proj_intensity), np.max(synth_slice_proj_intensity)])
 
-#     im2_1.set_data(aligned_proj_iter_array_aux[iter_idx])
-#     im2_2.set_data(synth_proj_iter_array_aux[iter_idx])
-#     im2_3.set_data(rgb_proj_iter_array[iter_idx])
+    im2_1.set_data(aligned_proj_iter_array_aux[iter_idx])
+    im2_2.set_data(synth_proj_iter_array_aux[iter_idx])
+    im2_3.set_data(rgb_proj_iter_array[iter_idx])
 
-#     im4.set_data(recon_iter_array_aux[iter_idx])
+    im4.set_data(recon_iter_array_aux[iter_idx])
     
-#     curve4.set_ydata(net_shift_x)
-#     curve5.set_ydata(net_shift_y)
-#     curve6.set_ydata(exp_slice_proj_intensity)
-#     curve7.set_ydata(synth_slice_proj_intensity)
+    curve4.set_ydata(net_shift_x)
+    curve5.set_ydata(net_shift_y)
+    curve6.set_ydata(exp_slice_proj_intensity)
+    curve7.set_ydata(synth_slice_proj_intensity)
 
-#     text_2.set_text(r'Iter. {0}'.format(iter_idx))
-#     text_4.set_text(r'Iter. {0}'.format(iter_idx))
+    text_2.set_text(r'Iter. {0}'.format(iter_idx))
+    text_4.set_text(r'Iter. {0}'.format(iter_idx))
 
-#     axs7.set_ylim(min_shift, max_shift + 0.1)
-#     axs7.set_title(r'Iteration {0}'.format(iter_idx))
+    axs7.set_ylim(min_shift, max_shift + 0.1)
+    axs7.set_title(r'Iteration {0}'.format(iter_idx))
     
-#     axs8.set_ylim(min_intensity, max_intensity + 0.1)
-#     axs8.set_title(r'Iteration {0}'.format(iter_idx))
+    axs8.set_ylim(min_intensity, max_intensity + 0.1)
+    axs8.set_title(r'Iteration {0}'.format(iter_idx))
 
-#     filename_2 = os.path.join(dir_path, f'proj_iter_{iter_idx:03d}.tiff')
-#     filename_4 = os.path.join(dir_path, f'recon_iter_{iter_idx:03d}.tiff')
-#     filename_7 = os.path.join(dir_path, f'net_shifts_iter_{iter_idx:03d}.tiff')
-#     filename_8 = os.path.join(dir_path, f'slice_proj_iter_{iter_idx:03d}.tiff')
+    filename_2 = os.path.join(dir_path, f'proj_iter_{iter_idx:03d}.tiff')
+    filename_4 = os.path.join(dir_path, f'recon_iter_{iter_idx:03d}.tiff')
+    filename_7 = os.path.join(dir_path, f'net_shifts_iter_{iter_idx:03d}.tiff')
+    filename_8 = os.path.join(dir_path, f'slice_proj_iter_{iter_idx:03d}.tiff')
 
-#     fig2.tight_layout()
-#     fig4.tight_layout()
-#     fig7.tight_layout()
-#     fig8.tight_layout()
+    fig2.tight_layout()
+    fig4.tight_layout()
+    fig7.tight_layout()
+    fig8.tight_layout()
     
-#     fig2.savefig(filename_2, dpi = 400)
-#     fig4.savefig(filename_4, dpi = 400)
-#     fig7.savefig(filename_7, dpi = 400)
-#     fig8.savefig(filename_8, dpi = 400)
+    fig2.savefig(filename_2, dpi = 400)
+    fig4.savefig(filename_4, dpi = 400)
+    fig7.savefig(filename_7, dpi = 400)
+    fig8.savefig(filename_8, dpi = 400)
 
-#     tiff_array_2.append(filename_2)
-#     tiff_array_4.append(filename_4)
-#     tiff_array_7.append(filename_7)
-#     tiff_array_8.append(filename_8)
+    tiff_array_2.append(filename_2)
+    tiff_array_4.append(filename_4)
+    tiff_array_7.append(filename_7)
+    tiff_array_8.append(filename_8)
 
-# plt.close(fig2)
-# plt.close(fig4)
-# plt.close(fig7)
-# plt.close(fig8)
+plt.close(fig2)
+plt.close(fig4)
+plt.close(fig7)
+plt.close(fig8)
 
 for theta_pair_idx in range(len(theta_idx_pairs)):
     legend_10.remove()
