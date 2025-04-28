@@ -531,6 +531,10 @@ print('Creating slice projection GIF (changing theta)...')
 
 create_gif(tiff_array_9, os.path.join(dir_path, 'slice_proj_theta.gif'), fps = 15)
 
+print('Creating slice projection GIF (changing theta pair)...')
+
+create_gif(tiff_array_10, os.path.join(dir_path, 'slice_proj_theta_pair.gif'), fps = 15)
+
 print('Done')
 
 # anim1 = anim.FuncAnimation(fig1, update_proj_theta, frames = n_theta, interval = 1000/fps_imgs, blit = True) # Interval is in ms --> interval = (1/fps)*1000
