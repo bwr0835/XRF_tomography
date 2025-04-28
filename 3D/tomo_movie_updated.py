@@ -362,11 +362,11 @@ axs10.set_ylabel(r'Intensity (a.u.)')
 legend_10 = axs10.legend(frameon = False)
 
 for theta_idx in range(n_theta):
-    im1_1.set_data(aligned_proj_theta_array_aux[theta_idx])
-    im1_2.set_data(synth_proj_theta_array_aux[theta_idx])
+    im1_1.set_data(aligned_proj_theta_array_aux_red[theta_idx])
+    im1_2.set_data(synth_proj_theta_array_aux_blue[theta_idx])
     im1_3.set_data(rgb_proj_theta_array[theta_idx])
-    im1_4.set_data(aligned_proj_theta_array_aux_2[theta_idx])
-    im1_5.set_data(synth_proj_theta_array_aux_2[theta_idx])
+    im1_4.set_data(aligned_proj_theta_array_aux_2_red[theta_idx])
+    im1_5.set_data(synth_proj_theta_array_aux_2_blue[theta_idx])
     im1_6.set_data(rgb_proj_theta_array_2[theta_idx])
 
     text_1.set_text(r'$\theta = {0}$'.format(theta_array[theta_idx]))
@@ -451,8 +451,8 @@ for iter_idx in range(n_iter):
     min_intensity = np.min([np.min(exp_slice_proj_intensity), np.min(synth_slice_proj_intensity)])
     max_intensity = np.max([np.max(exp_slice_proj_intensity), np.max(synth_slice_proj_intensity)])
 
-    im2_1.set_data(aligned_proj_iter_array_aux[iter_idx])
-    im2_2.set_data(synth_proj_iter_array_aux[iter_idx])
+    im2_1.set_data(aligned_proj_iter_array_aux_red[iter_idx])
+    im2_2.set_data(synth_proj_iter_array_aux_blue[iter_idx])
     im2_3.set_data(rgb_proj_iter_array[iter_idx])
 
     im4.set_data(recon_iter_array_aux[iter_idx])
