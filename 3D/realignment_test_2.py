@@ -273,6 +273,8 @@ def iter_reproj(ref_element,
 
     ref_element_idx = element_array.index(ref_element)
 
+    orig_ref_proj = xrf_proj_img_array[ref_element_idx].copy()
+
     if (n_slices % 2) or (n_columns % 2): # Padding for odd-integer detector positions and/or slices
 
         if (n_slices % 2) and (n_columns % 2):
@@ -471,7 +473,7 @@ def iter_reproj(ref_element,
     synth_proj_array = np.array(synth_proj_array)
     recon_array = np.array(recon_array)
     
-    return aligned_proj_total, aligned_exp_proj_array, synth_proj_array, recon_array, net_x_shifts_pc_new, net_y_shifts_pc_new
+    return orig_ref_proj, aligned_proj_total, aligned_exp_proj_array, synth_proj_array, recon_array, net_x_shifts_pc_new, net_y_shifts_pc_new
 
 file_path_xrf = '/home/bwr0835/2_ide_aggregate_xrf.h5'
 output_dir_path_base = '/home/bwr0835'
@@ -510,6 +512,7 @@ n_desired_iter = 5 # For the reprojection scheme, NOT for reconstruction by itse
 
 algorithm = 'gridrec'
 
+orig_proj_ref, \
 aligned_proj_total, \
 aligned_exp_proj_array, \
 synth_proj_array, \
@@ -536,3 +539,4 @@ np.save(os.path.join(full_output_dir_path, 'synth_proj_array_iter_' + desired_el
 np.save(os.path.join(full_output_dir_path, 'recon_array_iter_' + desired_element + '.npy'), recon_array)
 np.save(os.path.join(full_output_dir_path, 'net_x_shifts_' + desired_element + '.npy'), net_x_shifts)
 np.save(os.path.join(full_output_dir_path, 'net_y_shifts_' + desired_element + '.npy'), net_y_shifts)
+np.save(os.path.join(full_output_dir_path, 'orig_exp_proj_' + desired_element + '.npy'), orig_proj_ref)

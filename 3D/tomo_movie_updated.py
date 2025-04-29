@@ -107,6 +107,9 @@ for f in file_array:
     if f == 'aligned_proj_all_elements.npy':
         aligned_proj = np.load(os.path.join(dir_path, f))
     
+    elif 'orig_exp_proj_' in f and f.endswith('.npy'):
+        orig_exp_proj = np.load(os.path.join(dir_path, f))
+
     elif 'aligned_proj_array_iter' in f and f.endswith('.npy'):
         aligned_proj_iter_array = np.load(os.path.join(dir_path, f))
 
@@ -502,8 +505,8 @@ for theta_pair_idx in range(len(theta_idx_pairs)):
     theta_idx_1 = theta_idx_pairs[theta_pair_idx][0]
     theta_idx_2 = theta_idx_pairs[theta_pair_idx][1]
 
-    exp_slice_proj_intensity_theta_1 = aligned_proj_theta_array_aux[theta_idx_1][slice_idx_desired]
-    exp_slice_proj_intensity_theta_2 = aligned_proj_theta_array_aux[theta_idx_2][slice_idx_desired]
+    exp_slice_proj_intensity_theta_1 = orig_exp_proj[theta_idx_1, slice_idx_desired]
+    exp_slice_proj_intensity_theta_2 = orig_exp_proj[theta_idx_2, slice_idx_desired]
 
     min_slice_proj_intensity = np.min([np.min(exp_slice_proj_intensity_theta_1), np.min(exp_slice_proj_intensity_theta_2)])
     max_slice_proj_intensity = np.max([np.max(exp_slice_proj_intensity_theta_1), np.max(exp_slice_proj_intensity_theta_2)])
@@ -518,7 +521,7 @@ for theta_pair_idx in range(len(theta_idx_pairs)):
 
     legend_10 = axs10.legend(frameon = False)
 
-    filename_10 = os.path.join(dir_path, f'slice_proj_theta_pair_{theta_pair_idx:03d}.tiff')
+    filename_10 = os.path.join(dir_path, f'slice_proj_theta_pair_{theta_pair_idx:03d}_orig.tiff')
 
     fig10.savefig(filename_10, dpi = 400)
 
