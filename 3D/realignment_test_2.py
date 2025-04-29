@@ -320,7 +320,7 @@ def iter_reproj(ref_element,
     if np.isscalar(init_y_shift):
         init_y_shift *= np.ones(n_theta)
 
-    theta_idx_pairs = find_theta_combos(theta_array, dtheta = 0)
+    theta_idx_pairs = find_theta_combos(theta_array, dtheta = 1)
 
     for theta_idx_pair in theta_idx_pairs:
         print(np.array([theta_array[theta_idx_pair[0]], theta_array[theta_idx_pair[1]]]))

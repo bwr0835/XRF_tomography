@@ -285,7 +285,7 @@ curve1, = axs5.plot(iter_array, net_x_shifts[:, 0], 'k-o', markersize = 3, label
 curve2, = axs5.plot(iter_array, net_y_shifts[:, 0], 'r-o', markersize = 3, label = r'$\Delta y$')
 # curve3, = axs6.plot(iter_array, cor_shifts, 'k-o', markersize = 3)
 curve4, = axs7.plot(theta_array, net_x_shifts[0, :], 'k-o', markersize = 3, label = r'$\Delta x$')
-curve5, = axs7.plot(theta_array, net_y_shifts[0, :], 'k-o', markersize = 3, label = r'$\Delta y$')
+curve5, = axs7.plot(theta_array, net_y_shifts[0, :], 'r-o', markersize = 3, label = r'$\Delta y$')
 curve6, = axs8.plot(scan_pos_array, aligned_proj_iter_array_aux[0][slice_idx_desired], 'k', label = r'Measured')
 curve7, = axs8.plot(scan_pos_array, synth_proj_iter_array_aux[0][slice_idx_desired], 'r', label = r'Reprojected')
 curve8, = axs9[0].plot(scan_pos_array, aligned_proj_theta_array_aux[0][slice_idx_desired], 'k', label = r'Measured')
