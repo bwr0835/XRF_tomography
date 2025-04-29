@@ -273,8 +273,6 @@ def iter_reproj(ref_element,
 
     ref_element_idx = element_array.index(ref_element)
 
-    orig_ref_proj = xrf_proj_img_array[ref_element_idx].copy()
-
     if (n_slices % 2) or (n_columns % 2): # Padding for odd-integer detector positions and/or slices
 
         if (n_slices % 2) and (n_columns % 2):
@@ -296,6 +294,8 @@ def iter_reproj(ref_element,
 
     print('XRF Tomography dataset dimensions: ' + str(xrf_proj_img_array.shape))
 
+    orig_ref_proj = xrf_proj_img_array[ref_element_idx].copy()
+    
     aligned_proj_total = np.zeros((n_elements, n_theta, n_slices, n_columns))
     aligned_proj = np.zeros((n_theta, n_slices, n_columns))
     synth_proj = np.zeros((n_theta, n_slices, n_columns))
