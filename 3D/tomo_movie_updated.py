@@ -180,7 +180,7 @@ theta_idx_desired = 0
 iter_idx_desired = 0
 iter_idx_final = iter_array[-1]
 # slice_idx_desired = 64
-slice_idx_desired = n_slices//2
+slice_idx_desired = 64
 element_idx_desired = 11 # Fe for this directory
 
 theta_idx_pairs = find_theta_combos(theta_array, dtheta = 1)
@@ -537,11 +537,11 @@ plt.close(fig10)
 
 print('Creating projection GIF (changing thetas)...')
 
-create_gif(tiff_array_1, os.path.join(dir_path, 'proj_theta.gif'), fps = 25)
+create_gif(tiff_array_1, os.path.join(dir_path, 'proj_theta_slice_idx_64.gif'), fps = 25)
 
 print('Creating projection GIF (changing iteration)...')
 
-create_gif(tiff_array_2, os.path.join(dir_path, 'proj_iter.gif'), fps = 25)
+create_gif(tiff_array_2, os.path.join(dir_path, 'proj_iter_slice_idx_64.gif'), fps = 25)
 
 print('Creating reconstruction GIF (changing slice)...')
 
@@ -549,11 +549,11 @@ create_gif(tiff_array_3, os.path.join(dir_path, 'recon_slice.gif'), fps = 25)
 
 print('Creating reconstruction GIF (changing iteration)...')
 
-create_gif(tiff_array_4, os.path.join(dir_path, 'recon_iter.gif'), fps = 25)
+create_gif(tiff_array_4, os.path.join(dir_path, 'recon_iter_slice_idx_64.gif'), fps = 25)
 
 print('Creating net shift GIF (changing theta)...')
 
-create_gif(tiff_array_5, os.path.join(dir_path, 'net_shifts_theta.gif'), fps = 15)
+create_gif(tiff_array_5, os.path.join(dir_path, 'net_shifts_theta_slice_idx_64.gif'), fps = 15)
 
 print('Creating net shift GIF (changing iteration)...')
 
@@ -561,15 +561,15 @@ create_gif(tiff_array_7, os.path.join(dir_path, 'net_shifts_iter.gif'), fps = 15
 
 print('Creating slice projection GIF (changing iteration)...')
 
-create_gif(tiff_array_8, os.path.join(dir_path, 'slice_proj_iter.gif'), fps = 15)
+create_gif(tiff_array_8, os.path.join(dir_path, 'slice_proj_iter_slice_idx_64.gif'), fps = 15)
 
 print('Creating slice projection GIF (changing theta)...')
 
-create_gif(tiff_array_9, os.path.join(dir_path, 'slice_proj_theta.gif'), fps = 15)
+create_gif(tiff_array_9, os.path.join(dir_path, 'slice_proj_theta_slice_idx_64.gif'), fps = 15)
 
 print('Creating slice projection GIF (changing theta pair)...')
 
-create_gif(tiff_array_10, os.path.join(dir_path, 'slice_proj_theta_pair.gif'), fps = 15)
+create_gif(tiff_array_10, os.path.join(dir_path, 'slice_proj_theta_pair_slice_idx_64.gif'), fps = 15)
 
 print('Done')
 
