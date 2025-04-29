@@ -392,7 +392,7 @@ def iter_reproj(ref_element,
         print(f'Center of rotation after shifting: {round_correct(center_of_rotation_new, ndec = 3)}')
         
         if algorithm == 'gridrec':
-            recon = tomo.recon(aligned_proj, theta_array*np.pi/180, center_of_rotation, algorithm = algorithm)
+            recon = tomo.recon(aligned_proj, theta_array*np.pi/180, center_of_rotation, algorithm = algorithm, filter_name = 'ramlak')
         
         elif algorithm == 'mlem':
             recon = tomo.recon(aligned_proj, theta_array*np.pi/180, center_of_rotation, algorithm, num_iter = 60)
