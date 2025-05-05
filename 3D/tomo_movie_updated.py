@@ -506,7 +506,7 @@ for theta_pair_idx in range(len(theta_idx_pairs)):
     theta_idx_2 = theta_idx_pairs[theta_pair_idx][1]
 
     exp_slice_proj_intensity_theta_1 = orig_exp_proj[theta_idx_1, slice_idx_desired]
-    exp_slice_proj_intensity_theta_2 = np.flip(orig_exp_proj[theta_idx_2, slice_idx_desired], axis = 1)
+    exp_slice_proj_intensity_theta_2 = np.flip(orig_exp_proj[theta_idx_2, slice_idx_desired])
 
     min_slice_proj_intensity = np.min([np.min(exp_slice_proj_intensity_theta_1), np.min(exp_slice_proj_intensity_theta_2)])
     max_slice_proj_intensity = np.max([np.max(exp_slice_proj_intensity_theta_1), np.max(exp_slice_proj_intensity_theta_2)])
