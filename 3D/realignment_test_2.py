@@ -339,142 +339,141 @@ def iter_reproj(ref_element,
 
     # plt.show()
         
-    # center_geom = (n_columns - 1)/2
+    center_geom = (n_columns - 1)/2
     
-    # offset = center_of_rotation - center_geom
+    offset = center_of_rotation - center_geom
 
-    # print(f'Center of rotation via phase cross-correlation: {round_correct(center_of_rotation, ndec = 3)}')
-    # print(f'Geometric center: {center_geom}')
-    # print(f'Center of rotation error: {offset}')
-    # print(f'Incorporating x-shift = {-offset} to all projection images...')
+    print(f'Center of rotation via phase cross-correlation: {round_correct(center_of_rotation, ndec = 3)}')
+    print(f'Geometric center: {center_geom}')
+    print(f'Center of rotation error: {offset}')
+    print(f'Incorporating x-shift = {-offset} to all projection images...')
 
-    # for element_idx in range(n_elements):
-    #     for theta_idx in range(n_theta):
-    #         xrf_proj_img_array[element_idx, theta_idx] = ndi.shift(xrf_proj_img_array[element_idx, theta_idx], shift = (0, -offset))
+    for element_idx in range(n_elements):
+        for theta_idx in range(n_theta):
+            xrf_proj_img_array[element_idx, theta_idx] = ndi.shift(xrf_proj_img_array[element_idx, theta_idx], shift = (0, -offset))
 
-    # center_of_rotation_array = np.array([tomo.find_center_pc(xrf_proj_img_array[ref_element_idx, theta_idx_pair[0]], 
-    #                                                 xrf_proj_img_array[ref_element_idx, theta_idx_pair[1]], 
-    #                                                 tol = 0.01) for theta_idx_pair in theta_idx_pairs])
+    center_of_rotation_array = np.array([tomo.find_center_pc(xrf_proj_img_array[ref_element_idx, theta_idx_pair[0]], 
+                                                    xrf_proj_img_array[ref_element_idx, theta_idx_pair[1]], 
+                                                    tol = 0.01) for theta_idx_pair in theta_idx_pairs])
     
-    # center_of_rotation = np.mean(center_of_rotation_array)
+    center_of_rotation = np.mean(center_of_rotation_array)
     
-    # print(f'New center of rotation: {center_of_rotation}')
-    # print('Performing iterative reprojection...')
+    print(f'New center of rotation: {center_of_rotation}')
+    print('Performing iterative reprojection...')
 
-    # for i in range(n_iterations):
-    #     iterations.append(i)
+    for i in range(n_iterations):
+        iterations.append(i)
         
-    #     print(f'Iteration {i + 1}/{n_iterations}')
+        print(f'Iteration {i + 1}/{n_iterations}')
 
-    #     if i == 0:
-    #         for theta_idx in range(n_theta):
-    #             aligned_proj[theta_idx] = ndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx], shift = (init_y_shift, init_x_shift))
+        if i == 0:
+            for theta_idx in range(n_theta):
+                aligned_proj[theta_idx] = ndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx], shift = (init_y_shift, init_x_shift))
             
-    #     else:
-    #         for theta_idx in range(n_theta):
-    #             net_x_shift = net_x_shifts_pc[i - 1, theta_idx]
-    #             net_y_shift = net_y_shifts_pc[i - 1, theta_idx]
+        else:
+            for theta_idx in range(n_theta):
+                net_x_shift = net_x_shifts_pc[i - 1, theta_idx]
+                net_y_shift = net_y_shifts_pc[i - 1, theta_idx]
                 
-    #             if (theta_idx % 7) == 0:
-    #                 print(f'Shifting projection by net x shift = {round_correct(net_x_shift, ndec = 3)} (theta = {round_correct(theta_array[theta_idx], ndec = 1)})...')
-    #                 print(f'Shifting projection by net y shift = {round_correct(net_y_shift, ndec = 3)}...')
+                if (theta_idx % 7) == 0:
+                    print(f'Shifting projection by net x shift = {round_correct(net_x_shift, ndec = 3)} (theta = {round_correct(theta_array[theta_idx], ndec = 1)})...')
+                    print(f'Shifting projection by net y shift = {round_correct(net_y_shift, ndec = 3)}...')
 
-    #             aligned_proj[theta_idx] = ndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx], shift = (net_y_shift, net_x_shift))
+                aligned_proj[theta_idx] = ndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx], shift = (net_y_shift, net_x_shift))
 
-    #     aligned_exp_proj_array.append(aligned_proj.copy())
+        aligned_exp_proj_array.append(aligned_proj.copy())
 
-    #     print(aligned_proj.shape)
+        print(aligned_proj.shape)
 
-    #     center_of_rotation_array_new = np.array([tomo.find_center_pc(aligned_proj[theta_idx_pair[0]], 
-    #                                                 aligned_proj[theta_idx_pair[1]], 
-    #                                                 tol = 0.01) for theta_idx_pair in theta_idx_pairs])
+        center_of_rotation_array_new = np.array([tomo.find_center_pc(aligned_proj[theta_idx_pair[0]], 
+                                                    aligned_proj[theta_idx_pair[1]], 
+                                                    tol = 0.01) for theta_idx_pair in theta_idx_pairs])
     
-    #     center_of_rotation_new = np.mean(center_of_rotation_array_new)
+        center_of_rotation_new = np.mean(center_of_rotation_array_new)
         
-    #     print(f'Center of rotation after shifting: {round_correct(center_of_rotation_new, ndec = 3)}')
+        print(f'Center of rotation after shifting: {round_correct(center_of_rotation_new, ndec = 3)}')
         
-    #     if algorithm == 'gridrec':
-    #         recon = tomo.recon(aligned_proj, theta_array*np.pi/180, center_of_rotation, algorithm = algorithm, filter_name = 'hamming')
+        if algorithm == 'gridrec':
+            recon = tomo.recon(aligned_proj, theta_array*np.pi/180, center_of_rotation, algorithm = algorithm, filter_name = 'hamming')
         
-    #     elif algorithm == 'mlem':
-    #         recon = tomo.recon(aligned_proj, theta_array*np.pi/180, center_of_rotation, algorithm, num_iter = 60)
+        elif algorithm == 'mlem':
+            recon = tomo.recon(aligned_proj, theta_array*np.pi/180, center_of_rotation, algorithm, num_iter = 60)
 
-    #     else:
-    #         print('Error: Algorithm not available. Exiting...')
+        else:
+            print('Error: Algorithm not available. Exiting...')
             
-    #         sys.exit()
+            sys.exit()
         
-    #     recon_array.append(recon)
+        recon_array.append(recon)
 
-    #     for slice_idx in range(n_slices):
-    #         print(f'Slice {slice_idx + 1}/{n_slices}')
+        for slice_idx in range(n_slices):
+            print(f'Slice {slice_idx + 1}/{n_slices}')
 
-    #         sinogram = (xform.radon(recon[slice_idx].copy(), theta_array)).T
+            sinogram = (xform.radon(recon[slice_idx].copy(), theta_array)).T
 
-    #         synth_proj[:, slice_idx, :] = sinogram
+            synth_proj[:, slice_idx, :] = sinogram
         
-    #     synth_proj_array.append(synth_proj.copy())
+        synth_proj_array.append(synth_proj.copy())
 
-    #     for theta_idx in range(n_theta):
-    #         dy, dx = phase_correlate(synth_proj[theta_idx], aligned_proj[theta_idx], upsample_factor = 100)
+        for theta_idx in range(n_theta):
+            dy, dx = phase_correlate(synth_proj[theta_idx], aligned_proj[theta_idx], upsample_factor = 100)
 
-    #         dx_array_pc[theta_idx] = dx
-    #         dy_array_pc[theta_idx] = dy
+            dx_array_pc[theta_idx] = dx
+            dy_array_pc[theta_idx] = dy
             
-    #         if i == 0: 
-    #             net_x_shifts_pc[i, theta_idx] = init_x_shift[theta_idx] + dx
-    #             net_y_shifts_pc[i, theta_idx] = init_y_shift[theta_idx] + dy
+            if i == 0: 
+                net_x_shifts_pc[i, theta_idx] = init_x_shift[theta_idx] + dx
+                net_y_shifts_pc[i, theta_idx] = init_y_shift[theta_idx] + dy
             
-    #         else:
-    #             net_x_shifts_pc[i, theta_idx] = net_x_shifts_pc[i - 1, theta_idx] + dx
-    #             net_y_shifts_pc[i, theta_idx] = net_y_shifts_pc[i - 1, theta_idx] + dy
+            else:
+                net_x_shifts_pc[i, theta_idx] = net_x_shifts_pc[i - 1, theta_idx] + dx
+                net_y_shifts_pc[i, theta_idx] = net_y_shifts_pc[i - 1, theta_idx] + dy
             
-    #         if (theta_idx % 7) == 0:
-    #             print(f'Current x-shift: {round_correct(dx, ndec = 3)} (theta = {round_correct(theta_array[theta_idx], ndec = 1)})')
-    #             print(f'Current y-shift: {round_correct(dy, ndec = 3)}')
+            if (theta_idx % 7) == 0:
+                print(f'Current x-shift: {round_correct(dx, ndec = 3)} (theta = {round_correct(theta_array[theta_idx], ndec = 1)})')
+                print(f'Current y-shift: {round_correct(dy, ndec = 3)}')
         
-    #     if np.max(np.abs(dx_array_pc)) < eps and np.max(np.abs(dy_array_pc)) < eps:
-    #         iterations = np.array(iterations)
+        if np.max(np.abs(dx_array_pc)) < eps and np.max(np.abs(dy_array_pc)) < eps:
+            iterations = np.array(iterations)
            
-    #         net_x_shifts_pc_new = net_x_shifts_pc[:len(iterations)]
-    #         net_y_shifts_pc_new = net_y_shifts_pc[:len(iterations)]
+            net_x_shifts_pc_new = net_x_shifts_pc[:len(iterations)]
+            net_y_shifts_pc_new = net_y_shifts_pc[:len(iterations)]
 
-    #         print(f'Number of iterations taken: {len(iterations)}')
-    #         print('Shifting all elements in aggregate aligned projection array by current net shifts...')
+            print(f'Number of iterations taken: {len(iterations)}')
+            print('Shifting all elements in aggregate aligned projection array by current net shifts...')
 
-    #         for element_idx in range(n_elements):
-    #             for theta_idx in range(n_theta):
-    #                 net_x_shift = net_x_shifts_pc_new[i]
-    #                 net_y_shift = net_y_shifts_pc_new[i]
+            for element_idx in range(n_elements):
+                for theta_idx in range(n_theta):
+                    net_x_shift = net_x_shifts_pc_new[i]
+                    net_y_shift = net_y_shifts_pc_new[i]
 
-    #                 aligned_proj_total[element_idx, theta_idx] = ndi.shift(xrf_proj_img_array[element_idx, theta_idx], shift = (net_y_shift, net_x_shift))
+                    aligned_proj_total[element_idx, theta_idx] = ndi.shift(xrf_proj_img_array[element_idx, theta_idx], shift = (net_y_shift, net_x_shift))
             
-    #         print('Done')
+            print('Done')
 
-    #         break
+            break
 
-    #     if i == n_iterations - 1:
-    #         print('Iterative reprojection complete. Shifting other elements...')
+        if i == n_iterations - 1:
+            print('Iterative reprojection complete. Shifting other elements...')
 
-    #         iterations = np.array(iterations)
+            iterations = np.array(iterations)
 
-    #         net_x_shifts_pc_new, net_y_shifts_pc_new = net_x_shifts_pc, net_y_shifts_pc
+            net_x_shifts_pc_new, net_y_shifts_pc_new = net_x_shifts_pc, net_y_shifts_pc
             
-    #         for element_idx in range(n_elements):
-    #             for theta_idx in range(n_theta):
-    #                 net_x_shift = net_x_shifts_pc_new[i, theta_idx]
-    #                 net_y_shift = net_y_shifts_pc_new[i, theta_idx]
+            for element_idx in range(n_elements):
+                for theta_idx in range(n_theta):
+                    net_x_shift = net_x_shifts_pc_new[i, theta_idx]
+                    net_y_shift = net_y_shifts_pc_new[i, theta_idx]
                         
-    #                 aligned_proj_total[element_idx, theta_idx] = ndi.shift(xrf_proj_img_array[element_idx, theta_idx], shift = (net_y_shift, net_x_shift))
+                    aligned_proj_total[element_idx, theta_idx] = ndi.shift(xrf_proj_img_array[element_idx, theta_idx], shift = (net_y_shift, net_x_shift))
 
-    #         print('Done')
+            print('Done')
 
-    # aligned_exp_proj_array = np.array(aligned_exp_proj_array)
-    # synth_proj_array = np.array(synth_proj_array)
-    # recon_array = np.array(recon_array)
+    aligned_exp_proj_array = np.array(aligned_exp_proj_array)
+    synth_proj_array = np.array(synth_proj_array)
+    recon_array = np.array(recon_array)
     
-    return orig_ref_proj
-    # return orig_ref_proj, aligned_proj_total, aligned_exp_proj_array, synth_proj_array, recon_array, net_x_shifts_pc_new, net_y_shifts_pc_new
+    return orig_ref_proj, aligned_proj_total, aligned_exp_proj_array, synth_proj_array, recon_array, net_x_shifts_pc_new, net_y_shifts_pc_new
 
 file_path_xrf = '/home/bwr0835/2_ide_aggregate_xrf.h5'
 output_dir_path_base = '/home/bwr0835'
@@ -513,21 +512,13 @@ n_desired_iter = 5 # For the reprojection scheme, NOT for reconstruction by itse
 
 algorithm = 'gridrec'
 
-# orig_proj_ref, \
-# aligned_proj_total, \
-# aligned_exp_proj_array, \
-# synth_proj_array, \
-# recon_array, \
-# net_x_shifts, \
-# net_y_shifts = iter_reproj(desired_element, 
-#                            elements_xrf, 
-#                            theta_xrf, 
-#                            counts_xrf, 
-#                            algorithm, 
-#                            n_desired_iter,
-#                            init_x_shift = init_x_shift)
-
-orig_proj_ref = iter_reproj(desired_element, 
+orig_proj_ref, \
+aligned_proj_total, \
+aligned_exp_proj_array, \
+synth_proj_array, \
+recon_array, \
+net_x_shifts, \
+net_y_shifts = iter_reproj(desired_element, 
                            elements_xrf, 
                            theta_xrf, 
                            counts_xrf, 
@@ -541,11 +532,11 @@ full_output_dir_path = os.path.join(output_dir_path_base, 'iter_reproj', output_
 
 os.makedirs(full_output_dir_path, exist_ok = True)
 
-# np.save(os.path.join(full_output_dir_path, 'theta_array.npy'), theta_xrf)
-# np.save(os.path.join(full_output_dir_path, 'aligned_proj_all_elements.npy'), aligned_proj_total)
-# np.save(os.path.join(full_output_dir_path, 'aligned_proj_array_iter_' + desired_element + '.npy'), aligned_exp_proj_array)
-# np.save(os.path.join(full_output_dir_path, 'synth_proj_array_iter_' + desired_element + '.npy'), synth_proj_array)
-# np.save(os.path.join(full_output_dir_path, 'recon_array_iter_' + desired_element + '.npy'), recon_array)
-# np.save(os.path.join(full_output_dir_path, 'net_x_shifts_' + desired_element + '.npy'), net_x_shifts)
-# np.save(os.path.join(full_output_dir_path, 'net_y_shifts_' + desired_element + '.npy'), net_y_shifts)
+np.save(os.path.join(full_output_dir_path, 'theta_array.npy'), theta_xrf)
+np.save(os.path.join(full_output_dir_path, 'aligned_proj_all_elements.npy'), aligned_proj_total)
+np.save(os.path.join(full_output_dir_path, 'aligned_proj_array_iter_' + desired_element + '.npy'), aligned_exp_proj_array)
+np.save(os.path.join(full_output_dir_path, 'synth_proj_array_iter_' + desired_element + '.npy'), synth_proj_array)
+np.save(os.path.join(full_output_dir_path, 'recon_array_iter_' + desired_element + '.npy'), recon_array)
+np.save(os.path.join(full_output_dir_path, 'net_x_shifts_' + desired_element + '.npy'), net_x_shifts)
+np.save(os.path.join(full_output_dir_path, 'net_y_shifts_' + desired_element + '.npy'), net_y_shifts)
 np.save(os.path.join(full_output_dir_path, 'orig_exp_proj_' + desired_element + '.npy'), orig_proj_ref)

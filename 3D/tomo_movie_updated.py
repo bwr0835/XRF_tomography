@@ -183,7 +183,7 @@ theta_idx_desired = 0
 iter_idx_desired = 0
 iter_idx_final = iter_array[-1]
 # slice_idx_desired = 64
-slice_idx_desired = n_slices//2
+slice_idx_desired = 64
 element_idx_desired = 11 # Fe for this directory
 
 theta_idx_pairs = find_theta_combos(theta_array, dtheta = 1)
@@ -357,12 +357,12 @@ curve13, = axs10.plot(scan_pos_array, aligned_proj_theta_array_aux[theta_idx_pai
 
 # fig9.suptitle(r'$\theta = {0}$\textdegree; Slice index {1}'.format(theta_array[0], slice_idx_desired))
 
-axs10.set_xlim(0, n_columns - 1)
-axs10.set_title(r'Non-COR-shifted projection set; Slice index {0}'.format(slice_idx_desired))
-axs10.set_xlabel(r'Scan position index')
-axs10.set_ylabel(r'Intensity (a.u.)')
+# axs10.set_xlim(0, n_columns - 1)
+# axs10.set_title(r'Non-COR-corrected projection set; Slice index {0}'.format(slice_idx_desired))
+# axs10.set_xlabel(r'Scan position index')
+# axs10.set_ylabel(r'Intensity (a.u.)')
 
-legend_10 = axs10.legend(frameon = False)
+# legend_10 = axs10.legend(frameon = False)
 
 # for theta_idx in range(n_theta):
 #     im1_1.set_data(aligned_proj_theta_array_aux_red[theta_idx])
@@ -506,7 +506,7 @@ for theta_pair_idx in range(len(theta_idx_pairs)):
     theta_idx_2 = theta_idx_pairs[theta_pair_idx][1]
 
     exp_slice_proj_intensity_theta_1 = orig_exp_proj[theta_idx_1, slice_idx_desired]
-    exp_slice_proj_intensity_theta_2 = orig_exp_proj[theta_idx_2, slice_idx_desired]
+    exp_slice_proj_intensity_theta_2 = np.fliplr(orig_exp_proj[theta_idx_2, slice_idx_desired])
 
     min_slice_proj_intensity = np.min([np.min(exp_slice_proj_intensity_theta_1), np.min(exp_slice_proj_intensity_theta_2)])
     max_slice_proj_intensity = np.max([np.max(exp_slice_proj_intensity_theta_1), np.max(exp_slice_proj_intensity_theta_2)])
@@ -570,9 +570,9 @@ plt.close(fig10)
 
 # create_gif(tiff_array_9, os.path.join(dir_path, 'slice_proj_theta_slice_idx_64.gif'), fps = 15)
 
-# print('Creating slice projection GIF (changing theta pair)...')
+print('Creating slice projection GIF (changing theta pair)...')
 
-create_gif(tiff_array_10, os.path.join(dir_path, 'slice_proj_theta_pair.gif'), fps = 15)
+create_gif(tiff_array_10, os.path.join(dir_path, 'slice_proj_theta_pair_slice_idx_64.gif'), fps = 15)
 
 print('Done')
 
