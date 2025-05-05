@@ -186,7 +186,6 @@ iter_idx_desired = 0
 iter_idx_final = iter_array[-1]
 # slice_idx_desired = n_slices//2
 slice_idx_desired = 64
-element_idx_desired = 11 # Fe for this directory
 
 theta_idx_pairs = find_theta_combos(theta_array, dtheta = 1)
 
