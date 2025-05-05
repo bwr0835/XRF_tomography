@@ -175,8 +175,8 @@ tiff_array_5 = []
 tiff_array_7 = []
 tiff_array_8 = []
 tiff_array_9 = []
-tiff_array_10 = []
-tiff_array_11 = []
+# tiff_array_10 = []
+# tiff_array_11 = []
 
 iter_array = np.arange(n_iter)
 scan_pos_array = np.arange(n_columns)
@@ -519,6 +519,9 @@ legend_11 = axs11.legend(frameon = False)
 slice_idx_desired = [54, 64, 151]
 
 for slice_idx in slice_idx_desired:
+    tiff_array_10 = []
+    tiff_array_11 = []
+    
     for theta_pair_idx in range(len(theta_idx_pairs)):
         legend_10.remove()
         legend_11.remove()
