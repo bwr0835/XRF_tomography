@@ -258,7 +258,7 @@ print('Generating figures...')
 fps_imgs = 25 # Frames per second (fps)
 fps_plots = 15
 
-shift = -20
+shift = 20
 
 shift_1 = (0, shift)
 shift_2 = (0, -shift)
