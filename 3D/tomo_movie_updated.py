@@ -525,8 +525,8 @@ for slice_idx in slice_idx_desired:
     tiff_array_10 = []
     tiff_array_11 = []
 
-    axs10.set_title(r'Abs. COR-shift = {0}; Slice index {1}'.format(shift, slice_idx_desired))
-    axs11.set_title(r'Abs. COR-shift = {0} (2nd angle data flipped); Slice index {1}'.format(shift, slice_idx_desired))
+    axs10.set_title(r'Abs. COR-shift = {0}; Slice index {1}'.format(shift, slice_idx))
+    axs11.set_title(r'Abs. COR-shift = {0} (2nd angle data flipped); Slice index {1}'.format(shift, slice_idx))
 
     for theta_pair_idx in range(len(theta_idx_pairs)):
         legend_10.remove()
