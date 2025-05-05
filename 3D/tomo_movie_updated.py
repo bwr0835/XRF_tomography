@@ -3,6 +3,7 @@ import numpy as np, tkinter as tk, os, sys, imageio as iio
 from tkinter import filedialog
 from matplotlib import pyplot as plt
 from itertools import combinations as combos
+from scipy import ndimage as ndi
 
 plt.rcParams['text.usetex'] = True
 plt.rcParams['font.family'] = 'serif'
@@ -296,7 +297,7 @@ fig10, axs10 = plt.subplots()
 # curve10, = axs9[1].plot(scan_pos_array, aligned_proj_theta_array_aux_2[0][slice_idx_desired], 'k', label = r'Measured')
 # curve11, = axs9[1].plot(scan_pos_array, synth_proj_theta_array_aux_2[0][slice_idx_desired], 'r', label = r'Reprojected')
 curve12, = axs10.plot(scan_pos_array, aligned_proj_theta_array_aux[theta_idx_pairs[0][0]][slice_idx_desired], 'k', label = r'$\theta = {0}$\textdegree'.format(theta_array[theta_idx_pairs[0][0]]))
-curve13, = axs10.plot(scan_pos_array, aligned_proj_theta_array_aux[theta_idx_pairs[0][1]][slice_idx_desired], 'r', label = r'$\theta = {0}$\textdegree'.format(theta_array[theta_idx_pairs[0][1]]))
+curve13, = axs10.plot(scan_pos_array, np.flip(aligned_proj_theta_array_aux[theta_idx_pairs[0][1]][slice_idx_desired]), 'r', label = r'$\theta = {0}$\textdegree'.format(theta_array[theta_idx_pairs[0][1]]))
 
 # text_1 = axs1[0, 0].text(0.02, 0.02, r'$\theta = {0}$\textdegree'.format(theta_array[0]), transform = axs1[0, 0].transAxes, color = 'white')
 # text_2 = axs2[0].text(0.02, 0.02, r'Iter. 0', transform = axs2[0].transAxes, color = 'white')
