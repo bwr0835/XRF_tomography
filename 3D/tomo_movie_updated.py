@@ -357,12 +357,12 @@ curve13, = axs10.plot(scan_pos_array, aligned_proj_theta_array_aux[theta_idx_pai
 
 # fig9.suptitle(r'$\theta = {0}$\textdegree; Slice index {1}'.format(theta_array[0], slice_idx_desired))
 
-# axs10.set_xlim(0, n_columns - 1)
-# axs10.set_title(r'Non-COR-corrected projection set; Slice index {0}'.format(slice_idx_desired))
-# axs10.set_xlabel(r'Scan position index')
-# axs10.set_ylabel(r'Intensity (a.u.)')
+axs10.set_xlim(0, n_columns - 1)
+axs10.set_title(r'Non-COR-corrected projection set; Slice index {0}'.format(slice_idx_desired))
+axs10.set_xlabel(r'Scan position index')
+axs10.set_ylabel(r'Intensity (a.u.)')
 
-# legend_10 = axs10.legend(frameon = False)
+legend_10 = axs10.legend(frameon = False)
 
 # for theta_idx in range(n_theta):
 #     im1_1.set_data(aligned_proj_theta_array_aux_red[theta_idx])
