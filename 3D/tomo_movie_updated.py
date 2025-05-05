@@ -605,7 +605,7 @@ create_gif(tiff_array_10, os.path.join(dir_path, 'slice_proj_theta_pair_slice_id
 
 print('Creating slice projection GIF (changing theta pair; data for second angle flipped)...')
 
-create_gif(tiff_array_10, os.path.join(dir_path, 'slice_proj_theta_pair_slice_idx_64_ang_2_data_flipped.gif'), fps = 15)
+create_gif(tiff_array_11, os.path.join(dir_path, 'slice_proj_theta_pair_slice_idx_64_ang_2_data_flipped.gif'), fps = 15)
 
 print('Done')
 
