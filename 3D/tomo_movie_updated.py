@@ -537,7 +537,7 @@ for theta_pair_idx in range(len(theta_idx_pairs)):
     curve14.set_ydata(exp_slice_proj_intensity_theta_1)
     curve14.set_label(r'$\theta = {0}$\textdegree'.format(theta_array[theta_idx_1]))
     
-    curve15.set_ydata(exp_slice_proj_intensity_theta_2)
+    curve15.set_ydata(exp_slice_proj_intensity_theta_3)
     curve15.set_label(r'$\theta = {0}$\textdegree'.format(theta_array[theta_idx_2]))
 
     axs10.set_ylim(min_slice_proj_intensity, max_slice_proj_intensity)
