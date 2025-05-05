@@ -258,10 +258,10 @@ print('Generating figures...')
 fps_imgs = 25 # Frames per second (fps)
 fps_plots = 15
 
-shift_abs = 20
+shift = -20
 
-shift_1 = (0, shift_abs)
-shift_2 = (0, -shift_abs)
+shift_1 = (0, shift)
+shift_2 = (0, -shift)
 
 # fig1, axs1 = plt.subplots(2, 3) # Aligned experimental projection, synthetic experimental projection, overlays at different angles
 # fig2, axs2 = plt.subplots(1, 3) # Same as above, but for different iterations - use first projection angle
