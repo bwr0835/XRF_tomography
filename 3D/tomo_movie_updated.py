@@ -308,7 +308,7 @@ fig11, axs11 = plt.subplots()
 slice_idx_desired = [54, 64, 151]
 
 curve12, = axs10.plot(scan_pos_array, ndi.shift(aligned_proj_theta_array_aux[theta_idx_pairs[0][0]], shift = shift_1)[slice_idx_desired[0]], 'k', label = r'$\theta = {0}$\textdegree'.format(theta_array[theta_idx_pairs[0][0]]))
-curve13, = axs10.plot(scan_pos_array, ndi.shift(aligned_proj_theta_array_aux[theta_idx_pairs[0][1]], shift = shift_2)[slice_idx_desired[0]], 'r', label = r'$\theta = {0}$\textdegree'.format(theta_array[theta_idx_pairs[0][1]]))
+curve13, = axs10.plot(scan_pos_array, ndi.shift(aligned_proj_theta_array_aux[theta_idx_pairs[0][1]], shift = shift_1)[slice_idx_desired[0]], 'r', label = r'$\theta = {0}$\textdegree'.format(theta_array[theta_idx_pairs[0][1]]))
 curve14, = axs11.plot(scan_pos_array, ndi.shift(aligned_proj_theta_array_aux[theta_idx_pairs[0][0]], shift = shift_1)[slice_idx_desired[0]], 'k', label = r'$\theta = {0}$\textdegree'.format(theta_array[theta_idx_pairs[0][0]]))
 curve15, = axs11.plot(scan_pos_array, np.flip(ndi.shift(aligned_proj_theta_array_aux[theta_idx_pairs[0][1]], shift = shift_2))[slice_idx_desired[0]], 'r', label = r'$\theta = {0}$\textdegree'.format(theta_array[theta_idx_pairs[0][1]]))
 
@@ -536,8 +536,8 @@ for slice_idx in slice_idx_desired:
         theta_idx_2 = theta_idx_pairs[theta_pair_idx][1]
 
         exp_slice_proj_intensity_theta_1 = ndi.shift(orig_exp_proj[theta_idx_1], shift = shift_1)[slice_idx]
-        exp_slice_proj_intensity_theta_2 = ndi.shift(orig_exp_proj[theta_idx_2], shift = shift_2)[slice_idx]
-        exp_slice_proj_intensity_theta_3 = np.flip(ndi.shift(orig_exp_proj[theta_idx_2], shift = shift_1), axis = 1)[slice_idx]
+        exp_slice_proj_intensity_theta_2 = ndi.shift(orig_exp_proj[theta_idx_2], shift = shift_1)[slice_idx]
+        exp_slice_proj_intensity_theta_3 = np.flip(ndi.shift(orig_exp_proj[theta_idx_2], shift = shift_2), axis = 1)[slice_idx]
 
         min_slice_proj_intensity = np.min([np.min(exp_slice_proj_intensity_theta_1), np.min(exp_slice_proj_intensity_theta_2)])
         max_slice_proj_intensity = np.max([np.max(exp_slice_proj_intensity_theta_1), np.max(exp_slice_proj_intensity_theta_2)])
