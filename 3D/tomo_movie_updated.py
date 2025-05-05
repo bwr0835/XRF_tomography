@@ -176,6 +176,7 @@ tiff_array_7 = []
 tiff_array_8 = []
 tiff_array_9 = []
 tiff_array_10 = []
+tiff_array_11 = []
 
 iter_array = np.arange(n_iter)
 scan_pos_array = np.arange(n_columns)
@@ -273,6 +274,7 @@ shift_2 = (0, -shift)
 # fig8, axs8 = plt.subplots()
 # fig9, axs9 = plt.subplots(2, 1)
 fig10, axs10 = plt.subplots()
+fig11, axs11 = plt.subplots()
 
 # im1_1 = axs1[0, 0].imshow(aligned_proj_theta_array_aux_red[0])
 # im1_2 = axs1[0, 1].imshow(synth_proj_theta_array_aux_blue[0])
@@ -302,7 +304,9 @@ fig10, axs10 = plt.subplots()
 # curve10, = axs9[1].plot(scan_pos_array, aligned_proj_theta_array_aux_2[0][slice_idx_desired], 'k', label = r'Measured')
 # curve11, = axs9[1].plot(scan_pos_array, synth_proj_theta_array_aux_2[0][slice_idx_desired], 'r', label = r'Reprojected')
 curve12, = axs10.plot(scan_pos_array, ndi.shift(aligned_proj_theta_array_aux[theta_idx_pairs[0][0]], shift = shift_1)[slice_idx_desired], 'k', label = r'$\theta = {0}$\textdegree'.format(theta_array[theta_idx_pairs[0][0]]))
-curve13, = axs10.plot(scan_pos_array, np.flip(ndi.shift(aligned_proj_theta_array_aux[theta_idx_pairs[0][1]], shift = shift_2)[slice_idx_desired]), 'r', label = r'$\theta = {0}$\textdegree'.format(theta_array[theta_idx_pairs[0][1]]))
+curve13, = axs10.plot(scan_pos_array, ndi.shift(aligned_proj_theta_array_aux[theta_idx_pairs[0][1]], shift = shift_1)[slice_idx_desired], 'r', label = r'$\theta = {0}$\textdegree'.format(theta_array[theta_idx_pairs[0][1]]))
+curve14, = axs11.plot(scan_pos_array, ndi.shift(aligned_proj_theta_array_aux[theta_idx_pairs[0][0]], shift = shift_1)[slice_idx_desired], 'k', label = r'$\theta = {0}$\textdegree'.format(theta_array[theta_idx_pairs[0][0]]))
+curve15, = axs11.plot(scan_pos_array, np.flip(ndi.shift(aligned_proj_theta_array_aux[theta_idx_pairs[0][1]], shift = shift_2)[slice_idx_desired]), 'r', label = r'$\theta = {0}$\textdegree'.format(theta_array[theta_idx_pairs[0][1]]))
 
 # text_1 = axs1[0, 0].text(0.02, 0.02, r'$\theta = {0}$\textdegree'.format(theta_array[0]), transform = axs1[0, 0].transAxes, color = 'white')
 # text_2 = axs2[0].text(0.02, 0.02, r'Iter. 0', transform = axs2[0].transAxes, color = 'white')
@@ -364,11 +368,17 @@ curve13, = axs10.plot(scan_pos_array, np.flip(ndi.shift(aligned_proj_theta_array
 # fig9.suptitle(r'$\theta = {0}$\textdegree; Slice index {1}'.format(theta_array[0], slice_idx_desired))
 
 axs10.set_xlim(0, n_columns - 1)
-axs10.set_title(r'Non-COR-corrected projection set; Slice index {0}'.format(slice_idx_desired))
+axs10.set_title(r'Abs. COR shift = {0}; Slice index {1}'.format(shift, slice_idx_desired))
 axs10.set_xlabel(r'Scan position index')
 axs10.set_ylabel(r'Intensity (a.u.)')
 
+axs11.set_xlim(0, n_columns - 1)
+axs11.set_title(r'Abs. COR-shift = {0} (2nd angle data flipped); Slice index {1}'.format(shift, slice_idx_desired))
+axs11.set_xlabel(r'Scan position index')
+axs11.set_ylabel(r'Intensity (a.u.)')
+
 legend_10 = axs10.legend(frameon = False)
+legend_11 = axs11.legend(frameon = False)
 
 # for theta_idx in range(n_theta):
 #     im1_1.set_data(aligned_proj_theta_array_aux_red[theta_idx])
@@ -507,12 +517,14 @@ legend_10 = axs10.legend(frameon = False)
 
 for theta_pair_idx in range(len(theta_idx_pairs)):
     legend_10.remove()
+    legend_11.remove()
 
     theta_idx_1 = theta_idx_pairs[theta_pair_idx][0]
     theta_idx_2 = theta_idx_pairs[theta_pair_idx][1]
 
     exp_slice_proj_intensity_theta_1 = ndi.shift(orig_exp_proj[theta_idx_1], shift = shift_1)[slice_idx_desired]
-    exp_slice_proj_intensity_theta_2 = np.flip(ndi.shift(orig_exp_proj[theta_idx_2], shift = shift_2)[slice_idx_desired])
+    exp_slice_proj_intensity_theta_2 = ndi.shift(orig_exp_proj[theta_idx_1], shift = shift_2)[slice_idx_desired]
+    exp_slice_proj_intensity_theta_3 = np.flip(ndi.shift(orig_exp_proj[theta_idx_2], shift = shift_2)[slice_idx_desired])
 
     min_slice_proj_intensity = np.min([np.min(exp_slice_proj_intensity_theta_1), np.min(exp_slice_proj_intensity_theta_2)])
     max_slice_proj_intensity = np.max([np.max(exp_slice_proj_intensity_theta_1), np.max(exp_slice_proj_intensity_theta_2)])
@@ -524,16 +536,22 @@ for theta_pair_idx in range(len(theta_idx_pairs)):
     curve13.set_label(r'$\theta = {0}$\textdegree'.format(theta_array[theta_idx_2]))
 
     axs10.set_ylim(min_slice_proj_intensity, max_slice_proj_intensity)
+    axs11.set_ylim(min_slice_proj_intensity, max_slice_proj_intensity)
 
     legend_10 = axs10.legend(frameon = False)
+    legend_11 = axs10.legend(frameon = False)
 
     filename_10 = os.path.join(dir_path, f'slice_proj_theta_pair_{theta_pair_idx:03d}_orig.tiff')
+    filename_11 = os.path.join(dir_path, f'slice_proj_theta_pair_{theta_pair_idx:03d}_orig_second_ang_flipped.tiff')
 
     fig10.savefig(filename_10, dpi = 400)
+    fig11.savefig(filename_11, dpi = 400)
 
     tiff_array_10.append(filename_10)
+    tiff_array_11.append(filename_10)
 
 plt.close(fig10)
+plt.close(fig11)
 
 # print('Saving COR plot...')
 
@@ -579,6 +597,10 @@ plt.close(fig10)
 print('Creating slice projection GIF (changing theta pair)...')
 
 create_gif(tiff_array_10, os.path.join(dir_path, 'slice_proj_theta_pair_slice_idx_64.gif'), fps = 15)
+
+print('Creating slice projection GIF (changing theta pair; data for second angle flipped)...')
+
+create_gif(tiff_array_10, os.path.join(dir_path, 'slice_proj_theta_pair_slice_idx_64_ang_2_data_flipped.gif'), fps = 15)
 
 print('Done')
 
