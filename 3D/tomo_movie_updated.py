@@ -260,7 +260,7 @@ print('Generating figures...')
 fps_imgs = 25 # Frames per second (fps)
 fps_plots = 15
 
-shift = 20
+shift = 0
 
 shift_1 = (0, shift)
 shift_2 = (0, -shift)
@@ -548,8 +548,8 @@ for theta_pair_idx in range(len(theta_idx_pairs)):
     legend_10 = axs10.legend(frameon = False)
     legend_11 = axs11.legend(frameon = False)
 
-    filename_10 = os.path.join(dir_path, f'slice_proj_theta_pair_{theta_pair_idx:03d}_orig.tiff')
-    filename_11 = os.path.join(dir_path, f'slice_proj_theta_pair_{theta_pair_idx:03d}_orig_second_ang_flipped.tiff')
+    filename_10 = os.path.join(dir_path, f'slice_proj_theta_pair_{theta_pair_idx:03d}_orig_abs_shift_{shift}.tiff')
+    filename_11 = os.path.join(dir_path, f'slice_proj_theta_pair_{theta_pair_idx:03d}_orig_abs_shift_{shift}_second_ang_flipped.tiff')
 
     fig10.savefig(filename_10, dpi = 400)
     fig11.savefig(filename_11, dpi = 400)
@@ -603,11 +603,11 @@ plt.close(fig11)
 
 print('Creating slice projection GIF (changing theta pair)...')
 
-create_gif(tiff_array_10, os.path.join(dir_path, 'slice_proj_theta_pair_slice_idx_64.gif'), fps = 15)
+create_gif(tiff_array_10, os.path.join(dir_path, f'slice_proj_theta_pair_slice_idx_{slice_idx_desired:03d}.gif'), fps = 15)
 
 print('Creating slice projection GIF (changing theta pair; data for second angle flipped)...')
 
-create_gif(tiff_array_11, os.path.join(dir_path, 'slice_proj_theta_pair_slice_idx_64_ang_2_data_flipped.gif'), fps = 15)
+create_gif(tiff_array_11, os.path.join(dir_path, f'slice_proj_theta_pair_slice_idx_{slice_idx_desired:03d}_ang_2_data_flipped.gif'), fps = 15)
 
 print('Done')
 
