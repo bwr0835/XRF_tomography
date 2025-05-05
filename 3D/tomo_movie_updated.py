@@ -183,8 +183,8 @@ scan_pos_array = np.arange(n_columns)
 theta_idx_desired = 0
 iter_idx_desired = 0
 iter_idx_final = iter_array[-1]
+slice_idx_desired = n_slices//2
 # slice_idx_desired = 64
-slice_idx_desired = 64
 element_idx_desired = 11 # Fe for this directory
 
 theta_idx_pairs = find_theta_combos(theta_array, dtheta = 1)
@@ -578,7 +578,7 @@ plt.close(fig10)
 
 print('Creating slice projection GIF (changing theta pair)...')
 
-create_gif(tiff_array_10, os.path.join(dir_path, 'slice_proj_theta_pair_slice_idx_64.gif'), fps = 15)
+create_gif(tiff_array_10, os.path.join(dir_path, 'slice_proj_theta_pair_slice_idx.gif'), fps = 15)
 
 print('Done')
 
