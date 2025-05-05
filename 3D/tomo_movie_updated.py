@@ -304,10 +304,13 @@ fig11, axs11 = plt.subplots()
 # curve9, = axs9[0].plot(scan_pos_array, synth_proj_theta_array_aux[0][slice_idx_desired], 'r', label = r'Reprojected')
 # curve10, = axs9[1].plot(scan_pos_array, aligned_proj_theta_array_aux_2[0][slice_idx_desired], 'k', label = r'Measured')
 # curve11, = axs9[1].plot(scan_pos_array, synth_proj_theta_array_aux_2[0][slice_idx_desired], 'r', label = r'Reprojected')
-curve12, = axs10.plot(scan_pos_array, ndi.shift(aligned_proj_theta_array_aux[theta_idx_pairs[0][0]], shift = shift_1)[slice_idx_desired], 'k', label = r'$\theta = {0}$\textdegree'.format(theta_array[theta_idx_pairs[0][0]]))
-curve13, = axs10.plot(scan_pos_array, ndi.shift(aligned_proj_theta_array_aux[theta_idx_pairs[0][1]], shift = shift_2)[slice_idx_desired], 'r', label = r'$\theta = {0}$\textdegree'.format(theta_array[theta_idx_pairs[0][1]]))
-curve14, = axs11.plot(scan_pos_array, ndi.shift(aligned_proj_theta_array_aux[theta_idx_pairs[0][0]], shift = shift_1)[slice_idx_desired], 'k', label = r'$\theta = {0}$\textdegree'.format(theta_array[theta_idx_pairs[0][0]]))
-curve15, = axs11.plot(scan_pos_array, np.flip(ndi.shift(aligned_proj_theta_array_aux[theta_idx_pairs[0][1]], shift = shift_2))[slice_idx_desired], 'r', label = r'$\theta = {0}$\textdegree'.format(theta_array[theta_idx_pairs[0][1]]))
+
+slice_idx_desired = [54, 64, 151]
+
+curve12, = axs10.plot(scan_pos_array, ndi.shift(aligned_proj_theta_array_aux[theta_idx_pairs[0][0]], shift = shift_1)[slice_idx_desired[0]], 'k', label = r'$\theta = {0}$\textdegree'.format(theta_array[theta_idx_pairs[0][0]]))
+curve13, = axs10.plot(scan_pos_array, ndi.shift(aligned_proj_theta_array_aux[theta_idx_pairs[0][1]], shift = shift_2)[slice_idx_desired[0]], 'r', label = r'$\theta = {0}$\textdegree'.format(theta_array[theta_idx_pairs[0][1]]))
+curve14, = axs11.plot(scan_pos_array, ndi.shift(aligned_proj_theta_array_aux[theta_idx_pairs[0][0]], shift = shift_1)[slice_idx_desired[0]], 'k', label = r'$\theta = {0}$\textdegree'.format(theta_array[theta_idx_pairs[0][0]]))
+curve15, = axs11.plot(scan_pos_array, np.flip(ndi.shift(aligned_proj_theta_array_aux[theta_idx_pairs[0][1]], shift = shift_2))[slice_idx_desired[0]], 'r', label = r'$\theta = {0}$\textdegree'.format(theta_array[theta_idx_pairs[0][1]]))
 
 # text_1 = axs1[0, 0].text(0.02, 0.02, r'$\theta = {0}$\textdegree'.format(theta_array[0]), transform = axs1[0, 0].transAxes, color = 'white')
 # text_2 = axs2[0].text(0.02, 0.02, r'Iter. 0', transform = axs2[0].transAxes, color = 'white')
@@ -369,12 +372,12 @@ curve15, = axs11.plot(scan_pos_array, np.flip(ndi.shift(aligned_proj_theta_array
 # fig9.suptitle(r'$\theta = {0}$\textdegree; Slice index {1}'.format(theta_array[0], slice_idx_desired))
 
 axs10.set_xlim(0, n_columns - 1)
-axs10.set_title(r'Abs. COR shift = {0}; Slice index {1}'.format(shift, slice_idx_desired))
+axs10.set_title(r'Abs. COR shift = {0}; Slice index {1}'.format(shift, slice_idx_desired[0]))
 axs10.set_xlabel(r'Scan position index')
 axs10.set_ylabel(r'Intensity (a.u.)')
 
 axs11.set_xlim(0, n_columns - 1)
-axs11.set_title(r'Abs. COR-shift = {0} (2nd angle data flipped); Slice index {1}'.format(shift, slice_idx_desired))
+axs11.set_title(r'Abs. COR-shift = {0} (2nd angle data flipped); Slice index {1}'.format(shift, slice_idx_desired[0]))
 axs11.set_xlabel(r'Scan position index')
 axs11.set_ylabel(r'Intensity (a.u.)')
 
@@ -521,6 +524,9 @@ slice_idx_desired = [54, 64, 151]
 for slice_idx in slice_idx_desired:
     tiff_array_10 = []
     tiff_array_11 = []
+
+    axs10.set_title(r'Abs. COR-shift = {0}; Slice index {1}'.format(shift, slice_idx_desired))
+    axs11.set_title(r'Abs. COR-shift = {0} (2nd angle data flipped); Slice index {1}'.format(shift, slice_idx_desired))
 
     for theta_pair_idx in range(len(theta_idx_pairs)):
         legend_10.remove()
