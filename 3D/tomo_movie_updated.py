@@ -547,7 +547,7 @@ for theta_pair_idx in range(len(theta_idx_pairs)):
     fig11.savefig(filename_11, dpi = 400)
 
     tiff_array_10.append(filename_10)
-    tiff_array_11.append(filename_10)
+    tiff_array_11.append(filename_11)
 
 plt.close(fig10)
 plt.close(fig11)
