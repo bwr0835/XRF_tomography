@@ -264,6 +264,8 @@ shift = 20
 
 shift_1 = (0, shift)
 shift_2 = (0, -shift)
+shift_3 = (0, shift/2)
+shift_4 = (0, -shift/2)
 
 # fig1, axs1 = plt.subplots(2, 3) # Aligned experimental projection, synthetic experimental projection, overlays at different angles
 # fig2, axs2 = plt.subplots(1, 3) # Same as above, but for different iterations - use first projection angle
