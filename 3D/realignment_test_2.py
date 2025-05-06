@@ -399,7 +399,7 @@ def iter_reproj(ref_element,
         
         elif algorithm == 'mlem':
             # recon = tomo.recon(aligned_proj, theta_array*np.pi/180, center_of_rotation, algorithm, num_iter = 60)
-            recon = tomo.recon(aligned_proj, theta_array*np.pi/180, algorithm, num_iter = 60)
+            recon = tomo.recon(aligned_proj, theta_array*np.pi/180, algorithm = algorithm, num_iter = 60)
 
         else:
             print('Error: Algorithm not available. Exiting...')
