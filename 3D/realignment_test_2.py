@@ -322,43 +322,43 @@ def iter_reproj(ref_element,
     if np.isscalar(init_y_shift):
         init_y_shift *= np.ones(n_theta)
 
-    theta_idx_pairs = find_theta_combos(theta_array, dtheta = 1)
+    # theta_idx_pairs = find_theta_combos(theta_array, dtheta = 1)
 
-    for theta_idx_pair in theta_idx_pairs:
-        print(np.array([theta_array[theta_idx_pair[0]], theta_array[theta_idx_pair[1]]]))
+    # for theta_idx_pair in theta_idx_pairs:
+        # print(np.array([theta_array[theta_idx_pair[0]], theta_array[theta_idx_pair[1]]]))
 
-    center_of_rotation_array = np.array([tomo.find_center_pc(xrf_proj_img_array[ref_element_idx, theta_idx_pair[1]], 
-                                                             xrf_proj_img_array[ref_element_idx, theta_idx_pair[0]], 
-                                                             tol = 0.01) for theta_idx_pair in theta_idx_pairs]) 
+    # center_of_rotation_array = np.array([tomo.find_center_pc(xrf_proj_img_array[ref_element_idx, theta_idx_pair[1]], 
+                                                            #  xrf_proj_img_array[ref_element_idx, theta_idx_pair[0]], 
+                                                            #  tol = 0.01) for theta_idx_pair in theta_idx_pairs]) 
                                                           # The second image is flipped about the vertical axis within the TomoPy function
     
-    center_of_rotation = np.mean(center_of_rotation_array)
+    # center_of_rotation = np.mean(center_of_rotation_array)
 
     # plt.plot(np.arange(len(center_of_rotation_array)), center_of_rotation_array, 'o', markersize = 3)
     # plt.plot(np.arange(len(center_of_rotation_array)), center_of_rotation*np.ones(len(center_of_rotation_array)))
 
     # plt.show()
         
-    center_geom = (n_columns - 1)/2
+    # center_geom = (n_columns - 1)/2
     
-    offset = center_of_rotation - center_geom
+    # offset = center_of_rotation - center_geom
 
-    print(f'Center of rotation via phase cross-correlation: {round_correct(center_of_rotation, ndec = 3)}')
-    print(f'Geometric center: {center_geom}')
-    print(f'Center of rotation error: {offset}')
-    print(f'Incorporating x-shift = {-offset} to all projection images...')
+    # print(f'Center of rotation via phase cross-correlation: {round_correct(center_of_rotation, ndec = 3)}')
+    # print(f'Geometric center: {center_geom}')
+    # print(f'Center of rotation error: {offset}')
+    # print(f'Incorporating x-shift = {-offset} to all projection images...')
 
-    for element_idx in range(n_elements):
-        for theta_idx in range(n_theta):
-            xrf_proj_img_array[element_idx, theta_idx] = ndi.shift(xrf_proj_img_array[element_idx, theta_idx], shift = (0, -offset))
+    # for element_idx in range(n_elements):
+    #     for theta_idx in range(n_theta):
+    #         xrf_proj_img_array[element_idx, theta_idx] = ndi.shift(xrf_proj_img_array[element_idx, theta_idx], shift = (0, -offset))
 
-    center_of_rotation_array = np.array([tomo.find_center_pc(xrf_proj_img_array[ref_element_idx, theta_idx_pair[0]], 
-                                                    xrf_proj_img_array[ref_element_idx, theta_idx_pair[1]], 
-                                                    tol = 0.01) for theta_idx_pair in theta_idx_pairs])
+    # center_of_rotation_array = np.array([tomo.find_center_pc(xrf_proj_img_array[ref_element_idx, theta_idx_pair[0]], 
+    #                                                 xrf_proj_img_array[ref_element_idx, theta_idx_pair[1]], 
+    #                                                 tol = 0.01) for theta_idx_pair in theta_idx_pairs])
     
-    center_of_rotation = np.mean(center_of_rotation_array)
+    # center_of_rotation = np.mean(center_of_rotation_array)
     
-    print(f'New center of rotation: {center_of_rotation}')
+    # print(f'New center of rotation: {center_of_rotation}')
     print('Performing iterative reprojection...')
 
     for i in range(n_iterations):
@@ -368,7 +368,7 @@ def iter_reproj(ref_element,
 
         if i == 0:
             for theta_idx in range(n_theta):
-                aligned_proj[theta_idx] = ndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx], shift = (init_y_shift, init_x_shift))
+                aligned_proj[theta_idx] = ndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx], shift = (init_y_shift[theta_idx], init_x_shift[theta_idx]))
             
         else:
             for theta_idx in range(n_theta):
@@ -385,19 +385,21 @@ def iter_reproj(ref_element,
 
         print(aligned_proj.shape)
 
-        center_of_rotation_array_new = np.array([tomo.find_center_pc(aligned_proj[theta_idx_pair[0]], 
-                                                    aligned_proj[theta_idx_pair[1]], 
-                                                    tol = 0.01) for theta_idx_pair in theta_idx_pairs])
+        # center_of_rotation_array_new = np.array([tomo.find_center_pc(aligned_proj[theta_idx_pair[0]], 
+        #                                             aligned_proj[theta_idx_pair[1]], 
+        #                                             tol = 0.01) for theta_idx_pair in theta_idx_pairs])
     
-        center_of_rotation_new = np.mean(center_of_rotation_array_new)
+        # center_of_rotation_new = np.mean(center_of_rotation_array_new)
         
-        print(f'Center of rotation after shifting: {round_correct(center_of_rotation_new, ndec = 3)}')
+        # print(f'Center of rotation after shifting: {round_correct(center_of_rotation_new, ndec = 3)}')
         
         if algorithm == 'gridrec':
-            recon = tomo.recon(aligned_proj, theta_array*np.pi/180, center_of_rotation, algorithm = algorithm, filter_name = 'hamming')
+            # recon = tomo.recon(aligned_proj, theta_array*np.pi/180, center_of_rotation, algorithm = algorithm, filter_name = 'hamming');
+            sys.exit()
         
         elif algorithm == 'mlem':
-            recon = tomo.recon(aligned_proj, theta_array*np.pi/180, center_of_rotation, algorithm, num_iter = 60)
+            # recon = tomo.recon(aligned_proj, theta_array*np.pi/180, center_of_rotation, algorithm, num_iter = 60)
+            recon = tomo.recon(aligned_proj, theta_array*np.pi/180, algorithm, num_iter = 60)
 
         else:
             print('Error: Algorithm not available. Exiting...')
