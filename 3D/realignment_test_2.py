@@ -508,8 +508,8 @@ desired_element_idx = elements_xrf.index(desired_element)
 n_theta = counts_xrf.shape[1]
 n_slices = counts_xrf.shape[2]
 
-# init_x_shift = 20*np.ones(n_theta)
-init_x_shift = 0
+init_x_shift = 20*np.ones(n_theta)
+# init_x_shift = 0
 
 n_desired_iter = 1 # For the reprojection scheme, NOT for reconstruction by itself
 
