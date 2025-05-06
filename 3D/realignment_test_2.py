@@ -395,7 +395,7 @@ def iter_reproj(ref_element,
         
         if algorithm == 'gridrec':
             # recon = tomo.recon(aligned_proj, theta_array*np.pi/180, center_of_rotation, algorithm = algorithm, filter_name = 'hamming')
-            recon = tomo.recon(aligned_proj, theta_array*np.pi/180, algorithm = algorithm, filter_name = 'hamming')
+            recon = tomo.recon(aligned_proj, theta_array*np.pi/180, algorithm = algorithm, filter_name = 'ramlak')
             # sys.exit()
         
         elif algorithm == 'mlem':
