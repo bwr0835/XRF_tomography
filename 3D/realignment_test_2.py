@@ -483,7 +483,7 @@ output_dir_path_base = '/home/bwr0835'
 
 # output_file_name_base = input('Choose a base file name: ')
 # output_file_name_base = 'gridrec_5_iter_vacek_cor_and_shift_correction_padding_-22_deg_158_deg'
-output_file_name_base = 'mlem_1_iter_no_cor_shift_tomopy_default_cor_w_padding_05_06_2025'
+output_file_name_base = 'gridrec_5_iter_manual_shift_20_tomopy_default_cor_w_padding_05_08_2025'
 
 if output_file_name_base == '':
     print('No output base file name chosen. Ending program...')
@@ -508,12 +508,12 @@ desired_element_idx = elements_xrf.index(desired_element)
 n_theta = counts_xrf.shape[1]
 n_slices = counts_xrf.shape[2]
 
-# init_x_shift = 20*np.ones(n_theta)
-init_x_shift = 0
+init_x_shift = 20*np.ones(n_theta)
+# init_x_shift = 0
 
 n_desired_iter = 1 # For the reprojection scheme, NOT for reconstruction by itself
 
-algorithm = 'mlem'
+algorithm = 'gridrec'
 
 orig_proj_ref, \
 aligned_proj_total, \
