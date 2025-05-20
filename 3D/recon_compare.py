@@ -47,8 +47,8 @@ for slice_idx in range(n_slices):
 
     n = 0
 
-    for axes in fig1.axes:
-        axes.set_data(recon_array[n][slice_idx])
+    for axs in fig1.axes:
+        axs.set_data(recon_array[n][slice_idx])
     
     text_1.set_text(r'Slice index {0}'.format(slice_idx))
 
