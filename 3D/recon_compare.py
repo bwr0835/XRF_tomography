@@ -2,6 +2,10 @@ import numpy as np, imageio as iio, os
 
 from matplotlib import pyplot as plt
 
+plt.rcParams['text.usetex'] = True
+plt.rcParams['font.family'] = 'serif'
+plt.rcParams['text.latex.preamble'] = r'\usepackage{times}'
+
 def create_gif(tiff_filename_array, output_filepath, fps):
     writer = iio.get_writer(output_filepath, mode = 'I', duration = 1/fps)
     
@@ -26,8 +30,8 @@ file_4 = '/home/bwr0835/iter_reproj/mlem_1_iter_no_cor_shift_tomopy_default_cor_
 
 recon_gridrec_no_shift = np.load(file_3)[0]
 recon_gridrec_shift_20 = np.load(file_2)[0]
-recon_mlem_no_shift = np.load(file_1)[0]
-recon_mlem_shift_20 = np.load(file_4)[0]
+recon_mlem_no_shift = np.load(file_4)[0]
+recon_mlem_shift_20 = np.load(file_1)[0]
 
 recon_array = [recon_gridrec_no_shift, recon_gridrec_shift_20, recon_mlem_no_shift, recon_mlem_shift_20]
 
@@ -68,6 +72,8 @@ for slice_idx in range(n_slices):
     fig1.savefig(filename_1, dpi = 400)
 
     tiff_array.append(filename_1)
+
+fig1.close()
 
 print('Creating reconstruction comparison GIF...')
 
