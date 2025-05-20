@@ -39,7 +39,7 @@ n_slices = recon_gridrec_no_shift.shape[0]
 
 tiff_array = []
 
-fig1, axs1 = plt.subplots(4, 4)
+fig1, axs1 = plt.subplots(2, 2)
 
 for axs in fig1.axes:
     axs.axis('off')
@@ -69,7 +69,7 @@ for slice_idx in range(n_slices):
     filename_1 = os.path.join(output_dir_path, f'recon_compare_slice_{slice_idx:03d}.tiff')
 
     fig1.tight_layout()
-    fig1.savefig(filename_1, dpi = 400, bbox_inches = 'tight')
+    fig1.savefig(filename_1, dpi = 400)
 
     tiff_array.append(filename_1)
 
