@@ -69,7 +69,7 @@ for slice_idx in range(n_slices):
     filename_1 = os.path.join(output_dir_path, f'recon_compare_slice_{slice_idx:03d}.tiff')
 
     fig1.tight_layout()
-    fig1.savefig(filename_1, dpi = 400)
+    fig1.savefig(filename_1, dpi = 400, bbox_inches = 'tight')
 
     tiff_array.append(filename_1)
 
