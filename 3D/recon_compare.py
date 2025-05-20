@@ -73,7 +73,7 @@ for slice_idx in range(n_slices):
 
     tiff_array.append(filename_1)
 
-fig1.close()
+plt.close(fig1)
 
 print('Creating reconstruction comparison GIF...')
 
