@@ -59,7 +59,7 @@ for slice_idx in range(n_slices):
     fig1.tight_layout()
     fig1.savefig(filename_1, dpi = 400)
 
-    tiff_array.append()
+    tiff_array.append(filename_1)
 
 print('Creating reconstruction comparison GIF...')
 
