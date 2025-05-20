@@ -17,6 +17,8 @@ def create_gif(tiff_filename_array, output_filepath, fps):
 
 output_dir_path = '/home/bwr0835/iter_reproj/gridrec_mlem_comp_no_shift_shift_20_may_20_2025'
 
+os.makedirs(output_dir_path, exist_ok = True)
+
 file_1 = '/home/bwr0835/iter_reproj/mlem_1_iter_manual_shift_20_tomopy_default_cor_w_padding_05_06_2025/recon_array_iter_Fe.npy'
 file_2 = '/home/bwr0835/iter_reproj/gridrec_1_iter_manual_shift_20_tomopy_default_cor_w_padding_05_06_2025/recon_array_iter_Fe.npy'
 file_3 = '/home/bwr0835/iter_reproj/gridrec_1_iter_no_cor_shift_tomopy_default_cor_w_padding_05_06_2025/recon_array_iter_Fe.npy'
