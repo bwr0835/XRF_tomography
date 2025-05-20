@@ -45,10 +45,10 @@ text_1 = axs1[0, 0].text(0.02, 0.02, r'Slice 0', transform = axs1[0, 0].transAxe
 for slice_idx in range(n_slices):
     print(f'Creating frame {slice_idx}...')
 
-    n = 0
-
-    for axs in fig1.axes:
-        axs.set_data(recon_array[n][slice_idx])
+    im1_1.set_data(recon_gridrec_no_shift[slice_idx])
+    im2_1.set_data(recon_gridrec_shift_20[slice_idx])
+    im3_1.set_data(recon_mlem_no_shift[slice_idx])
+    im4_1.set_data(recon_mlem_shift_20[slice_idx])
     
     text_1.set_text(r'Slice index {0}'.format(slice_idx))
 
