@@ -37,10 +37,18 @@ tiff_array = []
 
 fig1, axs1 = plt.subplots(4, 4)
 
+for axs in fig1.axes:
+    axs.axis('off')
+
 im1_1 = axs1[0, 0].imshow(recon_gridrec_no_shift[0])
 im2_1 = axs1[0, 1].imshow(recon_gridrec_shift_20[0])
 im3_1 = axs1[1, 0].imshow(recon_mlem_no_shift[0])
 im4_1 = axs1[1, 1].imshow(recon_mlem_shift_20[0])
+
+axs1[0, 0].set_title(r'No COR shift, GR')
+axs1[0, 1].set_title(r'+20 shift, GR')
+axs1[1, 0].set_title(r'No COR shift, MLEM')
+axs1[1, 1].set_title(r'+20 shift, MLEM')
 
 text_1 = axs1[0, 0].text(0.02, 0.02, r'Slice 0', transform = axs1[0, 0].transAxes, color = 'white')
 
