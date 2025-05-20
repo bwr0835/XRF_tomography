@@ -15,12 +15,12 @@ def create_gif(tiff_filename_array, output_filepath, fps):
     for filename in tiff_filename_array:
         os.remove(filename)
 
-output_dir_path = '/Users/iter_reproj/gridrec_mlem_comp_no_shift_shift_20_may_20_2025'
+output_dir_path = '/home/bwr0835/iter_reproj/gridrec_mlem_comp_no_shift_shift_20_may_20_2025'
 
-file_1 = '/Users/bwr0835/iter_reproj/mlem/mlem_1_iter_manual_shift_20_tomopy_default_cor_w_padding_05_06_2025/recon_array_iter_Fe.npy'
-file_2 = '/Users/bwr0835/iter_reproj/gridrec/gridrec_1_iter_manual_shift_20_tomopy_default_cor_w_padding_05_06_2025/recon_array_iter_Fe.npy'
-file_3 = '/Users/bwr0835/iter_reproj/gridrec/gridrec_1_iter_no_cor_shift_tomopy_default_cor_w_padding_05_06_2025/recon_array_iter_Fe.npy'
-file_4 = '/Users/bwr0835/iter_reproj/mlem/mlem_1_iter_no_cor_shift_tomopy_default_cor_w_padding_05_06_2025/recon_array_iter_Fe.npy'
+file_1 = '/home/bwr0835/iter_reproj/mlem/mlem_1_iter_manual_shift_20_tomopy_default_cor_w_padding_05_06_2025/recon_array_iter_Fe.npy'
+file_2 = '/home/bwr0835/iter_reproj/gridrec/gridrec_1_iter_manual_shift_20_tomopy_default_cor_w_padding_05_06_2025/recon_array_iter_Fe.npy'
+file_3 = '/home/bwr0835/iter_reproj/gridrec/gridrec_1_iter_no_cor_shift_tomopy_default_cor_w_padding_05_06_2025/recon_array_iter_Fe.npy'
+file_4 = '/home/bwr0835/iter_reproj/mlem/mlem_1_iter_no_cor_shift_tomopy_default_cor_w_padding_05_06_2025/recon_array_iter_Fe.npy'
 
 recon_gridrec_no_shift = np.load(file_3)[0]
 recon_gridrec_shift_20 = np.load(file_2)[0]
