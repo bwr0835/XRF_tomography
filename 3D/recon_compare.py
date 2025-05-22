@@ -31,10 +31,10 @@ file_4 = '/home/bwr0835/iter_reproj/mlem_1_iter_no_cor_shift_tomopy_default_cor_
 file_5 = '/home/bwr0835/iter_reproj/gridrec_1_iter_no_cor_shift_tomopy_default_cor_w_padding_05_06_2025/orig_exp_proj_Fe.npy'
 file_6 = '/home/bwr0835/iter_reproj/gridrec_1_iter_manual_shift_20_tomopy_default_cor_w_padding_05_06_2025/aligned_proj_array_iter_Fe.npy'
 
-file_7 = '/home/bwr0835/iter_reproj/gridrec_1_iter_no_cor_shift_tomopy_default_cor_w_padding_05_06_2025/aligned_proj_array_iter_Fe.npy'
-file_8 = '/home/bwr0835/iter_reproj/gridrec_1_iter_manual_shift_20_tomopy_default_cor_w_padding_05_06_2025/aligned_proj_array_iter_Fe.npy'
-file_9 = '/home/bwr0835/iter_reproj/mlem_1_iter_no_cor_shift_tomopy_default_cor_w_padding_05_06_2025/aligned_proj_array_iter_Fe.npy'
-file_10 = '/home/bwr0835/iter_reproj/mlem_1_iter_manual_shift_20_tomopy_default_cor_w_padding_05_06_2025/aligned_proj_array_iter_Fe.npy'
+file_7 = '/home/bwr0835/iter_reproj/gridrec_1_iter_no_cor_shift_tomopy_default_cor_w_padding_05_06_2025/synth_proj_array_iter_Fe.npy'
+file_8 = '/home/bwr0835/iter_reproj/gridrec_1_iter_manual_shift_20_tomopy_default_cor_w_padding_05_06_2025/synth_proj_array_iter_Fe.npy'
+file_9 = '/home/bwr0835/iter_reproj/mlem_1_iter_no_cor_shift_tomopy_default_cor_w_padding_05_06_2025/synth_proj_array_iter_Fe.npy'
+file_10 = '/home/bwr0835/iter_reproj/mlem_1_iter_manual_shift_20_tomopy_default_cor_w_padding_05_06_2025/synth_proj_array_iter_Fe.npy'
 
 file_11 = '/home/bwr0835/iter_reproj/mlem_1_iter_no_cor_shift_tomopy_default_cor_w_padding_05_06_2025/theta_array.npy'
 
