@@ -56,7 +56,7 @@ theta_array = np.load(file_11)
 recon_array = [recon_gridrec_no_shift, recon_gridrec_shift_20, recon_mlem_no_shift, recon_mlem_shift_20]
 
 n_slices = recon_gridrec_no_shift.shape[0]
-n_theta = recon_gridrec_no_shift.shape[1]
+n_theta = len(theta_array)
 
 tiff_array_1 = []
 tiff_array_2 = []
@@ -111,7 +111,7 @@ text_2 = axs2[0, 0].text(0.02, 0.02, r'$\theta = {0}$'.format(theta_array[0]), t
 # plt.close(fig1)
 
 for theta_idx in range(n_theta):
-    print(f'Creating frame for theta = {theta_array[theta_idx]}...')
+    print(f'Creating frame for theta = {theta_array[theta_idx]} degrees...')
 
     im2_1.set_data(orig_proj[:, theta_idx, :])
     im2_2.set_data(synth_proj_array_gridrec_no_shift[:, theta_idx, :])
