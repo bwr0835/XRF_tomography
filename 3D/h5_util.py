@@ -127,22 +127,22 @@ def extract_h5_xrt_data(file_path, synchrotron):
         nx = len(nx_conv)
         ny = len(ny_conv) - 2 # MAPS tacks on two extra values for whatever reason
         
-        us_ic_idx = np.where(scaler_names == b'US_IC')[0]
-        ds_ic_idx = np.where(scaler_names == b'DS_IC')[0]
-        abs_ic_idx = np.where(scaler_names == b'abs_ic')[0]
+        us_ic_idx = np.where(scaler_names == b'US_IC')[0][0] # The second [0] converts the 1-element array into a scalar
+        ds_ic_idx = np.where(scaler_names == b'DS_IC')[0][0]
+        abs_ic_idx = np.where(scaler_names == b'abs_ic')[0][0]
         theta_idx = np.where(extra_pvs_names == b'2xfm:m58.VAL')[0]
 
         nx, ny = ny, nx
         
         cts_combined = np.zeros((n_elements, ny, nx))
         
-        cts_us_ic = scaler_values[us_ic_idx][:, :-2] # Remove last two columns since they are added after row is finished scanning
-        cts_ds_ic = scaler_values[ds_ic_idx][:, :-2]
-        cts_abs_ic = scaler_values[abs_ic_idx][:, :-2]
+        cts_us_ic = scaler_values[us_ic_idx] # Remove last two columns since they are added after row is finished scanning
+        cts_ds_ic = scaler_values[ds_ic_idx]
+        cts_abs_ic = scaler_values[abs_ic_idx]
 
-        cts_combined[1] = cts_us_ic
-        cts_combined[2] = cts_ds_ic
-        cts_combined[3] = cts_abs_ic
+        cts_combined[1] = cts_us_ic[:, :-2]
+        cts_combined[2] = cts_ds_ic[:, :-2]
+        cts_combined[3] = cts_abs_ic[:, :-2]
 
         dx_cm = 1e-1*np.abs([-1] - nx_conv[0])/(nx - 1)
         dy_cm = 1e-1*np.abs(ny_conv[-3] - ny_conv[0])/(ny - 1)
@@ -172,15 +172,16 @@ def create_aggregate_xrf_h5(file_path_array, output_h5_file, synchrotron):
         theta_array[theta_idx] = theta
         file_path_array[theta_idx] = os.path.basename(file_path)
     
-    theta_idx_sorted = np.argsort(theta) # Get indices for angles for sorting them in ascending order
+    theta_idx_sorted = np.argsort(theta_array) # Get indices for angles for sorting them in ascending order
     
     theta_array_sorted = theta_array[theta_idx_sorted]
     counts_array_sorted = counts_array[:, theta_idx_sorted, :, :]
-    file_path_array_sorted = file_path_array[theta_idx_sorted]
+    
+    file_path_array_sorted = [file_path_array[theta_idx] for theta_idx in range(n_theta)]
 
     with h5py.File(output_h5_file, 'w') as f:
         exchange = f.create_group('exchange')
-        file_info = f.creategroup('corresponding_file_info')
+        file_info = f.create_group('corresponding_file_info')
 
         exchange.create_dataset('data', data = counts_array_sorted, compression = 'gzip', compression_opts = 6)
         exchange.create_dataset('elements', data = elements_new)
@@ -210,15 +211,16 @@ def create_aggregate_xrt_h5(file_path_array, output_h5_file, synchrotron):
         theta_array[theta_idx] = theta
         file_path_array[theta_idx] = os.path.basename(file_path)
     
-    theta_idx_sorted = np.argsort(theta) # Get indices for angles for sorting them in ascending order
+    theta_idx_sorted = np.argsort(theta_array) # Get indices for angles for sorting them in ascending order
     
     theta_array_sorted = theta_array[theta_idx_sorted]
     counts_array_sorted = counts_array[:, theta_idx_sorted, :, :]
-    file_path_array_sorted = file_path_array[theta_idx_sorted]
+    
+    file_path_array_sorted = [file_path_array[theta_idx] for theta_idx in range(n_theta)]
 
     with h5py.File(output_h5_file, 'w') as f:
         exchange = f.create_group('exchange')
-        file_info = f.creategroup('corresponding_file_info')
+        file_info = f.create_group('corresponding_file_info')
 
         exchange.create_dataset('data', data = counts_array_sorted, compression = 'gzip', compression_opts = 6)
         exchange.create_dataset('elements', data = elements_new)
