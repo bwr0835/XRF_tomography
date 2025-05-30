@@ -1,8 +1,7 @@
-import numpy as np, h5py, os, sys, tkinter as tk, tomopy as tomo, csv
+import numpy as np, h5py, os, sys, tkinter as tk, tomopy as tomo, csv, h5_util as util
 
 from skimage import transform as xform, registration as reg
 from scipy import ndimage as ndi, fft
-from h5_util import extract_h5_aggregate_xrf_data, create_aggregate_xrf_h5
 from matplotlib import pyplot as plt
 from itertools import combinations as combos
 
@@ -495,14 +494,15 @@ if output_file_name_base == '':
 # file_path_xrt = ''
 
 try:
-    elements_xrf, counts_xrf, theta_xrf, dataset_type_xrf = extract_h5_aggregate_xrf_data(file_path_xrf)
+    elements_xrf, counts_xrf, theta_xrf, dataset_type_xrf = util.extract_h5_aggregate_xrt_data(file_path_xrf)
 
 except:
     print('Cannot upload HDF5 file. Check file structure. Ending...')
 
     sys.exit()
 
-desired_element = 'Fe'
+desired_element = 'abs_ic'
+# desired_element = 'Fe'
 desired_element_idx = elements_xrf.index(desired_element)
 # output_dir_path = filedialog.askdirectory(parent = root, title = "Choose directory to output NPY files to.")
 n_theta = counts_xrf.shape[1]
