@@ -477,12 +477,14 @@ def iter_reproj(ref_element,
     
     return orig_ref_proj, aligned_proj_total, aligned_exp_proj_array, synth_proj_array, recon_array, net_x_shifts_pc_new, net_y_shifts_pc_new
 
-file_path_xrf = '/home/bwr0835/2_ide_aggregate_xrf.h5'
+# file_path_xrf = '/home/bwr0835/2_ide_aggregate_xrf.h5'
+file_path_xrt = '/home/bwr0835/2_ide_aggregate_xrt.h5'
 output_dir_path_base = '/home/bwr0835'
 
 # output_file_name_base = input('Choose a base file name: ')
 # output_file_name_base = 'gridrec_5_iter_vacek_cor_and_shift_correction_padding_-22_deg_158_deg'
-output_file_name_base = 'gridrec_5_iter_manual_shift_20_tomopy_default_cor_w_padding_05_08_2025'
+# output_file_name_base = 'gridrec_5_iter_manual_shift_20_tomopy_default_cor_w_padding_05_08_2025'
+output_file_name_base = 'gridrec_1_iter_no_shift_tomopy_default_cor_w_padding_06_25_2025'
 
 if output_file_name_base == '':
     print('No output base file name chosen. Ending program...')
@@ -494,7 +496,8 @@ if output_file_name_base == '':
 # file_path_xrt = ''
 
 try:
-    elements_xrf, counts_xrf, theta_xrf, dataset_type_xrf = util.extract_h5_aggregate_xrt_data(file_path_xrf)
+    # elements_xrf, counts_xrf, theta_xrf, dataset_type_xrf = util.extract_h5_aggregate_xrt_data(file_path_xrf)
+    elements_xrt, counts_xrt, theta_xrt, dataset_type_xrt = util.extract_h5_aggregate_xrt_data(file_path_xrt)
 
 except:
     print('Cannot upload HDF5 file. Check file structure. Ending...')
@@ -503,17 +506,34 @@ except:
 
 desired_element = 'abs_ic'
 # desired_element = 'Fe'
-desired_element_idx = elements_xrf.index(desired_element)
+# desired_element_idx = elements_xrf.index(desired_element)
+desired_element_idx = elements_xrt.index(desired_element)
 # output_dir_path = filedialog.askdirectory(parent = root, title = "Choose directory to output NPY files to.")
-n_theta = counts_xrf.shape[1]
-n_slices = counts_xrf.shape[2]
+n_theta = counts_xrt.shape[1]
+n_slices = counts_xrt.shape[2]
+# n_theta = counts_xrf.shape[1]
+# n_slices = counts_xrf.shape[2]
 
-init_x_shift = 20*np.ones(n_theta)
-# init_x_shift = 0
+# init_x_shift = 20*np.ones(n_theta)
+init_x_shift = 0
 
 n_desired_iter = 5 # For the reprojection scheme, NOT for reconstruction by itself
 
 algorithm = 'gridrec'
+
+# orig_proj_ref, \
+# aligned_proj_total, \
+# aligned_exp_proj_array, \
+# synth_proj_array, \
+# recon_array, \
+# net_x_shifts, \
+# net_y_shifts = iter_reproj(desired_element, 
+#                            elements_xrf, 
+#                            theta_xrf, 
+#                            counts_xrf, 
+#                            algorithm, 
+#                            n_desired_iter,
+#                            init_x_shift = init_x_shift)
 
 orig_proj_ref, \
 aligned_proj_total, \
@@ -522,9 +542,9 @@ synth_proj_array, \
 recon_array, \
 net_x_shifts, \
 net_y_shifts = iter_reproj(desired_element, 
-                           elements_xrf, 
-                           theta_xrf, 
-                           counts_xrf, 
+                           elements_xrt, 
+                           theta_xrt, 
+                           counts_xrt, 
                            algorithm, 
                            n_desired_iter,
                            init_x_shift = init_x_shift)
@@ -535,7 +555,8 @@ full_output_dir_path = os.path.join(output_dir_path_base, 'iter_reproj', output_
 
 os.makedirs(full_output_dir_path, exist_ok = True)
 
-np.save(os.path.join(full_output_dir_path, 'theta_array.npy'), theta_xrf)
+np.save(os.path.join(full_output_dir_path, 'theta_array.npy'), theta_xrt)
+# np.save(os.path.join(full_output_dir_path, 'theta_array.npy'), theta_xrf)
 np.save(os.path.join(full_output_dir_path, 'aligned_proj_all_elements.npy'), aligned_proj_total)
 np.save(os.path.join(full_output_dir_path, 'aligned_proj_array_iter_' + desired_element + '.npy'), aligned_exp_proj_array)
 np.save(os.path.join(full_output_dir_path, 'synth_proj_array_iter_' + desired_element + '.npy'), synth_proj_array)
