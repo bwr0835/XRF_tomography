@@ -495,14 +495,14 @@ if output_file_name_base == '':
 
 # file_path_xrt = ''
 
-try:
+# try:
     # elements_xrf, counts_xrf, theta_xrf, dataset_type_xrf = util.extract_h5_aggregate_xrt_data(file_path_xrf)
-    elements_xrt, counts_xrt, theta_xrt, dataset_type_xrt = util.extract_h5_aggregate_xrt_data(file_path_xrt)
+elements_xrt, counts_xrt, theta_xrt, dataset_type_xrt = util.extract_h5_aggregate_xrt_data(file_path_xrt)
 
-except:
-    print('Cannot upload HDF5 file. Check file structure. Ending...')
+# except:
+    # print('Cannot upload HDF5 file. Check file structure. Ending...')
 
-    sys.exit()
+    # sys.exit()
 
 desired_element = 'abs_ic'
 # desired_element = 'Fe'
