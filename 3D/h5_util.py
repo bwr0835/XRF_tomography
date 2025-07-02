@@ -262,5 +262,3 @@ def extract_h5_aggregate_xrt_data(file_path):
     elements_string = [element.decode() for element in elements]
 
     return elements_string, counts, theta, dataset_type.decode()
-
-    
