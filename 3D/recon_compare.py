@@ -25,18 +25,18 @@ os.makedirs(output_dir_path, exist_ok = True)
 
 file_1 = '/home/bwr0835/iter_reproj/xrt_mlem_1_iter_manual_shift_20_tomopy_default_cor_w_padding_07_02_2025/recon_array_iter_abs_ic.npy'
 file_2 = '/home/bwr0835/iter_reproj/xrt_gridrec_1_iter_manual_shift_20_tomopy_default_cor_w_padding_07_02_2025/recon_array_iter_abs_ic.npy'
-file_3 = '/home/bwr0835/iter_reproj/xrt_gridrec_1_iter_no_cor_shift_tomopy_default_cor_w_padding_07_02_2025/recon_array_iter_abs_ic.npy'
-file_4 = '/home/bwr0835/iter_reproj/xrt_mlem_1_iter_no_cor_shift_tomopy_default_cor_w_padding_07_02_2025/recon_array_iter_abs_ic.npy'
+file_3 = '/home/bwr0835/iter_reproj/xrt_gridrec_1_iter_no_shift_tomopy_default_cor_w_padding_07_02_2025/recon_array_iter_abs_ic.npy'
+file_4 = '/home/bwr0835/iter_reproj/xrt_mlem_1_iter_no_shift_tomopy_default_cor_w_padding_07_02_2025/recon_array_iter_abs_ic.npy'
 
-file_5 = '/home/bwr0835/iter_reproj/xrt_gridrec_1_iter_no_cor_shift_tomopy_default_cor_w_padding_07_02_2025/orig_exp_proj_abs_ic.npy'
+file_5 = '/home/bwr0835/iter_reproj/xrt_gridrec_1_iter_no_shift_tomopy_default_cor_w_padding_07_02_2025/orig_exp_proj_abs_ic.npy'
 file_6 = '/home/bwr0835/iter_reproj/xrt_gridrec_1_iter_manual_shift_20_tomopy_default_cor_w_padding_07_02_2025/aligned_proj_array_iter_abs_ic.npy'
 
-file_7 = '/home/bwr0835/iter_reproj/xrt_gridrec_1_iter_no_cor_shift_tomopy_default_cor_w_padding_07_02_2025/synth_proj_array_iter_abs_ic.npy'
+file_7 = '/home/bwr0835/iter_reproj/xrt_gridrec_1_iter_no_shift_tomopy_default_cor_w_padding_07_02_2025/synth_proj_array_iter_abs_ic.npy'
 file_8 = '/home/bwr0835/iter_reproj/xrt_gridrec_1_iter_manual_shift_20_tomopy_default_cor_w_padding_07_02_2025/synth_proj_array_iter_abs_ic.npy'
-file_9 = '/home/bwr0835/iter_reproj/xrt_mlem_1_iter_no_cor_shift_tomopy_default_cor_w_padding_07_02_2025/synth_proj_array_iter_abs_ic.npy'
+file_9 = '/home/bwr0835/iter_reproj/xrt_mlem_1_iter_no_shift_tomopy_default_cor_w_padding_07_02_2025/synth_proj_array_iter_abs_ic.npy'
 file_10 = '/home/bwr0835/iter_reproj/xrt_mlem_1_iter_manual_shift_20_tomopy_default_cor_w_padding_07_02_2025/synth_proj_array_iter_abs_ic.npy'
 
-file_11 = '/home/bwr0835/iter_reproj/xrt_mlem_1_iter_no_cor_shift_tomopy_default_cor_w_padding_07_02_2025/theta_array.npy'
+file_11 = '/home/bwr0835/iter_reproj/xrt_mlem_1_iter_no_shift_tomopy_default_cor_w_padding_07_02_2025/theta_array.npy'
 
 recon_gridrec_no_shift = np.load(file_3)[0]
 recon_gridrec_shift_20 = np.load(file_2)[0]
