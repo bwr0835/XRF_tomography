@@ -36,7 +36,7 @@ file_8 = '/home/bwr0835/iter_reproj/xrt_gridrec_1_iter_manual_shift_20_tomopy_de
 file_9 = '/home/bwr0835/iter_reproj/xrt_mlem_1_iter_no_cor_shift_tomopy_default_cor_w_padding_07_02_2025/synth_proj_array_iter_abs_ic.npy'
 file_10 = '/home/bwr0835/iter_reproj/xrt_mlem_1_iter_manual_shift_20_tomopy_default_cor_w_padding_07_02_2025/synth_proj_array_iter_abs_ic.npy'
 
-file_11 = '/home/bwr0835/iter_reproj/mlem_1_iter_no_cor_shift_tomopy_default_cor_w_padding_07_02_2025/theta_array.npy'
+file_11 = '/home/bwr0835/iter_reproj/xrt_mlem_1_iter_no_cor_shift_tomopy_default_cor_w_padding_07_02_2025/theta_array.npy'
 
 recon_gridrec_no_shift = np.load(file_3)[0]
 recon_gridrec_shift_20 = np.load(file_2)[0]
