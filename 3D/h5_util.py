@@ -216,7 +216,7 @@ def create_aggregate_xrt_h5(file_path_array, output_h5_file, synchrotron):
     theta_array_sorted = theta_array[theta_idx_sorted]
     counts_array_sorted = counts_array[:, theta_idx_sorted, :, :]
     
-    file_path_array_sorted = [file_path_array[theta_idx] for theta_idx in range(n_theta)]
+    file_path_array_sorted = [file_path_array[theta_idx] for theta_idx in theta_idx_sorted]
 
     with h5py.File(output_h5_file, 'w') as f:
         exchange = f.create_group('exchange')
