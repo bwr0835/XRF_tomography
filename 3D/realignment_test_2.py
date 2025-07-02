@@ -517,7 +517,7 @@ n_slices = counts_xrt.shape[2]
 # init_x_shift = 20*np.ones(n_theta)
 init_x_shift = 0
 
-n_desired_iter = 5 # For the reprojection scheme, NOT for reconstruction by itself
+n_desired_iter = 1 # For the reprojection scheme, NOT for reconstruction by itself
 
 algorithm = 'gridrec'
 
