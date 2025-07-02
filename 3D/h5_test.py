@@ -17,7 +17,7 @@ from copy import copy
 
 # root.withdraw()
 
-file_path_array_xrt = ['/raid/users/roter/Jacobsen/img.dat/2xfm_0030.mda.h5',
+file_path_array_xrf = ['/raid/users/roter/Jacobsen/img.dat/2xfm_0030.mda.h5',
                        '/raid/users/roter/Jacobsen/img.dat/2xfm_0031.mda.h5',
                        '/raid/users/roter/Jacobsen/img.dat/2xfm_0032.mda.h5',
                        '/raid/users/roter/Jacobsen/img.dat/2xfm_0033.mda.h5',
@@ -70,13 +70,13 @@ file_path_array_xrt = ['/raid/users/roter/Jacobsen/img.dat/2xfm_0030.mda.h5',
 # file_path_array_xrt = list(fd.askopenfilenames(parent = root, title = 'Select XRT HDF5 files', filetypes = [('HDF5 Files', '*.h5')]))
 # file_path_array_xrt = copy(file_path_array_xrf)
 
-# output_file_path_xrf = '/home/bwr0835/2_ide_aggregate_xrf.h5'
-output_file_path_xrt = '/home/bwr0835/2_ide_aggregate_xrt.h5'
+output_file_path_xrf = '/home/bwr0835/2_ide_aggregate_xrf.h5'
+# output_file_path_xrt = '/home/bwr0835/2_ide_aggregate_xrt.h5'
 
 # file_path = '/Users/bwr0835/Documents/GitHub/gradresearch/xrt/test_combined_file.h5'
 
-# util.create_aggregate_xrf_h5(file_path_array_xrf, output_file_path_xrf, 'APS')
-util.create_aggregate_xrt_h5(file_path_array_xrt, output_file_path_xrt, 'APS')
+util.create_aggregate_xrf_h5(file_path_array_xrf, output_file_path_xrf, 'APS')
+# util.create_aggregate_xrt_h5(file_path_array_xrt, output_file_path_xrt, 'APS')
 
 # elements, counts, theta, dataset_type = extract_h5_aggregate_xrf_data(file_path)
 
