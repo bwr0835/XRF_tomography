@@ -511,14 +511,14 @@ desired_element = 'abs_ic'
 # desired_element_idx = elements_xrf.index(desired_element)
 desired_element_idx = elements_xrt.index(desired_element)
 
-nonzero_idx = np.where(counts_xrt[desired_element_idx] > 0)
+nonzero_mask = counts_xrt[desired_element_idx] > 0
 
 phi_inc = 8.67768e5
 t_dwell_s = 0.01 
 
 counts_inc = phi_inc*t_dwell_s
 
-counts_xrt[desired_element_idx, nonzero_idx] = -np.log(counts_xrt[desired_element_idx, nonzero_idx]/counts_inc)
+counts_xrt[desired_element_idx][nonzero_mask] = -np.log(counts_xrt[desired_element_idx][nonzero_mask]/counts_inc)
 
 # output_dir_path = filedialog.askdirectory(parent = root, title = "Choose directory to output NPY files to.")
 n_theta = counts_xrt.shape[1]
