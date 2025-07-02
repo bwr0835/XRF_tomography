@@ -61,13 +61,13 @@ n_theta = len(theta_array)
 tiff_array_1 = []
 tiff_array_2 = []
 
-# fig1, axs1 = plt.subplots(2, 2)
+fig1, axs1 = plt.subplots(2, 2)
 fig2, axs2 = plt.subplots(2, 3)
 
-# im1_1 = axs1[0, 0].imshow(recon_gridrec_no_shift[0])
-# im1_2 = axs1[0, 1].imshow(recon_gridrec_shift_20[0])
-# im1_3 = axs1[1, 0].imshow(recon_mlem_no_shift[0])
-# im1_4 = axs1[1, 1].imshow(recon_mlem_shift_20[0])
+im1_1 = axs1[0, 0].imshow(recon_gridrec_no_shift[0])
+im1_2 = axs1[0, 1].imshow(recon_gridrec_shift_20[0])
+im1_3 = axs1[1, 0].imshow(recon_mlem_no_shift[0])
+im1_4 = axs1[1, 1].imshow(recon_mlem_shift_20[0])
 
 im2_1 = axs2[0, 0].imshow(orig_proj[0])
 im2_2 = axs2[0, 1].imshow(synth_proj_array_gridrec_no_shift[0])
@@ -76,10 +76,10 @@ im2_4 = axs2[1, 0].imshow(aligned_proj_array_shift_20[0])
 im2_5 = axs2[1, 1].imshow(synth_proj_array_gridrec_shift_20[0])
 im2_6 = axs2[1, 2].imshow(synth_proj_array_mlem_shift_20[0])
 
-# axs1[0, 0].set_title(r'No COR shift, GR')
-# axs1[0, 1].set_title(r'+20 shift, GR')
-# axs1[1, 0].set_title(r'No COR shift, MLEM')
-# axs1[1, 1].set_title(r'+20 shift, MLEM')
+axs1[0, 0].set_title(r'No COR shift, GR')
+axs1[0, 1].set_title(r'+20 shift, GR')
+axs1[1, 0].set_title(r'No COR shift, MLEM')
+axs1[1, 1].set_title(r'+20 shift, MLEM')
 
 axs2[0, 0].set_title(r'Exp., Orig ->.')
 axs2[0, 1].set_title(r'Synth., GR')
@@ -88,27 +88,27 @@ axs2[1, 0].set_title(r'Exp., +20 shift ->')
 axs2[1, 1].set_title(r'Synth., GR')
 axs2[1, 2].set_title(r'Synth., MLEM')
 
-# text_1 = axs1[0, 0].text(0.02, 0.02, r'Slice 0', transform = axs1[0, 0].transAxes, color = 'white')
+text_1 = axs1[0, 0].text(0.02, 0.02, r'Slice 0', transform = axs1[0, 0].transAxes, color = 'white')
 text_2 = axs2[0, 0].text(0.02, 0.02, r'$\theta = {0}$'.format(theta_array[0]), transform = axs2[0, 0].transAxes, color = 'white')
 
-# for slice_idx in range(n_slices):
-#     print(f'Creating frame for slice {slice_idx}...')
+for slice_idx in range(n_slices):
+    print(f'Creating frame for slice {slice_idx}...')
 
-#     im1_1.set_data(recon_gridrec_no_shift[slice_idx])
-#     im1_2.set_data(recon_gridrec_shift_20[slice_idx])
-#     im1_3.set_data(recon_mlem_no_shift[slice_idx])
-#     im1_4.set_data(recon_mlem_shift_20[slice_idx])
+    im1_1.set_data(recon_gridrec_no_shift[slice_idx])
+    im1_2.set_data(recon_gridrec_shift_20[slice_idx])
+    im1_3.set_data(recon_mlem_no_shift[slice_idx])
+    im1_4.set_data(recon_mlem_shift_20[slice_idx])
     
-#     text_1.set_text(r'Slice index {0}'.format(slice_idx))
+    text_1.set_text(r'Slice index {0}'.format(slice_idx))
 
-#     filename_1 = os.path.join(output_dir_path, f'recon_compare_slice_{slice_idx:03d}.tiff')
+    filename_1 = os.path.join(output_dir_path, f'recon_compare_slice_{slice_idx:03d}.tiff')
 
-#     fig1.tight_layout()
-#     fig1.savefig(filename_1, dpi = 400)
+    fig1.tight_layout()
+    fig1.savefig(filename_1, dpi = 400)
 
-#     tiff_array_1.append(filename_1)
+    tiff_array_1.append(filename_1)
 
-# plt.close(fig1)
+plt.close(fig1)
 
 for theta_idx in range(n_theta):
     print(f'Creating frame for theta = {theta_array[theta_idx]} degrees...')
@@ -133,7 +133,7 @@ plt.close(fig2)
 
 # print('Creating reconstruction comparison GIF...')
 
-# create_gif(tiff_array_1, os.path.join(output_dir_path, 'recon_compare.gif'), fps = 25)
+create_gif(tiff_array_1, os.path.join(output_dir_path, 'recon_compare.gif'), fps = 25)
 
 print('Creating projection comparison GIF...')
 
