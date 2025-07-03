@@ -518,7 +518,7 @@ t_dwell_s = 0.01
 
 counts_inc = phi_inc*t_dwell_s
 
-# counts_xrt[desired_element_idx][nonzero_mask] = -np.log(counts_xrt[desired_element_idx][nonzero_mask]/counts_inc)
+counts_xrt[desired_element_idx][nonzero_mask] = -np.log(counts_xrt[desired_element_idx][nonzero_mask]/counts_inc)
 
 # output_dir_path = filedialog.askdirectory(parent = root, title = "Choose directory to output NPY files to.")
 n_theta = counts_xrt.shape[1]
