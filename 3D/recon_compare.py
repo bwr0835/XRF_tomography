@@ -19,7 +19,7 @@ def create_gif(tiff_filename_array, output_filepath, fps):
     for filename in tiff_filename_array:
         os.remove(filename)
 
-output_dir_path = '/home/bwr0835/iter_reproj/xrt_gridrec_mlem_comp_no_shift_shift_20_no_log_july_03_2025'
+output_dir_path = '/home/bwr0835/iter_reproj/xrt_gridrec_mlem_comp_no_shift_shift_20_post_recon_log_july_03_2025'
 
 os.makedirs(output_dir_path, exist_ok = True)
 
@@ -64,27 +64,27 @@ tiff_array_2 = []
 fig1, axs1 = plt.subplots(2, 2)
 fig2, axs2 = plt.subplots(2, 3)
 
-im1_1 = axs1[0, 0].imshow(recon_gridrec_no_shift[0])
-im1_2 = axs1[0, 1].imshow(recon_gridrec_shift_20[0])
-im1_3 = axs1[1, 0].imshow(recon_mlem_no_shift[0])
-im1_4 = axs1[1, 1].imshow(recon_mlem_shift_20[0])
+im1_1 = axs1[0, 0].imshow(np.log(recon_gridrec_no_shift[0]))
+im1_2 = axs1[0, 1].imshow(np.log(recon_gridrec_shift_20[0]))
+im1_3 = axs1[1, 0].imshow(np.log(recon_mlem_no_shift[0]))
+im1_4 = axs1[1, 1].imshow(np.log(recon_mlem_shift_20[0]))
 
-im2_1 = axs2[0, 0].imshow(orig_proj[0])
-im2_2 = axs2[0, 1].imshow(synth_proj_array_gridrec_no_shift[0])
-im2_3 = axs2[0, 2].imshow(synth_proj_array_mlem_no_shift[0])
-im2_4 = axs2[1, 0].imshow(aligned_proj_array_shift_20[0])
-im2_5 = axs2[1, 1].imshow(synth_proj_array_gridrec_shift_20[0])
-im2_6 = axs2[1, 2].imshow(synth_proj_array_mlem_shift_20[0])
+im2_1 = axs2[0, 0].imshow(np.log(orig_proj[0]))
+im2_2 = axs2[0, 1].imshow(np.log(synth_proj_array_gridrec_no_shift[0]))
+im2_3 = axs2[0, 2].imshow(np.log(synth_proj_array_mlem_no_shift[0]))
+im2_4 = axs2[1, 0].imshow(np.log(aligned_proj_array_shift_20[0]))
+im2_5 = axs2[1, 1].imshow(np.log(synth_proj_array_gridrec_shift_20[0]))
+im2_6 = axs2[1, 2].imshow(np.log(synth_proj_array_mlem_shift_20[0]))
 
 axs1[0, 0].set_title(r'No COR shift, GR')
 axs1[0, 1].set_title(r'+20 shift, GR')
 axs1[1, 0].set_title(r'No COR shift, MLEM')
 axs1[1, 1].set_title(r'+20 shift, MLEM')
 
-axs2[0, 0].set_title(r'Exp., Orig ->.')
+axs2[0, 0].set_title(r'Exp., Orig $\rightarrow$')
 axs2[0, 1].set_title(r'Synth., GR')
 axs2[0, 2].set_title(r'Synth., MLEM')
-axs2[1, 0].set_title(r'Exp., +20 shift ->')
+axs2[1, 0].set_title(r'Exp., +20 shift $\rightarrow$')
 axs2[1, 1].set_title(r'Synth., GR')
 axs2[1, 2].set_title(r'Synth., MLEM')
 
@@ -94,10 +94,10 @@ text_2 = axs2[0, 0].text(0.02, 0.02, r'$\theta = {0}$'.format(theta_array[0]), t
 for slice_idx in range(n_slices):
     print(f'Creating frame for slice {slice_idx}...')
 
-    im1_1.set_data(recon_gridrec_no_shift[slice_idx])
-    im1_2.set_data(recon_gridrec_shift_20[slice_idx])
-    im1_3.set_data(recon_mlem_no_shift[slice_idx])
-    im1_4.set_data(recon_mlem_shift_20[slice_idx])
+    im1_1.set_data(np.log(recon_gridrec_no_shift[slice_idx]))
+    im1_2.set_data(np.log(recon_gridrec_shift_20[slice_idx]))
+    im1_3.set_data(np.log(recon_mlem_no_shift[slice_idx]))
+    im1_4.set_data(np.log(recon_mlem_shift_20[slice_idx]))
     
     text_1.set_text(r'Slice index {0}'.format(slice_idx))
 
@@ -113,12 +113,12 @@ plt.close(fig1)
 for theta_idx in range(n_theta):
     print(f'Creating frame for theta = {theta_array[theta_idx]} degrees...')
 
-    im2_1.set_data(orig_proj[theta_idx])
-    im2_2.set_data(synth_proj_array_gridrec_no_shift[theta_idx])
-    im2_3.set_data(synth_proj_array_mlem_no_shift[theta_idx, :])
-    im2_4.set_data(aligned_proj_array_shift_20[theta_idx])
-    im2_5.set_data(synth_proj_array_gridrec_shift_20[theta_idx])
-    im2_6.set_data(synth_proj_array_mlem_shift_20[theta_idx])
+    im2_1.set_data(np.log(orig_proj[theta_idx]))
+    im2_2.set_data(np.log(synth_proj_array_gridrec_no_shift[theta_idx]))
+    im2_3.set_data(np.log(synth_proj_array_mlem_no_shift[theta_idx]))
+    im2_4.set_data(np.log(aligned_proj_array_shift_20[theta_idx]))
+    im2_5.set_data(np.log(synth_proj_array_gridrec_shift_20[theta_idx]))
+    im2_6.set_data(np.log(synth_proj_array_mlem_shift_20[theta_idx]))
 
     text_2.set_text(r'$\theta = {0}$'.format(theta_array[theta_idx]))
 
