@@ -484,9 +484,9 @@ output_dir_path_base = '/home/bwr0835'
 # output_file_name_base = input('Choose a base file name: ')
 # output_file_name_base = 'gridrec_5_iter_vacek_cor_and_shift_correction_padding_-22_deg_158_deg'
 # output_file_name_base = 'xrt_mlem_1_iter_no_shift_tomopy_default_cor_w_padding_07_02_2025'
-output_file_name_base = 'xrt_mlem_1_iter_manual_shift_20_tomopy_default_cor_w_padding_07_02_2025'
-# output_file_name_base = 'xrt_gridrec_1_iter_manual_shift_20_tomopy_default_cor_w_padding_07_02_2025'
-# output_file_name_base = 'xrt_gridrec_1_iter_no_shift_tomopy_default_cor_w_padding_07_02_2025'
+# output_file_name_base = 'xrt_mlem_1_iter_manual_shift_20_tomopy_default_cor_w_padding_07_03_2025'
+# output_file_name_base = 'xrt_gridrec_1_iter_manual_shift_20_tomopy_default_cor_w_padding_07_03_2025'
+output_file_name_base = 'xrt_gridrec_1_iter_no_shift_tomopy_default_cor_w_padding_07_03_2025'
 
 if output_file_name_base == '':
     print('No output base file name chosen. Ending program...')
@@ -506,7 +506,7 @@ elements_xrt, counts_xrt, theta_xrt, dataset_type_xrt = util.extract_h5_aggregat
 
     # sys.exit()
 
-desired_element = 'abs_ic'
+desired_element = 'ds_ic'
 # desired_element = 'Fe'
 # desired_element_idx = elements_xrf.index(desired_element)
 desired_element_idx = elements_xrt.index(desired_element)
@@ -518,7 +518,7 @@ t_dwell_s = 0.01
 
 counts_inc = phi_inc*t_dwell_s
 
-counts_xrt[desired_element_idx][nonzero_mask] = -np.log(counts_xrt[desired_element_idx][nonzero_mask]/counts_inc)
+# counts_xrt[desired_element_idx][nonzero_mask] = -np.log(counts_xrt[desired_element_idx][nonzero_mask]/counts_inc)
 
 # output_dir_path = filedialog.askdirectory(parent = root, title = "Choose directory to output NPY files to.")
 n_theta = counts_xrt.shape[1]
@@ -526,8 +526,8 @@ n_slices = counts_xrt.shape[2]
 # n_theta = counts_xrf.shape[1]
 # n_slices = counts_xrf.shape[2]
 
-init_x_shift = 20*np.ones(n_theta)
-# init_x_shift = 0
+# init_x_shift = 20*np.ones(n_theta)
+init_x_shift = 0
 
 n_desired_iter = 1 # For the reprojection scheme, NOT for reconstruction by itself
 
