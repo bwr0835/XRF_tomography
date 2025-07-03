@@ -56,18 +56,18 @@ synth_proj_array_gridrec_shift_20 = np.load(file_8)[0]
 synth_proj_array_mlem_no_shift = np.load(file_9)[0]
 synth_proj_array_mlem_shift_20 = np.load(file_10)[0]
 
-recon_gridrec_no_shift[recon_gridrec_no_shift > 0] = np.log(recon_gridrec_no_shift[recon_gridrec_no_shift > 0]/counts_inc)
-recon_gridrec_shift_20[recon_gridrec_shift_20 > 0] = np.log(recon_gridrec_shift_20[recon_gridrec_shift_20 > 0]/counts_inc)
-recon_mlem_no_shift[recon_mlem_no_shift > 0] = np.log(recon_mlem_no_shift[recon_mlem_no_shift > 0]/counts_inc)
-recon_mlem_shift_20[recon_mlem_shift_20 > 0] = np.log(recon_mlem_shift_20[recon_mlem_shift_20 > 0]/counts_inc)
+recon_gridrec_no_shift[recon_gridrec_no_shift > 0] = -np.log(recon_gridrec_no_shift[recon_gridrec_no_shift > 0]/counts_inc)
+recon_gridrec_shift_20[recon_gridrec_shift_20 > 0] = -np.log(recon_gridrec_shift_20[recon_gridrec_shift_20 > 0]/counts_inc)
+recon_mlem_no_shift[recon_mlem_no_shift > 0] = -np.log(recon_mlem_no_shift[recon_mlem_no_shift > 0]/counts_inc)
+recon_mlem_shift_20[recon_mlem_shift_20 > 0] = -np.log(recon_mlem_shift_20[recon_mlem_shift_20 > 0]/counts_inc)
 
-orig_proj[orig_proj > 0] = np.log(orig_proj[orig_proj > 0]/counts_inc)
-aligned_proj_array_shift_20[aligned_proj_array_shift_20 > 0] = np.log(aligned_proj_array_shift_20[aligned_proj_array_shift_20 > 0]/counts_inc)
+orig_proj[orig_proj > 0] = -np.log(orig_proj[orig_proj > 0]/counts_inc)
+aligned_proj_array_shift_20[aligned_proj_array_shift_20 > 0] = -np.log(aligned_proj_array_shift_20[aligned_proj_array_shift_20 > 0]/counts_inc)
 
-synth_proj_array_gridrec_no_shift[synth_proj_array_gridrec_no_shift > 0] = np.log(synth_proj_array_gridrec_no_shift[synth_proj_array_gridrec_no_shift > 0]/counts_inc)
-synth_proj_array_gridrec_shift_20[synth_proj_array_gridrec_shift_20 > 0] = np.log(synth_proj_array_gridrec_shift_20[synth_proj_array_gridrec_shift_20 > 0]/counts_inc)
-synth_proj_array_mlem_no_shift[synth_proj_array_mlem_no_shift > 0] = np.log(synth_proj_array_mlem_no_shift[synth_proj_array_mlem_no_shift > 0]/counts_inc)
-synth_proj_array_mlem_shift_20[synth_proj_array_mlem_shift_20 > 0] = np.log(synth_proj_array_mlem_shift_20[synth_proj_array_mlem_shift_20 > 0]/counts_inc)
+synth_proj_array_gridrec_no_shift[synth_proj_array_gridrec_no_shift > 0] = -np.log(synth_proj_array_gridrec_no_shift[synth_proj_array_gridrec_no_shift > 0]/counts_inc)
+synth_proj_array_gridrec_shift_20[synth_proj_array_gridrec_shift_20 > 0] = -np.log(synth_proj_array_gridrec_shift_20[synth_proj_array_gridrec_shift_20 > 0]/counts_inc)
+synth_proj_array_mlem_no_shift[synth_proj_array_mlem_no_shift > 0] = -np.log(synth_proj_array_mlem_no_shift[synth_proj_array_mlem_no_shift > 0]/counts_inc)
+synth_proj_array_mlem_shift_20[synth_proj_array_mlem_shift_20 > 0] = -np.log(synth_proj_array_mlem_shift_20[synth_proj_array_mlem_shift_20 > 0]/counts_inc)
 
 theta_array = np.load(file_11)
 
