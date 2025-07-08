@@ -82,17 +82,17 @@ tiff_array_2 = []
 fig1, axs1 = plt.subplots(2, 2)
 fig2, axs2 = plt.subplots(2, 3)
 
-im1_1 = axs1[0, 0].imshow(recon_gridrec_no_shift[0], vmin = np.quantile(recon_gridrec_no_shift[0], 0.02, 0.98)[0], vmax = np.quantile(recon_gridrec_no_shift[0], 0.02, 0.98)[1])
-im1_2 = axs1[0, 1].imshow(recon_gridrec_shift_20[0], vmin = np.quantile(recon_gridrec_shift_20[0], 0.02, 0.98)[0], vmax = np.quantile(recon_gridrec_shift_20[0], 0.02, 0.98)[1])
-im1_3 = axs1[1, 0].imshow(recon_mlem_no_shift[0], vmin = np.quantile(recon_mlem_no_shift[0], 0.02, 0.98)[0], vmax = np.quantile(recon_mlem_no_shift[0], 0.02, 0.98)[1])
-im1_4 = axs1[1, 1].imshow(recon_mlem_shift_20[0], vmin = np.quantile(recon_mlem_shift_20[0], 0.02, 0.98)[0], vmax = np.quantile(recon_mlem_shift_20[0], 0.02, 0.98)[1])
+im1_1 = axs1[0, 0].imshow(recon_gridrec_no_shift[0], vmin = np.quantile(recon_gridrec_no_shift[0], [0.02, 0.98])[0], vmax = np.quantile(recon_gridrec_no_shift[0], [0.02, 0.98])[1])
+im1_2 = axs1[0, 1].imshow(recon_gridrec_shift_20[0], vmin = np.quantile(recon_gridrec_shift_20[0], [0.02, 0.98])[0], vmax = np.quantile(recon_gridrec_shift_20[0], [0.02, 0.98])[1])
+im1_3 = axs1[1, 0].imshow(recon_mlem_no_shift[0], vmin = np.quantile(recon_mlem_no_shift[0], [0.02, 0.98])[0], vmax = np.quantile(recon_mlem_no_shift[0], [0.02, 0.98])[1])
+im1_4 = axs1[1, 1].imshow(recon_mlem_shift_20[0], vmin = np.quantile(recon_mlem_shift_20[0], [0.02, 0.98])[0], vmax = np.quantile(recon_mlem_shift_20[0], [0.02, 0.98])[1])
 
 im2_1 = axs2[0, 0].imshow(orig_proj[0])
-im2_2 = axs2[0, 1].imshow(synth_proj_array_gridrec_no_shift[0], vmin = np.quantile(synth_proj_array_gridrec_no_shift[0], 0.02, 0.98)[0], vmax = np.quantile(synth_proj_array_gridrec_no_shift[0], 0.02, 0.98)[1])
-im2_3 = axs2[0, 2].imshow(synth_proj_array_mlem_no_shift[0], vmin = np.quantile(synth_proj_array_mlem_no_shift[0], 0.02, 0.98)[0], vmax = np.quantile(synth_proj_array_mlem_no_shift[0], 0.02, 0.98)[1])
+im2_2 = axs2[0, 1].imshow(synth_proj_array_gridrec_no_shift[0], vmin = np.quantile(synth_proj_array_gridrec_no_shift[0], [0.02, 0.98])[0], vmax = np.quantile(synth_proj_array_gridrec_no_shift[0], [0.02, 0.98])[1])
+im2_3 = axs2[0, 2].imshow(synth_proj_array_mlem_no_shift[0], vmin = np.quantile(synth_proj_array_mlem_no_shift[0], [0.02, 0.98])[0], vmax = np.quantile(synth_proj_array_mlem_no_shift[0], [0.02, 0.98])[1])
 im2_4 = axs2[1, 0].imshow(aligned_proj_array_shift_20[0])
-im2_5 = axs2[1, 1].imshow(synth_proj_array_gridrec_shift_20[0], vmin = np.quantile(synth_proj_array_gridrec_shift_20[0], 0.02, 0.98)[0], vmax = np.quantile(synth_proj_array_gridrec_shift_20[0], 0.02, 0.98)[1])
-im2_6 = axs2[1, 2].imshow(synth_proj_array_mlem_shift_20[0], vmin = np.quantile(synth_proj_array_mlem_shift_20[0], 0.02, 0.98)[0], vmax = np.quantile(synth_proj_array_mlem_shift_20[0], 0.02, 0.98)[1])
+im2_5 = axs2[1, 1].imshow(synth_proj_array_gridrec_shift_20[0], vmin = np.quantile(synth_proj_array_gridrec_shift_20[0], [0.02, 0.98])[0], vmax = np.quantile(synth_proj_array_gridrec_shift_20[0], [0.02, 0.98])[1])
+im2_6 = axs2[1, 2].imshow(synth_proj_array_mlem_shift_20[0], vmin = np.quantile(synth_proj_array_mlem_shift_20[0], [0.02, 0.98])[0], vmax = np.quantile(synth_proj_array_mlem_shift_20[0], [0.02, 0.98])[1])
 
 axs1[0, 0].set_title(r'No COR shift, GR')
 axs1[0, 1].set_title(r'+20 shift, GR')
@@ -112,10 +112,10 @@ text_2 = axs2[0, 0].text(0.02, 0.02, r'$\theta = {0}$'.format(theta_array[0]), t
 for slice_idx in range(n_slices):
     print(f'Creating frame for slice {slice_idx}...')
 
-    im1_1.set_data(recon_gridrec_no_shift[slice_idx], vmin = np.quantile(recon_gridrec_no_shift[slice_idx], 0.02, 0.98)[0], vmax = np.quantile(recon_gridrec_no_shift[slice_idx], 0.02, 0.98)[1])
-    im1_2.set_data(recon_gridrec_shift_20[slice_idx], vmin = np.quantile(recon_gridrec_shift_20[slice_idx], 0.02, 0.98)[0], vmax = np.quantile(recon_gridrec_shift_20[slice_idx], 0.02, 0.98)[1])
-    im1_3.set_data(recon_mlem_no_shift[slice_idx], vmin = np.quantile(recon_mlem_no_shift[slice_idx], 0.02, 0.98)[0], vmax = np.quantile(recon_mlem_no_shift[slice_idx], 0.02, 0.98)[1])
-    im1_4.set_data(recon_mlem_shift_20[slice_idx], vmin = np.quantile(recon_mlem_shift_20[slice_idx], 0.02, 0.98)[0], vmax = np.quantile(recon_mlem_shift_20[slice_idx], 0.02, 0.98)[1])
+    im1_1.set_data(recon_gridrec_no_shift[slice_idx], vmin = np.quantile(recon_gridrec_no_shift[slice_idx], [0.02, 0.98])[0], vmax = np.quantile(recon_gridrec_no_shift[slice_idx], [0.02, 0.98])[1])
+    im1_2.set_data(recon_gridrec_shift_20[slice_idx], vmin = np.quantile(recon_gridrec_shift_20[slice_idx], [0.02, 0.98])[0], vmax = np.quantile(recon_gridrec_shift_20[slice_idx], [0.02, 0.98])[1])
+    im1_3.set_data(recon_mlem_no_shift[slice_idx], vmin = np.quantile(recon_mlem_no_shift[slice_idx], [0.02, 0.98])[0], vmax = np.quantile(recon_mlem_no_shift[slice_idx], [0.02, 0.98])[1])
+    im1_4.set_data(recon_mlem_shift_20[slice_idx], vmin = np.quantile(recon_mlem_shift_20[slice_idx], [0.02, 0.98])[0], vmax = np.quantile(recon_mlem_shift_20[slice_idx], [0.02, 0.98])[1])
     
     text_1.set_text(r'Slice index {0}'.format(slice_idx))
 
@@ -132,11 +132,11 @@ for theta_idx in range(n_theta):
     print(f'Creating frame for theta = {theta_array[theta_idx]} degrees...')
 
     im2_1.set_data(orig_proj[theta_idx])
-    im2_2.set_data(synth_proj_array_gridrec_no_shift[theta_idx], vmin = np.quantile(synth_proj_array_gridrec_no_shift[theta_idx], 0.02, 0.98)[0], vmax = np.quantile(synth_proj_array_gridrec_no_shift[theta_idx], 0.02, 0.98)[1])
-    im2_3.set_data(synth_proj_array_mlem_no_shift[theta_idx], vmin = np.quantile(synth_proj_array_mlem_no_shift[theta_idx], 0.02, 0.98)[0], vmax = np.quantile(synth_proj_array_mlem_no_shift[theta_idx], 0.02, 0.98)[1])
+    im2_2.set_data(synth_proj_array_gridrec_no_shift[theta_idx], vmin = np.quantile(synth_proj_array_gridrec_no_shift[theta_idx], [0.02, 0.98])[0], vmax = np.quantile(synth_proj_array_gridrec_no_shift[theta_idx], [0.02, 0.98])[1])
+    im2_3.set_data(synth_proj_array_mlem_no_shift[theta_idx], vmin = np.quantile(synth_proj_array_mlem_no_shift[theta_idx], [0.02, 0.98])[0], vmax = np.quantile(synth_proj_array_mlem_no_shift[theta_idx], [0.02, 0.98])[1])
     im2_4.set_data(aligned_proj_array_shift_20[theta_idx])
-    im2_5.set_data(synth_proj_array_gridrec_shift_20[theta_idx], vmin = np.quantile(synth_proj_array_gridrec_shift_20[theta_idx], 0.02, 0.98)[0], vmax = np.quantile(synth_proj_array_gridrec_shift_20[theta_idx], 0.02, 0.98)[1])
-    im2_6.set_data(synth_proj_array_mlem_shift_20[theta_idx], vmin = np.quantile(synth_proj_array_mlem_shift_20[theta_idx], 0.02, 0.98)[0], vmax = np.quantile(synth_proj_array_mlem_shift_20[theta_idx], 0.02, 0.98)[1])
+    im2_5.set_data(synth_proj_array_gridrec_shift_20[theta_idx], vmin = np.quantile(synth_proj_array_gridrec_shift_20[theta_idx], [0.02, 0.98])[0], vmax = np.quantile(synth_proj_array_gridrec_shift_20[theta_idx], [0.02, 0.98])[1])
+    im2_6.set_data(synth_proj_array_mlem_shift_20[theta_idx], vmin = np.quantile(synth_proj_array_mlem_shift_20[theta_idx], [0.02, 0.98])[0], vmax = np.quantile(synth_proj_array_mlem_shift_20[theta_idx], [0.02, 0.98])[1])
 
     text_2.set_text(r'$\theta = {0}$'.format(theta_array[theta_idx]))
 
