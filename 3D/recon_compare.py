@@ -86,7 +86,7 @@ lower_quantile_recon = 0.02
 lower_quantile_proj = 0.02
 
 upper_quantile_recon = 0.97
-upper_quantile_proj = 0.75
+upper_quantile_proj = 0.5
 
 # im1_1 = axs1[0, 0].imshow(recon_gridrec_no_shift[0], norm = colors.Normalize(vmin = np.quantile(recon_gridrec_no_shift[0], [0.02, 0.98])[0], vmax = np.quantile(recon_gridrec_no_shift[0], [0.02, 0.98])[1]))
 # im1_2 = axs1[0, 1].imshow(recon_gridrec_shift_20[0], norm = colors.Normalize(vmin = np.quantile(recon_gridrec_shift_20[0], [0.02, 0.98])[0], vmax = np.quantile(recon_gridrec_shift_20[0], [0.02, 0.98])[1]))
