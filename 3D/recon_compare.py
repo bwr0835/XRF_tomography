@@ -82,11 +82,11 @@ tiff_array_2 = []
 fig1, axs1 = plt.subplots(2, 2)
 # fig2, axs2 = plt.subplots(2, 3)
 
-lower_quantile_recon = 0.02
-lower_quantile_proj = 0.02
+lower_quantile_recon = 0.1
+lower_quantile_proj = 0.1
 
-upper_quantile_recon = 0.85
-upper_quantile_proj = 0.98
+upper_quantile_recon = 1
+upper_quantile_proj = 1
 
 # im1_1 = axs1[0, 0].imshow(recon_gridrec_no_shift[0], norm = colors.Normalize(vmin = np.quantile(recon_gridrec_no_shift[0], [0.02, 0.98])[0], vmax = np.quantile(recon_gridrec_no_shift[0], [0.02, 0.98])[1]))
 # im1_2 = axs1[0, 1].imshow(recon_gridrec_shift_20[0], norm = colors.Normalize(vmin = np.quantile(recon_gridrec_shift_20[0], [0.02, 0.98])[0], vmax = np.quantile(recon_gridrec_shift_20[0], [0.02, 0.98])[1]))
