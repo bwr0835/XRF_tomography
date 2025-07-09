@@ -19,7 +19,7 @@ def create_gif(tiff_filename_array, output_filepath, fps):
     for filename in tiff_filename_array:
         os.remove(filename)
 
-output_dir_path = '/home/bwr0835/iter_reproj/xrt_gridrec_mlem_comp_no_shift_shift_20_post_recon_log_july_03_2025'
+output_dir_path = '/home/bwr0835/iter_reproj/xrt_gridrec_mlem_comp_no_shift_shift_20_no_log_july_08_2025'
 
 os.makedirs(output_dir_path, exist_ok = True)
 
@@ -82,15 +82,21 @@ tiff_array_2 = []
 fig1, axs1 = plt.subplots(2, 2)
 fig2, axs2 = plt.subplots(2, 3)
 
+lower_quantile_recon = 0.02
+lower_quantile_proj = 0.02
+
+upper_quantile_recon = 0.97
+upper_quantile_proj = 0.97
+
 # im1_1 = axs1[0, 0].imshow(recon_gridrec_no_shift[0], norm = colors.Normalize(vmin = np.quantile(recon_gridrec_no_shift[0], [0.02, 0.98])[0], vmax = np.quantile(recon_gridrec_no_shift[0], [0.02, 0.98])[1]))
 # im1_2 = axs1[0, 1].imshow(recon_gridrec_shift_20[0], norm = colors.Normalize(vmin = np.quantile(recon_gridrec_shift_20[0], [0.02, 0.98])[0], vmax = np.quantile(recon_gridrec_shift_20[0], [0.02, 0.98])[1]))
 # im1_3 = axs1[1, 0].imshow(recon_mlem_no_shift[0], norm = colors.Normalize(vmin = np.quantile(recon_mlem_no_shift[0], [0.02, 0.98])[0], vmax = np.quantile(recon_mlem_no_shift[0], [0.02, 0.98])[1]))
 # im1_4 = axs1[1, 1].imshow(recon_mlem_shift_20[0], norm = colors.Normalize(vmin = np.quantile(recon_mlem_shift_20[0], [0.02, 0.98])[0], vmax = np.quantile(recon_mlem_shift_20[0], [0.02, 0.98])[1]))
 
-im1_1 = axs1[0, 0].imshow(recon_gridrec_no_shift[0], vmin = np.quantile(recon_gridrec_no_shift[0], [0.02, 0.98])[0], vmax = np.quantile(recon_gridrec_no_shift[0], [0.02, 0.98])[1])
-im1_2 = axs1[0, 1].imshow(recon_gridrec_shift_20[0], vmin = np.quantile(recon_gridrec_shift_20[0], [0.02, 0.98])[0], vmax = np.quantile(recon_gridrec_shift_20[0], [0.02, 0.98])[1])
-im1_3 = axs1[1, 0].imshow(recon_mlem_no_shift[0], vmin = np.quantile(recon_mlem_no_shift[0], [0.02, 0.98])[0], vmax = np.quantile(recon_mlem_no_shift[0], [0.02, 0.98])[1])
-im1_4 = axs1[1, 1].imshow(recon_mlem_shift_20[0], vmin = np.quantile(recon_mlem_shift_20[0], [0.02, 0.98])[0], vmax = np.quantile(recon_mlem_shift_20[0], [0.02, 0.98])[1])
+im1_1 = axs1[0, 0].imshow(recon_gridrec_no_shift[0], vmin = np.quantile(recon_gridrec_no_shift[0], [lower_quantile_recon, upper_quantile_recon])[0], vmax = np.quantile(recon_gridrec_no_shift[0], [lower_quantile_recon, upper_quantile_recon])[1])
+im1_2 = axs1[0, 1].imshow(recon_gridrec_shift_20[0], vmin = np.quantile(recon_gridrec_shift_20[0], [lower_quantile_recon, upper_quantile_recon])[0], vmax = np.quantile(recon_gridrec_shift_20[0], [lower_quantile_recon, upper_quantile_recon])[1])
+im1_3 = axs1[1, 0].imshow(recon_mlem_no_shift[0], vmin = np.quantile(recon_mlem_no_shift[0], [lower_quantile_recon, upper_quantile_recon])[0], vmax = np.quantile(recon_mlem_no_shift[0], [lower_quantile_recon, upper_quantile_recon])[1])
+im1_4 = axs1[1, 1].imshow(recon_mlem_shift_20[0], vmin = np.quantile(recon_mlem_shift_20[0], [lower_quantile_recon, upper_quantile_recon])[0], vmax = np.quantile(recon_mlem_shift_20[0], [lower_quantile_recon, upper_quantile_recon])[1])
 
 # im2_1 = axs2[0, 0].imshow(orig_proj[0])
 # im2_2 = axs2[0, 1].imshow(synth_proj_array_gridrec_no_shift[0], norm = colors.Normalize(vmin = np.quantile(synth_proj_array_gridrec_no_shift[0], [0.02, 0.98])[0], vmax = np.quantile(synth_proj_array_gridrec_no_shift[0], [0.02, 0.98])[1]))
@@ -160,10 +166,10 @@ for theta_idx in range(n_theta):
     im2_5.set_data(synth_proj_array_gridrec_shift_20[theta_idx])
     im2_6.set_data(synth_proj_array_mlem_shift_20[theta_idx])
     
-    im2_2.set_clim(np.quantile(synth_proj_array_gridrec_no_shift[theta_idx], [0.02, 0.98])[0], np.quantile(synth_proj_array_gridrec_no_shift[theta_idx], [0.02, 0.98])[1])
-    im2_3.set_clim(np.quantile(synth_proj_array_mlem_no_shift[theta_idx], [0.02, 0.98])[0], np.quantile(synth_proj_array_mlem_no_shift[theta_idx], [0.02, 0.98])[1])
-    im2_5.set_clim(np.quantile(synth_proj_array_gridrec_shift_20[theta_idx], [0.02, 0.98])[0], np.quantile(synth_proj_array_gridrec_shift_20[theta_idx], [0.02, 0.98])[1])
-    im2_6.set_clim(np.quantile(synth_proj_array_mlem_shift_20[theta_idx], [0.02, 0.98])[0], np.quantile(synth_proj_array_mlem_shift_20[theta_idx], [0.02, 0.98])[1])
+    im2_2.set_clim(np.quantile(synth_proj_array_gridrec_no_shift[theta_idx], [lower_quantile_proj,upper_quantile_proj])[0], np.quantile(synth_proj_array_gridrec_no_shift[theta_idx], [lower_quantile_proj,upper_quantile_proj])[1])
+    im2_3.set_clim(np.quantile(synth_proj_array_mlem_no_shift[theta_idx], [lower_quantile_proj,upper_quantile_proj])[0], np.quantile(synth_proj_array_mlem_no_shift[theta_idx], [lower_quantile_proj,upper_quantile_proj])[1])
+    im2_5.set_clim(np.quantile(synth_proj_array_gridrec_shift_20[theta_idx], [lower_quantile_proj,upper_quantile_proj])[0], np.quantile(synth_proj_array_gridrec_shift_20[theta_idx], [lower_quantile_proj,upper_quantile_proj])[1])
+    im2_6.set_clim(np.quantile(synth_proj_array_mlem_shift_20[theta_idx], [lower_quantile_proj,upper_quantile_proj])[0], np.quantile(synth_proj_array_mlem_shift_20[theta_idx], [lower_quantile_proj,upper_quantile_proj])[1])
 
     text_2.set_text(r'$\theta = {0}$'.format(theta_array[theta_idx]))
 
