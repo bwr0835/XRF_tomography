@@ -82,8 +82,8 @@ tiff_array_2 = []
 fig1, axs1 = plt.subplots(2, 2)
 # fig2, axs2 = plt.subplots(2, 3)
 
-lower_quantile_recon = 0.1
-upper_quantile_recon = 1
+lower_quantile_recon = 0.2
+upper_quantile_recon = 0.8
 
 lower_quantile_proj = 0.1
 upper_quantile_proj = 1
