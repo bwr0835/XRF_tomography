@@ -367,8 +367,8 @@ slice_idx_desired = 64
 exp_slice_proj_intensity_theta_iter_1 = aligned_proj_theta_array_aux[0][slice_idx_desired]
 synth_slice_proj_intensity_theta_iter_1 = synth_proj_theta_array_aux[0][slice_idx_desired]
 
-min_intensity_theta_iter_1 = np.min([np.min(exp_slice_proj_intensity_theta_iter_1), np.min(synth_slice_proj_intensity_theta_iter_1)])
-max_intensity_theta_iter_1 = np.max([np.max(exp_slice_proj_intensity_theta_iter_1), np.max(synth_slice_proj_intensity_theta_iter_1)])
+min_intensity_theta_iter_1 = np.nanmin([np.nanmin(exp_slice_proj_intensity_theta_iter_1), np.min(synth_slice_proj_intensity_theta_iter_1)])
+max_intensity_theta_iter_1 = np.nanmax([np.nanmax(exp_slice_proj_intensity_theta_iter_1), np.max(synth_slice_proj_intensity_theta_iter_1)])
 
 # axs9[0].set_xlim(0, n_columns - 1)
 # axs9[0].set_ylim(min_intensity_theta_iter_1, max_intensity_theta_iter_1)
@@ -378,7 +378,7 @@ max_intensity_theta_iter_1 = np.max([np.max(exp_slice_proj_intensity_theta_iter_
 # axs9[0].legend(frameon = False)
 
 axs9.set_xlim(0, n_columns - 1)
-# axs9.set_ylim(min_intensity_theta_iter_1, max_intensity_theta_iter_1)
+axs9.set_ylim(min_intensity_theta_iter_1, max_intensity_theta_iter_1)
 axs9.set_title(r'Iteration index 0')
 axs9.set_xlabel(r'Scan position index')
 axs9.set_ylabel(r'Intensity (a.u.)')
@@ -430,9 +430,9 @@ for theta_idx in range(n_theta):
     # curve10.set_ydata(exp_slice_proj_intensity_theta_iter_final)
     # curve11.set_ydata(synth_slice_proj_intensity_theta_iter_final)
 
-    min_intensity_theta_iter_1 = np.min([np.min(exp_slice_proj_intensity_theta_iter_1), np.min(synth_slice_proj_intensity_theta_iter_1)])
+    min_intensity_theta_iter_1 = np.nanmin([np.nanmin(exp_slice_proj_intensity_theta_iter_1), np.min(synth_slice_proj_intensity_theta_iter_1)])
     # min_intensity_theta_iter_final = np.min([np.min(exp_slice_proj_intensity_theta_iter_final), np.min(synth_slice_proj_intensity_theta_iter_final)])
-    max_intensity_theta_iter_1 = np.max([np.max(exp_slice_proj_intensity_theta_iter_1), np.max(synth_slice_proj_intensity_theta_iter_1)])
+    max_intensity_theta_iter_1 = np.nanmax([np.nanmax(exp_slice_proj_intensity_theta_iter_1), np.max(synth_slice_proj_intensity_theta_iter_1)])
     # max_intensity_theta_iter_final = np.max([np.max(exp_slice_proj_intensity_theta_iter_final), np.max(synth_slice_proj_intensity_theta_iter_final)])
 
     # min_shift = np.min([np.min(net_shift_x), np.min(net_shift_y)])
@@ -442,7 +442,7 @@ for theta_idx in range(n_theta):
     # axs5.set_title(r'$\theta = {0}$\textdegree'.format(theta_array[theta_idx]))
 
     # axs9[0].set_ylim(min_intensity_theta_iter_1, max_intensity_theta_iter_1)
-    # axs9.set_ylim(min_intensity_theta_iter_1, max_intensity_theta_iter_1)
+    axs9.set_ylim(min_intensity_theta_iter_1, max_intensity_theta_iter_1)
     # axs9[1].set_ylim(min_intensity_theta_iter_final, max_intensity_theta_iter_final)
 
     fig9.suptitle(r'$\theta = {0}$\textdegree; Slice index {1}'.format(theta_array[theta_idx], slice_idx_desired))
