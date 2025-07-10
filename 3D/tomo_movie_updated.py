@@ -304,10 +304,12 @@ fig9, axs9 = plt.subplots()
 # curve5, = axs7.plot(theta_array, net_y_shifts[0, :], 'r-o', markersize = 3, label = r'$\Delta y$')
 # curve6, = axs8.plot(scan_pos_array, aligned_proj_iter_array_aux[0][slice_idx_desired], 'k', label = r'Measured')
 # curve7, = axs8.plot(scan_pos_array, synth_proj_iter_array_aux[0][slice_idx_desired], 'r', label = r'Reprojected')
-curve8, = axs9[0].plot(scan_pos_array, aligned_proj_theta_array_aux[0][slice_idx_desired], 'k', label = r'Measured')
-curve9, = axs9[0].plot(scan_pos_array, synth_proj_theta_array_aux[0][slice_idx_desired], 'r', label = r'Reprojected')
-curve10, = axs9[1].plot(scan_pos_array, aligned_proj_theta_array_aux_2[0][slice_idx_desired], 'k', label = r'Measured')
-curve11, = axs9[1].plot(scan_pos_array, synth_proj_theta_array_aux_2[0][slice_idx_desired], 'r', label = r'Reprojected')
+# curve8, = axs9[0].plot(scan_pos_array, aligned_proj_theta_array_aux[0][slice_idx_desired], 'k', label = r'Measured')
+# curve9, = axs9[0].plot(scan_pos_array, synth_proj_theta_array_aux[0][slice_idx_desired], 'r', label = r'Reprojected')
+curve8, = axs9.plot(scan_pos_array, aligned_proj_theta_array_aux[0][slice_idx_desired], 'k', label = r'Measured')
+curve9, = axs9.plot(scan_pos_array, synth_proj_theta_array_aux[0][slice_idx_desired], 'r', label = r'Reprojected')
+# curve10, = axs9[1].plot(scan_pos_array, aligned_proj_theta_array_aux_2[0][slice_idx_desired], 'k', label = r'Measured')
+# curve11, = axs9[1].plot(scan_pos_array, synth_proj_theta_array_aux_2[0][slice_idx_desired], 'r', label = r'Reprojected')
 
 # slice_idx_desired = [54, 64, 151]
 slice_idx_desired = 64
