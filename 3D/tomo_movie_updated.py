@@ -425,7 +425,8 @@ for theta_idx in range(n_theta):
     # axs5.set_title(r'$\theta = {0}$\textdegree'.format(theta_array[theta_idx]))
 
     axs9[0].set_ylim(min_intensity_theta_iter_1, max_intensity_theta_iter_1)
-    axs9[1].set_ylim(min_intensity_theta_iter_final, max_intensity_theta_iter_final)
+    # axs9[1].set_ylim(min_intensity_theta_iter_final, max_intensity_theta_iter_final)
+    axs9[1].set_ylim(min_intensity_theta_iter_final, max_intensity_theta_iter_1)
 
     fig9.suptitle(r'$\theta = {0}$\textdegree; Slice index {1}'.format(theta_array[theta_idx], slice_idx_desired))
 
