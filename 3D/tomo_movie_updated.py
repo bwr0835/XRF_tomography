@@ -275,7 +275,7 @@ fps_plots = 15
 # fig5, axs5 = plt.subplots() # x- and y-shifts as function of iteration index
 # fig6, axs6 = plt.subplots() # Center of rotation as function of iteration index
 # fig7, axs7 = plt.subplots() # Net shifts as function of angle for each slice
-fig8, axs8 = plt.subplots()
+# fig8, axs8 = plt.subplots()
 fig9, axs9 = plt.subplots(2, 1)
 # fig10, axs10 = plt.subplots()
 # fig11, axs11 = plt.subplots()
@@ -354,12 +354,12 @@ slice_idx_desired = 64
 # axs7.set_ylabel(r'Net shift')
 # axs7.legend(frameon = False)
 # 
-axs8.set_xlim(0, n_columns - 1)
-axs8.set_xlabel(r'Scan position index')
-axs8.set_ylabel(r'Intensity (a.u.)')
-axs8.legend(frameon = False)
+# axs8.set_xlim(0, n_columns - 1)
+# axs8.set_xlabel(r'Scan position index')
+# axs8.set_ylabel(r'Intensity (a.u.)')
+# axs8.legend(frameon = False)
 
-fig8.suptitle(r'$\theta = {0}$\textdegree; Slice index {1}'.format(theta_array[theta_idx_desired], slice_idx_desired))
+# fig8.suptitle(r'$\theta = {0}$\textdegree; Slice index {1}'.format(theta_array[theta_idx_desired], slice_idx_desired))
 
 axs9[0].set_xlim(0, n_columns - 1)
 axs9[0].set_title(r'Iteration index 0')
