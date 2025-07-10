@@ -136,11 +136,11 @@ def extract_h5_xrt_data(file_path, synchrotron):
         
         cts_combined = np.zeros((n_elements, ny, nx))
         
-        cts_us_ic = scaler_values[us_ic_idx] # Remove last two columns since they are added after row is finished scanning
+        cts_us_ic = scaler_values[us_ic_idx] 
         cts_ds_ic = scaler_values[ds_ic_idx]
         cts_abs_ic = scaler_values[abs_ic_idx]
 
-        cts_combined[1] = cts_us_ic[:, :-2]
+        cts_combined[1] = cts_us_ic[:, :-2] # Remove last two columns since they are added after row is finished scanning
         cts_combined[2] = cts_ds_ic[:, :-2]
         cts_combined[3] = cts_abs_ic[:, :-2]
 
