@@ -94,7 +94,8 @@ def create_gif(tiff_filename_array, output_filepath, fps):
 # dir_path = filedialog.askdirectory(parent = root, title = 'Select directory containing alignment NPY files')
 
 # dir_path = '/home/bwr0835/iter_reproj/gridrec_5_iter_tomopy_cor_phase_corr_w_padding_04_28_2025'
-dir_path = '/home/bwr0835/iter_reproj/xrt_mlem_1_iter_no_shift_no_log_tomopy_default_cor_w_padding_07_03_2025'
+# dir_path = '/home/bwr0835/iter_reproj/xrt_mlem_1_iter_no_shift_no_log_tomopy_default_cor_w_padding_07_03_2025'
+dir_path = '/Users/bwr0835/Documents/xrt_mlem_1_iter_manual_shift_20_no_log_tomopy_default_cor_w_padding_07_03_2025'
 
 if dir_path == "":
     print('No directory chosen. Exiting...')
@@ -442,7 +443,13 @@ for theta_idx in range(n_theta):
     # axs5.set_title(r'$\theta = {0}$\textdegree'.format(theta_array[theta_idx]))
 
     # axs9[0].set_ylim(min_intensity_theta_iter_1, max_intensity_theta_iter_1)
-    axs9.set_ylim(min_intensity_theta_iter_1, max_intensity_theta_iter_1)
+    
+    min_val = min(np.min(exp_slice_proj_intensity_theta_iter_1), np.min(synth_slice_proj_intensity_theta_iter_1))
+    max_val = max(np.max(exp_slice_proj_intensity_theta_iter_1), np.max(synth_slice_proj_intensity_theta_iter_1))
+    margin = 0.15 * (max_val - min_val) if max_val > min_val else 1
+    axs9.set_ylim(min_val - margin, max_val + margin)
+
+    # axs9.set_ylim(min_intensity_theta_iter_1, max_intensity_theta_iter_1)
     # axs9[1].set_ylim(min_intensity_theta_iter_final, max_intensity_theta_iter_final)
 
     fig9.suptitle(r'$\theta = {0}$\textdegree; Slice index {1}'.format(theta_array[theta_idx], slice_idx_desired))
