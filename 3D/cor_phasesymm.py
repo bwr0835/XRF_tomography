@@ -1,10 +1,11 @@
 import numpy as np, tomopy as tomo, tkinter as tk, matplotlib as mpl
+import h5_util
 
 from skimage import transform as xform
 from scipy import ndimage as ndi
 from matplotlib import pyplot as plt, animation as anim
 from tkinter import filedialog as fd
-from h5_util import extract_h5_aggregate_xrf_data
+# from h5_util import extract_h5_aggregate_xrt_data
 from scipy import fft
 
 plt.rcParams['text.usetex'] = True
@@ -96,14 +97,14 @@ def rot_center(theta_sum):
 
     return COR
 
-file_path_xrf = '/home/bwr0835/2_ide_aggregate_xrf.h5'
+file_path_xrt = '/Users/bwr0835/Documents/2_ide_aggregate_xrt.h5'
 # output_path = '/home/bwr0835/cor_correction_proj_shift_array.npy'
-ref_element = 'Fe'
+ref_element = 'ds_ic'
 
-elements_xrf, counts_xrf, theta_xrf, dataset_type_xrf = extract_h5_aggregate_xrf_data(file_path_xrf)
+elements_xrt, counts_xrt, theta_xrt, dataset_type_xrt = h5_util.extract_h5_aggregate_xrt_data(file_path_xrt)
 
-ref_element_idx = elements_xrf.index(ref_element)
-counts = counts_xrf[ref_element_idx]
+ref_element_idx = elements_xrt.index(ref_element)
+counts = counts_xrt[ref_element_idx]
 
 n_theta = counts.shape[0] # Number of projection angles (projection images)
 n_slices = counts.shape[1] # Number of rows in a projection image
@@ -129,34 +130,35 @@ if (n_slices % 2) or (n_columns % 2):
 print(counts.shape)
 theta_sum = np.zeros((n_slices, n_columns))
 
-# proj_list = [counts[theta_idx, :, :] for theta_idx in range(n_theta)]
+proj_list = [counts[theta_idx, :, :] for theta_idx in range(n_theta)]
 
-# for proj in proj_list:
-#     theta_sum += proj
+for proj in proj_list:
+    theta_sum += proj
 
 # angle_pair = np.array([-22, 158])
-angle_pair = np.array([23, -156])
+angle_pair = np.array([-4, ])
 
-reflection_pair_idx_array_1 = create_ref_pair_theta_idx_array(angle_pair, theta_xrf)
+reflection_pair_idx_array_1 = create_ref_pair_theta_idx_array(angle_pair, theta_xrt)
 
-# sino = counts[:, n_slices//2, :]
+sino = counts[:, n_slices//2, :]
+# 
+slice_proj_neg_22 = sino[reflection_pair_idx_array_1[1], :]
+slice_proj_158 = np.flip(sino[reflection_pair_idx_array_1[0], :], axis = 1)
 
-# slice_proj_neg_22 = sino[reflection_pair_idx_array_1[0], :]
-# slice_proj_158 = sino[reflection_pair_idx_array_1[1], :]
-
-# theta_sum = slice_proj_158 + slice_proj_neg_22
+theta_sum = slice_proj_158 + slice_proj_neg_22
 
 # for slice_idx in range(n_slices):
     # theta_sum[slice_idx, :] = counts[reflection_pair_idx_array_1[0], slice_idx, :] + counts[reflection_pair_idx_array_1[1], slice_idx, :]
 
-for slice_idx in range(n_slices):
+# for slice_idx in range(n_slices):
 
-    sino = counts[:, slice_idx, :]
+#     sino = counts[:, slice_idx, :]
 
-    slice_proj_neg_22 = sino[reflection_pair_idx_array_1[0], :]
-    slice_proj_158 = np.flip(sino[reflection_pair_idx_array_1[1], :], axis = 1)
+#     slice_proj_neg_22 = sino[reflection_pair_idx_array_1[0], :]
+#     # slice_proj_158 = np.flip(sino[reflection_pair_idx_array_1[0], :], axis = 1)
+#     slice_proj_158 = (sino[reflection_pair_idx_array_1[1], :])
 
-    theta_sum[slice_idx, :] = slice_proj_neg_22 + slice_proj_158
+#     theta_sum[slice_idx, :] = slice_proj_neg_22 + slice_proj_158
 
 # theta_sum = proj_neg_22 + proj_158
 

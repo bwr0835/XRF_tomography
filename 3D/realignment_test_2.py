@@ -351,7 +351,8 @@ def iter_reproj(ref_element,
         init_y_shift *= np.ones(n_theta)
     
     if np.any(init_x_shift) or np.any(init_y_shift):
-        print('Yes')
+        print('Executing intial shift(s) in x and y')
+        
         if np.any(init_x_shift) and np.any(init_y_shift):
             # net_x_shifts_pc[0] = init_x_shift
             # net_y_shifts_pc[0] = init_y_shift
@@ -361,7 +362,7 @@ def iter_reproj(ref_element,
                     xrf_proj_img_array[element_idx, theta_idx] = ndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx], shift = (init_y_shift[theta_idx], init_x_shift[theta_idx]))
         
         elif np.any(init_x_shift):
-            print('OK')
+            print('Executing initial shift(s) in x')
             # net_x_shifts_pc[0] = init_x_shift
 
             for element_idx in range(n_elements):
@@ -369,6 +370,7 @@ def iter_reproj(ref_element,
                     xrf_proj_img_array[element_idx, theta_idx] = ndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx], shift = (0, init_x_shift[theta_idx]))
                 
         else:
+            print('Executing initial shift(s) in x')
             # net_y_shifts_pc[0] = init_y_shift
 
             for element_idx in range(n_elements):
@@ -377,8 +379,8 @@ def iter_reproj(ref_element,
 
     theta_idx_pairs = find_theta_combos(theta_array, dtheta = 1)
 
-    for theta_idx_pair in theta_idx_pairs:
-        print(np.array([theta_array[theta_idx_pair[0]], theta_array[theta_idx_pair[1]]]))
+    # for theta_idx_pair in theta_idx_pairs:
+    #     print(np.array([theta_array[theta_idx_pair[0]], theta_array[theta_idx_pair[1]]]))
 
     center_of_rotation_array = np.array([tomo.find_center_pc(xrf_proj_img_array[ref_element_idx, theta_idx_pair[0]], 
                                                              xrf_proj_img_array[ref_element_idx, theta_idx_pair[1]], 
@@ -386,6 +388,8 @@ def iter_reproj(ref_element,
                                                           # The second image is flipped about the vertical axis within the TomoPy function
     
     # center_of_rotation = tomo.find_center(xrf_proj_img_array[ref_element_idx], theta_array, tol = 0.05)[0]
+
+    print(center_of_rotation_array)
     center_of_rotation = center_of_rotation_array[-1]
 
     # plt.plot(np.arange(len(center_of_rotation_array)), center_of_rotation_array, 'o', markersize = 3)
