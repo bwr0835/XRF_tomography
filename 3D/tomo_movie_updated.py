@@ -95,7 +95,7 @@ def create_gif(tiff_filename_array, output_filepath, fps):
 
 # dir_path = '/home/bwr0835/iter_reproj/xrt_gridrec_1_iter_no_shift_no_log_default_cor_w_padding'
 # dir_path = '/home/bwr0835/iter_reproj/xrt_mlem_1_iter_no_shift_no_log_tomopy_default_cor_w_padding_07_03_2025'
-dir_path = '/Users/bwr0835/Documents/xrt_gridrec_1_iter_no_shift_no_log_tomopy_default_cor_w_padding_07_03_2025'
+dir_path = '/Users/bwr0835/Documents/xrt_gridrec_1_iter_tomo_find_center_correction_no_log_w_padding_07_14_2025'
 
 if dir_path == "":
     print('No directory chosen. Exiting...')

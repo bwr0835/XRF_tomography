@@ -329,7 +329,7 @@ def iter_reproj(ref_element,
                                                           # The second image is flipped about the vertical axis within the TomoPy function
     
     # center_of_rotation = tomo.find_center(xrf_proj_img_array[ref_element_idx], theta_array, tol = 0.05)[0]
-    center_of_rotation = center_of_rotation_array[-1]
+    center_of_rotation = center_of_rotation_array[-2]
 
     # plt.plot(np.arange(len(center_of_rotation_array)), center_of_rotation_array, 'o', markersize = 3)
     # plt.plot(np.arange(len(center_of_rotation_array)), center_of_rotation*np.ones(len(center_of_rotation_array)))
@@ -353,7 +353,7 @@ def iter_reproj(ref_element,
                                                     xrf_proj_img_array[ref_element_idx, theta_idx_pair[1]], 
                                                     tol = 0.01) for theta_idx_pair in theta_idx_pairs])
     
-    center_of_rotation = center_of_rotation_array[-1]
+    center_of_rotation = center_of_rotation_array[-2]
     
     # center_of_rotation = tomo.find_center_(xrf_proj_img_array[ref_element_idx], theta_array, tol = 0.05)
     
@@ -443,8 +443,8 @@ def iter_reproj(ref_element,
                                                              synth_proj[theta_idx_pair[0]], 
                                                              tol = 0.01) for theta_idx_pair in theta_idx_pairs])
 
-        center_of_rotation_exp = center_of_rotation_array_exp[-1] 
-        center_of_rotation_synth = center_of_rotation_array_synth[-1]
+        center_of_rotation_exp = center_of_rotation_array_exp[-2] 
+        center_of_rotation_synth = center_of_rotation_array_synth[-2]
 
         print(f'Post-jitter correction COR (exp.): {center_of_rotation_exp}')
         print(f'Post-jitter correction COR (synth.): {center_of_rotation_synth}')
