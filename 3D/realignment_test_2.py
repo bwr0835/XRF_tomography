@@ -498,12 +498,12 @@ def iter_reproj(ref_element,
                 print(f'Current x-shift: {round_correct(dx, ndec = 3)} (theta = {round_correct(theta_array[theta_idx], ndec = 1)})')
                 print(f'Current y-shift: {round_correct(dy, ndec = 3)}')
         
-        center_of_rotation_array_exp = np.array([tomo.find_center_pc(synth_proj[theta_idx_pair[1]], 
-                                                             synth_proj[theta_idx_pair[0]], 
+        center_of_rotation_array_exp = np.array([tomo.find_center_pc(synth_proj[theta_idx_pair[0]], 
+                                                             synth_proj[theta_idx_pair[1]], 
                                                              tol = 0.01) for theta_idx_pair in theta_idx_pairs]) 
         
-        center_of_rotation_array_synth = np.array([tomo.find_center_pc(synth_proj[theta_idx_pair[1]], 
-                                                             synth_proj[theta_idx_pair[0]], 
+        center_of_rotation_array_synth = np.array([tomo.find_center_pc(synth_proj[theta_idx_pair[0]], 
+                                                             synth_proj[theta_idx_pair[1]], 
                                                              tol = 0.01) for theta_idx_pair in theta_idx_pairs])
 
         center_of_rotation_exp = center_of_rotation_array_exp[-1] 
