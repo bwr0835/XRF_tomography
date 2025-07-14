@@ -406,7 +406,7 @@ def iter_reproj(ref_element,
         for theta_idx in range(n_theta):
             xrf_proj_img_array[element_idx, theta_idx] = ndi.shift(xrf_proj_img_array[element_idx, theta_idx], shift = (0, -offset))
 
-    net_x_shifts_pc[0] -= offset*np.ones(len(n_theta))
+    net_x_shifts_pc[0] -= offset
 
     center_of_rotation_array = np.array([tomo.find_center_pc(xrf_proj_img_array[ref_element_idx, theta_idx_pair[0]], 
                                                     xrf_proj_img_array[ref_element_idx, theta_idx_pair[1]], 
@@ -603,8 +603,8 @@ n_slices = counts_xrt.shape[2]
 # n_theta = counts_xrf.shape[1]
 # n_slices = counts_xrf.shape[2]
 
-init_x_shift = -20*np.ones(n_theta)
-# init_x_shift = 0
+# init_x_shift = -20*np.ones(n_theta)
+init_x_shift = 0
 
 n_desired_iter = 1 # For the reprojection scheme, NOT for reconstruction by itself
 
