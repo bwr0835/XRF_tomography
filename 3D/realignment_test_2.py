@@ -318,17 +318,18 @@ def iter_reproj(ref_element,
     if np.isscalar(init_y_shift):
         init_y_shift *= np.ones(n_theta)
 
-    # theta_idx_pairs = find_theta_combos(theta_array, dtheta = 1)
+    theta_idx_pairs = find_theta_combos(theta_array, dtheta = 1)
 
-    # for theta_idx_pair in theta_idx_pairs:
-        # print(np.array([theta_array[theta_idx_pair[0]], theta_array[theta_idx_pair[1]]]))
+    for theta_idx_pair in theta_idx_pairs:
+        print(np.array([theta_array[theta_idx_pair[0]], theta_array[theta_idx_pair[1]]]))
 
-    # center_of_rotation_array = np.array([tomo.find_center_pc(xrf_proj_img_array[ref_element_idx, theta_idx_pair[1]], 
-                                                            #  xrf_proj_img_array[ref_element_idx, theta_idx_pair[0]], 
-                                                            #  tol = 0.01) for theta_idx_pair in theta_idx_pairs]) 
+    center_of_rotation_array = np.array([tomo.find_center_pc(xrf_proj_img_array[ref_element_idx, theta_idx_pair[1]], 
+                                                             xrf_proj_img_array[ref_element_idx, theta_idx_pair[0]], 
+                                                             tol = 0.01) for theta_idx_pair in theta_idx_pairs]) 
                                                           # The second image is flipped about the vertical axis within the TomoPy function
     
-    center_of_rotation = tomo.find_center(xrf_proj_img_array[ref_element_idx], theta_array, tol = 0.05)[0]
+    # center_of_rotation = tomo.find_center(xrf_proj_img_array[ref_element_idx], theta_array, tol = 0.05)[0]
+    center_of_rotation = center_of_rotation_array[0]
 
     # plt.plot(np.arange(len(center_of_rotation_array)), center_of_rotation_array, 'o', markersize = 3)
     # plt.plot(np.arange(len(center_of_rotation_array)), center_of_rotation*np.ones(len(center_of_rotation_array)))
@@ -348,11 +349,13 @@ def iter_reproj(ref_element,
         for theta_idx in range(n_theta):
             xrf_proj_img_array[element_idx, theta_idx] = ndi.shift(xrf_proj_img_array[element_idx, theta_idx], shift = (0, -offset))
 
-    # center_of_rotation_array = np.array([tomo.find_center_pc(xrf_proj_img_array[ref_element_idx, theta_idx_pair[0]], 
-    #                                                 xrf_proj_img_array[ref_element_idx, theta_idx_pair[1]], 
-    #                                                 tol = 0.01) for theta_idx_pair in theta_idx_pairs])
+    center_of_rotation_array = np.array([tomo.find_center_pc(xrf_proj_img_array[ref_element_idx, theta_idx_pair[0]], 
+                                                    xrf_proj_img_array[ref_element_idx, theta_idx_pair[1]], 
+                                                    tol = 0.01) for theta_idx_pair in theta_idx_pairs])
     
-    center_of_rotation = tomo.find_center(xrf_proj_img_array[ref_element_idx], theta_array, tol = 0.05)
+    center_of_rotation = center_of_rotation_array[0]
+    
+    # center_of_rotation = tomo.find_center_(xrf_proj_img_array[ref_element_idx], theta_array, tol = 0.05)
     
     print(f'New center of rotation: {center_of_rotation}')
     print('Performing iterative reprojection...')
@@ -432,11 +435,19 @@ def iter_reproj(ref_element,
                 print(f'Current x-shift: {round_correct(dx, ndec = 3)} (theta = {round_correct(theta_array[theta_idx], ndec = 1)})')
                 print(f'Current y-shift: {round_correct(dy, ndec = 3)}')
         
-        center_of_rotation_exp_img = tomo.find_center(aligned_proj, theta_array, tol = 0.05)[0]
-        center_of_rotation_synth_img = tomo.find_center(synth_proj, theta_array, tol = 0.05)[0]
+        center_of_rotation_array_exp = np.array([tomo.find_center_pc(synth_proj[theta_idx_pair[1]], 
+                                                             synth_proj[theta_idx_pair[0]], 
+                                                             tol = 0.01) for theta_idx_pair in theta_idx_pairs]) 
+        
+        center_of_rotation_array_synth = np.array([tomo.find_center_pc(synth_proj[theta_idx_pair[1]], 
+                                                             synth_proj[theta_idx_pair[0]], 
+                                                             tol = 0.01) for theta_idx_pair in theta_idx_pairs])
 
-        print(f'Post-jitter correction COR (exp.): {center_of_rotation_exp_img}')
-        print(f'Post-jitter correction COR (synth.): {center_of_rotation_exp_img}')
+        center_of_rotation_exp = center_of_rotation_array_exp[0] 
+        center_of_rotation_synth = center_of_rotation_array_synth[0]
+
+        print(f'Post-jitter correction COR (exp.): {center_of_rotation_exp}')
+        print(f'Post-jitter correction COR (synth.): {center_of_rotation_synth}')
         
         if np.max(np.abs(dx_array_pc)) < eps and np.max(np.abs(dy_array_pc)) < eps:
             iterations = np.array(iterations)
