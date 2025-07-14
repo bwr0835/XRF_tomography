@@ -351,10 +351,10 @@ def iter_reproj(ref_element,
         init_y_shift *= np.ones(n_theta)
     
     if np.any(init_x_shift) or np.any(init_y_shift):
-        print('Executing intial shift(s) in x and y')
-        
         if np.any(init_x_shift) and np.any(init_y_shift):
-            # net_x_shifts_pc[0] = init_x_shift
+            print('Executing intial shift(s) in x and y')
+            
+            net_x_shifts_pc[0] = init_x_shift
             # net_y_shifts_pc[0] = init_y_shift
 
             for element_idx in range(n_elements):
@@ -363,7 +363,8 @@ def iter_reproj(ref_element,
         
         elif np.any(init_x_shift):
             print('Executing initial shift(s) in x')
-            # net_x_shifts_pc[0] = init_x_shift
+            
+            net_x_shifts_pc[0] = init_x_shift
 
             for element_idx in range(n_elements):
                 for theta_idx in range(n_theta):
