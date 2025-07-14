@@ -206,6 +206,38 @@ def phase_correlate(recon_proj, exp_proj, upsample_factor):
 
     return y_shift, x_shift
 
+def rot_center(theta_sum):
+    """
+    Code written by E. Vacek (2021): 
+    https://github.com/everettvacek/PhaseSymmetry/blob/master/PhaseSymmetry.py
+
+    Calculates the center of rotation of a sinogram.
+
+    Parameters
+    ----------
+    thetasum: array-like
+        The 2D theta-sum array (z,theta).
+
+    Returns
+    -------
+    COR: float
+        The center of rotation.
+    """
+    T = fft.rfft(theta_sum.ravel())
+    
+    # Get components of the AC spatial frequency for axis perpendicular to rotation axis.
+    
+    imag = T[theta_sum.shape[0]].imag
+    real = T[theta_sum.shape[0]].real
+    
+    # Get phase of thetasum and return center of rotation.
+    
+    phase = np.arctan2(imag*np.sign(real), real*np.sign(real)) 
+    
+    COR = theta_sum.shape[-1]*(1 - phase/np.pi)/2
+
+    return COR
+
 def iter_reproj(ref_element,
                 element_array, 
                 theta_array, 
@@ -317,6 +349,31 @@ def iter_reproj(ref_element,
         
     if np.isscalar(init_y_shift):
         init_y_shift *= np.ones(n_theta)
+    
+    if np.any(init_x_shift) or np.any(init_y_shift):
+        print('Yes')
+        if np.any(init_x_shift) and np.any(init_y_shift):
+            # net_x_shifts_pc[0] = init_x_shift
+            # net_y_shifts_pc[0] = init_y_shift
+
+            for element_idx in range(n_elements):
+                for theta_idx in range(n_theta):
+                    aligned_proj[theta_idx] = ndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx], shift = (init_y_shift[theta_idx], init_x_shift[theta_idx]))
+        
+        elif np.any(init_x_shift):
+            print('OK')
+            # net_x_shifts_pc[0] = init_x_shift
+
+            for element_idx in range(n_elements):
+                for theta_idx in range(n_theta):
+                    aligned_proj[theta_idx] = ndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx], shift = (0, init_x_shift[theta_idx]))
+                
+        else:
+            # net_y_shifts_pc[0] = init_y_shift
+
+            for element_idx in range(n_elements):
+                for theta_idx in range(n_theta):
+                    aligned_proj[theta_idx] = ndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx], shift = (init_x_shift[theta_idx], 0))
 
     theta_idx_pairs = find_theta_combos(theta_array, dtheta = 1)
 
@@ -329,7 +386,7 @@ def iter_reproj(ref_element,
                                                           # The second image is flipped about the vertical axis within the TomoPy function
     
     # center_of_rotation = tomo.find_center(xrf_proj_img_array[ref_element_idx], theta_array, tol = 0.05)[0]
-    center_of_rotation = center_of_rotation_array[-2]
+    center_of_rotation = center_of_rotation_array[-1]
 
     # plt.plot(np.arange(len(center_of_rotation_array)), center_of_rotation_array, 'o', markersize = 3)
     # plt.plot(np.arange(len(center_of_rotation_array)), center_of_rotation*np.ones(len(center_of_rotation_array)))
@@ -349,11 +406,13 @@ def iter_reproj(ref_element,
         for theta_idx in range(n_theta):
             xrf_proj_img_array[element_idx, theta_idx] = ndi.shift(xrf_proj_img_array[element_idx, theta_idx], shift = (0, -offset))
 
+    net_x_shifts_pc[0] -= offset*np.ones(len(n_theta))
+
     center_of_rotation_array = np.array([tomo.find_center_pc(xrf_proj_img_array[ref_element_idx, theta_idx_pair[0]], 
                                                     xrf_proj_img_array[ref_element_idx, theta_idx_pair[1]], 
                                                     tol = 0.01) for theta_idx_pair in theta_idx_pairs])
     
-    center_of_rotation = center_of_rotation_array[-2]
+    center_of_rotation = center_of_rotation_array[-1]
     
     # center_of_rotation = tomo.find_center_(xrf_proj_img_array[ref_element_idx], theta_array, tol = 0.05)
     
@@ -365,11 +424,12 @@ def iter_reproj(ref_element,
         
         print(f'Iteration {i + 1}/{n_iterations}')
 
-        if i == 0:
-            for theta_idx in range(n_theta):
-                aligned_proj[theta_idx] = ndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx], shift = (init_y_shift[theta_idx], init_x_shift[theta_idx]))
+        if i > 0:
+        # if i == 0:
+            # for theta_idx in range(n_theta):
+                # aligned_proj[theta_idx] = ndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx], shift = (init_y_shift[theta_idx], init_x_shift[theta_idx]))
             
-        else:
+        # else:
             for theta_idx in range(n_theta):
                 net_x_shift = net_x_shifts_pc[i - 1, theta_idx]
                 net_y_shift = net_y_shifts_pc[i - 1, theta_idx]
@@ -424,8 +484,11 @@ def iter_reproj(ref_element,
             dy_array_pc[theta_idx] = dy
             
             if i == 0: 
-                net_x_shifts_pc[i, theta_idx] = init_x_shift[theta_idx] + dx
-                net_y_shifts_pc[i, theta_idx] = init_y_shift[theta_idx] + dy
+                # net_x_shifts_pc[i, theta_idx] = init_x_shift[theta_idx] + dx
+                # net_y_shifts_pc[i, theta_idx] = init_y_shift[theta_idx] + dy
+                
+                net_x_shifts_pc[i, theta_idx] += dx
+                net_y_shifts_pc[i, theta_idx] += dy
             
             else:
                 net_x_shifts_pc[i, theta_idx] = net_x_shifts_pc[i - 1, theta_idx] + dx
@@ -443,8 +506,8 @@ def iter_reproj(ref_element,
                                                              synth_proj[theta_idx_pair[0]], 
                                                              tol = 0.01) for theta_idx_pair in theta_idx_pairs])
 
-        center_of_rotation_exp = center_of_rotation_array_exp[-2] 
-        center_of_rotation_synth = center_of_rotation_array_synth[-2]
+        center_of_rotation_exp = center_of_rotation_array_exp[-1] 
+        center_of_rotation_synth = center_of_rotation_array_synth[-1]
 
         print(f'Post-jitter correction COR (exp.): {center_of_rotation_exp}')
         print(f'Post-jitter correction COR (synth.): {center_of_rotation_synth}')
@@ -499,7 +562,7 @@ output_dir_path_base = '/home/bwr0835'
 # output_file_name_base = 'gridrec_5_iter_vacek_cor_and_shift_correction_padding_-22_deg_158_deg'
 # output_file_name_base = 'xrt_mlem_1_iter_no_shift_no_log_tomopy_default_cor_w_padding_07_03_2025'
 # output_file_name_base = 'xrt_mlem_1_iter_manual_shift_-20_no_log_tomopy_default_cor_w_padding_07_09_2025'
-output_file_name_base = 'xrt_gridrec_1_iter_tomo_find_center_correction_no_log_w_padding_07_14_2025'
+output_file_name_base = 'xrt_gridrec_1_iter_tomo_find_center_pc_correction_init_shift_-20_no_log_w_padding_07_14_2025'
 # output_file_name_base = 'xrt_gridrec_1_iter_no_shift_no_log_tomopy_default_cor_w_padding_07_03_2025'
 
 if output_file_name_base == '':
@@ -540,8 +603,8 @@ n_slices = counts_xrt.shape[2]
 # n_theta = counts_xrf.shape[1]
 # n_slices = counts_xrf.shape[2]
 
-# init_x_shift = -20*np.ones(n_theta)
-init_x_shift = 0
+init_x_shift = -20*np.ones(n_theta)
+# init_x_shift = 0
 
 n_desired_iter = 1 # For the reprojection scheme, NOT for reconstruction by itself
 
