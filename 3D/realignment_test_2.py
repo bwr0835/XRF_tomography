@@ -59,9 +59,6 @@ def pad_row(array):
     return array
 
 def edge_gauss_filter(image, sigma, alpha, nx, ny):
-    
-    import numpy as np
-
     n_rolloff = int(0.5 + alpha*sigma)
     
     if n_rolloff > 2:
@@ -331,33 +328,33 @@ def iter_reproj(ref_element,
                                                             #  tol = 0.01) for theta_idx_pair in theta_idx_pairs]) 
                                                           # The second image is flipped about the vertical axis within the TomoPy function
     
-    # center_of_rotation = np.mean(center_of_rotation_array)
+    center_of_rotation = tomo.find_center(xrf_proj_img_array[ref_element_idx], theta_array, tol = 0.05)
 
     # plt.plot(np.arange(len(center_of_rotation_array)), center_of_rotation_array, 'o', markersize = 3)
     # plt.plot(np.arange(len(center_of_rotation_array)), center_of_rotation*np.ones(len(center_of_rotation_array)))
 
     # plt.show()
         
-    # center_geom = (n_columns - 1)/2
+    center_geom = (n_columns - 1)/2
     
-    # offset = center_of_rotation - center_geom
+    offset = center_of_rotation - center_geom
 
-    # print(f'Center of rotation via phase cross-correlation: {round_correct(center_of_rotation, ndec = 3)}')
-    # print(f'Geometric center: {center_geom}')
-    # print(f'Center of rotation error: {offset}')
-    # print(f'Incorporating x-shift = {-offset} to all projection images...')
+    print(f'Center of rotation via phase cross-correlation: {round_correct(center_of_rotation, ndec = 3)}')
+    print(f'Geometric center: {center_geom}')
+    print(f'Center of rotation error: {offset}')
+    print(f'Incorporating x-shift = {-offset} to all projection images...')
 
-    # for element_idx in range(n_elements):
-    #     for theta_idx in range(n_theta):
-    #         xrf_proj_img_array[element_idx, theta_idx] = ndi.shift(xrf_proj_img_array[element_idx, theta_idx], shift = (0, -offset))
+    for element_idx in range(n_elements):
+        for theta_idx in range(n_theta):
+            xrf_proj_img_array[element_idx, theta_idx] = ndi.shift(xrf_proj_img_array[element_idx, theta_idx], shift = (0, -offset))
 
     # center_of_rotation_array = np.array([tomo.find_center_pc(xrf_proj_img_array[ref_element_idx, theta_idx_pair[0]], 
     #                                                 xrf_proj_img_array[ref_element_idx, theta_idx_pair[1]], 
     #                                                 tol = 0.01) for theta_idx_pair in theta_idx_pairs])
     
-    # center_of_rotation = np.mean(center_of_rotation_array)
+    center_of_rotation = tomo.find_center(xrf_proj_img_array[ref_element_idx])
     
-    # print(f'New center of rotation: {center_of_rotation}')
+    print(f'New center of rotation: {center_of_rotation}')
     print('Performing iterative reprojection...')
 
     for i in range(n_iterations):
@@ -435,6 +432,12 @@ def iter_reproj(ref_element,
                 print(f'Current x-shift: {round_correct(dx, ndec = 3)} (theta = {round_correct(theta_array[theta_idx], ndec = 1)})')
                 print(f'Current y-shift: {round_correct(dy, ndec = 3)}')
         
+        center_of_rotation_exp_img = tomo.find_center(aligned_proj, theta_array)
+        center_of_rotation_synth_img = tomo.find_center(synth_proj, theta_array)
+
+        print(f'Post-jitter correction COR (exp.): {center_of_rotation_exp_img}')
+        print(f'Post-jitter correction COR (synth.): {center_of_rotation_exp_img}')
+        
         if np.max(np.abs(dx_array_pc)) < eps and np.max(np.abs(dy_array_pc)) < eps:
             iterations = np.array(iterations)
            
@@ -484,8 +487,8 @@ output_dir_path_base = '/home/bwr0835'
 # output_file_name_base = input('Choose a base file name: ')
 # output_file_name_base = 'gridrec_5_iter_vacek_cor_and_shift_correction_padding_-22_deg_158_deg'
 # output_file_name_base = 'xrt_mlem_1_iter_no_shift_no_log_tomopy_default_cor_w_padding_07_03_2025'
-output_file_name_base = 'xrt_mlem_1_iter_manual_shift_-20_no_log_tomopy_default_cor_w_padding_07_09_2025'
-# output_file_name_base = 'xrt_gridrec_1_iter_manual_shift_20_no_log_tomopy_default_cor_w_padding_07_03_2025'
+# output_file_name_base = 'xrt_mlem_1_iter_manual_shift_-20_no_log_tomopy_default_cor_w_padding_07_09_2025'
+output_file_name_base = 'xrt_gridrec_1_iter_tomo_find_center_correction_no_log_w_padding_07_14_2025'
 # output_file_name_base = 'xrt_gridrec_1_iter_no_shift_no_log_tomopy_default_cor_w_padding_07_03_2025'
 
 if output_file_name_base == '':
@@ -526,12 +529,12 @@ n_slices = counts_xrt.shape[2]
 # n_theta = counts_xrf.shape[1]
 # n_slices = counts_xrf.shape[2]
 
-init_x_shift = -20*np.ones(n_theta)
-# init_x_shift = 0
+# init_x_shift = -20*np.ones(n_theta)
+init_x_shift = 0
 
 n_desired_iter = 1 # For the reprojection scheme, NOT for reconstruction by itself
 
-algorithm = 'mlem'
+algorithm = 'gridrec'
 
 # orig_proj_ref, \
 # aligned_proj_total, \

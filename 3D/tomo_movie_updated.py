@@ -93,9 +93,9 @@ def create_gif(tiff_filename_array, output_filepath, fps):
 
 # dir_path = filedialog.askdirectory(parent = root, title = 'Select directory containing alignment NPY files')
 
-# dir_path = '/home/bwr0835/iter_reproj/gridrec_5_iter_tomopy_cor_phase_corr_w_padding_04_28_2025'
+# dir_path = '/home/bwr0835/iter_reproj/xrt_gridrec_1_iter_no_shift_no_log_default_cor_w_padding'
 # dir_path = '/home/bwr0835/iter_reproj/xrt_mlem_1_iter_no_shift_no_log_tomopy_default_cor_w_padding_07_03_2025'
-dir_path = '/Users/bwr0835/Documents/xrt_mlem_1_iter_manual_shift_20_no_log_tomopy_default_cor_w_padding_07_03_2025'
+dir_path = '/Users/bwr0835/Documents/xrt_gridrec_1_iter_no_shift_no_log_tomopy_default_cor_w_padding_07_03_2025'
 
 if dir_path == "":
     print('No directory chosen. Exiting...')
