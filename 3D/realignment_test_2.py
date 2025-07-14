@@ -339,7 +339,7 @@ def iter_reproj(ref_element,
     
     offset = center_of_rotation - center_geom
 
-    print(f'Center of rotation via phase cross-correlation: {round_correct(center_of_rotation, ndec = 3)}')
+    print(f'Center of rotation: {round_correct(center_of_rotation, ndec = 3)}')
     print(f'Geometric center: {center_geom}')
     print(f'Center of rotation error: {offset}')
     print(f'Incorporating x-shift = {-offset} to all projection images...')
@@ -352,7 +352,7 @@ def iter_reproj(ref_element,
     #                                                 xrf_proj_img_array[ref_element_idx, theta_idx_pair[1]], 
     #                                                 tol = 0.01) for theta_idx_pair in theta_idx_pairs])
     
-    center_of_rotation = tomo.find_center(xrf_proj_img_array[ref_element_idx])
+    center_of_rotation = tomo.find_center(xrf_proj_img_array[ref_element_idx], theta_array, tol = 0.05)
     
     print(f'New center of rotation: {center_of_rotation}')
     print('Performing iterative reprojection...')
@@ -432,8 +432,8 @@ def iter_reproj(ref_element,
                 print(f'Current x-shift: {round_correct(dx, ndec = 3)} (theta = {round_correct(theta_array[theta_idx], ndec = 1)})')
                 print(f'Current y-shift: {round_correct(dy, ndec = 3)}')
         
-        center_of_rotation_exp_img = tomo.find_center(aligned_proj, theta_array)
-        center_of_rotation_synth_img = tomo.find_center(synth_proj, theta_array)
+        center_of_rotation_exp_img = tomo.find_center(aligned_proj, theta_array, tol = 0.05)[0]
+        center_of_rotation_synth_img = tomo.find_center(synth_proj, theta_array, tol = 0.05)[0]
 
         print(f'Post-jitter correction COR (exp.): {center_of_rotation_exp_img}')
         print(f'Post-jitter correction COR (synth.): {center_of_rotation_exp_img}')
