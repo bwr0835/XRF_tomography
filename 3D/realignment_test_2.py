@@ -358,7 +358,7 @@ def iter_reproj(ref_element,
 
             for element_idx in range(n_elements):
                 for theta_idx in range(n_theta):
-                    aligned_proj[theta_idx] = ndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx], shift = (init_y_shift[theta_idx], init_x_shift[theta_idx]))
+                    xrf_proj_img_array[element_idx, theta_idx] = ndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx], shift = (init_y_shift[theta_idx], init_x_shift[theta_idx]))
         
         elif np.any(init_x_shift):
             print('OK')
@@ -366,14 +366,14 @@ def iter_reproj(ref_element,
 
             for element_idx in range(n_elements):
                 for theta_idx in range(n_theta):
-                    aligned_proj[theta_idx] = ndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx], shift = (0, init_x_shift[theta_idx]))
+                    xrf_proj_img_array[element_idx, theta_idx] = ndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx], shift = (0, init_x_shift[theta_idx]))
                 
         else:
             # net_y_shifts_pc[0] = init_y_shift
 
             for element_idx in range(n_elements):
                 for theta_idx in range(n_theta):
-                    aligned_proj[theta_idx] = ndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx], shift = (init_x_shift[theta_idx], 0))
+                    xrf_proj_img_array[element_idx, theta_idx] = ndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx], shift = (init_y_shift[theta_idx], 0))
 
     theta_idx_pairs = find_theta_combos(theta_array, dtheta = 1)
 
