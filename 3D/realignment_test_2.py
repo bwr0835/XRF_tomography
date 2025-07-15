@@ -391,6 +391,7 @@ def iter_reproj(ref_element,
     # center_of_rotation = tomo.find_center(xrf_proj_img_array[ref_element_idx], theta_array, tol = 0.05)[0]
 
     print(center_of_rotation_array)
+    print(f'Average COR: {np.mean(np.array(center_of_rotation_array))}')
     center_of_rotation = center_of_rotation_array[-1]
 
     # plt.plot(np.arange(len(center_of_rotation_array)), center_of_rotation_array, 'o', markersize = 3)

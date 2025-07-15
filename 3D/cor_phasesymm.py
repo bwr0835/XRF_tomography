@@ -7,6 +7,7 @@ from matplotlib import pyplot as plt, animation as anim
 from tkinter import filedialog as fd
 # from h5_util import extract_h5_aggregate_xrt_data
 from scipy import fft
+from itertools import combinations as combos
 
 plt.rcParams['text.usetex'] = True
 plt.rcParams['font.family'] = 'serif'
@@ -45,11 +46,20 @@ def pad_row(array):
 
     return array
 
-def create_ref_pair_theta_idx_array(ref_pair_theta_array, theta_array):
-    ref_pair_theta_idx_1 = np.where(theta_array == ref_pair_theta_array[0])[0]
-    ref_pair_theta_idx_2 = np.where(theta_array == ref_pair_theta_array[1])[0]
+def find_theta_combos(theta_array_deg, dtheta):
+    '''
+    
+    Make sure angles are in degrees!
 
-    return np.array([ref_pair_theta_idx_1, ref_pair_theta_idx_2])
+    '''
+
+    theta_array_idx_pairs = list(combos(np.arange(len(theta_array_deg)), 2)) # Generate a list of all pairs of theta_array indices
+
+    valid_theta_idx_pairs = [(theta_idx_1, theta_idx_2) for theta_idx_1, theta_idx_2 in theta_array_idx_pairs 
+                             if (180 - dtheta <= np.abs(theta_array_deg[theta_idx_1] - theta_array_deg[theta_idx_2]) <= 180 + dtheta)]
+                            # Compound inequality syntax is acceptable in Python in certain cases
+
+    return valid_theta_idx_pairs
 
 def rot_center(theta_sum):
     """
@@ -61,39 +71,26 @@ def rot_center(theta_sum):
     Parameters
     ----------
     thetasum: array-like
-        2D theta-sum array (z,theta).
+        The 2D theta-sum array (z,theta).
 
     Returns
     -------
     COR: float
         The center of rotation.
     """
-    if theta_sum.ndim == 1:
-        T = fft.rfft(theta_sum)
 
-    # n_slices = theta_sum.shape[0]
-        n_columns = len(theta_sum)
-
-        real, imag = T[-1].real, T[-1].imag
-
+    T = fft.rfft(theta_sum.ravel())
     
-    # In a sinogram, a feature may be more positive or less positive than the background (i.e. X-ray fluorescence vs. X-ray absorption contrast).
-    # This can mess with T_phase --> multiply real, imag. components by sign function
-    else:
-        T = fft.rfft(theta_sum.ravel())
+    # Get components of the AC spatial frequency for axis perpendicular to rotation axis.
     
-        # # Get components of the AC spatial frequency for axis perpendicular to rotation axis.
-        n_columns = theta_sum.shape[-1]
-        
-        imag = T[theta_sum.shape[0]].imag
-        real = T[theta_sum.shape[0]].real
+    imag = T[theta_sum.shape[1]].imag
+    real = T[theta_sum.shape[1]].real
     
-        # Get phase of thetasum and return center of rotation.
+    # Get phase of thetasum and return center of rotation.
     
-    phase = (np.arctan2(imag*np.sign(real), real*np.sign(real)))
+    phase = np.arctan2(imag*np.sign(real), real*np.sign(real)) 
     
-    COR = n_columns*(1 - phase/np.pi)/2
-        # COR = theta_sum.shape[-1]*(1 - phase/np.pi)/2
+    COR = theta_sum.shape[-1]*(1 - phase/np.pi)/2
 
     return COR
 
@@ -128,24 +125,42 @@ if (n_slices % 2) or (n_columns % 2):
         n_columns += 1
 
 print(counts.shape)
-theta_sum = np.zeros((n_slices, n_columns))
+# for theta_idx in range(n_theta):
+    # counts[theta_idx] = ndi.shift(counts[theta_idx], shift = (0, -22.6328223508))
 
-proj_list = [counts[theta_idx, :, :] for theta_idx in range(n_theta)]
 
-for proj in proj_list:
-    theta_sum += proj
+cor_array = []
+# theta_sum = np.zeros((n_slices, n_columns))
+
+# proj_list = [counts[theta_idx, :, :] for theta_idx in range(n_theta)]
+
+# for proj in proj_list:
+    # theta_sum += proj
 
 # angle_pair = np.array([-22, 158])
-angle_pair = np.array([-4, ])
+# angle_pair = np.array([-22, 158])
 
-reflection_pair_idx_array_1 = create_ref_pair_theta_idx_array(angle_pair, theta_xrt)
+reflection_pair_idx_array = find_theta_combos(theta_xrt, dtheta = 1)
+# print(theta_xrt[reflection_pair_idx_array])
 
-sino = counts[:, n_slices//2, :]
+sino = counts
+
+for theta_idx in range(len(reflection_pair_idx_array)):
 # 
-slice_proj_neg_22 = sino[reflection_pair_idx_array_1[1], :]
-slice_proj_158 = np.flip(sino[reflection_pair_idx_array_1[0], :], axis = 1)
+    # slice_proj_neg_22 = np.flip(sino, axis = 1)[reflection_pair_idx_array[theta_idx][1]]
+    slice_proj_neg_22 = sino[reflection_pair_idx_array[theta_idx][0]]
+    slice_proj_158 = np.flip(sino, axis = 1)[reflection_pair_idx_array[theta_idx][1]]
+    # slice_proj_158 = (sino[reflection_pair_idx_array[theta_idx][0]])
 
-theta_sum = slice_proj_158 + slice_proj_neg_22
+    theta_sum = slice_proj_158 + slice_proj_neg_22
+
+    center_of_rotation = rot_center(theta_sum)
+
+    cor_array.append(center_of_rotation)
+
+    print(center_of_rotation)
+
+print(f'Mean COR = {np.mean(np.array(cor_array))}')
 
 # for slice_idx in range(n_slices):
     # theta_sum[slice_idx, :] = counts[reflection_pair_idx_array_1[0], slice_idx, :] + counts[reflection_pair_idx_array_1[1], slice_idx, :]
@@ -158,7 +173,7 @@ theta_sum = slice_proj_158 + slice_proj_neg_22
 #     # slice_proj_158 = np.flip(sino[reflection_pair_idx_array_1[0], :], axis = 1)
 #     slice_proj_158 = (sino[reflection_pair_idx_array_1[1], :])
 
-#     theta_sum[slice_idx, :] = slice_proj_neg_22 + slice_proj_158
+    # theta_sum[slice_idx, :] = slice_proj_neg_22 + slice_proj_158
 
 # theta_sum = proj_neg_22 + proj_158
 
@@ -168,11 +183,11 @@ theta_sum = slice_proj_158 + slice_proj_neg_22
 
 # theta_sum = np.sum(counts, axis = 0)
 
-center_of_rotation = rot_center(theta_sum)
+# center_of_rotation = rot_center(theta_sum)
 
 # center_of_rotation = tomo.find_center(counts, theta_xrf*np.pi/180, tol = 0.1)
 
-print(center_of_rotation)
+# print(center_of_rotation)
 
 # slice_desired_idx = 61
 
