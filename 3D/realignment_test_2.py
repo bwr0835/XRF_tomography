@@ -189,7 +189,7 @@ def find_theta_combos(theta_array_deg, dtheta):
 
     valid_theta_idx_pairs = [(theta_idx_1, theta_idx_2) for theta_idx_1, theta_idx_2 in theta_array_idx_pairs 
                              if (180 - dtheta <= np.abs(theta_array_deg[theta_idx_1] - theta_array_deg[theta_idx_2]) <= 180 + dtheta)]
-                            # Compound inequality syntax is acceptable in Python
+                            # Compound inequality syntax is acceptable in Python in certain cases
 
     return valid_theta_idx_pairs
 
@@ -608,8 +608,8 @@ n_slices = counts_xrt.shape[2]
 # n_theta = counts_xrf.shape[1]
 # n_slices = counts_xrf.shape[2]
 
-init_x_shift = -20*np.ones(n_theta)
-# init_x_shift = 0
+# init_x_shift = -20*np.ones(n_theta)
+init_x_shift = 0
 
 n_desired_iter = 1 # For the reprojection scheme, NOT for reconstruction by itself
 
