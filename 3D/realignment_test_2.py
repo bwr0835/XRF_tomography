@@ -402,7 +402,6 @@ def iter_reproj(ref_element,
         center_of_rotation_sum += center_of_rotation
 
     center_of_rotation_avg = center_of_rotation_sum/n_theta_pairs
-    center_of_rotation_avg_copy = center_of_rotation_avg.copy()
 
     print(f'Average COR: {(center_of_rotation_avg)}')
         
@@ -477,6 +476,7 @@ def iter_reproj(ref_element,
             center_of_rotation_sum += center_of_rotation
 
         center_of_rotation_avg = center_of_rotation_sum/n_theta_pairs
+        center_of_rotation_avg_copy = center_of_rotation_avg.copy()
         
         center_geom = (n_columns - 1)/2
     
@@ -511,6 +511,9 @@ def iter_reproj(ref_element,
         for theta_idx in range(n_theta):
             dy, dx = phase_correlate(synth_proj[theta_idx], aligned_proj[theta_idx], upsample_factor = 100)
 
+            dx_array_pc[theta_idx] = dx
+            dy_array_pc[theta_idx] = dy
+            
             if i == 0: 
                 # net_x_shifts_pc[i, theta_idx] = init_x_shift[theta_idx] + dx
                 # net_y_shifts_pc[i, theta_idx] = init_y_shift[theta_idx] + dy
