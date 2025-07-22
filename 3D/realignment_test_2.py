@@ -408,6 +408,7 @@ def iter_reproj(ref_element,
     center_geom = (n_columns - 1)/2
     
     offset = center_of_rotation_avg - center_geom
+    offset_copy = offset.copy()
 
     print(f'Average center of rotation: {round_correct(center_of_rotation_avg, ndec = 3)}')
     print(f'Geometric center: {center_geom}')
@@ -417,8 +418,6 @@ def iter_reproj(ref_element,
     for element_idx in range(n_elements):
         for theta_idx in range(n_theta):
             xrf_proj_img_array[element_idx, theta_idx] = ndi.shift(xrf_proj_img_array[element_idx, theta_idx], shift = (0, -offset))
-
-    net_x_shifts_pc[0] -= offset
 
     center_of_rotation_sum = 0
     
@@ -566,6 +565,8 @@ def iter_reproj(ref_element,
 
                     aligned_proj_total[element_idx, theta_idx] = ndi.shift(xrf_proj_img_array[element_idx, theta_idx], shift = (net_y_shift, net_x_shift))
             
+            net_x_shifts_pc_new -= offset_copy
+
             print('Done')
 
             break
@@ -584,6 +585,8 @@ def iter_reproj(ref_element,
                         
                     aligned_proj_total[element_idx, theta_idx] = ndi.shift(xrf_proj_img_array[element_idx, theta_idx], shift = (net_y_shift, net_x_shift))
 
+            net_x_shifts_pc_new -= offset_copy
+            
             print('Done')
 
     aligned_exp_proj_array = np.array(aligned_exp_proj_array)
