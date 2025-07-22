@@ -484,7 +484,7 @@ def iter_reproj(ref_element,
 
         print(f'New average center of rotation after jitter correction attempt: {round_correct(center_of_rotation_avg, ndec = 3)}')
         print(f'Geometric center: {center_geom}')
-        print(f'Center of rotation error: {round_correct(offset, ndec= 3)}')
+        print(f'Center of rotation error: {round_correct(offset, ndec = 3)}')
         
         if algorithm == 'gridrec':
             recon = tomo.recon(aligned_proj, theta_array*np.pi/180, center = center_of_rotation_avg_copy, algorithm = algorithm, filter_name = 'ramlak')
