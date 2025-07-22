@@ -397,7 +397,7 @@ def iter_reproj(ref_element,
 
         center_of_rotation = rot_center(theta_sum)
 
-        print(f'Center of rotation ({theta_array[theta_pair_idx[0]]} degrees, {theta_array[theta_pair_idx[1]]} degrees) = {center_of_rotation}')
+        print(f'Center of rotation ({theta_array[theta_pair_idx[0]]} degrees, {theta_array[theta_pair_idx[1]]} degrees) = {round_correct(center_of_rotation, ndec = 3)}')
 
         center_of_rotation_sum += center_of_rotation
 
@@ -427,7 +427,7 @@ def iter_reproj(ref_element,
 
         center_of_rotation = rot_center(theta_sum)
 
-        print(f'New center of rotation ({theta_array[theta_pair_idx[0]]} degrees, {theta_array[theta_pair_idx[1]]} degrees) = {center_of_rotation}')
+        print(f'New center of rotation ({theta_array[theta_pair_idx[0]]} degrees, {theta_array[theta_pair_idx[1]]} degrees) = {round_correct(center_of_rotation, ndec = 3)}')
 
         center_of_rotation_sum += center_of_rotation
 
@@ -472,7 +472,7 @@ def iter_reproj(ref_element,
 
             center_of_rotation = rot_center(theta_sum)
 
-            print(f'New center of rotation after jitter correction attempt ({theta_array[theta_pair_idx[0]]} degrees, {theta_array[theta_pair_idx[1]]} degrees) = {center_of_rotation}')
+            print(f'New center of rotation after jitter correction attempt ({theta_array[theta_pair_idx[0]]} degrees, {theta_array[theta_pair_idx[1]]} degrees) = {round_correct(center_of_rotation, ndec = 3)}')
 
             center_of_rotation_sum += center_of_rotation
 
@@ -529,24 +529,24 @@ def iter_reproj(ref_element,
                 print(f'Current x-shift: {round_correct(dx, ndec = 3)} (theta = {round_correct(theta_array[theta_idx], ndec = 1)})')
                 print(f'Current y-shift: {round_correct(dy, ndec = 3)}')
 
-            for theta_pair_idx in theta_idx_pairs:
-                theta_sum = synth_proj[theta_pair_idx[0]] + synth_proj[theta_pair_idx[1]]
+        for theta_pair_idx in theta_idx_pairs:
+            theta_sum = synth_proj[theta_pair_idx[0]] + synth_proj[theta_pair_idx[1]]
 
-                center_of_rotation = rot_center(theta_sum)
+            center_of_rotation = rot_center(theta_sum)
 
-                print(f'Synthetic center of rotation ({theta_array[theta_pair_idx[0]]} degrees, {theta_array[theta_pair_idx[1]]} degrees) = {center_of_rotation}')
+            print(f'Synthetic center of rotation ({theta_array[theta_pair_idx[0]]} degrees, {theta_array[theta_pair_idx[1]]} degrees) = {round_correct(center_of_rotation, ndec = 3)}')
 
-                center_of_rotation_sum += center_of_rotation
+            center_of_rotation_sum += center_of_rotation
 
-            center_of_rotation_avg = center_of_rotation_sum/n_theta_pairs
+        center_of_rotation_avg = center_of_rotation_sum/n_theta_pairs
         
-            center_geom = (n_columns - 1)/2
+        center_geom = (n_columns - 1)/2
     
-            offset = center_of_rotation - center_geom
+        offset = center_of_rotation - center_geom
 
-            print(f'Average synthetic center of rotation after jitter correction attempt: {round_correct(center_of_rotation_avg, ndec = 3)}')
-            print(f'Geometric center: {center_geom}')
-            print(f'Center of rotation error: {round_correct(offset, ndec = 3)}')
+        print(f'Average synthetic center of rotation after jitter correction attempt: {round_correct(center_of_rotation_avg, ndec = 3)}')
+        print(f'Geometric center: {center_geom}')
+        print(f'Center of rotation error: {round_correct(offset, ndec = 3)}')
         
         if np.max(np.abs(dx_array_pc)) < eps and np.max(np.abs(dy_array_pc)) < eps:
             iterations = np.array(iterations)
@@ -642,7 +642,7 @@ n_slices = counts_xrt.shape[2]
 # init_x_shift = -20*np.ones(n_theta)
 init_x_shift = 0
 
-n_desired_iter = 1 # For the reprojection scheme, NOT for reconstruction by itself
+n_desired_iter = 5 # For the reprojection scheme, NOT for reconstruction by itself
 
 algorithm = 'gridrec'
 
