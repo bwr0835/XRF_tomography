@@ -431,10 +431,11 @@ def iter_reproj(ref_element,
         center_of_rotation_sum += center_of_rotation
 
     center_of_rotation_avg = center_of_rotation_sum/n_theta_pairs
+    center_of_rotation_avg_copy = center_of_rotation_avg.copy()
         
     center_geom = (n_columns - 1)/2
     
-    offset = center_of_rotation - center_geom
+    offset = center_of_rotation_avg - center_geom
 
     print(f'New average center of rotation: {round_correct(center_of_rotation_avg, ndec = 3)}')
     print(f'Geometric center: {center_geom}')
@@ -476,11 +477,10 @@ def iter_reproj(ref_element,
             center_of_rotation_sum += center_of_rotation
 
         center_of_rotation_avg = center_of_rotation_sum/n_theta_pairs
-        center_of_rotation_avg_copy = center_of_rotation_avg.copy()
         
         center_geom = (n_columns - 1)/2
     
-        offset = center_of_rotation - center_geom
+        offset = center_of_rotation_avg - center_geom
 
         print(f'New average center of rotation after jitter correction attempt: {round_correct(center_of_rotation_avg, ndec = 3)}')
         print(f'Geometric center: {center_geom}')
@@ -544,7 +544,7 @@ def iter_reproj(ref_element,
         
         center_geom = (n_columns - 1)/2
     
-        offset = center_of_rotation - center_geom
+        offset = center_of_rotation_avg - center_geom
 
         print(f'Average synthetic center of rotation after jitter correction attempt: {round_correct(center_of_rotation_avg, ndec = 3)}')
         print(f'Geometric center: {center_geom}')
