@@ -465,7 +465,7 @@ def iter_reproj(ref_element,
 
         print(aligned_proj.shape)
         
-        center_of_rotation = 0
+        center_of_rotation_sum = 0
 
         for theta_pair_idx in theta_idx_pairs:
             theta_sum = aligned_proj[theta_pair_idx[0]] + aligned_proj[theta_pair_idx[1]]
