@@ -198,7 +198,12 @@ slice_idx_desired = 75
 
 theta_idx_pairs = find_theta_combos(theta_array, dtheta = 1)
 
+# offset = 9.896418493522106
+offset = 0
+
 for theta_idx in range(n_theta):
+    orig_exp_proj[theta_idx] = ndi.shift(orig_exp_proj[theta_idx], shift = (0, -offset))
+
     aligned_proj_theta_array_aux.append(aligned_proj_iter_array[iter_idx_desired][theta_idx])
     aligned_proj_theta_array_aux_2.append(aligned_proj_iter_array[-1][theta_idx])
     synth_proj_theta_array_aux.append(synth_proj_iter_array[iter_idx_desired][theta_idx])
@@ -241,9 +246,9 @@ for iter_idx in range(n_iter):
     rgb_proj_iter_array.append(rgb)
     recon_iter_array_aux.append(recon_iter_array[iter_idx][slice_idx_desired])
 
-for slice_idx in range(n_slices):
-    recon_slice_array_aux.append(recon_iter_array[iter_idx_desired][slice_idx])
-    recon_slice_array_aux_2.append(recon_iter_array[-1][slice_idx])
+# for slice_idx in range(n_slices):
+    # recon_slice_array_aux.append(recon_iter_array[iter_idx_desired][slice_idx])
+    # recon_slice_array_aux_2.append(recon_iter_array[-1][slice_idx])
 
 aligned_proj_theta_array_aux = np.array(aligned_proj_theta_array_aux)
 aligned_proj_theta_array_aux_red = np.array(aligned_proj_theta_array_aux_red)
@@ -273,6 +278,11 @@ fps_plots = 15
 # shift_2 = (0, -shift)
 # shift_3 = (0, shift/2)
 # shift_4 = (0, -shift/2)
+
+# plt.plot(scan_pos_array, orig_exp_proj[theta_idx_pairs[0][0], slice_idx_desired], 'k', label = r'$\theta = {0}$\textdegree'.format(theta_array[theta_idx_pairs[0][0]]))
+# plt.plot(scan_pos_array, np.flip(orig_exp_proj[theta_idx_pairs[0][0], slice_idx_desired]), 'r', label = r'$\theta = {0}$\textdegree (flipped)'.format(theta_array[theta_idx_pairs[0][0]])) # Flip 1D array directly
+# plt.legend()
+# plt.show()
 
 # fig1, axs1 = plt.subplots(2, 3) # Aligned experimental projection, synthetic experimental projection, overlays at different angles
 # fig2, axs2 = plt.subplots(1, 3) # Same as above, but for different iterations - use first projection angle
@@ -319,12 +329,12 @@ curve8, = axs9.plot(scan_pos_array, orig_exp_proj[0, slice_idx_desired], 'k', la
 # curve11, = axs9[1].plot(scan_pos_array, synth_proj_theta_array_aux_2[0][slice_idx_desired], 'r', label = r'Reprojected')
 
 # slice_idx_desired = [54, 64, 151]
-slice_idx_desired = 64
+slice_idx_desired = 151
 
 # curve12, = axs10.plot(scan_pos_array, ndi.shift(aligned_proj_theta_array_aux[theta_idx_pairs[0][0]], shift = shift_1)[slice_idx_desired[0]], 'k', label = r'$\theta = {0}$\textdegree'.format(theta_array[theta_idx_pairs[0][0]]))
 curve12, = axs10.plot(scan_pos_array, orig_exp_proj[theta_idx_pairs[0][0], slice_idx_desired], 'k', label = r'$\theta = {0}$\textdegree'.format(theta_array[theta_idx_pairs[0][0]]))
-# curve13, = axs10.plot(scan_pos_array, orig_exp_proj[theta_idx_pairs[0][1], slice_idx_desired], 'r', label = r'$\theta = {0}$\textdegree'.format(theta_array[theta_idx_pairs[0][1]]))
-curve13, = axs10.plot(scan_pos_array, np.flip(orig_exp_proj, axis = 1)[theta_idx_pairs[0][1], slice_idx_desired], 'r', label = r'$\theta = {0}$\textdegree'.format(theta_array[theta_idx_pairs[0][1]]))
+curve13, = axs10.plot(scan_pos_array, orig_exp_proj[theta_idx_pairs[0][1], slice_idx_desired], 'r', label = r'$\theta = {0}$\textdegree'.format(theta_array[theta_idx_pairs[0][1]]))
+# curve13, = axs10.plot(scan_pos_array, np.flip(orig_exp_proj[theta_idx_pairs[0][1], slice_idx_desired]), 'r', label = r'$\theta = {0}$\textdegree'.format(theta_array[theta_idx_pairs[0][1]]))
 # curve13, = axs10.plot(scan_pos_array, ndi.shift(aligned_proj_theta_array_aux[theta_idx_pairs[0][1]], shift = shift_1)[slice_idx_desired[0]], 'r', label = r'$\theta = {0}$\textdegree'.format(theta_array[theta_idx_pairs[0][1]]))
 # curve14, = axs11.plot(scan_pos_array, ndi.shift(aligned_proj_theta_array_aux[theta_idx_pairs[0][0]], shift = shift_1)[slice_idx_desired[0]], 'k', label = r'$\theta = {0}$\textdegree'.format(theta_array[theta_idx_pairs[0][0]]))
 # curve15, = axs11.plot(scan_pos_array, np.flip(ndi.shift(aligned_proj_theta_array_aux[theta_idx_pairs[0][1]], shift = shift_2))[slice_idx_desired[0]], 'r', label = r'$\theta = {0}$\textdegree'.format(theta_array[theta_idx_pairs[0][1]]))
@@ -375,7 +385,7 @@ curve13, = axs10.plot(scan_pos_array, np.flip(orig_exp_proj, axis = 1)[theta_idx
 # fig8.suptitle(r'$\theta = {0}$\textdegree; Slice index {1}'.format(theta_array[theta_idx_desired], slice_idx_desired))exp_slice_proj_intensity_theta_iter_1 = aligned_proj_theta_array_aux[theta_idx][slice_idx_desired]
 
 # exp_slice_proj_intensity_theta_iter_1 = aligned_proj_theta_array_aux[0][slice_idx_desired]
-orig_exp_proj_intensity_theta_iter_1 = orig_exp_proj[0, slice_idx]
+orig_exp_proj_intensity_theta_iter_1 = orig_exp_proj[0, slice_idx_desired]
 synth_slice_proj_intensity_theta_iter_1 = synth_proj_theta_array_aux[0][slice_idx_desired]
 
 min_intensity_theta_iter_1 = np.nanmin([np.nanmin(orig_exp_proj_intensity_theta_iter_1), np.min(synth_slice_proj_intensity_theta_iter_1)])
@@ -413,7 +423,8 @@ axs10.set_xlim(100, 500)
 axs10.set_ylim(0, 9e5)
 axs10.minorticks_on()
 # axs10.set_title(r'Abs. COR shift = {0}; Slice index {1}'.format(shift, slice_idx_desired[0]))
-axs10.set_title(r'No COR shift, 2nd angle flipped')
+# axs10.set_title(r'Shift $\sim$ -9.90 (Slice {0})'.format(slice_idx_desired))
+axs10.set_title(r'No COR shift (Slice {0})'.format(slice_idx_desired))
 axs10.set_xlabel(r'Scan position index')
 axs10.set_ylabel(r'Intensity (a.u.)')
 
@@ -580,7 +591,7 @@ for slice_idx in slice_idx_desired:
     # axs10.set_title(r'Abs. COR-shift = {0}; Slice index {1}'.format(shift, slice_idx))
     # axs10.set_title(r'No shift, 2nd angle flipped')
 #     axs11.set_title(r'Abs. COR-shift = {0} (2nd angle data flipped); Slice index {1}'.format(shift, slice_idx))
-    if slice_idx == 64:
+    if slice_idx == 151:
         for theta_pair_idx in range(len(theta_idx_pairs)):
             legend_10.remove()
             # legend_11.remove()
@@ -589,8 +600,8 @@ for slice_idx in slice_idx_desired:
             theta_idx_2 = theta_idx_pairs[theta_pair_idx][1]
 
             exp_slice_proj_intensity_theta_1 = orig_exp_proj[theta_idx_1, slice_idx]
-            # exp_slice_proj_intensity_theta_2 = orig_exp_proj[theta_idx_2, slice_idx]
-            exp_slice_proj_intensity_theta_2 = np.flip(orig_exp_proj, axis = 1)[theta_idx_2, slice_idx]
+            exp_slice_proj_intensity_theta_2 = orig_exp_proj[theta_idx_2, slice_idx]
+            # exp_slice_proj_intensity_theta_2 = np.flip(orig_exp_proj[theta_idx_2, slice_idx])
 
         # exp_slice_proj_intensity_theta_1 = ndi.shift(orig_exp_proj[theta_idx_1], shift = shift_1)[slice_idx]
         # exp_slice_proj_intensity_theta_2 = ndi.shift(orig_exp_proj[theta_idx_2], shift = shift_1)[slice_idx]
@@ -611,13 +622,13 @@ for slice_idx in slice_idx_desired:
 #         curve15.set_ydata(exp_slice_proj_intensity_theta_3)
 #         curve15.set_label(r'$\theta = {0}$\textdegree'.format(theta_array[theta_idx_2]))
 
-            # axs10.set_ylim(min_slice_proj_intensity, max_slice_proj_intensity)
+            axs10.set_ylim(min_slice_proj_intensity, max_slice_proj_intensity)
 #         axs11.set_ylim(min_slice_proj_intensity, max_slice_proj_intensity)
 
             legend_10 = axs10.legend(frameon = False)
         # legend_11 = axs11.legend(frameon = False)
 
-            filename_10 = os.path.join(dir_path, f'slice_proj_theta_pair_{theta_pair_idx:03d}_orig_no_shift_second_ang_flipped.tiff')
+            filename_10 = os.path.join(dir_path, f'slice_proj_theta_pair_{theta_pair_idx:03d}_orig_no_shift.tiff')
         # filename_10 = os.path.join(dir_path, f'slice_proj_theta_pair_{theta_pair_idx:03d}_orig_abs_shift_{shift}.tiff')
 #         filename_11 = os.path.join(dir_path, f'slice_proj_theta_pair_{theta_pair_idx:03d}_orig_abs_shift_{shift}_second_ang_flipped.tiff')
 
@@ -628,9 +639,11 @@ for slice_idx in slice_idx_desired:
             tiff_array_10.append(filename_10)
 #         tiff_array_11.append(filename_11)
 
-        print('Creating slice projection GIF (changing theta pair, 2nd angle flipped)...')
+        print('Creating slice projection GIF (changing theta pair, shift ~ -9.90)...')
+        # print('Creating slice projection GIF (changing theta pair, no shift)...')
 
-        create_gif(tiff_array_10, os.path.join(dir_path, f'slice_proj_theta_pair_slice_idx_{slice_idx:03d}_2nd_ang_flipped.gif'), fps = 15)
+        # create_gif(tiff_array_10, os.path.join(dir_path, f'slice_proj_theta_pair_slice_idx_{slice_idx:03d}_shift_-9_90.gif'), fps = 15)
+        create_gif(tiff_array_10, os.path.join(dir_path, f'slice_proj_theta_pair_slice_idx_{slice_idx:03d}.gif'), fps = 15)
 
 #     print('Creating slice projection GIF (changing theta pair; data for second angle flipped)...')
 
@@ -682,7 +695,7 @@ create_gif(tiff_array_9, os.path.join(dir_path, 'slice_proj_theta_slice_idx_64.g
 
 # print('Creating slice projection GIF (changing theta pair)...')
 
-# create_gif(tiff_array_10, os.path.join(dir_path, f'slice_proj_theta_pair_slice_idx_{slice_idx_desired[1]:03d}_2nd_ang_flipped.gif'), fps = 15)
+# create_gif(tiff_array_10, os.path.join(dir_path, f'slice_proj_theta_pair_slice_idx_{slice_idx_desired[1]:03d}_shift_-9_90.gif'), fps = 15)
 
 # print('Creating slice projection GIF (changing theta pair; data for second angle flipped)...')
 

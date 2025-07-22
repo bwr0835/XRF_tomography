@@ -13,6 +13,11 @@ plt.rcParams['text.usetex'] = True
 plt.rcParams['font.family'] = 'serif'
 plt.rcParams['text.latex.preamble'] = r'\usepackage{times}'
 
+plt.rcParams['xtick.major.size'] = 9
+plt.rcParams['xtick.minor.size'] = 4.5
+plt.rcParams['ytick.major.size'] = 9
+plt.rcParams['ytick.minor.size'] = 4.5
+
 def pad_col_row(array):
     array_new = np.zeros((array.shape[0], array.shape[1] + 1, array.shape[2] + 1))
 
@@ -61,7 +66,8 @@ def find_theta_combos(theta_array_deg, dtheta):
 
     return valid_theta_idx_pairs
 
-def rot_center(theta_sum):
+# def rot_center(theta_sum):
+def rot_center(theta_sum, slice_idx_desired): # Use only with F. Marin's code
     """
     Code written by E. Vacek (2021): 
     https://github.com/everettvacek/PhaseSymmetry/blob/master/PhaseSymmetry.py
@@ -71,28 +77,65 @@ def rot_center(theta_sum):
     Parameters
     ----------
     thetasum: array-like
-        The 2D theta-sum array (z,theta).
+        2D theta-sum array (Nz,Nt).
+
+        Nz = number of slices
+        Nt = number of scan positions
 
     Returns
     -------
     COR: float
         The center of rotation.
     """
+    
+    # Nz = theta_sum.shape[0]
+    # Nt = theta_sum.shape[1]
 
-    T = fft.rfft(theta_sum.ravel())
-    
-    # Get components of the AC spatial frequency for axis perpendicular to rotation axis.
-    
-    imag = T[theta_sum.shape[1]].imag
-    real = T[theta_sum.shape[1]].real
-    
+    # T = fft.rfft(theta_sum.ravel()) # Real FFT (no negative frequencies) of flattened 2D array of length Nt*Nz ('C'/row-major order)
+
+    # Get real, imaginary components of the first AC spatial frequency for axis perpendicular to rotation axis.
+    # Nt is the spatial period (there are Nt columns per row); Nz is the (fundamental) spatial frequency (thus, the first AC frequency)
+
+    # real = T[Nz].real
+    # imag = T[Nz].imag
+
     # Get phase of thetasum and return center of rotation.
     
-    phase = np.arctan2(imag*np.sign(real), real*np.sign(real)) 
-    
-    COR = theta_sum.shape[-1]*(1 - phase/np.pi)/2
+    # In a sinogram the feature may be more positive or less positive than the background (i.e. fluorescence vs
+    # absorption contrast). This can mess with the T_phase value so we multiply by the sign of the even function
+    # to account for this. (Comment from F. Marin's XRFTomo code)
 
-    return COR
+    # phase = np.arctan2(imag*np.sign(real), real*np.sign(real)) 
+    
+    # COR = Nt*(1 - phase/np.pi)/2 - 1/2 # Extra -1/2 since Python starts indexing at zero
+
+    # return COR
+
+    # # The bottom chunk of code is Fabricio's XRFTomo code if looking for phase ramp contributions for individual slices (????)
+    # # For total phase ramp (????), use second options when applicable (like for T and cor)
+    if theta_sum.ndim == 1:
+        theta_sum = theta_sum[None, :]
+    
+    T = fft.fft(theta_sum, axis = 1)
+    # T = np.sum(fft.fft(theta_sum, axis = 1), axis = 0)
+        
+    # # Collect real and imaginary coefficients.
+    
+    real, imag = T[:, 1].real, T[:, 1].imag
+    # real, imag = T[1].real, T[1].imag
+    
+    Nz = theta_sum.shape[0]
+    Nt = theta_sum.shape[1]
+   
+    T_phase = np.arctan2(imag*np.sign(real), real*np.sign(real))
+
+    cor = Nt*(1 - T_phase[slice_idx_desired]/(np.pi))/2 - 1/2
+    # cor = Nt*(1 - T_phase/(np.pi))/2 - 1/2
+
+    # print(cor)
+
+    return cor
+
 
 file_path_xrt = '/Users/bwr0835/Documents/2_ide_aggregate_xrt.h5'
 # output_path = '/home/bwr0835/cor_correction_proj_shift_array.npy'
@@ -124,7 +167,6 @@ if (n_slices % 2) or (n_columns % 2):
 
         n_columns += 1
 
-print(counts.shape)
 # for theta_idx in range(n_theta):
     # counts[theta_idx] = ndi.shift(counts[theta_idx], shift = (0, -22.6328223508))
 
@@ -143,52 +185,73 @@ cor_array = []
 reflection_pair_idx_array = find_theta_combos(theta_xrt, dtheta = 1)
 # print(theta_xrt[reflection_pair_idx_array])
 
+color_array = ['r', 'orange', 'gold', 'g', 'c', 'b', 'indigo', 'darkviolet', 'm', 'saddlebrown', 'gray', 'k']
+
 sino = counts
 
+fig1, axs1 = plt.subplots(2, 1, figsize = (11, 8))
+
+slice_idx_desired = 151
+
+# axs1[0].set_title(r'Slice {0}'.format(slice_idx_desired))
+# axs1[0].set_xlabel(r'Scan position index')
+# axs1[0].set_ylabel(r'$\theta$-sum')
+
+# axs1[1].set_title(r'Total'.format(slice_idx_desired))
+# axs1[1].set_xlabel(r'Scan position index')
+# axs1[1].set_ylabel(r'$\theta$-sum')
+
+# for theta_idx in range(len(reflection_pair_idx_array)):
+#     slice_proj_neg_22 = sino[reflection_pair_idx_array[theta_idx][0]]
+#     slice_proj_158 = (sino[reflection_pair_idx_array[theta_idx][1]])
+
+#     theta_sum = slice_proj_158 + slice_proj_neg_22
+
+#     center_of_rotation = rot_center(theta_sum, slice_idx_desired)
+
+#     print(center_of_rotation)
+
+#     cor_array.append(center_of_rotation)
+
+#     plt.plot(np.arange(n_columns), np.sum(theta_sum, axis = 0))
+    
+#     axs1[0].plot(np.arange(n_columns), theta_sum[slice_idx_desired], color = color_array[theta_idx], label = r'({0}\textdegree, {1}\textdegree)'.format(theta_xrt[reflection_pair_idx_array[theta_idx][0]], theta_xrt[reflection_pair_idx_array[theta_idx][1]]))
+#     axs1[1].plot(np.arange(n_columns), np.sum(theta_sum, axis = 0), color = color_array[theta_idx])
+
+
+# plt.show()
+
+# print(f'Mean COR = {cor_total/12}')
+
+
+
+# print(f'Mean COR = {np.mean(np.array(cor_array))}')
+
+# offset = np.mean(np.array(cor_array)) - (counts.shape[2]/2 - 1/2)
+
+offset = 9.896418493522106
+# offset = 0
+
+print(offset)
+
+for theta_idx in range(n_theta):
+    counts[theta_idx] = ndi.shift(counts[theta_idx], shift = (0, -offset))
+
+cor_array = []
+
 for theta_idx in range(len(reflection_pair_idx_array)):
-# 
-    # slice_proj_neg_22 = np.flip(sino, axis = 1)[reflection_pair_idx_array[theta_idx][1]]
     slice_proj_neg_22 = sino[reflection_pair_idx_array[theta_idx][0]]
-    slice_proj_158 = np.flip(sino, axis = 1)[reflection_pair_idx_array[theta_idx][1]]
-    # slice_proj_158 = (sino[reflection_pair_idx_array[theta_idx][0]])
+    slice_proj_158 = (sino[reflection_pair_idx_array[theta_idx][1]])
 
     theta_sum = slice_proj_158 + slice_proj_neg_22
 
-    center_of_rotation = rot_center(theta_sum)
-
-    cor_array.append(center_of_rotation)
+    center_of_rotation = rot_center(theta_sum, slice_idx_desired)
+    # center_of_rotation = tomo.find_center_pc(slice_proj_neg_22, slice_proj_158, tol = 0.01)
 
     print(center_of_rotation)
 
+    cor_array.append(center_of_rotation)
+
 print(f'Mean COR = {np.mean(np.array(cor_array))}')
 
-# for slice_idx in range(n_slices):
-    # theta_sum[slice_idx, :] = counts[reflection_pair_idx_array_1[0], slice_idx, :] + counts[reflection_pair_idx_array_1[1], slice_idx, :]
 
-# for slice_idx in range(n_slices):
-
-#     sino = counts[:, slice_idx, :]
-
-#     slice_proj_neg_22 = sino[reflection_pair_idx_array_1[0], :]
-#     # slice_proj_158 = np.flip(sino[reflection_pair_idx_array_1[0], :], axis = 1)
-#     slice_proj_158 = (sino[reflection_pair_idx_array_1[1], :])
-
-    # theta_sum[slice_idx, :] = slice_proj_neg_22 + slice_proj_158
-
-# theta_sum = proj_neg_22 + proj_158
-
-# theta_sum = (counts[reflection_pair_idx_array_1[0], :, :] + counts[reflection_pair_idx_array_1[1], :, :]).T
-# theta_sum = np.tile(theta_sum, (n_slices, n_columns))
-# theta_sum = counts[:, 0, :]
-
-# theta_sum = np.sum(counts, axis = 0)
-
-# center_of_rotation = rot_center(theta_sum)
-
-# center_of_rotation = tomo.find_center(counts, theta_xrf*np.pi/180, tol = 0.1)
-
-# print(center_of_rotation)
-
-# slice_desired_idx = 61
-
-# fps_images = 25
