@@ -487,7 +487,7 @@ def iter_reproj(ref_element,
         print(f'Center of rotation error: {round_correct(offset, ndec = 3)}')
         
         if algorithm == 'gridrec':
-            recon = tomo.recon(aligned_proj, theta_array*np.pi/180, center = center_of_rotation_avg_copy, algorithm = algorithm, filter_name = 'ramlak')
+            recon = tomo.recon(aligned_proj, theta_array*np.pi/180, algorithm = algorithm, filter_name = 'ramlak')
         
         elif algorithm == 'mlem':
             recon = tomo.recon(aligned_proj, theta_array*np.pi/180, algorithm = algorithm, num_iter = 60)
@@ -502,14 +502,19 @@ def iter_reproj(ref_element,
         for slice_idx in range(n_slices):
             print(f'Slice {slice_idx + 1}/{n_slices}')
 
-            # sinogram = (xform.radon(recon[slice_idx].copy(), theta_array)).T
-            sinogram = tomo.project(recon[slice_idx][None, :, :].copy(), theta_array*np.pi/180, center = center_of_rotation_avg_copy)[0]
+            sinogram = (xform.radon(recon[slice_idx].copy(), theta_array)).T
 
             synth_proj[:, slice_idx, :] = sinogram
         
         synth_proj_array.append(synth_proj.copy())
-
+        
         for theta_idx in range(n_theta):
+            if theta_idx % 7 == 0:
+                print(f"Iteration {i}, theta {theta_idx}:")
+                print(f"  aligned_proj mean: {aligned_proj[theta_idx].mean()}, std: {aligned_proj[theta_idx].std()}")
+                print(f"  synth_proj mean: {synth_proj[theta_idx].mean()}, std: {synth_proj[theta_idx].std()}")
+                print(f"  diff mean: {(synth_proj[theta_idx] - aligned_proj[theta_idx]).mean()}, std: {(synth_proj[theta_idx] - aligned_proj[theta_idx]).std()}")
+            
             dy, dx = phase_correlate(synth_proj[theta_idx], aligned_proj[theta_idx], upsample_factor = 100)
 
             dx_array_pc[theta_idx] = dx
@@ -649,7 +654,7 @@ n_slices = counts_xrt.shape[2]
 # init_x_shift = -20*np.ones(n_theta)
 init_x_shift = 0
 
-n_desired_iter = 5 # For the reprojection scheme, NOT for reconstruction by itself
+n_desired_iter = 2 # For the reprojection scheme, NOT for reconstruction by itself
 
 algorithm = 'gridrec'
 
