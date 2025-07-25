@@ -604,7 +604,7 @@ output_dir_path_base = '/home/bwr0835'
 # output_file_name_base = 'gridrec_5_iter_vacek_cor_and_shift_correction_padding_-22_deg_158_deg'
 # output_file_name_base = 'xrt_mlem_1_iter_no_shift_no_log_tomopy_default_cor_w_padding_07_03_2025'
 # output_file_name_base = 'xrt_mlem_1_iter_manual_shift_-20_no_log_tomopy_default_cor_w_padding_07_09_2025'
-output_file_name_base = 'xrt_gridrec_3_iter_ps_cor_correction_log_w_padding_07_25_2025'
+output_file_name_base = 'xrt_gridrec_3_iter_ps_cor_correction_no_log_w_padding_07_22_2025'
 # output_file_name_base = 'xrt_gridrec_1_iter_no_shift_no_log_tomopy_default_cor_w_padding_07_03_2025'
 
 if output_file_name_base == '':
@@ -632,12 +632,12 @@ desired_element_idx = elements_xrt.index(desired_element)
 
 nonzero_mask = counts_xrt[desired_element_idx] > 0
 
-phi_inc = 8.67768e5
-t_dwell_s = 0.01 
+# phi_inc = 8.67768e5
+# t_dwell_s = 0.01 
 
-counts_inc = phi_inc*t_dwell_s
+# counts_inc = phi_inc*t_dwell_s
 
-counts_xrt[desired_element_idx][nonzero_mask] = -np.log(counts_xrt[desired_element_idx][nonzero_mask]/counts_inc)
+# counts_xrt[desired_element_idx][nonzero_mask] = -np.log(counts_xrt[desired_element_idx][nonzero_mask]/counts_inc)
 
 # output_dir_path = filedialog.askdirectory(parent = root, title = "Choose directory to output NPY files to.")
 n_theta = counts_xrt.shape[1]
