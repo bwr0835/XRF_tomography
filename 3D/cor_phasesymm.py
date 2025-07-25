@@ -116,21 +116,21 @@ def rot_center(theta_sum, slice_idx_desired): # Use only with F. Marin's code
     if theta_sum.ndim == 1:
         theta_sum = theta_sum[None, :]
     
-    T = fft.fft(theta_sum, axis = 1)
-    # T = np.sum(fft.fft(theta_sum, axis = 1), axis = 0)
+    # T = fft.fft(theta_sum, axis = 1)
+    T = np.sum(fft.fft(theta_sum, axis = 1), axis = 0)
         
     # # Collect real and imaginary coefficients.
     
-    real, imag = T[:, 1].real, T[:, 1].imag
-    # real, imag = T[1].real, T[1].imag
+    # real, imag = T[:, 1].real, T[:, 1].imag
+    real, imag = T[1].real, T[1].imag
     
     Nz = theta_sum.shape[0]
     Nt = theta_sum.shape[1]
    
     T_phase = np.arctan2(imag*np.sign(real), real*np.sign(real))
 
-    cor = Nt*(1 - T_phase[slice_idx_desired]/(np.pi))/2 - 1/2
-    # cor = Nt*(1 - T_phase/(np.pi))/2 - 1/2
+    # cor = Nt*(1 - T_phase[slice_idx_desired]/(np.pi))/2 - 1/2
+    cor = Nt*(1 - T_phase/(np.pi))/2 - 1/2
 
     # print(cor)
 
@@ -167,29 +167,23 @@ if (n_slices % 2) or (n_columns % 2):
 
         n_columns += 1
 
-# for theta_idx in range(n_theta):
-    # counts[theta_idx] = ndi.shift(counts[theta_idx], shift = (0, -22.6328223508))
+phi_inc = 8.67768e5
+t_dwell_s = 0.01 
 
+counts_inc = phi_inc*t_dwell_s
+
+counts[counts > 0] = -np.log(counts[counts > 0]/counts_inc)
+# print(counts.shape)
 
 cor_array = []
-# theta_sum = np.zeros((n_slices, n_columns))
-
-# proj_list = [counts[theta_idx, :, :] for theta_idx in range(n_theta)]
-
-# for proj in proj_list:
-    # theta_sum += proj
-
-# angle_pair = np.array([-22, 158])
-# angle_pair = np.array([-22, 158])
 
 reflection_pair_idx_array = find_theta_combos(theta_xrt, dtheta = 1)
-# print(theta_xrt[reflection_pair_idx_array])
 
 color_array = ['r', 'orange', 'gold', 'g', 'c', 'b', 'indigo', 'darkviolet', 'm', 'saddlebrown', 'gray', 'k']
 
 sino = counts
 
-fig1, axs1 = plt.subplots(2, 1, figsize = (11, 8))
+# fig1, axs1 = plt.subplots(2, 1, figsize = (11, 8))
 
 slice_idx_desired = 151
 
@@ -229,8 +223,8 @@ slice_idx_desired = 151
 
 # offset = np.mean(np.array(cor_array)) - (counts.shape[2]/2 - 1/2)
 
-offset = 9.896418493522106
-# offset = 0
+# offset = 9.896418493522106
+offset = 0
 
 print(offset)
 
