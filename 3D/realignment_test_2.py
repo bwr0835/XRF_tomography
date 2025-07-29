@@ -525,7 +525,7 @@ def iter_reproj(ref_element,
                 print(f'Current x-shift: {round_correct(dx, ndec = 3)} (theta = {round_correct(theta_array[theta_idx], ndec = 1)})')
                 print(f'Current y-shift: {round_correct(dy, ndec = 3)}')
 
-        center_of_rotation_avg_synth, _, offset_synth = rot_center_avg(synth_proj_array, theta_idx_pairs, theta_array)
+        center_of_rotation_avg_synth, _, offset_synth = rot_center_avg(synth_proj, theta_idx_pairs, theta_array)
 
         print(f'Average synthetic center of rotation after jitter, dynamic COR correction attempts: {round_correct(center_of_rotation_avg_synth, ndec = 3)}')
         print(f'Geometric center: {center_geom}')
