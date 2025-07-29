@@ -474,16 +474,17 @@ def iter_reproj(ref_element,
                     
                     aligned_proj[theta_idx] = ndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx], shift = (net_y_shift, net_x_shift))
 
-                center_of_rotation_avg_new, _, offset_new = rot_center_avg(aligned_proj, theta_idx_pairs, theta_array)
+                center_of_rotation_avg, _, offset = rot_center_avg(aligned_proj, theta_idx_pairs, theta_array)
 
-                print(f'New average center of rotation after dynamic COR correction: {round_correct(center_of_rotation_avg_new, ndec = 3)}')
+                print(f'New average center of rotation after dynamic COR correction: {round_correct(center_of_rotation_avg, ndec = 3)}')
                 print(f'Geometric center: {center_geom}')
-                print(f'Center of rotation error: {round_correct(offset_new, ndec = 3)}')
+                print(f'Center of rotation error: {round_correct(offset, ndec = 3)}')
 
         aligned_exp_proj_array.append(aligned_proj.copy())
         
         if algorithm == 'gridrec':
-            recon = tomo.recon(aligned_proj, theta_array*np.pi/180, algorithm = algorithm, filter_name = 'ramlak')
+            # recon = tomo.recon(aligned_proj, theta_array*np.pi/180, algorithm = algorithm, filter_name = 'ramlak')
+            recon = tomo.recon(aligned_proj, theta_array*np.pi/180, center = center_of_rotation_avg, algorithm = algorithm, filter_name = 'ramlak')
         
         elif algorithm == 'mlem':
             recon = tomo.recon(aligned_proj, theta_array*np.pi/180, algorithm = algorithm, num_iter = 60)
