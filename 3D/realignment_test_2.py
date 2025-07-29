@@ -451,8 +451,8 @@ def iter_reproj(ref_element,
                     # print(f'Shifting projection by net x shift = {round_correct(net_x_shift, ndec = 3)} (theta = {round_correct(theta_array[theta_idx], ndec = 1)})...')
                     # print(f'Shifting projection by net y shift = {round_correct(net_y_shift, ndec = 3)}...')
 
-                    print(f'Shifting projection by x shift = {round_correct(net_x_shift, ndec = 3)} (theta = {round_correct(theta_array[theta_idx], ndec = 1)})...')
-                    print(f'Shifting projection by y shift = {round_correct(net_y_shift, ndec = 3)}...')
+                    print(f'Shifting projection by x shift = {round_correct(dx, ndec = 3)} (theta = {round_correct(theta_array[theta_idx], ndec = 1)})...')
+                    print(f'Shifting projection by y shift = {round_correct(dy, ndec = 3)}...')
 
                 # aligned_proj[theta_idx] = ndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx], shift = (net_y_shift, net_x_shift))
                 aligned_proj[theta_idx] = ndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx], shift = (dy, dx))
@@ -477,8 +477,8 @@ def iter_reproj(ref_element,
                         # print(f'Shifting projection by net x shift = {round_correct(net_x_shift, ndec = 3)} (theta = {round_correct(theta_array[theta_idx], ndec = 1)})...')
                         # print(f'Shifting projection by net y shift = {round_correct(net_y_shift, ndec = 3)}...')
                         
-                        print(f'Shifting projection by x shift = {round_correct(net_x_shift, ndec = 3)} (theta = {round_correct(theta_array[theta_idx], ndec = 1)})...')
-                        print(f'Shifting projection by y shift = {round_correct(net_y_shift, ndec = 3)}...')
+                        print(f'Shifting projection by x shift = {round_correct(dx - offset, ndec = 3)} (theta = {round_correct(theta_array[theta_idx], ndec = 1)})...')
+                        print(f'Shifting projection by y shift = {round_correct(dy, ndec = 3)}...')
                     
                     # aligned_proj[theta_idx] = ndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx], shift = (net_y_shift, net_x_shift))
                     aligned_proj[theta_idx] = ndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx], shift = (dy, dx))
