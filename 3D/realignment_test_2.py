@@ -425,7 +425,7 @@ def iter_reproj(ref_element,
         for theta_idx in range(n_theta):
             xrf_proj_img_array[element_idx, theta_idx] = ndi.shift(xrf_proj_img_array[element_idx, theta_idx], shift = (0, -offset))
 
-    center_of_rotation_avg, center_geom, offset = center_of_rotation_avg(xrf_proj_img_array[ref_element_idx], theta_idx_pairs, theta_array)
+    center_of_rotation_avg, center_geom, offset = rot_center_avg(xrf_proj_img_array[ref_element_idx], theta_idx_pairs, theta_array)
     
     offset_copy = offset.copy()
 
@@ -613,12 +613,12 @@ desired_element_idx = elements_xrt.index(desired_element)
 
 nonzero_mask = counts_xrt[desired_element_idx] > 0
 
-# phi_inc = 8.67768e5
-# t_dwell_s = 0.01 
+phi_inc = 8.67768e5
+t_dwell_s = 0.01 
 
-# counts_inc = phi_inc*t_dwell_s
+counts_inc = phi_inc*t_dwell_s
 
-# counts_xrt[desired_element_idx][nonzero_mask] = -np.log(counts_xrt[desired_element_idx][nonzero_mask]/counts_inc)
+counts_xrt[desired_element_idx][nonzero_mask] = -np.log(counts_xrt[desired_element_idx][nonzero_mask]/counts_inc)
 
 # output_dir_path = filedialog.askdirectory(parent = root, title = "Choose directory to output NPY files to.")
 n_theta = counts_xrt.shape[1]
