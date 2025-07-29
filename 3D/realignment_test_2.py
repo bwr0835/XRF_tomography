@@ -246,6 +246,28 @@ def rot_center(theta_sum):
 
     return COR
 
+def rot_center_avg(proj_img_array, theta_pair_array, theta_array):
+    n_columns = proj_img_array.shape[2]
+   
+    center_of_rotation_sum = 0
+    
+    for theta_pair in theta_pair_array:
+        theta_sum = proj_img_array[theta_pair[0]] + proj_img_array[theta_pair[1]]
+
+        center_of_rotation = rot_center(theta_sum)
+
+        print(f'Center of rotation ({theta_array[theta_pair[0]]} degrees, {theta_array[theta_pair[1]]} degrees) = {round_correct(center_of_rotation, ndec = 3)}')
+
+        center_of_rotation_sum += center_of_rotation
+    
+    center_rotation_avg = center_of_rotation_sum/len(theta_pair_array)
+
+    geom_center = (n_columns - 1)/2
+
+    offset = center_rotation_avg - geom_center
+
+    return center_rotation_avg, geom_center, offset
+
 def iter_reproj(ref_element,
                 element_array, 
                 theta_array, 
@@ -390,28 +412,12 @@ def iter_reproj(ref_element,
 
     n_theta_pairs = len(theta_idx_pairs)
 
-    center_of_rotation_sum = 0
-    
-    for theta_pair_idx in theta_idx_pairs:
-        theta_sum = xrf_proj_img_array[ref_element_idx, theta_pair_idx[0]] + xrf_proj_img_array[ref_element_idx, theta_pair_idx[1]]
-
-        center_of_rotation = rot_center(theta_sum)
-
-        print(f'Center of rotation ({theta_array[theta_pair_idx[0]]} degrees, {theta_array[theta_pair_idx[1]]} degrees) = {round_correct(center_of_rotation, ndec = 3)}')
-
-        center_of_rotation_sum += center_of_rotation
-
-    center_of_rotation_avg = center_of_rotation_sum/n_theta_pairs
+    center_of_rotation_avg, geom_center, offset = rot_center_avg(xrf_proj_img_array[ref_element_idx], theta_idx_pairs, theta_array)
 
     print(f'Average COR: {(center_of_rotation_avg)}')
-        
-    center_geom = (n_columns - 1)/2
-    
-    offset = center_of_rotation_avg - center_geom
-    offset_copy = offset.copy()
 
     print(f'Average center of rotation: {round_correct(center_of_rotation_avg, ndec = 3)}')
-    print(f'Geometric center: {center_geom}')
+    print(f'Geometric center: {geom_center}')
     print(f'Center of rotation error: {round_correct(offset, ndec = 3)}')
     print(f'Incorporating x-shift = {round_correct(-offset, ndec = 3)} to all projection images...')
 
@@ -419,23 +425,9 @@ def iter_reproj(ref_element,
         for theta_idx in range(n_theta):
             xrf_proj_img_array[element_idx, theta_idx] = ndi.shift(xrf_proj_img_array[element_idx, theta_idx], shift = (0, -offset))
 
-    center_of_rotation_sum = 0
+    center_of_rotation_avg, center_geom, offset = center_of_rotation_avg(xrf_proj_img_array[ref_element_idx], theta_idx_pairs, theta_array)
     
-    for theta_pair_idx in theta_idx_pairs:
-        theta_sum = xrf_proj_img_array[ref_element_idx, theta_pair_idx[0]] + xrf_proj_img_array[ref_element_idx, theta_pair_idx[1]]
-
-        center_of_rotation = rot_center(theta_sum)
-
-        print(f'New center of rotation ({theta_array[theta_pair_idx[0]]} degrees, {theta_array[theta_pair_idx[1]]} degrees) = {round_correct(center_of_rotation, ndec = 3)}')
-
-        center_of_rotation_sum += center_of_rotation
-
-    center_of_rotation_avg = center_of_rotation_sum/n_theta_pairs
-    center_of_rotation_avg_copy = center_of_rotation_avg.copy()
-        
-    center_geom = (n_columns - 1)/2
-    
-    offset = center_of_rotation_avg - center_geom
+    offset_copy = offset.copy()
 
     print(f'New average center of rotation: {round_correct(center_of_rotation_avg, ndec = 3)}')
     print(f'Geometric center: {center_geom}')
@@ -460,31 +452,35 @@ def iter_reproj(ref_element,
                     print(f'Shifting projection by net y shift = {round_correct(net_y_shift, ndec = 3)}...')
 
                 aligned_proj[theta_idx] = ndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx], shift = (net_y_shift, net_x_shift))
+        
+            center_of_rotation_avg, center_geom, offset = rot_center_avg(aligned_proj, theta_idx_pairs, theta_array)
+
+            print(f'New average center of rotation: {round_correct(center_of_rotation_avg, ndec = 3)}')
+            print(f'Geometric center: {center_geom}')
+            print(f'Center of rotation error: {round_correct(offset, ndec = 3)}')
+
+            if offset != 0:
+                net_x_shifts_pc[i - 1, :] -= offset
+                
+                print(f'Incorporating x shift = {round_correct(-offset, ndec = 3)} to all projection images for reference element {element_array[ref_element_idx]}...')
+
+                for theta_idx in range(n_theta):
+                    net_x_shift = net_x_shifts_pc[i - 1, theta_idx]
+                    net_y_shift = net_y_shifts_pc[i - 1, theta_idx]
+
+                    if (theta_idx % 7) == 0:
+                        print(f'Shifting projection by net x shift = {round_correct(net_x_shift, ndec = 3)} (theta = {round_correct(theta_array[theta_idx], ndec = 1)})...')
+                        print(f'Shifting projection by net y shift = {round_correct(net_y_shift, ndec = 3)}...')
+                    
+                    aligned_proj[theta_idx] = ndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx], shift = (net_y_shift, net_x_shift))
+
+                center_of_rotation_avg_new, _, offset_new = rot_center_avg(aligned_proj, theta_idx_pairs, theta_array)
+
+                print(f'New average center of rotation after dynamic COR correction: {round_correct(center_of_rotation_avg_new, ndec = 3)}')
+                print(f'Geometric center: {center_geom}')
+                print(f'Center of rotation error: {round_correct(offset_new, ndec = 3)}')
 
         aligned_exp_proj_array.append(aligned_proj.copy())
-
-        print(aligned_proj.shape)
-        
-        center_of_rotation_sum = 0
-
-        for theta_pair_idx in theta_idx_pairs:
-            theta_sum = aligned_proj[theta_pair_idx[0]] + aligned_proj[theta_pair_idx[1]]
-
-            center_of_rotation = rot_center(theta_sum)
-
-            print(f'New center of rotation after jitter correction attempt ({theta_array[theta_pair_idx[0]]} degrees, {theta_array[theta_pair_idx[1]]} degrees) = {round_correct(center_of_rotation, ndec = 3)}')
-
-            center_of_rotation_sum += center_of_rotation
-
-        center_of_rotation_avg = center_of_rotation_sum/n_theta_pairs
-        
-        center_geom = (n_columns - 1)/2
-    
-        offset = center_of_rotation_avg - center_geom
-
-        print(f'New average center of rotation after jitter correction attempt: {round_correct(center_of_rotation_avg, ndec = 3)}')
-        print(f'Geometric center: {center_geom}')
-        print(f'Center of rotation error: {round_correct(offset, ndec = 3)}')
         
         if algorithm == 'gridrec':
             recon = tomo.recon(aligned_proj, theta_array*np.pi/180, algorithm = algorithm, filter_name = 'ramlak')
@@ -529,26 +525,11 @@ def iter_reproj(ref_element,
                 print(f'Current x-shift: {round_correct(dx, ndec = 3)} (theta = {round_correct(theta_array[theta_idx], ndec = 1)})')
                 print(f'Current y-shift: {round_correct(dy, ndec = 3)}')
 
-        center_of_rotation_sum = 0
+        center_of_rotation_avg_synth, _, offset_synth = rot_center_avg(synth_proj_array, theta_idx_pairs, theta_array)
 
-        for theta_pair_idx in theta_idx_pairs:
-            theta_sum = synth_proj[theta_pair_idx[0]] + synth_proj[theta_pair_idx[1]]
-
-            center_of_rotation = rot_center(theta_sum)
-
-            print(f'Synthetic center of rotation ({theta_array[theta_pair_idx[0]]} degrees, {theta_array[theta_pair_idx[1]]} degrees) = {round_correct(center_of_rotation, ndec = 3)}')
-
-            center_of_rotation_sum += center_of_rotation
-
-        center_of_rotation_avg = center_of_rotation_sum/n_theta_pairs
-        
-        center_geom = (n_columns - 1)/2
-    
-        offset = center_of_rotation_avg - center_geom
-
-        print(f'Average synthetic center of rotation after jitter correction attempt: {round_correct(center_of_rotation_avg, ndec = 3)}')
+        print(f'Average synthetic center of rotation after jitter, dynamic COR correction attempts: {round_correct(center_of_rotation_avg_synth, ndec = 3)}')
         print(f'Geometric center: {center_geom}')
-        print(f'Center of rotation error: {round_correct(offset, ndec = 3)}')
+        print(f'Center of rotation error: {round_correct(offset_synth, ndec = 3)}')
         
         if np.max(np.abs(dx_array_pc)) < eps and np.max(np.abs(dy_array_pc)) < eps:
             iterations = np.array(iterations)
@@ -604,7 +585,7 @@ output_dir_path_base = '/home/bwr0835'
 # output_file_name_base = 'gridrec_5_iter_vacek_cor_and_shift_correction_padding_-22_deg_158_deg'
 # output_file_name_base = 'xrt_mlem_1_iter_no_shift_no_log_tomopy_default_cor_w_padding_07_03_2025'
 # output_file_name_base = 'xrt_mlem_1_iter_manual_shift_-20_no_log_tomopy_default_cor_w_padding_07_09_2025'
-output_file_name_base = 'xrt_gridrec_6_iter_ps_cor_correction_no_log_w_padding_07_25_2025'
+output_file_name_base = 'xrt_gridrec_3_iter_dynamic_ps_cor_correction_no_log_w_padding_07_29_2025'
 # output_file_name_base = 'xrt_gridrec_1_iter_no_shift_no_log_tomopy_default_cor_w_padding_07_03_2025'
 
 if output_file_name_base == '':
@@ -648,7 +629,7 @@ n_slices = counts_xrt.shape[2]
 # init_x_shift = -20*np.ones(n_theta)
 init_x_shift = 0
 
-n_desired_iter = 6 # For the reprojection scheme, NOT for reconstruction by itself
+n_desired_iter = 3 # For the reprojection scheme, NOT for reconstruction by itself
 
 algorithm = 'gridrec'
 
