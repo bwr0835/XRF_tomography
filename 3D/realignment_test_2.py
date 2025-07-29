@@ -464,7 +464,7 @@ def iter_reproj(ref_element,
             print(f'Center of rotation error: {round_correct(offset, ndec = 3)}')
 
             if offset != 0:
-                # net_x_shifts_pc[i - 1, :] -= offset
+                net_x_shifts_pc[i - 1, :] -= offset
                 dx -= offset
                 
                 print(f'Incorporating x shift = {round_correct(-offset, ndec = 3)} to all projection images for reference element {element_array[ref_element_idx]}...')
