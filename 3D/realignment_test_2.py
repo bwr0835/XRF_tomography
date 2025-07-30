@@ -476,8 +476,9 @@ def iter_reproj(ref_element,
     
     print(f'Total COR shift needed (final COR - initial COR): {round_correct(total_cor_shift_needed, ndec = 3)}')
     
-    for theta_idx in range(n_theta):
-        aligned_proj[theta_idx] = xrf_proj_img_array[ref_element_idx, theta_idx].copy()
+    net_x_shifts_pc[0] += total_cor_shift_needed
+    # for theta_idx in range(n_theta):
+    #     aligned_proj[theta_idx] = xrf_proj_img_array[ref_element_idx, theta_idx].copy()
 
     for i in range(n_iterations):
         iterations.append(i)
