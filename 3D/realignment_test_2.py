@@ -416,36 +416,68 @@ def iter_reproj(ref_element,
 
     theta_idx_pairs = find_theta_combos(theta_array, dtheta = 1)
 
-    center_of_rotation_avg, geom_center, offset = rot_center_avg(xrf_proj_img_array[ref_element_idx], theta_idx_pairs, theta_array)
-    # offset_copy = offset.copy()
+    # center_of_rotation_avg, geom_center, offset = rot_center_avg(xrf_proj_img_array[ref_element_idx], theta_idx_pairs, theta_array)
+    # # offset_copy = offset.copy()
 
-    print(f'Average COR: {(center_of_rotation_avg)}')
+    # print(f'Average COR: {(center_of_rotation_avg)}')
 
-    print(f'Average center of rotation: {round_correct(center_of_rotation_avg, ndec = 3)}')
-    print(f'Geometric center: {geom_center}')
-    print(f'Center of rotation error: {round_correct(offset, ndec = 3)}')
-    print(f'Incorporating x-shift = {round_correct(-offset, ndec = 3)} to all projection images...')
+    # print(f'Average center of rotation: {round_correct(center_of_rotation_avg, ndec = 3)}')
+    # print(f'Geometric center: {geom_center}')
+    # print(f'Center of rotation error: {round_correct(offset, ndec = 3)}')
+    # print(f'Incorporating x-shift = {round_correct(-offset, ndec = 3)} to all projection images...')
 
     # for element_idx in range(n_elements):
     #     for theta_idx in range(n_theta):
     #         xrf_proj_img_array[element_idx, theta_idx] = ndi.shift(xrf_proj_img_array[element_idx, theta_idx], shift = (0, -offset))
     
-    offset_sum = offset.copy()
+    # Iterative center of rotation correction for reference element
+    print("Starting iterative center of rotation correction...")
+    
+    max_cor_iterations = 10  # Maximum iterations for center of rotation correction
+    eps_cor = 0.001     # Tolerance for center of rotation convergence
 
-    for i in range(2):
-        net_x_shifts_pc[0] -= offset
-        
-        for theta_idx in range(n_theta):
-            aligned_proj[theta_idx] = ndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx], shift = (0, -offset_sum))
-
-    # center_of_rotation_avg, center_geom, offset = rot_center_avg(xrf_proj_img_array[ref_element_idx], theta_idx_pairs, theta_array)
+    aligned_proj = xrf_proj_img_array[ref_element_idx].copy()
+    
+    for cor_iter in range(max_cor_iterations):
+        # Calculate current center of rotation
         center_of_rotation_avg, center_geom, offset = rot_center_avg(aligned_proj, theta_idx_pairs, theta_array)
 
-        print(f'New average center of rotation: {round_correct(center_of_rotation_avg, ndec = 3)}')
+        if cor_iter == 0:
+            init_cor_avg = center_of_rotation_avg.copy()
+            net_offset = offset.copy()
+        
+        else:
+            net_offset -= offset
+        
+        print(f'COR iteration {cor_iter + 1}: Center of rotation = {round_correct(center_of_rotation_avg, ndec = 3)}')
         print(f'Geometric center: {center_geom}')
         print(f'Center of rotation error: {round_correct(offset, ndec = 3)}')
+        
+        # Check if we've converged
+        if abs(offset) < eps_cor:
+            print(f'Center of rotation converged after {cor_iter + 1} iterations')
 
-        offset_sum -= offset
+            break
+
+        # Apply correction to reference element
+        print(f'Applying center of rotation correction: {round_correct(-net_offset, ndec = 3)}')
+        
+        for theta_idx in range(n_theta):
+            aligned_proj[ref_element_idx] = ndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx], shift = (0, -net_offset))
+    
+    # Final verification of center of rotation
+    final_center_of_rotation_avg = center_of_rotation_avg.copy()
+    
+    print(f'Final center of rotation after iterative correction: {round_correct(center_of_rotation_avg, ndec = 3)}')
+    print(f'Final center of rotation error: {round_correct(offset, ndec = 3)}')
+    
+    # Calculate the total shift needed as the difference between final and initial COR
+    total_cor_shift_needed = final_center_of_rotation_avg - init_cor_avg
+    
+    print(f'Total COR shift needed (final COR - initial COR): {round_correct(total_cor_shift_needed, ndec = 3)}')
+    
+    for theta_idx in range(n_theta):
+        aligned_proj[theta_idx] = xrf_proj_img_array[ref_element_idx, theta_idx].copy()
 
     for i in range(n_iterations):
         iterations.append(i)
