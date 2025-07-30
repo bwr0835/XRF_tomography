@@ -410,9 +410,8 @@ def iter_reproj(ref_element,
 
     theta_idx_pairs = find_theta_combos(theta_array, dtheta = 1)
 
-    n_theta_pairs = len(theta_idx_pairs)
-
     center_of_rotation_avg, geom_center, offset = rot_center_avg(xrf_proj_img_array[ref_element_idx], theta_idx_pairs, theta_array)
+    # offset_copy = offset.copy()
 
     print(f'Average COR: {(center_of_rotation_avg)}')
 
@@ -421,14 +420,18 @@ def iter_reproj(ref_element,
     print(f'Center of rotation error: {round_correct(offset, ndec = 3)}')
     print(f'Incorporating x-shift = {round_correct(-offset, ndec = 3)} to all projection images...')
 
-    for element_idx in range(n_elements):
-        for theta_idx in range(n_theta):
-            xrf_proj_img_array[element_idx, theta_idx] = ndi.shift(xrf_proj_img_array[element_idx, theta_idx], shift = (0, -offset))
+    net_x_shifts_pc[0] -= offset
 
+    # for element_idx in range(n_elements):
+    #     for theta_idx in range(n_theta):
+    #         xrf_proj_img_array[element_idx, theta_idx] = ndi.shift(xrf_proj_img_array[element_idx, theta_idx], shift = (0, -offset))
+
+    for theta_idx in range(n_theta):
+        aligned_proj[theta_idx] = ndi.shift(xrf_proj_img_array[element_idx, theta_idx], shift = (0, -offset))
+
+    # center_of_rotation_avg, center_geom, offset = rot_center_avg(xrf_proj_img_array[ref_element_idx], theta_idx_pairs, theta_array)
     center_of_rotation_avg, center_geom, offset = rot_center_avg(xrf_proj_img_array[ref_element_idx], theta_idx_pairs, theta_array)
     
-    offset_copy = offset.copy()
-
     print(f'New average center of rotation: {round_correct(center_of_rotation_avg, ndec = 3)}')
     print(f'Geometric center: {center_geom}')
     print(f'Center of rotation error: {round_correct(offset, ndec = 3)}')
@@ -438,24 +441,21 @@ def iter_reproj(ref_element,
         
         print(f'Iteration {i + 1}/{n_iterations}')
 
-        if i == 0:
-            for theta_idx in range(n_theta):
-                aligned_proj[theta_idx] = xrf_proj_img_array[ref_element_idx, theta_idx]
+        # if i == 0:
+        #     for theta_idx in range(n_theta):
+        #         aligned_proj[theta_idx] = xrf_proj_img_array[ref_element_idx, theta_idx]
             
-        else:
+        # else:
+        if i > 0:
             for theta_idx in range(n_theta):
-                # net_x_shift = net_x_shifts_pc[i - 1, theta_idx]
-                # net_y_shift = net_y_shifts_pc[i - 1, theta_idx]
+                net_x_shift = net_x_shifts_pc[i - 1, theta_idx]
+                net_y_shift = net_y_shifts_pc[i - 1, theta_idx]
                 
                 if (theta_idx % 7) == 0:
-                    # print(f'Shifting projection by net x shift = {round_correct(net_x_shift, ndec = 3)} (theta = {round_correct(theta_array[theta_idx], ndec = 1)})...')
-                    # print(f'Shifting projection by net y shift = {round_correct(net_y_shift, ndec = 3)}...')
+                    print(f'Shifting projection by net x shift = {round_correct(net_x_shift, ndec = 3)} (theta = {round_correct(theta_array[theta_idx], ndec = 1)})...')
+                    print(f'Shifting projection by net y shift = {round_correct(net_y_shift, ndec = 3)}...')
 
-                    print(f'Shifting projection by x shift = {round_correct(dx, ndec = 3)} (theta = {round_correct(theta_array[theta_idx], ndec = 1)})...')
-                    print(f'Shifting projection by y shift = {round_correct(dy, ndec = 3)}...')
-
-                # aligned_proj[theta_idx] = ndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx], shift = (net_y_shift, net_x_shift))
-                aligned_proj[theta_idx] = ndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx], shift = (dy, dx))
+                aligned_proj[theta_idx] = ndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx], shift = (net_y_shift, net_x_shift))
         
             center_of_rotation_avg, center_geom, offset = rot_center_avg(aligned_proj, theta_idx_pairs, theta_array)
 
@@ -465,23 +465,18 @@ def iter_reproj(ref_element,
 
             if offset != 0:
                 net_x_shifts_pc[i - 1, :] -= offset
-                dx -= offset
                 
                 print(f'Incorporating x shift = {round_correct(-offset, ndec = 3)} to all projection images for reference element {element_array[ref_element_idx]}...')
 
                 for theta_idx in range(n_theta):
-                    # net_x_shift = net_x_shifts_pc[i - 1, theta_idx]
-                    # net_y_shift = net_y_shifts_pc[i - 1, theta_idx]
+                    net_x_shift = net_x_shifts_pc[i - 1, theta_idx]
+                    net_y_shift = net_y_shifts_pc[i - 1, theta_idx]
 
                     if (theta_idx % 7) == 0:
-                        # print(f'Shifting projection by net x shift = {round_correct(net_x_shift, ndec = 3)} (theta = {round_correct(theta_array[theta_idx], ndec = 1)})...')
-                        # print(f'Shifting projection by net y shift = {round_correct(net_y_shift, ndec = 3)}...')
-                        
-                        print(f'Shifting projection by x shift = {round_correct(dx - offset, ndec = 3)} (theta = {round_correct(theta_array[theta_idx], ndec = 1)})...')
-                        print(f'Shifting projection by y shift = {round_correct(dy, ndec = 3)}...')
+                        print(f'Shifting projection by net x shift = {round_correct(net_x_shift, ndec = 3)} (theta = {round_correct(theta_array[theta_idx], ndec = 1)})...')
+                        print(f'Shifting projection by net y shift = {round_correct(net_y_shift, ndec = 3)}...')
                     
-                    # aligned_proj[theta_idx] = ndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx], shift = (net_y_shift, net_x_shift))
-                    aligned_proj[theta_idx] = ndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx], shift = (dy, dx))
+                    aligned_proj[theta_idx] = ndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx], shift = (net_y_shift, net_x_shift))
 
                 center_of_rotation_avg, _, offset = rot_center_avg(aligned_proj, theta_idx_pairs, theta_array)
 
@@ -519,16 +514,13 @@ def iter_reproj(ref_element,
 
             dx_array_pc[theta_idx] = dx
             dy_array_pc[theta_idx] = dy
-
-            # dx_array_pc_copy = dx_array_pc.copy()
-            # dy_array_pc_copy = dy_array_pc.copy()
             
             if i == 0: 
                 # net_x_shifts_pc[i, theta_idx] = init_x_shift[theta_idx] + dx
                 # net_y_shifts_pc[i, theta_idx] = init_y_shift[theta_idx] + dy
                 
-                net_x_shifts_pc[i, theta_idx] += dx
-                net_y_shifts_pc[i, theta_idx] += dy
+                net_x_shifts_pc[i, theta_idx] = dx
+                net_y_shifts_pc[i, theta_idx] = dy
             
             else:
                 net_x_shifts_pc[i, theta_idx] = net_x_shifts_pc[i - 1, theta_idx] + dx
@@ -560,7 +552,7 @@ def iter_reproj(ref_element,
 
                     aligned_proj_total[element_idx, theta_idx] = ndi.shift(xrf_proj_img_array[element_idx, theta_idx], shift = (net_y_shift, net_x_shift))
             
-            net_x_shifts_pc_new -= offset_copy
+            # net_x_shifts_pc_new -= offset_copy
 
             print('Done')
 
@@ -580,7 +572,7 @@ def iter_reproj(ref_element,
                         
                     aligned_proj_total[element_idx, theta_idx] = ndi.shift(xrf_proj_img_array[element_idx, theta_idx], shift = (net_y_shift, net_x_shift))
 
-            net_x_shifts_pc_new -= offset_copy
+            # net_x_shifts_pc_new -= offset_copy
             
             print('Done')
 
