@@ -262,7 +262,7 @@ def rot_center_avg(proj_img_array, theta_pair_array, theta_array):
 
         center_of_rotation = rot_center(theta_sum)
 
-        print(f'Center of rotation ({theta_array[theta_pair[0]]} degrees, {theta_array[theta_pair[1]]} degrees) = {round_correct(center_of_rotation, ndec = 3)}')
+        # print(f'Center of rotation ({theta_array[theta_pair[0]]} degrees, {theta_array[theta_pair[1]]} degrees) = {round_correct(center_of_rotation, ndec = 3)}')
 
         center_of_rotation_sum += center_of_rotation
     
