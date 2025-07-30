@@ -436,7 +436,7 @@ def iter_reproj(ref_element,
         net_x_shifts_pc[0] -= offset
         
         for theta_idx in range(n_theta):
-            aligned_proj[theta_idx] = ndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx], shift = (0, -offset))
+            aligned_proj[theta_idx] = ndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx], shift = (0, -offset_sum))
 
     # center_of_rotation_avg, center_geom, offset = rot_center_avg(xrf_proj_img_array[ref_element_idx], theta_idx_pairs, theta_array)
         center_of_rotation_avg, center_geom, offset = rot_center_avg(aligned_proj, theta_idx_pairs, theta_array)
