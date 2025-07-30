@@ -447,7 +447,7 @@ def iter_reproj(ref_element,
             net_offset = offset.copy()
         
         else:
-            net_offset -= offset
+            net_offset += offset
         
         print(f'COR iteration {cor_iter + 1}: Center of rotation = {round_correct(center_of_rotation_avg, ndec = 3)}')
         print(f'Geometric center: {center_geom}')
