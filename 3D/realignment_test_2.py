@@ -472,11 +472,11 @@ def iter_reproj(ref_element,
     print(f'Final center of rotation error: {round_correct(offset, ndec = 3)}')
     
     # Calculate the total shift needed as the difference between final and initial COR
-    total_cor_shift_needed = final_center_of_rotation_avg - init_cor_avg
+    # total_cor_shift_needed = final_center_of_rotation_avg - init_cor_avg
     
-    print(f'Total COR shift needed (final COR - initial COR): {round_correct(total_cor_shift_needed, ndec = 3)}')
+    print(f'Total COR shift needed (final COR - initial COR): {round_correct(-net_offset, ndec = 3)}')
     
-    net_x_shifts_pc[0] += total_cor_shift_needed
+    net_x_shifts_pc[0] -= net_offset
     # for theta_idx in range(n_theta):
     #     aligned_proj[theta_idx] = xrf_proj_img_array[ref_element_idx, theta_idx].copy()
 
