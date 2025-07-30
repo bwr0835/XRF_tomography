@@ -519,8 +519,8 @@ def iter_reproj(ref_element,
                 # net_x_shifts_pc[i, theta_idx] = init_x_shift[theta_idx] + dx
                 # net_y_shifts_pc[i, theta_idx] = init_y_shift[theta_idx] + dy
                 
-                net_x_shifts_pc[i, theta_idx] = dx
-                net_y_shifts_pc[i, theta_idx] = dy
+                net_x_shifts_pc[i, theta_idx] += dx
+                net_y_shifts_pc[i, theta_idx] += dy
             
             else:
                 net_x_shifts_pc[i, theta_idx] = net_x_shifts_pc[i - 1, theta_idx] + dx
