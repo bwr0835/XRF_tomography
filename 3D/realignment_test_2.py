@@ -430,8 +430,12 @@ def iter_reproj(ref_element,
     #     for theta_idx in range(n_theta):
     #         xrf_proj_img_array[element_idx, theta_idx] = ndi.shift(xrf_proj_img_array[element_idx, theta_idx], shift = (0, -offset))
     
+    offset_sum = 0
+
     for i in range(2):
         net_x_shifts_pc[0] -= offset
+        
+        offset_sum += offset
         
         for theta_idx in range(n_theta):
             aligned_proj[theta_idx] = ndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx], shift = (0, -offset))
