@@ -200,7 +200,13 @@ def create_ref_pair_theta_idx_array(ref_pair_theta_array, theta_array):
     return np.array([ref_pair_theta_idx_1, ref_pair_theta_idx_2])
 
 def phase_correlate(recon_proj, exp_proj, upsample_factor):
-    shift, _, _ = reg.phase_cross_correlation(reference_image = recon_proj, moving_image = exp_proj, upsample_factor = upsample_factor)
+    n_columns = recon_proj.shape[1]
+    n_slices = recon_proj.shape[0]
+
+    recon_proj_filtered = edge_gauss_filter(recon_proj, sigma = 5, alpha = 10, nx = n_columns, ny = n_slices)
+    exp_proj_filtered = edge_gauss_filter(exp_proj, sigma = 5, alpha = 10, nx = n_columns, ny = n_slices)
+    
+    shift, _, _ = reg.phase_cross_correlation(reference_image = recon_proj_filtered, moving_image = exp_proj_filtered, upsample_factor = upsample_factor)
 
     y_shift, x_shift = shift[0], shift[1]
 
@@ -409,32 +415,36 @@ def iter_reproj(ref_element,
                     xrf_proj_img_array[element_idx, theta_idx] = ndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx], shift = (init_y_shift[theta_idx], 0))
 
     theta_idx_pairs = find_theta_combos(theta_array, dtheta = 1)
+    
+    offset_sum = 0
 
-    center_of_rotation_avg, geom_center, offset = rot_center_avg(xrf_proj_img_array[ref_element_idx], theta_idx_pairs, theta_array)
+    for i in range(2):
+        center_of_rotation_avg, geom_center, offset = rot_center_avg(xrf_proj_img_array[ref_element_idx], theta_idx_pairs, theta_array)
     # offset_copy = offset.copy()
 
-    print(f'Average COR: {(center_of_rotation_avg)}')
+        print(f'Average COR: {(center_of_rotation_avg)}')
 
-    print(f'Average center of rotation: {round_correct(center_of_rotation_avg, ndec = 3)}')
-    print(f'Geometric center: {geom_center}')
-    print(f'Center of rotation error: {round_correct(offset, ndec = 3)}')
-    print(f'Incorporating x-shift = {round_correct(-offset, ndec = 3)} to all projection images...')
+        print(f'Average center of rotation: {round_correct(center_of_rotation_avg, ndec = 3)}')
+        print(f'Geometric center: {geom_center}')
+        print(f'Center of rotation error: {round_correct(offset, ndec = 3)}')
+        print(f'Incorporating x-shift = {round_correct(-offset, ndec = 3)} to all projection images...')
 
-    net_x_shifts_pc[0] -= offset
+        net_x_shifts_pc[0] -= offset
+        offset_sum += offset
 
     # for element_idx in range(n_elements):
     #     for theta_idx in range(n_theta):
     #         xrf_proj_img_array[element_idx, theta_idx] = ndi.shift(xrf_proj_img_array[element_idx, theta_idx], shift = (0, -offset))
 
-    for theta_idx in range(n_theta):
-        aligned_proj[theta_idx] = ndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx], shift = (0, -offset))
+        for theta_idx in range(n_theta):
+            aligned_proj[theta_idx] = ndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx], shift = (0, -offset_sum))
 
     # center_of_rotation_avg, center_geom, offset = rot_center_avg(xrf_proj_img_array[ref_element_idx], theta_idx_pairs, theta_array)
-    center_of_rotation_avg, center_geom, offset = rot_center_avg(aligned_proj, theta_idx_pairs, theta_array)
+        center_of_rotation_avg, center_geom, offset = rot_center_avg(aligned_proj, theta_idx_pairs, theta_array)
     
-    print(f'New average center of rotation: {round_correct(center_of_rotation_avg, ndec = 3)}')
-    print(f'Geometric center: {center_geom}')
-    print(f'Center of rotation error: {round_correct(offset, ndec = 3)}')
+        print(f'New average center of rotation: {round_correct(center_of_rotation_avg, ndec = 3)}')
+        print(f'Geometric center: {center_geom}')
+        print(f'Center of rotation error: {round_correct(offset, ndec = 3)}')
     
     for i in range(n_iterations):
         iterations.append(i)
