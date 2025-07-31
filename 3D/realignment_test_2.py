@@ -465,16 +465,13 @@ def iter_reproj(ref_element,
         for theta_idx in range(n_theta):
             aligned_proj[theta_idx] = ndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx], shift = (0, -net_offset))
     
-    # Final verification of center of rotation
-    final_center_of_rotation_avg = center_of_rotation_avg.copy()
-    
     print(f'Final center of rotation after iterative correction: {round_correct(center_of_rotation_avg, ndec = 3)}')
     print(f'Final center of rotation error: {round_correct(offset, ndec = 3)}')
     
     # Calculate the total shift needed as the difference between final and initial COR
     # total_cor_shift_needed = final_center_of_rotation_avg - init_cor_avg
     
-    print(f'Total COR shift needed (final COR - initial COR): {round_correct(-net_offset, ndec = 3)}')
+    print(f'Total COR shift needed: {round_correct(-net_offset, ndec = 3)}')
     
     net_x_shifts_pc[0] -= net_offset
     # for theta_idx in range(n_theta):
@@ -531,8 +528,8 @@ def iter_reproj(ref_element,
         aligned_exp_proj_array.append(aligned_proj.copy())
         
         if algorithm == 'gridrec':
-            recon = tomo.recon(aligned_proj, theta_array*np.pi/180, algorithm = algorithm, filter_name = 'ramlak')
-            # recon = tomo.recon(aligned_proj, theta_array*np.pi/180, center = center_of_rotation_avg, algorithm = algorithm, filter_name = 'ramlak')
+            # recon = tomo.recon(aligned_proj, theta_array*np.pi/180, algorithm = algorithm, filter_name = 'ramlak')
+            recon = tomo.recon(aligned_proj, theta_array*np.pi/180, center = center_of_rotation_avg, algorithm = algorithm, filter_name = 'ramlak')
         
         elif algorithm == 'mlem':
             recon = tomo.recon(aligned_proj, theta_array*np.pi/180, algorithm = algorithm, num_iter = 60)
