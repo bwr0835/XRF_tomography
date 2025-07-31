@@ -500,36 +500,36 @@ def iter_reproj(ref_element,
         
             center_of_rotation_avg, center_geom, offset = rot_center_avg(aligned_proj, theta_idx_pairs, theta_array)
 
-            print(f'New average center of rotation: {round_correct(center_of_rotation_avg, ndec = 3)}')
+            print(f'New average center of rotation after jitter correction: {round_correct(center_of_rotation_avg, ndec = 3)}')
             print(f'Geometric center: {center_geom}')
             print(f'Center of rotation error: {round_correct(offset, ndec = 3)}')
 
-            if offset != 0:
-                net_x_shifts_pc[i - 1, :] -= offset
+            # if offset != 0:
+            #     net_x_shifts_pc[i - 1, :] -= offset
                 
-                print(f'Incorporating x shift = {round_correct(-offset, ndec = 3)} to all projection images for reference element {element_array[ref_element_idx]}...')
+            #     print(f'Incorporating x shift = {round_correct(-offset, ndec = 3)} to all projection images for reference element {element_array[ref_element_idx]}...')
 
-                for theta_idx in range(n_theta):
-                    net_x_shift = net_x_shifts_pc[i - 1, theta_idx]
-                    net_y_shift = net_y_shifts_pc[i - 1, theta_idx]
+            #     for theta_idx in range(n_theta):
+            #         net_x_shift = net_x_shifts_pc[i - 1, theta_idx]
+            #         net_y_shift = net_y_shifts_pc[i - 1, theta_idx]
 
-                    if (theta_idx % 7) == 0:
-                        print(f'Shifting projection by net x shift = {round_correct(net_x_shift, ndec = 3)} (theta = {round_correct(theta_array[theta_idx], ndec = 1)})...')
-                        print(f'Shifting projection by net y shift = {round_correct(net_y_shift, ndec = 3)}...')
+            #         if (theta_idx % 7) == 0:
+            #             print(f'Shifting projection by net x shift = {round_correct(net_x_shift, ndec = 3)} (theta = {round_correct(theta_array[theta_idx], ndec = 1)})...')
+            #             print(f'Shifting projection by net y shift = {round_correct(net_y_shift, ndec = 3)}...')
                     
-                    aligned_proj[theta_idx] = ndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx], shift = (net_y_shift, net_x_shift))
+            #         aligned_proj[theta_idx] = ndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx], shift = (net_y_shift, net_x_shift))
 
-                center_of_rotation_avg, _, offset = rot_center_avg(aligned_proj, theta_idx_pairs, theta_array)
+            #     center_of_rotation_avg, _, offset = rot_center_avg(aligned_proj, theta_idx_pairs, theta_array)
 
-                print(f'New average center of rotation after dynamic COR correction: {round_correct(center_of_rotation_avg, ndec = 3)}')
-                print(f'Geometric center: {center_geom}')
-                print(f'Center of rotation error: {round_correct(offset, ndec = 3)}')
+            #     print(f'New average center of rotation after dynamic COR correction: {round_correct(center_of_rotation_avg, ndec = 3)}')
+            #     print(f'Geometric center: {center_geom}')
+            #     print(f'Center of rotation error: {round_correct(offset, ndec = 3)}')
 
         aligned_exp_proj_array.append(aligned_proj.copy())
         
         if algorithm == 'gridrec':
-            # recon = tomo.recon(aligned_proj, theta_array*np.pi/180, algorithm = algorithm, filter_name = 'ramlak')
-            recon = tomo.recon(aligned_proj, theta_array*np.pi/180, center = center_of_rotation_avg, algorithm = algorithm, filter_name = 'ramlak')
+            recon = tomo.recon(aligned_proj, theta_array*np.pi/180, algorithm = algorithm, filter_name = 'ramlak')
+            # recon = tomo.recon(aligned_proj, theta_array*np.pi/180, center = center_of_rotation_avg, algorithm = algorithm, filter_name = 'ramlak')
         
         elif algorithm == 'mlem':
             recon = tomo.recon(aligned_proj, theta_array*np.pi/180, algorithm = algorithm, num_iter = 60)
