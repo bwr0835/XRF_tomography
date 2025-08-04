@@ -140,6 +140,7 @@ def rot_center(theta_sum, slice_idx_desired): # Use only with F. Marin's code
 file_path_xrt = '/Users/bwr0835/Documents/2_ide_aggregate_xrt.h5'
 # output_path = '/home/bwr0835/cor_correction_proj_shift_array.npy'
 ref_element = 'ds_ic'
+# ref_element = 'Ca'
 
 elements_xrt, counts_xrt, theta_xrt, dataset_type_xrt = h5_util.extract_h5_aggregate_xrt_data(file_path_xrt)
 
