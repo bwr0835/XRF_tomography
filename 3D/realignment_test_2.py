@@ -446,7 +446,7 @@ def iter_reproj(ref_element,
             net_offset = offset.copy()
         
         else:
-            net_offset_copy = net_offset.copy()
+            # net_offset_copy = net_offset.copy()
             net_offset += offset
         
         print(f'COR iteration {cor_iter + 1}: Center of rotation = {round_correct(center_of_rotation_avg, ndec = 3)}')
@@ -506,27 +506,87 @@ def iter_reproj(ref_element,
             print(f'New average center of rotation after jitter correction: {round_correct(center_of_rotation_avg, ndec = 3)}')
             print(f'Geometric center: {center_geom}')
             print(f'Center of rotation error: {round_correct(offset, ndec = 3)}')
-
+            
             if offset != 0:
                 net_x_shifts_pc[i - 1, :] -= offset
                 
                 print(f'Incorporating x shift = {round_correct(-offset, ndec = 3)} to all projection images for reference element {element_array[ref_element_idx]}...')
 
-                for theta_idx in range(n_theta):
-                    net_x_shift = net_x_shifts_pc[i - 1, theta_idx]
-                    net_y_shift = net_y_shifts_pc[i - 1, theta_idx]
+                print("Starting iterative center of rotation correction...")
+    
+                max_cor_iterations = 10  # Maximum iterations for center of rotation correction
+                eps_cor = 0.001     # Tolerance for center of rotation convergence
+    
+                for cor_iter in range(max_cor_iterations):
+                    center_of_rotation_avg, center_geom, offset = rot_center_avg(aligned_proj, theta_idx_pairs, theta_array)
 
-                    if (theta_idx % 7) == 0:
-                        print(f'Shifting projection by net x shift = {round_correct(net_x_shift, ndec = 3)} (theta = {round_correct(theta_array[theta_idx], ndec = 1)})...')
-                        print(f'Shifting projection by net y shift = {round_correct(net_y_shift, ndec = 3)}...')
+                    # if cor_iter == 0:
+                    #     net_offset = offset.copy()
+        
+                    # else:
+            # net_offset_copy = net_offset.copy()
+                    net_x_shifts_pc[i - 1, :] -= offset
+        
+                    print(f'COR iteration {cor_iter + 1}: Center of rotation = {round_correct(center_of_rotation_avg, ndec = 3)}')
+                    print(f'Geometric center: {center_geom}')
+                    print(f'Center of rotation error: {round_correct(offset, ndec = 3)}')
+        
+        # Check if we've converged
+                    if abs(offset) < eps_cor:
+                        print(f'Center of rotation converged after {cor_iter + 1} iterations')
+            
+                        # for theta_idx in range(n_theta):
+                            # aligned_proj[theta_idx] = ndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx], shift = (0, -net_offset))
+
+                        break
+
+        # Apply correction to reference element
+                    print(f'Applying center of rotation correction: {round_correct(-net_offset, ndec = 3)}')
+        
+                    for theta_idx in range(n_theta):
+                        net_x_shift = net_x_shifts_pc[i - 1, :]
+                        net_y_shift = net_y_shifts_pc[i - 1, :]
+                        
+                        aligned_proj[theta_idx] = ndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx], shift = (net_y_shift, net_x_shift))
+    
+                print(f'Final center of rotation after dynamic iterative COR correction: {round_correct(center_of_rotation_avg, ndec = 3)}')
+                print(f'Final center of rotation error: {round_correct(offset, ndec = 3)}')
+    
+    # Calculate the total shift needed as the difference between final and initial COR
+    # total_cor_shift_needed = final_center_of_rotation_avg - init_cor_avg
+    
+    # print(f'Total COR shift needed: {round_correct(-net_offset, ndec = 3)}')
+    
+    # net_x_shifts_pc[0] -= net_offset
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                # for theta_idx in range(n_theta):
+                #     net_x_shift = net_x_shifts_pc[i - 1, theta_idx]
+                #     net_y_shift = net_y_shifts_pc[i - 1, theta_idx]
+
+                #     if (theta_idx % 7) == 0:
+                #         print(f'Shifting projection by net x shift = {round_correct(net_x_shift, ndec = 3)} (theta = {round_correct(theta_array[theta_idx], ndec = 1)})...')
+                #         print(f'Shifting projection by net y shift = {round_correct(net_y_shift, ndec = 3)}...')
                     
-                    aligned_proj[theta_idx] = ndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx], shift = (net_y_shift, net_x_shift))
+                #     aligned_proj[theta_idx] = ndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx], shift = (net_y_shift, net_x_shift))
 
-                center_of_rotation_avg, _, offset = rot_center_avg(aligned_proj, theta_idx_pairs, theta_array)
+                # center_of_rotation_avg, _, offset = rot_center_avg(aligned_proj, theta_idx_pairs, theta_array)
 
-                print(f'New average center of rotation after dynamic COR correction: {round_correct(center_of_rotation_avg, ndec = 3)}')
-                print(f'Geometric center: {center_geom}')
-                print(f'Center of rotation error: {round_correct(offset, ndec = 3)}')
+                # print(f'New average center of rotation after dynamic COR correction: {round_correct(center_of_rotation_avg, ndec = 3)}')
+                # print(f'Geometric center: {center_geom}')
+                # print(f'Center of rotation error: {round_correct(offset, ndec = 3)}')
 
         aligned_exp_proj_array.append(aligned_proj.copy())
         
