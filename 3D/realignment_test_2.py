@@ -457,8 +457,8 @@ def iter_reproj(ref_element,
         if abs(offset) < eps_cor:
             print(f'Center of rotation converged after {cor_iter + 1} iterations')
             
-            for theta_idx in range(n_theta):
-                aligned_proj[theta_idx] = ndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx], shift = (0, -net_offset))
+            # for theta_idx in range(n_theta):
+                # aligned_proj[theta_idx] = ndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx], shift = (0, -net_offset))
 
             break
 
