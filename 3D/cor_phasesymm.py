@@ -224,8 +224,15 @@ slice_idx_desired = 151
 
 # offset = np.mean(np.array(cor_array)) - (counts.shape[2]/2 - 1/2)
 
-# offset = 9.896418493522106
-offset = 0
+# offset = 6.745766492238204
+# offset = 7.963059334690836
+# offset = 7.929977403864523
+# offset = 7.963059334690836
+# offset = 7.975633256200336
+# offset = 7.925353803699164
+offset = 7.944292884322675
+
+# offset = 0
 
 print(offset)
 
@@ -243,10 +250,11 @@ for theta_idx in range(len(reflection_pair_idx_array)):
     center_of_rotation = rot_center(theta_sum, slice_idx_desired)
     # center_of_rotation = tomo.find_center_pc(slice_proj_neg_22, slice_proj_158, tol = 0.01)
 
-    print(center_of_rotation)
+    print(f'{center_of_rotation} ({theta_xrt[reflection_pair_idx_array[theta_idx][0]]}, {theta_xrt[reflection_pair_idx_array[theta_idx][1]]})')
 
     cor_array.append(center_of_rotation)
 
 print(f'Mean COR = {np.mean(np.array(cor_array))}')
+print(f'Offset = {np.mean(np.array(cor_array)) - 299.5}')
 
 
