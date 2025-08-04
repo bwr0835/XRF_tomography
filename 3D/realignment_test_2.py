@@ -544,8 +544,8 @@ def iter_reproj(ref_element,
                     print(f'Applying center of rotation correction: {round_correct(-net_offset, ndec = 3)}')
         
                     for theta_idx in range(n_theta):
-                        net_x_shift = net_x_shifts_pc[i - 1, :]
-                        net_y_shift = net_y_shifts_pc[i - 1, :]
+                        net_x_shift = net_x_shifts_pc[i - 1, theta_idx]
+                        net_y_shift = net_y_shifts_pc[i - 1, theta_idx]
                         
                         aligned_proj[theta_idx] = ndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx], shift = (net_y_shift, net_x_shift))
     
