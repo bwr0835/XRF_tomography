@@ -414,7 +414,7 @@ def iter_reproj(ref_element,
                 for theta_idx in range(n_theta):
                     xrf_proj_img_array[element_idx, theta_idx] = ndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx], shift = (init_y_shift[theta_idx], 0))
 
-    theta_idx_pairs = find_theta_combos(theta_array, dtheta = 1)
+    theta_idx_pairs = find_theta_combos(theta_array, dtheta = 0)
 
     # center_of_rotation_avg, geom_center, offset = rot_center_avg(xrf_proj_img_array[ref_element_idx], theta_idx_pairs, theta_array)
     # # offset_copy = offset.copy()
