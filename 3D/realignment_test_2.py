@@ -458,8 +458,8 @@ def iter_reproj(ref_element,
         if abs(offset) < eps_cor:
             print(f'Center of rotation converged after {cor_iter + 1} iterations')
             
-            for theta_idx in range(n_theta):
-                aligned_proj[theta_idx] = ndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx], shift = (0, -(net_offset_copy - 1)))
+            # for theta_idx in range(n_theta):
+                # aligned_proj[theta_idx] = ndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx], shift = (0, -(net_offset_copy - 1)))
 
             break
 
@@ -477,7 +477,8 @@ def iter_reproj(ref_element,
     
     print(f'Total COR shift needed: {round_correct(-net_offset, ndec = 3)}')
     
-    net_x_shifts_pc[0] -= (net_offset - 1)
+    net_x_shifts_pc[0] -= net_offset
+    # net_x_shifts_pc[0] -= (net_offset - 1)
     # for theta_idx in range(n_theta):
     #     aligned_proj[theta_idx] = xrf_proj_img_array[ref_element_idx, theta_idx].copy()
 
@@ -509,17 +510,22 @@ def iter_reproj(ref_element,
             print(f'Center of rotation error: {round_correct(offset, ndec = 3)}')
             
             if offset != 0:
-                net_x_shifts_pc[i - 1, :] -= (offset - 1)
+                # net_x_shifts_pc[i - 1, :] -= (offset - 1)
+                net_x_shifts_pc[i - 1, :] -= offset
                 
-                print(f'Incorporating x shift = {round_correct(-offset, ndec = 3)} + 1 pixels to all projection images for reference element {element_array[ref_element_idx]}...')
+                # print(f'Incorporating x shift = {round_correct(-offset, ndec = 3)} + 1 pixels to all projection images for reference element {element_array[ref_element_idx]}...')
+                print(f'Incorporating x shift = {round_correct(-offset, ndec = 3)} pixels to all projection images for reference element {element_array[ref_element_idx]}...')
 
                 for theta_idx in range(n_theta):
                     net_x_shift = net_x_shifts_pc[i - 1, theta_idx]
                     net_y_shift = net_y_shifts_pc[i - 1, theta_idx]
 
                     if (theta_idx % 7) == 0:
-                        print(f'Shifting projection by net x shift = {round_correct(net_x_shift - 1, ndec = 3)} (theta = {round_correct(theta_array[theta_idx], ndec = 1)})...')
-                        print(f'Shifting projection by net y shift = {round_correct(net_y_shift - 1, ndec = 3)}...')
+                        print(f'Shifting projection by net x shift = {round_correct(net_x_shift, ndec = 3)} (theta = {round_correct(theta_array[theta_idx], ndec = 1)})...')
+                        print(f'Shifting projection by net y shift = {round_correct(net_y_shift, ndec = 3)}...')
+
+                        # print(f'Shifting projection by net x shift = {round_correct(net_x_shift - 1, ndec = 3)} (theta = {round_correct(theta_array[theta_idx], ndec = 1)})...')
+                        # print(f'Shifting projection by net y shift = {round_correct(net_y_shift - 1, ndec = 3)}...')
                     
                     aligned_proj[theta_idx] = ndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx], shift = (net_y_shift, net_x_shift))
 
