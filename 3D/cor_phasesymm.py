@@ -234,7 +234,7 @@ slice_idx_desired = 151
 # offset = 7.937159098256455
 # offset = 7.939846200150093
 # offset = 7.938834044186073
-offset = 7.939
+offset = 7.939 + 1.2
 
 # offset = 0
 
