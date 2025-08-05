@@ -457,8 +457,8 @@ def iter_reproj(ref_element,
         if abs(offset) < eps_cor:
             print(f'Center of rotation converged after {cor_iter + 1} iterations')
             
-            for theta_idx in range(n_theta):
-                aligned_proj[theta_idx] = ndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx], shift = (0, -(net_offset_copy - 0.8)))
+            # for theta_idx in range(n_theta):
+                # aligned_proj[theta_idx] = ndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx], shift = (0, -(net_offset_copy - 0.8)))
 
             break
 
@@ -476,7 +476,8 @@ def iter_reproj(ref_element,
     
     print(f'Total COR shift needed: {round_correct(-net_offset, ndec = 3)}')
     
-    net_x_shifts_pc[0] -= (net_offset - 0.8)
+    net_x_shifts_pc[0] -= net_offset
+    # net_x_shifts_pc[0] -= (net_offset - 0.8)
     # for theta_idx in range(n_theta):
     #     aligned_proj[theta_idx] = xrf_proj_img_array[ref_element_idx, theta_idx].copy()
 
@@ -508,9 +509,11 @@ def iter_reproj(ref_element,
             print(f'Center of rotation error: {round_correct(offset, ndec = 3)}')
             
             if offset != 0:
-                net_x_shifts_pc[i - 1, :] -= (offset - 0.8)
+                # net_x_shifts_pc[i - 1, :] -= (offset - 0.8)
+                net_x_shifts_pc[i - 1, :] -= offset
                 
-                print(f'Incorporating x shift = {round_correct(-offset, ndec = 3)} + 1 pixels to all projection images for reference element {element_array[ref_element_idx]}...')
+                # print(f'Incorporating x shift = {round_correct(-offset, ndec = 3)} + 1 pixels to all projection images for reference element {element_array[ref_element_idx]}...')
+                print(f'Incorporating x shift = {round_correct(-offset, ndec = 3)} pixels to all projection images for reference element {element_array[ref_element_idx]}...')
 
                 for theta_idx in range(n_theta):
                     net_x_shift = net_x_shifts_pc[i - 1, theta_idx]
@@ -529,10 +532,10 @@ def iter_reproj(ref_element,
                 print(f'Center of rotation error: {round_correct(offset, ndec = 3)}')
 
         aligned_exp_proj_array.append(aligned_proj.copy())
-        
+
         if algorithm == 'gridrec':
-            recon = tomo.recon(aligned_proj, theta_array*np.pi/180, algorithm = algorithm, filter_name = 'ramlak')
-            # recon = tomo.recon(aligned_proj, theta_array*np.pi/180, center = center_of_rotation_avg, algorithm = algorithm, filter_name = 'ramlak')
+            # recon = tomo.recon(aligned_proj, theta_array*np.pi/180, algorithm = algorithm, filter_name = 'ramlak')
+            recon = tomo.recon(aligned_proj, theta_array*np.pi/180, center = (n_columns - 1)/2, algorithm = algorithm, filter_name = 'ramlak')
         
         elif algorithm == 'mlem':
             recon = tomo.recon(aligned_proj, theta_array*np.pi/180, algorithm = algorithm, num_iter = 60)
