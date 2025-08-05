@@ -248,7 +248,7 @@ def rot_center(theta_sum):
 
     phase = np.arctan2(imag*np.sign(real), real*np.sign(real)) 
     
-    COR = Nt*(1 - phase/np.pi)/2 - 1/2 # Extra -1/2 since Python starts indexing at zero
+    COR = Nt//2 - Nt*phase/(2*np.pi) # Extra -1/2 since Python starts indexing at zero
 
     return COR
 
