@@ -264,4 +264,4 @@ def extract_h5_aggregate_xrt_data(file_path):
     elements_string = [element.decode() for element in elements]
     filename_array = [filename.decode() for filename in filenames]
 
-    return elements_string, counts, theta, dataset_type.decode(), filename_array.decode()
+    return elements_string, counts, theta, dataset_type.decode(), filename_array
