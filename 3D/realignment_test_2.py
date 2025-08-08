@@ -254,7 +254,7 @@ def rot_center(theta_sum):
 
 def rot_center_avg(proj_img_array, theta_pair_array, theta_array):
     n_columns = proj_img_array.shape[2]
-   
+    
     center_of_rotation_sum = 0
     
     for theta_pair in theta_pair_array:
@@ -552,7 +552,8 @@ def iter_reproj(ref_element,
 
         for slice_idx in range(n_slices):
             print(f'Slice {slice_idx + 1}/{n_slices}')
-
+            recon[slice_idx] = xform.warp(recon[slice_idx], xform.SimilarityTransform(translation = (0, -0.5)))
+            
             sinogram = (xform.radon(recon[slice_idx].copy(), theta_array)).T
 
             synth_proj[:, slice_idx, :] = sinogram
