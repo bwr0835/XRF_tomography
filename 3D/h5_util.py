@@ -253,12 +253,15 @@ def extract_h5_aggregate_xrt_data(file_path):
     theta_h5 = h5['exchange/theta']
     elements_h5 = h5['exchange/elements']
     dataset_type_h5 = h5['corresponding_file_info/dataset_type']
+    filenames_h5 = h5['corresponding_file_info/filename']
 
     counts = counts_h5[()]
     theta = theta_h5[()]
     elements = elements_h5[()]
     dataset_type = dataset_type_h5[()]
+    filenames = filenames_h5[()]
 
     elements_string = [element.decode() for element in elements]
+    filename_array = [filename.decode() for filename in filenames]
 
-    return elements_string, counts, theta, dataset_type.decode()
+    return elements_string, counts, theta, dataset_type.decode(), filename_array.decode()
