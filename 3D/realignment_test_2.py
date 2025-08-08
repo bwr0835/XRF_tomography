@@ -552,7 +552,6 @@ def iter_reproj(ref_element,
 
         for slice_idx in range(n_slices):
             print(f'Slice {slice_idx + 1}/{n_slices}')
-            recon[slice_idx] = xform.warp(recon[slice_idx], xform.SimilarityTransform(translation = (0, -0.5)))
             
             sinogram = (xform.radon(recon[slice_idx].copy(), theta_array)).T
 
@@ -685,9 +684,9 @@ n_slices = counts_xrt.shape[2]
 # init_x_shift = -20*np.ones(n_theta)
 init_x_shift = 0
 
-n_desired_iter = 6 # For the reprojection scheme, NOT for reconstruction by itself
+n_desired_iter = 1 # For the reprojection scheme, NOT for reconstruction by itself
 
-algorithm = 'gridrec'
+algorithm = 'mlem'
 
 # orig_proj_ref, \
 # aligned_proj_total, \
