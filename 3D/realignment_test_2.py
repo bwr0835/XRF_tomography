@@ -248,7 +248,7 @@ def rot_center(theta_sum):
 
     phase = np.arctan2(imag*np.sign(real), real*np.sign(real)) 
     
-    COR = Nt*(1 - phase/np.pi)/2 - 1/2 # Extra -1/2 since Python starts indexing at zero
+    COR = Nt//2 - Nt*phase/(2*np.pi) # Extra -1/2 since Python starts indexing at zero
 
     return COR
 
@@ -268,11 +268,11 @@ def rot_center_avg(proj_img_array, theta_pair_array, theta_array):
     
     center_rotation_avg = center_of_rotation_sum/len(theta_pair_array)
 
-    geom_center = (n_columns - 1)/2
+    geom_center_index = n_columns//2
 
-    offset = center_rotation_avg - geom_center
+    offset = center_rotation_avg - geom_center_index
 
-    return center_rotation_avg, geom_center, offset
+    return center_rotation_avg, geom_center_index, offset
 
 def iter_reproj(ref_element,
                 element_array, 
