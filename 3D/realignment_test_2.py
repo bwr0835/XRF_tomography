@@ -732,7 +732,7 @@ init_x_shift = 0
 
 n_desired_iter = 1 # For the reprojection scheme, NOT for reconstruction by itself
 
-algorithm = 'mlem'
+algorithm = 'gridrec'
 
 # orig_proj_ref, \
 # aligned_proj_total, \
