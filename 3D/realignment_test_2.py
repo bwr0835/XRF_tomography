@@ -238,7 +238,7 @@ def radon_manual(image, theta_array, circle = True):
     sinogram = np.zeros((n_theta, n_columns))
 
     for theta_idx, theta in enumerate(theta_array):
-        rotated_img = ndi.rotate(padded_image, theta, reshape = False, order = 1) # First part of discrete Radon transform
+        rotated_img = ndi.rotate(padded_image, 90 - theta, reshape = False, order = 1) # First part of discrete Radon transform
         sinogram[theta_idx] = np.sum(rotated_img, axis = 0) # Second part of discrete Radon transform
     
     return sinogram
