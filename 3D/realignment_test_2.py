@@ -241,7 +241,7 @@ def radon_manual(image, theta_array, circle = True):
     n_theta = len(theta_array)
     n_columns = padded_image.shape[0]
     
-    sinogram = np.zeros((n_theta, n_columns))
+    sinogram = np.zeros((n_columns, n_theta))
 
     for theta_idx, theta in enumerate(theta_array):
         rotated_img = xform.rotate(padded_image, theta, order = 1)
