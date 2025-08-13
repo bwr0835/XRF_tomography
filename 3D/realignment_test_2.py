@@ -200,6 +200,10 @@ def create_ref_pair_theta_idx_array(ref_pair_theta_array, theta_array):
     return np.array([ref_pair_theta_idx_1, ref_pair_theta_idx_2])
 
 def radon_manual(image, theta_array, circle = True):
+
+    if image.dtype == np.float16:
+        image = image.astype(np.float32)
+    
     if circle:
         shape_min = min(image.shape)
         radius = shape_min // 2
@@ -238,7 +242,7 @@ def radon_manual(image, theta_array, circle = True):
     sinogram = np.zeros((n_theta, n_columns))
 
     for theta_idx, theta in enumerate(theta_array):
-        rotated_img = ndi.rotate(padded_image, 90 - theta, reshape = False, order = 1) # First part of discrete Radon transform
+        rotated_img = ndi.rotate(padded_image, theta, reshape = False, order = 1) # First part of discrete Radon transform
         sinogram[theta_idx] = np.sum(rotated_img, axis = 0) # Second part of discrete Radon transform
     
     return sinogram
