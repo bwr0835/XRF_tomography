@@ -211,6 +211,7 @@ def radon_manual(image, theta_array, circle = True):
         coords = np.array(np.ogrid[: image.shape[0], : image.shape[1]], dtype=object)
         dist = ((coords - img_shape // 2) ** 2).sum(0)
         outside_reconstruction_circle = dist > radius**2
+
         if np.any(image[outside_reconstruction_circle]):
             warnings.warn(
                 'Radon transform: image must be zero outside the '
@@ -236,7 +237,7 @@ def radon_manual(image, theta_array, circle = True):
         pad_width = [(pb, p - pb) for pb, p in zip(pad_before, pad)]
         padded_image = np.pad(image, pad_width, mode='constant', constant_values=0)
     
-    padded_image = ndi.shift(padded_image, shift = (0, -0.5))
+    # padded_image = ndi.shift(padded_image, shift = (0, -0.5))
 
     n_theta = len(theta_array)
     n_columns = padded_image.shape[0]
@@ -605,7 +606,7 @@ def iter_reproj(ref_element,
         for slice_idx in range(n_slices):
             print(f'Slice {slice_idx + 1}/{n_slices}')
             
-            # sinogram = (xform.radon(recon[slice_idx].copy(), theta_array)).T
+            sinogram = (xform.radon(recon[slice_idx].copy(), theta_array)).T
             sinogram = radon_manual(recon[slice_idx].copy(), theta_array)
 
             synth_proj[:, slice_idx, :] = sinogram
