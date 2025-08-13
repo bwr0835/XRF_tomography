@@ -203,7 +203,7 @@ def radon_manual(image, theta_array, circle = True):
 
     if image.dtype == np.float16:
         image = image.astype(np.float32)
-    
+
     if circle:
         shape_min = min(image.shape)
         radius = shape_min // 2
@@ -236,14 +236,17 @@ def radon_manual(image, theta_array, circle = True):
         pad_width = [(pb, p - pb) for pb, p in zip(pad_before, pad)]
         padded_image = np.pad(image, pad_width, mode='constant', constant_values=0)
     
+    padded_image = ndi.shift(padded_image, shift = (0, -0.5))
+
     n_theta = len(theta_array)
     n_columns = padded_image.shape[0]
     
     sinogram = np.zeros((n_theta, n_columns))
 
     for theta_idx, theta in enumerate(theta_array):
-        rotated_img = ndi.rotate(padded_image, theta, reshape = False, order = 1) # First part of discrete Radon transform
-        sinogram[theta_idx] = np.sum(rotated_img, axis = 1) # Second part of discrete Radon transform
+        rotated_img = xform.rotate(padded_image, theta, order = 1)
+        # rotated_img = ndi.rotate(padded_image, theta, reshape = False, order = 1) # First part of discrete Radon transform
+        sinogram[theta_idx] = np.sum(rotated_img, axis = 0) # Second part of discrete Radon transform
     
     return sinogram
 
