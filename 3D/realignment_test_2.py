@@ -237,8 +237,6 @@ def radon_manual(image, theta_array, circle = True):
         pad_width = [(pb, p - pb) for pb, p in zip(pad_before, pad)]
         padded_image = np.pad(image, pad_width, mode='constant', constant_values=0)
 
-    xv, yv = np.meshgrid()
-
     n_theta = len(theta_array)
     n_columns = padded_image.shape[0]
     
