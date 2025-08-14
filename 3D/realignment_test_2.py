@@ -417,8 +417,8 @@ def iter_reproj(ref_element,
     aligned_proj_total = np.zeros((n_elements, n_theta, n_slices, n_columns))
     aligned_proj = np.zeros((n_theta, n_slices, n_columns))
     synth_proj = np.zeros((n_theta, n_slices, n_columns))
-    dx_array_pc = np.zeros(n_theta)
-    dy_array_pc = np.zeros(n_theta)
+    dx_array_pc = np.zeros((n_iterations, n_theta))
+    dy_array_pc = np.zeros((n_iterations, n_theta))
     net_x_shifts_pc = np.zeros((n_iterations, n_theta))
     net_y_shifts_pc = np.zeros((n_iterations, n_theta))
     
@@ -618,8 +618,8 @@ def iter_reproj(ref_element,
         for theta_idx in range(n_theta):            
             dy, dx = phase_correlate(synth_proj[theta_idx], aligned_proj[theta_idx], upsample_factor = 100)
 
-            dx_array_pc[theta_idx] = dx
-            dy_array_pc[theta_idx] = dy
+            dx_array_pc[i, theta_idx] = dx
+            dy_array_pc[i, theta_idx] = dy
             
             if i == 0: 
                 # net_x_shifts_pc[i, theta_idx] = init_x_shift[theta_idx] + dx
@@ -642,11 +642,14 @@ def iter_reproj(ref_element,
         print(f'Geometric center: {center_geom}')
         print(f'Center of rotation error: {round_correct(offset_synth, ndec = 3)}')
         
-        if np.max(np.abs(dx_array_pc)) < eps and np.max(np.abs(dy_array_pc)) < eps:
+        if np.max(np.abs(dx_array_pc[i])) < eps and np.max(np.abs(dy_array_pc[i])) < eps:
             iterations = np.array(iterations)
            
             net_x_shifts_pc_new = net_x_shifts_pc[:len(iterations)]
             net_y_shifts_pc_new = net_y_shifts_pc[:len(iterations)]
+
+            dx_array_new = dx_array_pc[:len(iterations)]
+            dy_array_new = dy_array_pc[:len(iterations)]
 
             print(f'Number of iterations taken: {len(iterations)}')
             print('Shifting all elements in aggregate aligned projection array by current net shifts...')
@@ -670,6 +673,9 @@ def iter_reproj(ref_element,
             iterations = np.array(iterations)
 
             net_x_shifts_pc_new, net_y_shifts_pc_new = net_x_shifts_pc, net_y_shifts_pc
+
+            dx_array_new = dx_array_pc
+            dy_array_new = dy_array_pc
             
             for element_idx in range(n_elements):
                 for theta_idx in range(n_theta):
@@ -686,7 +692,7 @@ def iter_reproj(ref_element,
     synth_proj_array = np.array(synth_proj_array)
     recon_array = np.array(recon_array)
     
-    return orig_ref_proj, aligned_proj_total, aligned_exp_proj_array, synth_proj_array, recon_array, net_x_shifts_pc_new, net_y_shifts_pc_new
+    return orig_ref_proj, aligned_proj_total, aligned_exp_proj_array, synth_proj_array, recon_array, net_x_shifts_pc_new, net_y_shifts_pc_new, dx_array_new, dy_array_new
 
 # file_path_xrf = '/home/bwr0835/2_ide_aggregate_xrf.h5'
 file_path_xrt = '/home/bwr0835/2_ide_aggregate_xrt.h5'
@@ -764,13 +770,15 @@ aligned_exp_proj_array, \
 synth_proj_array, \
 recon_array, \
 net_x_shifts, \
-net_y_shifts = iter_reproj(desired_element, 
-                           elements_xrt, 
-                           theta_xrt, 
-                           counts_xrt, 
-                           algorithm, 
-                           n_desired_iter,
-                           init_x_shift = init_x_shift)
+net_y_shifts, \
+dx_array, \
+dy_array = iter_reproj(desired_element, 
+                       elements_xrt, 
+                       theta_xrt, 
+                       counts_xrt, 
+                       algorithm, 
+                       n_desired_iter,
+                       init_x_shift = init_x_shift)
 
 print('Saving files...')
 
@@ -786,4 +794,6 @@ np.save(os.path.join(full_output_dir_path, 'synth_proj_array_iter_' + desired_el
 np.save(os.path.join(full_output_dir_path, 'recon_array_iter_' + desired_element + '.npy'), recon_array)
 np.save(os.path.join(full_output_dir_path, 'net_x_shifts_' + desired_element + '.npy'), net_x_shifts)
 np.save(os.path.join(full_output_dir_path, 'net_y_shifts_' + desired_element + '.npy'), net_y_shifts)
+np.save(os.path.join(full_output_dir_path, 'dx_array_iter_' + desired_element + '.npy'), dx_array)
+np.save(os.path.join(full_output_dir_path, 'dy_array_iter_' + desired_element + '.npy'), dy_array)
 np.save(os.path.join(full_output_dir_path, 'orig_exp_proj_' + desired_element + '.npy'), orig_proj_ref)
