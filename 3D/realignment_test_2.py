@@ -236,20 +236,18 @@ def radon_manual(image, theta_array, circle = True):
         pad_before = [nc - oc for oc, nc in zip(old_center, new_center)]
         pad_width = [(pb, p - pb) for pb, p in zip(pad_before, pad)]
         padded_image = np.pad(image, pad_width, mode='constant', constant_values=0)
-    
-    # padded_image = ndi.shift(padded_image, shift = (0, -0.5))
 
     n_theta = len(theta_array)
     n_columns = padded_image.shape[0]
     
-    sinogram = np.zeros((n_columns, n_theta))
+    sinogram = np.zeros((n_theta, n_columns))
 
     for theta_idx, theta in enumerate(theta_array):
-        rotated_img = xform.rotate(padded_image, theta, order = 1)
+        rotated_img = xform.rotate(padded_image, theta, center = (padded_image.shape[0]//2, padded_image.shape[0]//2), order = 1)
         # rotated_img = ndi.rotate(padded_image, theta, reshape = False, order = 1) # First part of discrete Radon transform
-        sinogram[:, theta_idx] = np.sum(rotated_img, axis = 0) # Second part of discrete Radon transform
+        sinogram[theta_idx] = np.sum(rotated_img, axis = 0) # Second part of discrete Radon transform
     
-    return sinogram.T
+    return sinogram
 
 def phase_correlate(recon_proj, exp_proj, upsample_factor):
     n_columns = recon_proj.shape[1]
@@ -606,7 +604,7 @@ def iter_reproj(ref_element,
         for slice_idx in range(n_slices):
             print(f'Slice {slice_idx + 1}/{n_slices}')
             
-            sinogram = (xform.radon(recon[slice_idx].copy(), theta_array)).T
+            # sinogram = (xform.radon(recon[slice_idx].copy(), theta_array)).T
             sinogram = radon_manual(recon[slice_idx].copy(), theta_array)
 
             synth_proj[:, slice_idx, :] = sinogram
