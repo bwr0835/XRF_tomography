@@ -243,7 +243,8 @@ def radon_manual(image, theta_array, circle = True):
     sinogram = np.zeros((n_columns, n_theta))
 
     t_grid = np.linspace(-1, 1, n_columns) # Creating grid for scan positions (?)
-    dt = np.diff(t_grid)[0]
+    # dt = np.diff(t_grid)[0]
+    dt = 1 # Difference between next scan position pixel index, current scan position pixel index
 
     for theta_idx, theta in enumerate(theta_array):
         rotated_img = xform.rotate(padded_image, theta, center = (padded_image.shape[0]//2, padded_image.shape[0]//2), order = 1)
@@ -607,8 +608,8 @@ def iter_reproj(ref_element,
         for slice_idx in range(n_slices):
             print(f'Slice {slice_idx + 1}/{n_slices}')
             
-            # sinogram = (xform.radon(recon[slice_idx].copy(), theta_array)).T
-            sinogram = radon_manual(recon[slice_idx].copy(), theta_array)
+            sinogram = (xform.radon(recon[slice_idx].copy(), theta_array)).T
+            # sinogram = radon_manual(recon[slice_idx].copy(), theta_array)
 
             synth_proj[:, slice_idx, :] = sinogram
         
@@ -695,7 +696,7 @@ output_dir_path_base = '/home/bwr0835'
 # output_file_name_base = 'gridrec_5_iter_vacek_cor_and_shift_correction_padding_-22_deg_158_deg'
 # output_file_name_base = 'xrt_mlem_1_iter_no_shift_no_log_tomopy_default_cor_w_padding_07_03_2025'
 # output_file_name_base = 'xrt_mlem_1_iter_manual_shift_-20_no_log_tomopy_default_cor_w_padding_07_09_2025'
-output_file_name_base = 'xrt_gridrec_6_iter_dynamic_ps_cor_correction_log_w_padding_gridrec_cor_299_5_aug_04_2025'
+output_file_name_base = 'xrt_gridrec_6_iter_dynamic_ps_cor_correction_log_w_padding_gridrec_cor_idx_300_skimage_radon_aug_14_2025'
 # output_file_name_base = 'xrt_gridrec_1_iter_no_shift_no_log_tomopy_default_cor_w_padding_07_03_2025'
 
 if output_file_name_base == '':
