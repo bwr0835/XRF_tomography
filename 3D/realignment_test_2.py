@@ -237,15 +237,20 @@ def radon_manual(image, theta_array, circle = True):
         pad_width = [(pb, p - pb) for pb, p in zip(pad_before, pad)]
         padded_image = np.pad(image, pad_width, mode='constant', constant_values=0)
 
+    xv, yv = np.meshgrid()
+
     n_theta = len(theta_array)
     n_columns = padded_image.shape[0]
     
     sinogram = np.zeros((n_columns, n_theta))
 
+    t_grid = np.linspace(-1, 1, n_columns) # Creating grid for scan positions (?)
+    dt = np.diff(t_grid)[0]
+
     for theta_idx, theta in enumerate(theta_array):
         rotated_img = xform.rotate(padded_image, theta, center = (padded_image.shape[0]//2, padded_image.shape[0]//2), order = 1)
         # rotated_img = ndi.rotate(padded_image, theta, reshape = False, order = 1) # First part of discrete Radon transform
-        sinogram[:, theta_idx] = np.sum(rotated_img, axis = 0) # Second part of discrete Radon transform
+        sinogram[:, theta_idx] = rotated_img.sum(0)*dt # Second part of discrete Radon transform
     
     return sinogram.T
 
