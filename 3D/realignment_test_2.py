@@ -322,7 +322,7 @@ def rot_center_avg(proj_img_array, theta_pair_array, theta_array):
     
     center_rotation_avg = center_of_rotation_sum/len(theta_pair_array)
 
-    geom_center_index = n_columns//2
+    geom_center_index = n_columns//2 - 1.5
 
     offset = center_rotation_avg - geom_center_index
 
