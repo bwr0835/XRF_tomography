@@ -698,15 +698,15 @@ def iter_reproj(ref_element,
     return orig_ref_proj, aligned_proj_total, aligned_exp_proj_array, synth_proj_array, recon_array, net_x_shifts_pc_new, net_y_shifts_pc_new, dx_array_new, dy_array_new
 
 # file_path_xrf = '/home/bwr0835/2_ide_aggregate_xrf.h5'
-# file_path_xrt = '/home/bwr0835/2_ide_aggregate_xrt.h5'
-file_path_xrt = '/Users/bwr0835/Documents/2_ide_aggregate_xrt.h5'
+file_path_xrt = '/home/bwr0835/2_ide_aggregate_xrt.h5'
+# file_path_xrt = '/Users/bwr0835/Documents/2_ide_aggregate_xrt.h5'
 output_dir_path_base = '/home/bwr0835'
 
 # output_file_name_base = input('Choose a base file name: ')
 # output_file_name_base = 'gridrec_5_iter_vacek_cor_and_shift_correction_padding_-22_deg_158_deg'
 # output_file_name_base = 'xrt_mlem_1_iter_no_shift_no_log_tomopy_default_cor_w_padding_07_03_2025'
 # output_file_name_base = 'xrt_mlem_1_iter_manual_shift_-20_no_log_tomopy_default_cor_w_padding_07_09_2025'
-output_file_name_base = 'xrt_gridrec_6_iter_dynamic_ps_cor_correction_log_w_padding_gridrec_cor_idx_300_skimage_radon_aug_14_2025'
+output_file_name_base = 'xrt_gridrec_6_iter_dynamic_ps_cor_correction_log_w_padding_gridrec_cor_300_minus_1_aug_19_2025'
 # output_file_name_base = 'xrt_gridrec_1_iter_no_shift_no_log_tomopy_default_cor_w_padding_07_03_2025'
 
 if output_file_name_base == '':
