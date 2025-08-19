@@ -487,7 +487,7 @@ def iter_reproj(ref_element,
     # Iterative center of rotation correction for reference element
     print("Starting iterative center of rotation correction...")
     
-    max_cor_iterations = 10  # Maximum iterations for center of rotation correction
+    max_cor_iterations = 20  # Maximum iterations for center of rotation correction
     eps_cor = 0.001     # Tolerance for center of rotation convergence
 
     aligned_proj = xrf_proj_img_array[ref_element_idx].copy()
