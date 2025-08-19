@@ -490,7 +490,7 @@ def iter_reproj(ref_element,
     max_cor_iterations = 20  # Maximum iterations for center of rotation correction
     eps_cor = 0.001     # Tolerance for center of rotation convergence
 
-    manual_offset = -1
+    # manual_offset = -1
 
     aligned_proj = xrf_proj_img_array[ref_element_idx].copy()
     
@@ -510,7 +510,7 @@ def iter_reproj(ref_element,
         print(f'Center of rotation error: {round_correct(offset, ndec = 3)}')
         
         # Check if we've converged
-        if abs(offset) < eps_cor:
+        if abs(offset) <= eps_cor:
             print(f'Center of rotation converged after {cor_iter + 1} iterations')
             
             # for theta_idx in range(n_theta):
@@ -586,7 +586,7 @@ def iter_reproj(ref_element,
                     aligned_proj[theta_idx] = ndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx], shift = (net_y_shift, net_x_shift))
                     # aligned_proj[theta_idx] = ndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx], shift = (net_y_shift, net_x_shift + manual_offset))
 
-                net_x_shifts_pc[i, :] -= manual_offset
+                # net_x_shifts_pc[i, :] -= manual_offset
 
                 center_of_rotation_avg, _, offset = rot_center_avg(aligned_proj, theta_idx_pairs, theta_array)
 
