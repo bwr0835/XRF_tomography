@@ -322,7 +322,7 @@ def rot_center_avg(proj_img_array, theta_pair_array, theta_array):
     
     center_rotation_avg = center_of_rotation_sum/len(theta_pair_array)
 
-    geom_center_index = n_columns//2
+    geom_center_index = n_columns//2 - 1
 
     offset = center_rotation_avg - geom_center_index
 
@@ -535,6 +535,9 @@ def iter_reproj(ref_element,
     # for theta_idx in range(n_theta):
     #     aligned_proj[theta_idx] = xrf_proj_img_array[ref_element_idx, theta_idx].copy()
 
+    # plt.imshow(aligned_proj[0])
+    # plt.show()
+
     for i in range(n_iterations):
         iterations.append(i)
         
@@ -695,7 +698,8 @@ def iter_reproj(ref_element,
     return orig_ref_proj, aligned_proj_total, aligned_exp_proj_array, synth_proj_array, recon_array, net_x_shifts_pc_new, net_y_shifts_pc_new, dx_array_new, dy_array_new
 
 # file_path_xrf = '/home/bwr0835/2_ide_aggregate_xrf.h5'
-file_path_xrt = '/home/bwr0835/2_ide_aggregate_xrt.h5'
+# file_path_xrt = '/home/bwr0835/2_ide_aggregate_xrt.h5'
+file_path_xrt = '/Users/bwr0835/Documents/2_ide_aggregate_xrt.h5'
 output_dir_path_base = '/home/bwr0835'
 
 # output_file_name_base = input('Choose a base file name: ')
