@@ -241,7 +241,7 @@ def radon_manual(image, theta_array, center = None):
 
         coords = np.vstack([yr, xr])
         # interpolate along rotated line
-        sino[:, i] = xform.map_coordinates(image, coords, order=1)
+        sino[:, i] = ndi.map_coordinates(image, coords, order=1)
 
     return sino
 
