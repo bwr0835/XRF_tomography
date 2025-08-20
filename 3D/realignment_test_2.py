@@ -643,13 +643,14 @@ def iter_reproj(ref_element,
         
         recon_array.append(recon)
 
-        for slice_idx in range(n_slices):
-            print(f'Slice {slice_idx + 1}/{n_slices}')
+        # for slice_idx in range(n_slices):
+            # print(f'Slice {slice_idx + 1}/{n_slices}')
             
             # sinogram = (xform.radon(recon[slice_idx].copy(), theta_array)).T
-            sinogram = (radon_manual(recon[slice_idx].copy(), theta_array, center = (n_slices//2, center_of_rotation_avg))).T
+            # sinogram = (radon_manual(recon[slice_idx].copy(), theta_array, center = (n_slices//2, center_of_rotation_avg))).T
+        synth_proj_array = tomo.project(recon_array, theta_array, center = center_of_rotation_avg, pad = False)
 
-            synth_proj[:, slice_idx, :] = sinogram
+        # synth_proj[:, slice_idx, :] = sinogram
         
         synth_proj_array.append(synth_proj.copy())
         
