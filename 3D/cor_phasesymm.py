@@ -284,7 +284,7 @@ counts_new = np.zeros((n_theta, n_slices, n_columns - int(np.ceil(np.abs(offset)
 # counts_new = np.zeros_like(counts)
 cts = counts.copy()
 
-print(int(np.ceil(np.abs(offset))))
+# print(int(np.ceil(np.abs(offset))))
 
 for theta_idx in range(n_theta):
     counts[theta_idx] = ndi.shift(counts[theta_idx], shift = (0, -offset))
@@ -300,6 +300,9 @@ for theta_idx in range(n_theta):
 counts_new[np.array(reflection_pair_idx_array).ravel()] = counts[np.array(reflection_pair_idx_array).ravel(), :, :-int(np.ceil(np.abs(offset)))]
 # plt.imshow(counts[0])
 # plt.show()
+
+for i in np.array(reflection_pair_idx_array).ravel():
+    print(i)
 
 cor_array = []
 # sino = counts
