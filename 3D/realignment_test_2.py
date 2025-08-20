@@ -226,26 +226,27 @@ def radon_manual(image, theta_array, center = None):
         cx, cy = center
 
     # compute diagonal length for output
-    diagonal = int(np.ceil(np.sqrt(n_cols**2 + n_cols**2)))
-   
-    t = np.arange(n_cols)
-    sino = np.zeros(((n_cols, n_theta)), dtype=image.dtype)
+    # detector positions (columns)
+    t = np.arange(n_cols) - cx
+    sino = np.zeros((n_cols, n_theta), dtype=image.dtype)
 
-    # coordinates relative to center (detector axis along x')
-    X, Y = np.meshgrid(np.arange(n_cols) - cx, np.arange(n_cols) - cy)
-    
+    # row positions for interpolation
+    y_indices = np.arange(n_cols) - cy
 
     for i, angle in enumerate(np.deg2rad(theta_array)):
-        # rotation
-        xr = X * np.cos(angle) - Y * np.sin(angle)
-        yr = -X * np.sin(angle) + Y * np.cos(angle)
+        cos_a = np.cos(angle)
+        sin_a = np.sin(angle)
 
-        coords = np.vstack([yr.ravel() + cy, xr.ravel() + cx])
-        rotated = ndi.map_coordinates(image, coords, order=1)
-        
-        sino[:, i] = rotated.reshape(n_cols, n_cols).sum(axis = 0)
-        
-
+        # for each detector column, compute rotated coordinates
+        # xr = t * cos_a - y * sin_a
+        # yr = t * sin_a + y * cos_a
+        # we vectorize over rows (y)
+        for j, x_prime in enumerate(t):
+            xr = x_prime * cos_a - y_indices * sin_a + cx
+            yr = x_prime * sin_a + y_indices * cos_a + cy
+            coords = np.vstack([yr, xr])
+            sino[j, i] = ndi.map_coordinates(image, coords, order=1, mode='constant', cval=0.0).sum()
+    
     return sino
 
 def phase_correlate(recon_proj, exp_proj, upsample_factor):
