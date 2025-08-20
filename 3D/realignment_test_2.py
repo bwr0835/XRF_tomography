@@ -475,8 +475,7 @@ def iter_reproj(ref_element,
 
     # print(f'Average COR: {(center_of_rotation_avg)}')
 
-    # print(f'Average center of rotation: {round_correct(center_of_rotation_avg, ndec = 3)}')
-    # print(f'Geometric center: {geom_center}')
+    
     # print(f'Center of rotation error: {round_correct(offset, ndec = 3)}')
     # print(f'Incorporating x-shift = {round_correct(-offset, ndec = 3)} to all projection images...')
 
@@ -485,7 +484,7 @@ def iter_reproj(ref_element,
     #         xrf_proj_img_array[element_idx, theta_idx] = ndi.shift(xrf_proj_img_array[element_idx, theta_idx], shift = (0, -offset))
     
     # Iterative center of rotation correction for reference element
-    print("Starting iterative center of rotation correction...")
+    # print("Starting iterative center of rotation correction...")
     
     # max_cor_iterations = 20  # Maximum iterations for center of rotation correction
     # eps_cor = 0.001     # Tolerance for center of rotation convergence
@@ -524,6 +523,8 @@ def iter_reproj(ref_element,
         # for theta_idx in range(n_theta):
             # aligned_proj[theta_idx] = ndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx], shift = (0, -net_offset))
     
+    print(f'Geometric center: {center_geom}')
+    print(f'Center of rotation error: {round_correct(offset_init, ndec = 3)}')
     print(f'Applying center of rotation correction: {round_correct(-offset_init, ndec = 3)}')
 
     for theta_idx in range(n_theta):

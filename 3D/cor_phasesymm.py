@@ -193,8 +193,6 @@ cor_array = []
 
 reflection_pair_idx_array = find_theta_combos(theta_xrt, dtheta = 1)
 
-print(np.array(reflection_pair_idx_array).ravel().astype(np.int8))
-
 color_array = ['r', 'orange', 'gold', 'g', 'c', 'b', 'indigo', 'darkviolet', 'm', 'saddlebrown', 'gray', 'k']
 
 sino = counts
@@ -274,7 +272,7 @@ for theta_idx in range(len(reflection_pair_idx_array)):
 
     cor_array.append(center_of_rotation)
 
-geom_center = 295
+geom_center = 300
 
 offset = np.mean(np.array(cor_array)) - geom_center
 
@@ -298,8 +296,8 @@ for theta_idx in range(n_theta):
     # counts_new[theta_idx] = counts[theta_idx]
     # counts_new[theta_idx] = counts[theta_idx, :, :-int(round_correct(np.abs(np.mean(np.array(cor_array)) - geom_center), ndec = 0))]
     # counts_new[theta_idx] = counts[theta_idx, :, :-int(np.ceil(np.abs(np.mean(np.array(cor_array)) - geom_center)))]
-    counts_new[theta_idx] = counts[theta_idx, :, :-int(np.ceil(np.abs(offset)))]
-
+    # counts_new[theta_idx] = counts[theta_idx, :, :-int(np.ceil(np.abs(offset)))]
+counts_new[np.array(reflection_pair_idx_array).ravel()] = counts[np.array(reflection_pair_idx_array).ravel(), :, :-int(np.ceil(np.abs(offset)))]
 # plt.imshow(counts[0])
 # plt.show()
 
