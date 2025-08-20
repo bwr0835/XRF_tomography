@@ -141,9 +141,9 @@ def rot_center(theta_sum, slice_idx_desired): # Use only with F. Marin's code
     Nt = theta_sum.shape[1]
    
     T_phase = np.arctan2(imag*np.sign(real), real*np.sign(real))
-
+    print(Nt)
     # cor = Nt*(1 - T_phase[slice_idx_desired]/(np.pi))/2 - 1/2
-    cor = Nt*(1 - T_phase/(np.pi))/2
+    cor = Nt//2 - Nt*T_phase/(2*np.pi)
 
     # print(cor)
 

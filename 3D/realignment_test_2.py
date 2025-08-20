@@ -302,7 +302,7 @@ def rot_center(theta_sum):
 
     phase = np.arctan2(imag*np.sign(real), real*np.sign(real)) 
     
-    COR = Nt//2 - Nt*phase/(2*np.pi) # Extra -1/2 since Python starts indexing at zero
+    COR = Nt//2 - Nt*phase/(2*np.pi)
 
     return COR
 
@@ -536,7 +536,7 @@ def iter_reproj(ref_element,
         theta_idx_pairs_nparray = np.array(theta_idx_pairs).ravel()
 
         aligned_proj_temp = np.zeros((n_theta, n_slices, n_columns - offset_crop_idx))
-        
+        print(aligned_proj_temp.shape)
         if offset_init > 0:
             aligned_proj_temp[theta_idx_pairs_nparray] = aligned_proj[theta_idx_pairs_nparray, :, :-offset_crop_idx]
         
@@ -546,15 +546,19 @@ def iter_reproj(ref_element,
     else:
         aligned_proj_temp = aligned_proj
     
-    center_of_rotation_avg, _, offset = rot_center_avg(aligned_proj_temp, theta_idx_pairs, theta_array)
+    center_of_rotation_avg, _, _ = rot_center_avg(aligned_proj_temp, theta_idx_pairs, theta_array)
+
+    offset = center_of_rotation_avg - center_geom
 
     if offset_init < 0:
         offset += offset_crop_idx
 
     # print(f'Final center of rotation after iterative correction: {round_correct(center_of_rotation_avg, ndec = 3)}')
     print(f'Final center of rotation after initial COR correction: {round_correct(center_of_rotation_avg, ndec = 3)}')
+    print(f'Geometric center: {center_geom}')
     print(f'Final center of rotation error: {round_correct(offset, ndec = 3)}')
     
+    # sys.exit()
     # Calculate the total shift needed as the difference between final and initial COR
     # total_cor_shift_needed = final_center_of_rotation_avg - init_cor_avg
     
@@ -732,8 +736,8 @@ def iter_reproj(ref_element,
     return orig_ref_proj, aligned_proj_total, aligned_exp_proj_array, synth_proj_array, recon_array, net_x_shifts_pc_new, net_y_shifts_pc_new, dx_array_new, dy_array_new
 
 # file_path_xrf = '/home/bwr0835/2_ide_aggregate_xrf.h5'
-file_path_xrt = '/home/bwr0835/2_ide_aggregate_xrt.h5'
-# file_path_xrt = '/Users/bwr0835/Documents/2_ide_aggregate_xrt.h5'
+# file_path_xrt = '/home/bwr0835/2_ide_aggregate_xrt.h5'
+file_path_xrt = '/Users/bwr0835/Documents/2_ide_aggregate_xrt.h5'
 output_dir_path_base = '/home/bwr0835'
 
 # output_file_name_base = input('Choose a base file name: ')
