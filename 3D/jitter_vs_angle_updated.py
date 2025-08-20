@@ -28,7 +28,7 @@ plt.rcParams['ytick.minor.size'] = 4.5
     # for filename in tiff_filename_array:
     #     os.remove(filename)
 
-dir_path = '/Users/bwr0835/Documents/xrt_gridrec_6_iter_dynamic_ps_cor_correction_log_w_padding_gridrec_cor_idx_300_skimage_radon_aug_14_2025'
+dir_path = '/Users/bwr0835/Documents/xrt_gridrec_6_iter_dynamic_ps_cor_correction_log_w_padding_gridrec_cor_idx_300_skimage_rado_aug_14_2025'
 
 aligned_proj_file = '/Users/bwr0835/Documents/xrt_gridrec_6_iter_dynamic_ps_cor_correction_log_w_padding_gridrec_cor_idx_300_skimage_radon_aug_14_2025/aligned_proj_array_iter_ds_ic.npy'
 dx_file = '/Users/bwr0835/Documents/xrt_gridrec_6_iter_dynamic_ps_cor_correction_log_w_padding_gridrec_cor_idx_300_skimage_radon_aug_14_2025/dx_array_iter_ds_ic.npy'
@@ -38,6 +38,7 @@ aligned_proj_array = np.load(aligned_proj_file)
 dx_iter_array = np.load(dx_file)
 theta_array = np.load(theta_file)
 
+n_columns = aligned_proj_array[0].shape[2]
 n_theta = len(theta_array)
 
 iter_idx_desired = 0
@@ -80,6 +81,7 @@ vmax = np.max(aligned_proj_array[0])
 im2 = axs2.imshow(aligned_proj_array[iter_idx_desired][0], vmin = vmin, vmax = vmax)
 text2 = axs2.text(0.02, 0.02, r'$\theta = {0}$\textdegree'.format(theta_array[0]), transform = axs2.transAxes, color = 'white')
 
+axs2.axvline(x = )
 axs2.axis('off')
 axs2.set_title(r'Iteration index {0}'.format(iter_idx_desired))
 

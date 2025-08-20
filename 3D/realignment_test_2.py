@@ -534,8 +534,13 @@ def iter_reproj(ref_element,
         offset_crop_idx = int(np.ceil(np.abs(offset_init))) 
         print(offset_crop_idx)
         theta_idx_pairs_nparray = np.array(theta_idx_pairs).ravel()
-
-        aligned_proj_temp = np.zeros((n_theta, n_slices, n_columns - offset_crop_idx))
+        
+        if ((n_columns - offset_crop_idx) % 2) == 0:
+            aligned_proj_temp = np.zeros((n_theta, n_slices, n_columns - offset_crop_idx))
+        
+        else:
+             aligned_proj_temp = np.zeros((n_theta, n_slices, n_columns - offset_crop_idx + 1))
+        
         print(aligned_proj_temp.shape)
         if offset_init > 0:
             aligned_proj_temp[theta_idx_pairs_nparray] = aligned_proj[theta_idx_pairs_nparray, :, :-offset_crop_idx]
