@@ -675,8 +675,8 @@ def iter_reproj(ref_element,
         print(f'Geometric center: {center_geom}')
         print(f'Center of rotation error: {round_correct(offset_synth, ndec = 3)}')
         
-        if i == 1:
-            sys.exit()
+        # if i == 1:
+            # sys.exit()
 
         if np.max(np.abs(dx_array_pc[i])) < eps and np.max(np.abs(dy_array_pc[i])) < eps:
             iterations = np.array(iterations)
