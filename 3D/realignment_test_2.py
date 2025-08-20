@@ -227,29 +227,29 @@ def radon_manual(image, theta_array, center = None):
 
     # compute diagonal length for output
     # detector positions (columns)
-    x = np.arange(n_cols) - cx
-    y = np.arange(n_cols) - cy
-    X, Y = np.meshgrid(x, y)  # shape (N, N)
+    t = np.arange(n_cols) - cx  # length N
+    rows = np.arange(n_cols) - cy  # length N
 
     sino = np.zeros((n_cols, n_theta), dtype=image.dtype)
 
-    # vectorized loop over angles
     angles_rad = np.deg2rad(theta_array)
     cos_a = np.cos(angles_rad)
     sin_a = np.sin(angles_rad)
 
+    # Broadcast row offsets for all columns at once
+    Y = rows[:, None]  # shape (N, 1)
     for i in range(n_theta):
-        # rotate coordinates
-        xr = X * cos_a[i] + Y * sin_a[i] + cx
-        yr = -X * sin_a[i] + Y * cos_a[i] + cy
+        # rotate detector positions (1D) plus row offsets
+        X_rot = t[None, :] * cos_a[i] - Y * sin_a[i] + cx
+        Y_rot = t[None, :] * sin_a[i] + Y * cos_a[i] + cy
 
-        # interpolate rotated image in one shot
-        coords = np.vstack([yr.ravel(), xr.ravel()])
-        rotated = ndi.map_coordinates(image, coords, order=1, mode='constant', cval=0.0)
-        rotated = rotated.reshape(n_cols, n_cols)
+        # interpolate rotated coordinates in one shot
+        coords = np.vstack([Y_rot.ravel(), X_rot.ravel()])
+        proj_image = ndi.map_coordinates(image, coords, order=1, mode='constant', cval=0.0)
+        proj_image = proj_image.reshape(n_cols, n_cols)
 
-        # sum along rows (axis=0) to get projection along columns
-        sino[:, i] = rotated.sum(axis=0)
+        # sum along rows to get projection (columns)
+        sino[:, i] = proj_image.sum(axis=0)
 
     return sino
 
