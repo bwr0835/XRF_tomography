@@ -648,7 +648,7 @@ def iter_reproj(ref_element,
             
             # sinogram = (xform.radon(recon[slice_idx].copy(), theta_array)).T
             # sinogram = (radon_manual(recon[slice_idx].copy(), theta_array, center = (n_slices//2, center_of_rotation_avg))).T
-        synth_proj_array = tomo.project(recon_array, theta_array, center = center_of_rotation_avg, pad = False)
+        synth_proj_array = tomo.project(recon, theta_array, center = center_of_rotation_avg, pad = False)
 
         # synth_proj[:, slice_idx, :] = sinogram
         
