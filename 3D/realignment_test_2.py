@@ -539,9 +539,11 @@ def iter_reproj(ref_element,
             aligned_proj_temp = np.zeros((n_theta, n_slices, n_columns - offset_crop_idx))
         
         else:
-             aligned_proj_temp = np.zeros((n_theta, n_slices, n_columns - offset_crop_idx + 1))
+            offset_crop_idx += 1
+            
+            aligned_proj_temp = np.zeros((n_theta, n_slices, n_columns - offset_crop_idx))
 
-             offset_crop_idx += 1
+             
         
         print(aligned_proj_temp.shape)
         if offset_init > 0:
