@@ -530,7 +530,7 @@ def iter_reproj(ref_element,
         aligned_proj[theta_idx] = ndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx], shift = (0, -offset_init))
     
     if offset_init != 0:
-        offset_crop_idx = int(np.ceil(np.abs(offset))) 
+        offset_crop_idx = int(np.ceil(np.abs(offset_init))) 
 
         theta_idx_pairs_nparray = np.array(theta_idx_pairs).ravel()
 
