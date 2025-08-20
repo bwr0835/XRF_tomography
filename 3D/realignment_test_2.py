@@ -227,21 +227,24 @@ def radon_manual(image, theta_array, center = None):
 
     # compute diagonal length for output
     diagonal = int(np.ceil(np.sqrt(n_cols**2 + n_cols**2)))
-    t = np.linspace(-diagonal//2, diagonal//2, diagonal)
-    sino = np.zeros(((diagonal, n_theta)), dtype=image.dtype)
+   
+    t = np.arange(n_cols)
+    sino = np.zeros(((n_cols, n_theta)), dtype=image.dtype)
 
     # coordinates relative to center (detector axis along x')
-    x = t
-    y = np.zeros_like(t)
+    X, Y = np.meshgrid(np.arange(n_cols) - cx, np.arange(n_cols) - cy)
+    
 
     for i, angle in enumerate(np.deg2rad(theta_array)):
         # rotation
-        xr = x * np.cos(angle) - y * np.sin(angle) + cx
-        yr = x * np.sin(angle) + y * np.cos(angle) + cy
+        xr = X * np.cos(angle) - Y * np.sin(angle)
+        yr = -X * np.sin(angle) + Y * np.cos(angle)
 
-        coords = np.vstack([yr, xr])
-        # interpolate along rotated line
-        sino[:, i] = ndi.map_coordinates(image, coords, order=1)
+        coords = np.vstack([yr.ravel() + cy, xr.ravel() + cx])
+        rotated = ndi.map_coordinates(image, coords, order=1)
+        
+        sino[:, i] = rotated.reshape(n_cols, n_cols).sum(axis = 0)
+        
 
     return sino
 
