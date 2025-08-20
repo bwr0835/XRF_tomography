@@ -18,6 +18,19 @@ plt.rcParams['xtick.minor.size'] = 4.5
 plt.rcParams['ytick.major.size'] = 9
 plt.rcParams['ytick.minor.size'] = 4.5
 
+def round_correct(num, ndec): # CORRECTLY round a number (num) to chosen number of decimal places (ndec)
+    if ndec == 0:
+        return int(num + 0.5)
+    
+    else:
+        digit_value = 10**ndec
+        
+        if num > 0:
+            return int(num*digit_value + 0.5)/digit_value
+        
+        else:
+            return int(num*digit_value - 0.5)/digit_value
+
 def pad_col_row(array):
     array_new = np.zeros((array.shape[0], array.shape[1] + 1, array.shape[2] + 1))
 
@@ -130,7 +143,7 @@ def rot_center(theta_sum, slice_idx_desired): # Use only with F. Marin's code
     T_phase = np.arctan2(imag*np.sign(real), real*np.sign(real))
 
     # cor = Nt*(1 - T_phase[slice_idx_desired]/(np.pi))/2 - 1/2
-    cor = Nt*(1 - T_phase/(np.pi))/2 - 1/2
+    cor = Nt*(1 - T_phase/(np.pi))/2
 
     # print(cor)
 
@@ -142,7 +155,7 @@ file_path_xrt = '/Users/bwr0835/Documents/2_ide_aggregate_xrt.h5'
 ref_element = 'ds_ic'
 # ref_element = 'Ca'
 
-elements_xrt, counts_xrt, theta_xrt, dataset_type_xrt = h5_util.extract_h5_aggregate_xrt_data(file_path_xrt)
+elements_xrt, counts_xrt, theta_xrt, dataset_type_xrt, _ = h5_util.extract_h5_aggregate_xrt_data(file_path_xrt)
 
 ref_element_idx = elements_xrt.index(ref_element)
 counts = counts_xrt[ref_element_idx]
@@ -179,6 +192,8 @@ counts[counts > 0] = -np.log(counts[counts > 0]/counts_inc)
 cor_array = []
 
 reflection_pair_idx_array = find_theta_combos(theta_xrt, dtheta = 1)
+
+print(np.array(reflection_pair_idx_array).ravel().astype(np.int8))
 
 color_array = ['r', 'orange', 'gold', 'g', 'c', 'b', 'indigo', 'darkviolet', 'm', 'saddlebrown', 'gray', 'k']
 
@@ -224,6 +239,7 @@ slice_idx_desired = 151
 
 # offset = np.mean(np.array(cor_array)) - (counts.shape[2]/2 - 1/2)
 
+
 # offset = 6.745766492238204
 # offset = 7.963059334690836
 # offset = 7.929977403864523
@@ -234,14 +250,14 @@ slice_idx_desired = 151
 # offset = 7.937159098256455
 # offset = 7.939846200150093
 # offset = 7.938834044186073
-offset = 7.939 + 1.2
+# offset = 7.939 + 1.2
 
 # offset = 0
 
-print(offset)
+# print(offset)
 
-for theta_idx in range(n_theta):
-    counts[theta_idx] = ndi.shift(counts[theta_idx], shift = (0, -offset))
+# for theta_idx in range(n_theta):
+    # counts[theta_idx] = ndi.shift(counts[theta_idx], shift = (0, -offset))
 
 cor_array = []
 
@@ -258,7 +274,59 @@ for theta_idx in range(len(reflection_pair_idx_array)):
 
     cor_array.append(center_of_rotation)
 
-print(f'Mean COR = {np.mean(np.array(cor_array))}')
-print(f'Offset = {np.mean(np.array(cor_array)) - 299.5}')
+geom_center = 295
 
+offset = np.mean(np.array(cor_array)) - geom_center
+
+print(f'Mean COR = {np.mean(np.array(cor_array))}')
+print(f'Offset = {offset}')
+
+# counts_new = np.zeros((n_theta, n_slices, n_columns - int(round_correct(np.abs(np.mean(np.array(cor_array)) - geom_center), ndec = 0))))
+counts_new = np.zeros((n_theta, n_slices, n_columns - int(np.ceil(np.abs(offset)))))
+# counts_new = np.zeros_like(counts)
+cts = counts.copy()
+
+print(int(np.ceil(np.abs(offset))))
+
+for theta_idx in range(n_theta):
+    counts[theta_idx] = ndi.shift(counts[theta_idx], shift = (0, -offset))
+
+    # if theta_idx == 1:
+    #     plt.plot(np.arange(cts.shape[-1]), cts[theta_idx, 151])
+    #     plt.plot(np.arange(counts.shape[-1]), counts[theta_idx, 151])
+    #     plt.show()
+    # counts_new[theta_idx] = counts[theta_idx]
+    # counts_new[theta_idx] = counts[theta_idx, :, :-int(round_correct(np.abs(np.mean(np.array(cor_array)) - geom_center), ndec = 0))]
+    # counts_new[theta_idx] = counts[theta_idx, :, :-int(np.ceil(np.abs(np.mean(np.array(cor_array)) - geom_center)))]
+    counts_new[theta_idx] = counts[theta_idx, :, :-int(np.ceil(np.abs(offset)))]
+
+# plt.imshow(counts[0])
+# plt.show()
+
+cor_array = []
+# sino = counts
+
+for theta_idx in range(len(reflection_pair_idx_array)):
+    slice_proj_neg_22 = counts_new[reflection_pair_idx_array[theta_idx][0]]
+    slice_proj_158 = (counts_new[reflection_pair_idx_array[theta_idx][1]])
+
+    theta_sum = slice_proj_158 + slice_proj_neg_22
+
+    # summed_proj = np.sum(counts_new[theta_idx], axis = 0)
+
+    # x_coords = np.arange(len(summed_proj))
+    
+    # center_of_rotation = np.sum(x_coords*summed_proj)/np.sum(summed_proj)
+
+    center_of_rotation = rot_center(theta_sum, slice_idx_desired)
+    # center_of_rotation = tomo.find_center_pc(slice_proj_neg_22, slice_proj_158, tol = 0.01)
+
+    print(f'{center_of_rotation} ({theta_xrt[reflection_pair_idx_array[theta_idx][0]]}, {theta_xrt[reflection_pair_idx_array[theta_idx][1]]})')
+
+    cor_array.append(center_of_rotation)
+
+offset = np.mean(np.array(cor_array)) - geom_center
+
+print(f'Mean COR = {np.mean(np.array(cor_array))}')
+print(f'Offset = {offset}')
 
