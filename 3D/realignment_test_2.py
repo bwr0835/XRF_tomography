@@ -199,59 +199,59 @@ def create_ref_pair_theta_idx_array(ref_pair_theta_array, theta_array):
 
     return np.array([ref_pair_theta_idx_1, ref_pair_theta_idx_2])
 
-def radon_manual(image, theta_array, center = None):
-    n_cols = image.shape[0]
-    n_theta = len(theta_array)
-    
-    # if image.dtype == np.float16:
-        # image = image.astype(np.float32)
+def radon_manual(image, theta_array, circle = True):
 
-    # if circle:
-    #     shape_min = min(image.shape)
-    #     radius = shape_min // 2
-    #     img_shape = np.array(image.shape)
-    #     coords = np.array(np.ogrid[: image.shape[0], : image.shape[1]], dtype=object)
-    #     dist = ((coords - img_shape // 2) ** 2).sum(0)
-    #     outside_reconstruction_circle = dist > radius**2
-    #     if np.any(image[outside_reconstruction_circle]):
-    #         warnings.warn(
-    #             'Radon transform: image must be zero outside the '
-    #             'reconstruction circle'
-    #         )
+    if image.dtype == np.float16:
+        image = image.astype(np.float32)
 
-    if center is None:
-        cx, cy = n_cols//2, n_cols//2
+    if circle:
+        shape_min = min(image.shape)
+        radius = shape_min // 2
+        img_shape = np.array(image.shape)
+        coords = np.array(np.ogrid[: image.shape[0], : image.shape[1]], dtype=object)
+        dist = ((coords - img_shape // 2) ** 2).sum(0)
+        outside_reconstruction_circle = dist > radius**2
+
+        if np.any(image[outside_reconstruction_circle]):
+            warnings.warn(
+                'Radon transform: image must be zero outside the '
+                'reconstruction circle'
+            )
+        # Crop image to make it square
+        slices = tuple(
+            (
+                slice(int(np.ceil(excess / 2)), int(np.ceil(excess / 2) + shape_min))
+                if excess > 0
+                else slice(None)
+            )
+            for excess in (img_shape - shape_min)
+        )
+        padded_image = image[slices]
     
     else:
-        cx, cy = center
+        diagonal = np.sqrt(2) * max(image.shape)
+        pad = [int(np.ceil(diagonal - s)) for s in image.shape]
+        new_center = [(s + p) // 2 for s, p in zip(image.shape, pad)]
+        old_center = [s // 2 for s in image.shape]
+        pad_before = [nc - oc for oc, nc in zip(old_center, new_center)]
+        pad_width = [(pb, p - pb) for pb, p in zip(pad_before, pad)]
+        padded_image = np.pad(image, pad_width, mode='constant', constant_values=0)
 
-    # compute diagonal length for output
-    # detector positions (columns)
-    t = np.arange(n_cols) - cx  # length N
-    rows = np.arange(n_cols) - cy  # length N
+    n_theta = len(theta_array)
+    n_columns = padded_image.shape[0]
+    
+    sinogram = np.zeros((n_columns, n_theta))
 
-    sino = np.zeros((n_cols, n_theta), dtype=image.dtype)
+    t_grid = np.linspace(-1, 1, n_columns) # Creating grid for scan positions (?)
+    # dt = np.diff(t_grid)[0]
+    dt = 1 # Difference between next scan position pixel index, current scan position pixel index
 
-    angles_rad = np.deg2rad(theta_array)
-    cos_a = np.cos(angles_rad)
-    sin_a = np.sin(angles_rad)
-
-    # Broadcast row offsets for all columns at once
-    Y = rows[:, None]  # shape (N, 1)
-    for i in range(n_theta):
-        # rotate detector positions (1D) plus row offsets
-        X_rot = t[None, :] * cos_a[i] - Y * sin_a[i] + cx
-        Y_rot = t[None, :] * sin_a[i] + Y * cos_a[i] + cy
-
-        # interpolate rotated coordinates in one shot
-        coords = np.vstack([Y_rot.ravel(), X_rot.ravel()])
-        proj_image = ndi.map_coordinates(image, coords, order=1, mode='constant', cval=0.0)
-        proj_image = proj_image.reshape(n_cols, n_cols)
-
-        # sum along rows to get projection (columns)
-        sino[:, i] = proj_image.sum(axis=0)
-
-    return sino
+    for theta_idx, theta in enumerate(theta_array):
+        rotated_img = xform.rotate(padded_image, theta, center = (padded_image.shape[0]//2, padded_image.shape[0]//2), order = 1)
+        # rotated_img = ndi.rotate(padded_image, theta, reshape = False, order = 1) # First part of discrete Radon transform
+        sinogram[:, theta_idx] = rotated_img.sum(0)*dt # Second part of discrete Radon transform
+    
+    return sinogram.T
 
 def phase_correlate(recon_proj, exp_proj, upsample_factor):
     n_columns = recon_proj.shape[1]
@@ -629,7 +629,7 @@ def iter_reproj(ref_element,
         aligned_exp_proj_array.append(aligned_proj.copy())
 
         if algorithm == 'gridrec':
-            recon = tomo.recon(aligned_proj, theta_array*np.pi/180, algorithm = algorithm, center = 300, filter_name = 'ramlak')
+            recon = tomo.recon(aligned_proj, theta_array*np.pi/180, algorithm = algorithm, filter_name = 'ramlak')
             print(recon.shape)
             # recon = tomo.recon(aligned_proj, theta_array*np.pi/180, center = (n_columns - 1)/2, algorithm = algorithm, filter_name = 'ramlak')
         
@@ -643,14 +643,13 @@ def iter_reproj(ref_element,
         
         recon_array.append(recon)
 
-        # for slice_idx in range(n_slices):
-            # print(f'Slice {slice_idx + 1}/{n_slices}')
+        for slice_idx in range(n_slices):
+            print(f'Slice {slice_idx + 1}/{n_slices}')
             
-            # sinogram = (xform.radon(recon[slice_idx].copy(), theta_array)).T
-            # sinogram = (radon_manual(recon[slice_idx].copy(), theta_array, center = (n_slices//2, center_of_rotation_avg))).T
-        synth_proj = tomo.project(recon, theta_array, center = 300, pad = False)
+            sinogram = (xform.radon(recon[slice_idx].copy(), theta_array)).T
+            # sinogram = radon_manual(recon[slice_idx].copy(), theta_array)
 
-        # synth_proj[:, slice_idx, :] = sinogram
+            synth_proj[:, slice_idx, :] = sinogram
         
         synth_proj_array.append(synth_proj.copy())
         
