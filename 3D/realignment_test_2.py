@@ -227,23 +227,28 @@ def radon_manual(image, theta_array, center = None):
 
     # compute diagonal length for output
     # detector positions (columns)
-        X, Y = np.meshgrid(np.arange(n_cols) - cx, np.arange(n_cols) - cy)
+    x = np.arange(n_cols) - cx
+    y = np.arange(n_cols) - cy
+    X, Y = np.meshgrid(x, y)  # shape (N, N)
 
     sino = np.zeros((n_cols, n_theta), dtype=image.dtype)
 
-    for i, angle in enumerate(np.deg2rad(theta_array)):
-        cos_a = np.cos(angle)
-        sin_a = np.sin(angle)
+    # vectorized loop over angles
+    angles_rad = np.deg2rad(theta_array)
+    cos_a = np.cos(angles_rad)
+    sin_a = np.sin(angles_rad)
 
-        # rotate entire grid
-        xr = X * cos_a + Y * sin_a + cx
-        yr = -X * sin_a + Y * cos_a + cy
+    for i in range(n_theta):
+        # rotate coordinates
+        xr = X * cos_a[i] + Y * sin_a[i] + cx
+        yr = -X * sin_a[i] + Y * cos_a[i] + cy
 
+        # interpolate rotated image in one shot
         coords = np.vstack([yr.ravel(), xr.ravel()])
         rotated = ndi.map_coordinates(image, coords, order=1, mode='constant', cval=0.0)
         rotated = rotated.reshape(n_cols, n_cols)
 
-        # sum along rows to get projection (columns)
+        # sum along rows (axis=0) to get projection along columns
         sino[:, i] = rotated.sum(axis=0)
 
     return sino
