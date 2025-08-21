@@ -467,7 +467,7 @@ def iter_reproj(ref_element,
             for element_idx in range(n_elements):
                 for theta_idx in range(n_theta):
                     xrf_proj_img_array[element_idx, theta_idx] = ndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx], shift = (init_y_shift[theta_idx], 0))
-
+    
     theta_idx_pairs = find_theta_combos(theta_array, dtheta = 1)
 
     # center_of_rotation_avg, geom_center, offset = rot_center_avg(xrf_proj_img_array[ref_element_idx], theta_idx_pairs, theta_array)
@@ -573,7 +573,7 @@ def iter_reproj(ref_element,
     # total_cor_shift_needed = final_center_of_rotation_avg - init_cor_avg
     
     # print(f'Total COR shift needed: {round_correct(-net_offset, ndec = 3)}')
-    add_shift = 0.1545368896 - 0.005924987
+    add_shift = -0.8
     
     print(f'Shifting by additional {-add_shift} pixels...')
 
@@ -698,9 +698,9 @@ def iter_reproj(ref_element,
         print(f'Geometric center: {center_geom}')
         print(f'Center of rotation error: {round_correct(offset_synth, ndec = 3)}')
         
-        # if i == 1:
-            # sys.exit()
-
+        if i == 0:
+            sys.exit()
+        
         if np.max(np.abs(dx_array_pc[i])) < eps and np.max(np.abs(dy_array_pc[i])) < eps:
             iterations = np.array(iterations)
            

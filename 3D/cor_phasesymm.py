@@ -193,6 +193,8 @@ cor_array = []
 
 reflection_pair_idx_array = find_theta_combos(theta_xrt, dtheta = 1)
 
+print(np.array(reflection_pair_idx_array))
+
 color_array = ['r', 'orange', 'gold', 'g', 'c', 'b', 'indigo', 'darkviolet', 'm', 'saddlebrown', 'gray', 'k']
 
 sino = counts
@@ -290,7 +292,7 @@ add = 0
 offset_crop = int(np.ceil(np.abs(-(offset + add))))
 
 # counts_new = np.zeros((n_theta, n_slices, n_columns - int(round_correct(np.abs(np.mean(np.array(cor_array)) - geom_center), ndec = 0))))
-counts_new = np.zeros((n_theta, n_slices, n_columns - offset_crop + 1))
+counts_new = np.zeros((n_theta, n_slices, n_columns - offset_crop))
 # counts_new = np.zeros_like(counts)
 cts = counts.copy()
 
@@ -312,7 +314,7 @@ for theta_idx in range(n_theta):
     # counts_new[theta_idx] = counts[theta_idx, :, :-int(round_correct(np.abs(np.mean(np.array(cor_array)) - geom_center), ndec = 0))]
     # counts_new[theta_idx] = counts[theta_idx, :, :-int(np.ceil(np.abs(np.mean(np.array(cor_array)) - geom_center)))]
     # counts_new[theta_idx] = counts[theta_idx, :, :-int(np.ceil(np.abs(offset)))]
-counts_new[np.array(reflection_pair_idx_array).ravel()] = counts[np.array(reflection_pair_idx_array).ravel(), :, :(-offset_crop + 1)]
+counts_new[np.array(reflection_pair_idx_array).ravel()] = counts[np.array(reflection_pair_idx_array).ravel(), :, :(-offset_crop)]
 # plt.imshow(counts[0])
 # plt.show()
 
