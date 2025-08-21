@@ -573,7 +573,7 @@ def iter_reproj(ref_element,
     # total_cor_shift_needed = final_center_of_rotation_avg - init_cor_avg
     
     # print(f'Total COR shift needed: {round_correct(-net_offset, ndec = 3)}')
-    add_shift = -0.8
+    add_shift = -1.2
     
     print(f'Shifting by additional {-add_shift} pixels...')
 
@@ -698,7 +698,7 @@ def iter_reproj(ref_element,
         print(f'Geometric center: {center_geom}')
         print(f'Center of rotation error: {round_correct(offset_synth, ndec = 3)}')
         
-        if i == 0:
+        if i == 1:
             sys.exit()
         
         if np.max(np.abs(dx_array_pc[i])) < eps and np.max(np.abs(dy_array_pc[i])) < eps:
