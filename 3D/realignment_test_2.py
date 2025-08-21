@@ -573,7 +573,7 @@ def iter_reproj(ref_element,
     # total_cor_shift_needed = final_center_of_rotation_avg - init_cor_avg
     
     # print(f'Total COR shift needed: {round_correct(-net_offset, ndec = 3)}')
-    add_shift = 0.4837 + 0.8
+    add_shift = 0.4837
     
     print(f'Shifting by additional {-add_shift} pixels...')
 
@@ -647,7 +647,7 @@ def iter_reproj(ref_element,
         aligned_exp_proj_array.append(aligned_proj.copy())
 
         if algorithm == 'gridrec':
-            recon = tomo.recon(aligned_proj, theta_array*np.pi/180, algorithm = algorithm, center = 301.2976378626965, filter_name = 'ramlak')
+            recon = tomo.recon(aligned_proj, theta_array*np.pi/180, algorithm = algorithm, center = 300.6551267201491, filter_name = 'ramlak')
             print(recon.shape)
             # recon = tomo.recon(aligned_proj, theta_array*np.pi/180, center = (n_columns - 1)/2, algorithm = algorithm, filter_name = 'ramlak')
         
@@ -762,7 +762,7 @@ output_dir_path_base = '/home/bwr0835'
 # output_file_name_base = 'gridrec_5_iter_vacek_cor_and_shift_correction_padding_-22_deg_158_deg'
 # output_file_name_base = 'xrt_mlem_1_iter_no_shift_no_log_tomopy_default_cor_w_padding_07_03_2025'
 # output_file_name_base = 'xrt_mlem_1_iter_manual_shift_-20_no_log_tomopy_default_cor_w_padding_07_09_2025'
-output_file_name_base = 'xrt_gridrec_6_iter_initial_ps_cor_correction_updated_log_w_padding_add_shift_-1_2837_tomopy_center_301_297_aug_20_2025'
+output_file_name_base = 'xrt_gridrec_6_iter_initial_ps_cor_correction_updated_log_w_padding_add_shift_-0_4837_tomopy_center_300_655_aug_20_2025'
 # output_file_name_base = 'xrt_gridrec_1_iter_no_shift_no_log_tomopy_default_cor_w_padding_07_03_2025'
 
 if output_file_name_base == '':
