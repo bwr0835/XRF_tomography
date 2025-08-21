@@ -143,7 +143,7 @@ def rot_center(theta_sum, slice_idx_desired): # Use only with F. Marin's code
     T_phase = np.arctan2(imag*np.sign(real), real*np.sign(real))
     print(Nt)
     # cor = Nt*(1 - T_phase[slice_idx_desired]/(np.pi))/2 - 1/2
-    cor = Nt/2 - Nt*T_phase/(2*np.pi)
+    cor = Nt//2 - Nt*T_phase/(2*np.pi)
 
     # print(cor)
 
@@ -286,14 +286,14 @@ offset = np.mean(np.array(cor_array)) - geom_center
 print(f'Mean COR = {np.mean(np.array(cor_array))}')
 print(f'Offset = {offset}')
 
-add = 0
-# add = -0.4837
+# add = 0
+add = -0.4837
 # add = 0.1545368896 - 0.005924987
 
 offset_crop = int(np.ceil(np.abs(-(offset + add))))
 
 # counts_new = np.zeros((n_theta, n_slices, n_columns - int(round_correct(np.abs(np.mean(np.array(cor_array)) - geom_center), ndec = 0))))
-counts_new = np.zeros((n_theta, n_slices, n_columns - offset_crop))
+counts_new = np.zeros((n_theta, n_slices, n_columns - offset_crop + 1))
 # counts_new = np.zeros_like(counts)
 cts = counts.copy()
 
@@ -315,7 +315,7 @@ for theta_idx in range(n_theta):
     # counts_new[theta_idx] = counts[theta_idx, :, :-int(round_correct(np.abs(np.mean(np.array(cor_array)) - geom_center), ndec = 0))]
     # counts_new[theta_idx] = counts[theta_idx, :, :-int(np.ceil(np.abs(np.mean(np.array(cor_array)) - geom_center)))]
     # counts_new[theta_idx] = counts[theta_idx, :, :-int(np.ceil(np.abs(offset)))]
-counts_new[np.array(reflection_pair_idx_array).ravel()] = counts[np.array(reflection_pair_idx_array).ravel(), :, :(-offset_crop)]
+counts_new[np.array(reflection_pair_idx_array).ravel()] = counts[np.array(reflection_pair_idx_array).ravel(), :, :(-offset_crop + 1)]
 # plt.imshow(counts[0])
 # plt.show()
 

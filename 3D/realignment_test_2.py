@@ -247,7 +247,7 @@ def radon_manual(image, theta_array, circle = True):
     dt = 1 # Difference between next scan position pixel index, current scan position pixel index
 
     for theta_idx, theta in enumerate(theta_array):
-        rotated_img = xform.rotate(padded_image, theta, center = (padded_image.shape[0]//2, padded_image.shape[0]//2), order = 1)
+        rotated_img = xform.rotate(padded_image, theta, center = (300.6551267201491, padded_image.shape[0]//2), order = 1)
         # rotated_img = ndi.rotate(padded_image, theta, reshape = False, order = 1) # First part of discrete Radon transform
         sinogram[:, theta_idx] = rotated_img.sum(0)*dt # Second part of discrete Radon transform
     
@@ -573,7 +573,7 @@ def iter_reproj(ref_element,
     # total_cor_shift_needed = final_center_of_rotation_avg - init_cor_avg
     
     # print(f'Total COR shift needed: {round_correct(-net_offset, ndec = 3)}')
-    add_shift = -0.8
+    add_shift = -0.4837
     
     print(f'Shifting by additional {-add_shift} pixels...')
 
