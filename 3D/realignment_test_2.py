@@ -647,7 +647,7 @@ def iter_reproj(ref_element,
         aligned_exp_proj_array.append(aligned_proj.copy())
 
         if algorithm == 'gridrec':
-            recon = tomo.recon(aligned_proj, theta_array*np.pi/180, algorithm = algorithm, filter_name = 'ramlak')
+            recon = tomo.recon(aligned_proj, theta_array*np.pi/180, algorithm = algorithm, center = 301.2976378626965, filter_name = 'ramlak')
             print(recon.shape)
             # recon = tomo.recon(aligned_proj, theta_array*np.pi/180, center = (n_columns - 1)/2, algorithm = algorithm, filter_name = 'ramlak')
         
