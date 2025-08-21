@@ -573,7 +573,7 @@ def iter_reproj(ref_element,
     # total_cor_shift_needed = final_center_of_rotation_avg - init_cor_avg
     
     # print(f'Total COR shift needed: {round_correct(-net_offset, ndec = 3)}')
-    add_shift = 0.4837
+    add_shift = 0.4837 + 0.8
     
     print(f'Shifting by additional {-add_shift} pixels...')
 
@@ -762,7 +762,7 @@ output_dir_path_base = '/home/bwr0835'
 # output_file_name_base = 'gridrec_5_iter_vacek_cor_and_shift_correction_padding_-22_deg_158_deg'
 # output_file_name_base = 'xrt_mlem_1_iter_no_shift_no_log_tomopy_default_cor_w_padding_07_03_2025'
 # output_file_name_base = 'xrt_mlem_1_iter_manual_shift_-20_no_log_tomopy_default_cor_w_padding_07_09_2025'
-output_file_name_base = 'xrt_gridrec_6_iter_initial_ps_cor_correction_updated_log_w_padding_add_shift_-0_4837_aug_20_2025'
+output_file_name_base = 'xrt_gridrec_6_iter_initial_ps_cor_correction_updated_log_w_padding_add_shift_-1_2837_aug_20_2025'
 # output_file_name_base = 'xrt_gridrec_1_iter_no_shift_no_log_tomopy_default_cor_w_padding_07_03_2025'
 
 if output_file_name_base == '':

@@ -284,7 +284,7 @@ offset = np.mean(np.array(cor_array)) - geom_center
 print(f'Mean COR = {np.mean(np.array(cor_array))}')
 print(f'Offset = {offset}')
 
-add = -0.4837
+add = -0.4837 - 0.8
 
 offset_crop = int(np.ceil(np.abs(-(offset + add))))
 
