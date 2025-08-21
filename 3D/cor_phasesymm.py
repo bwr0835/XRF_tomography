@@ -284,7 +284,8 @@ offset = np.mean(np.array(cor_array)) - geom_center
 print(f'Mean COR = {np.mean(np.array(cor_array))}')
 print(f'Offset = {offset}')
 
-add = -0.4837
+add = 0
+# add = 0.1545368896 - 0.005924987
 
 offset_crop = int(np.ceil(np.abs(-(offset + add))))
 
@@ -315,8 +316,8 @@ counts_new[np.array(reflection_pair_idx_array).ravel()] = counts[np.array(reflec
 # plt.imshow(counts[0])
 # plt.show()
 
-for i in np.array(reflection_pair_idx_array).ravel():
-    print(i)
+# for i in np.array(reflection_pair_idx_array).ravel():
+#     print(i)
 
 cor_array = []
 # sino = counts
