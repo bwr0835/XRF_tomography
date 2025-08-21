@@ -535,6 +535,8 @@ def iter_reproj(ref_element,
         print(offset_crop_idx)
         theta_idx_pairs_nparray = np.array(theta_idx_pairs).ravel()
         
+        aligned_proj_temp = np.zeros((n_theta, n_slices, n_columns - offset_crop_idx))
+
         # if ((n_columns - offset_crop_idx) % 2) == 0:
         #     aligned_proj_temp = np.zeros((n_theta, n_slices, n_columns - offset_crop_idx))
         
