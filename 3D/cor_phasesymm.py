@@ -1,4 +1,4 @@
-import numpy as np, tomopy as tomo, tkinter as tk, matplotlib as mpl
+import numpy as np, tomopy as tomo, tkinter as tk, matplotlib as mpl, sys
 import h5_util
 
 from skimage import transform as xform
@@ -250,12 +250,17 @@ slice_idx_desired = 151
 # offset = 7.938834044186073
 # offset = 7.939 + 1.2
 
-# offset = 0
+# offset = 6.745766492238204 + 0.8
 
 # print(offset)
 
 # for theta_idx in range(n_theta):
-    # counts[theta_idx] = ndi.shift(counts[theta_idx], shift = (0, -offset))
+#     counts[theta_idx] = ndi.shift(counts[theta_idx], shift = (0, -offset))
+
+#     if theta_idx == 0:
+#         plt.imshow(counts[0])
+#         plt.show()
+#         sys.exit()
 
 cor_array = []
 
@@ -279,15 +284,24 @@ offset = np.mean(np.array(cor_array)) - geom_center
 print(f'Mean COR = {np.mean(np.array(cor_array))}')
 print(f'Offset = {offset}')
 
+add = -0.4837
+
+offset_crop = int(np.ceil(np.abs(-(offset + add))))
+
 # counts_new = np.zeros((n_theta, n_slices, n_columns - int(round_correct(np.abs(np.mean(np.array(cor_array)) - geom_center), ndec = 0))))
-counts_new = np.zeros((n_theta, n_slices, n_columns - int(np.ceil(np.abs(offset)))))
+counts_new = np.zeros((n_theta, n_slices, n_columns - offset_crop))
 # counts_new = np.zeros_like(counts)
 cts = counts.copy()
 
 # print(int(np.ceil(np.abs(offset))))
 
 for theta_idx in range(n_theta):
-    counts[theta_idx] = ndi.shift(counts[theta_idx], shift = (0, -offset))
+    counts[theta_idx] = ndi.shift(counts[theta_idx], shift = (0, -(offset + add)))
+
+    # if theta_idx == 0:
+    #     plt.imshow(counts[theta_idx])
+    #     plt.show()
+    #     sys.exit()
 
     # if theta_idx == 1:
     #     plt.plot(np.arange(cts.shape[-1]), cts[theta_idx, 151])
@@ -297,7 +311,7 @@ for theta_idx in range(n_theta):
     # counts_new[theta_idx] = counts[theta_idx, :, :-int(round_correct(np.abs(np.mean(np.array(cor_array)) - geom_center), ndec = 0))]
     # counts_new[theta_idx] = counts[theta_idx, :, :-int(np.ceil(np.abs(np.mean(np.array(cor_array)) - geom_center)))]
     # counts_new[theta_idx] = counts[theta_idx, :, :-int(np.ceil(np.abs(offset)))]
-counts_new[np.array(reflection_pair_idx_array).ravel()] = counts[np.array(reflection_pair_idx_array).ravel(), :, :-int(np.ceil(np.abs(offset)))]
+counts_new[np.array(reflection_pair_idx_array).ravel()] = counts[np.array(reflection_pair_idx_array).ravel(), :, :(-offset_crop)]
 # plt.imshow(counts[0])
 # plt.show()
 
