@@ -143,7 +143,7 @@ def rot_center(theta_sum, slice_idx_desired): # Use only with F. Marin's code
     T_phase = np.arctan2(imag*np.sign(real), real*np.sign(real))
     print(Nt)
     # cor = Nt*(1 - T_phase[slice_idx_desired]/(np.pi))/2 - 1/2
-    cor = Nt//2 - Nt*T_phase/(2*np.pi)
+    cor = Nt/2 - Nt*T_phase/(2*np.pi)
 
     # print(cor)
 
@@ -286,7 +286,8 @@ offset = np.mean(np.array(cor_array)) - geom_center
 print(f'Mean COR = {np.mean(np.array(cor_array))}')
 print(f'Offset = {offset}')
 
-add = -0.8
+add = 0
+# add = -0.4837
 # add = 0.1545368896 - 0.005924987
 
 offset_crop = int(np.ceil(np.abs(-(offset + add))))

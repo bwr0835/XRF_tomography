@@ -112,8 +112,8 @@ def rot_center_avg(proj_img_array, theta_pair_array, theta_array):
 
 # dir_path = '/Users/bwr0835/Documents/xrt_gridrec_6_iter_initial_ps_cor_correction_updated_log_w_padding_aug_20_2025'
 # dir_path = '/Users/bwr0835/Documents/xrt_gridrec_6_iter_initial_ps_cor_correction_updated_log_w_padding_tomopy_cor_300_154_aug_20_2025'
-dir_path = '/Users/bwr0835/Documents/xrt_gridrec_6_iter_initial_ps_cor_correction_updated_log_w_padding_tomopy_cor_299_516_aug_20_2025'
-# dir_path = '/Users/bwr0835/Documents/xrt_gridrec_6_iter_initial_ps_cor_correction_updated_log_w_padding_add_shift_-0_4837_tomopy_center_300_655_aug_20_2025'
+# dir_path = '/Users/bwr0835/Documents/xrt_gridrec_6_iter_initial_ps_cor_correction_updated_log_w_padding_tomopy_cor_299_516_aug_20_2025'
+dir_path = '/Users/bwr0835/Documents/xrt_gridrec_6_iter_initial_ps_cor_correction_updated_log_w_padding_add_shift_-0_4837_tomopy_center_300_655_aug_20_2025'
 # dir_path = '/Users/bwr0835/Documents/xrt_gridrec_6_iter_initial_ps_cor_correction_updated_log_w_padding_add_shift_-0_4837_aug_20_2025'
 
 aligned_proj_file = os.path.join(dir_path, 'aligned_proj_array_iter_ds_ic.npy')
@@ -131,6 +131,7 @@ n_columns = aligned_proj_array[0].shape[2]
 n_theta = len(theta_array)
 
 iter_idx_desired = 0
+slice_idx_desired = 151
 
 iteration_idx_array = np.arange(dx_iter_array.shape[0])
 
@@ -148,8 +149,13 @@ for iter_idx in iteration_idx_array:
 
 fig1, axs1 = plt.subplots()
 # fig2, axs2 = plt.subplots(dpi = 200)
+fig3, axs3 = plt.subplots()
 
 theta_frames = []
+
+theta_pair_idx_desired = 0
+
+theta_idx_pair = theta_idx_pairs[theta_pair_idx_desired]
 
 curve1, = axs1.plot(theta_array, dx_iter_array[iter_idx_desired], 'k-o', markersize = 3, linewidth = 2, label = r'Iteration {0}'.format(iteration_idx_array[iter_idx_desired]))
 curve2, = axs1.plot(theta_array, dx_iter_array[iter_idx_desired + 2], 'b-o',  markersize = 3, linewidth = 2, label = r'Iteration {0}'.format(iteration_idx_array[iter_idx_desired + 2]))
@@ -163,7 +169,32 @@ axs1.set_xlabel(r'$\theta$ (\textdegree{})', fontsize = 16)
 axs1.set_ylabel(r'$\delta x$', fontsize = 16)
 axs1.legend(frameon = False, fontsize = 14)
 
-# fig1.tight_layout()
+curve5, = axs3.plot(np.arange(n_columns), aligned_proj_array[iter_idx_desired][theta_idx_pair[0], slice_idx_desired], 'k', linewidth = 2, label = r'$\theta = {0}^{{\circ}}$ (exp.)'.format(theta_array[theta_idx_pair[0]]))
+curve6, = axs3.plot(np.arange(n_columns), aligned_proj_array[iter_idx_desired][theta_idx_pair[1], slice_idx_desired], 'k--', linewidth = 2, label = r'$\theta = {0}^{{\circ}}$'.format(theta_array[theta_idx_pair[1]]))
+curve7, = axs3.plot(np.arange(n_columns), synth_proj_array[iter_idx_desired][theta_idx_pair[0], slice_idx_desired], 'r', linewidth = 2, label = r'$\theta = {0}^{{\circ}}$ (synth.)'.format(theta_array[theta_idx_pair[0]]))
+curve8, = axs3.plot(np.arange(n_columns), synth_proj_array[iter_idx_desired][theta_idx_pair[1], slice_idx_desired], 'r--', linewidth = 2, label = r'$\theta = {0}^{{\circ}}$'.format(theta_array[theta_idx_pair[1]]))
+
+global_min = np.min([np.min(aligned_proj_array[iter_idx_desired][theta_idx_pair[0], slice_idx_desired]), 
+                     np.min(aligned_proj_array[iter_idx_desired][theta_idx_pair[1], slice_idx_desired]),
+                     np.min(synth_proj_array[iter_idx_desired][theta_idx_pair[0], slice_idx_desired]),
+                     np.min(synth_proj_array[iter_idx_desired][theta_idx_pair[1], slice_idx_desired])])
+
+global_max = np.max([np.max(aligned_proj_array[iter_idx_desired][theta_idx_pair[0], slice_idx_desired]), 
+                     np.max(aligned_proj_array[iter_idx_desired][theta_idx_pair[1], slice_idx_desired]),
+                     np.max(synth_proj_array[iter_idx_desired][theta_idx_pair[0], slice_idx_desired]),
+                     np.max(synth_proj_array[iter_idx_desired][theta_idx_pair[1], slice_idx_desired])])
+
+axs3.set_xlim(0, n_columns - 1)
+axs3.set_ylim(global_min, global_max)
+axs3.tick_params(axis = 'both', which = 'major', labelsize = 14)
+axs3.tick_params(axis = 'both', which = 'minor', labelsize = 14)
+axs3.set_title(r'Iteration {0}'.format(iter_idx_desired), fontsize = 18)
+axs3.set_xlabel(r'Scan position index', fontsize = 16)
+axs3.set_ylabel(r'Optical density', fontsize = 16)
+axs3.legend(frameon = False, fontsize = 14)
+
+fig1.tight_layout()
+fig3.tight_layout()
 
 nonzero_mask = aligned_proj_array[iter_idx_desired] > 0
 
