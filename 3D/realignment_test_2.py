@@ -595,16 +595,16 @@ def iter_reproj(ref_element,
     # total_cor_shift_needed = final_center_of_rotation_avg - init_cor_avg
     
     # print(f'Total COR shift needed: {round_correct(-net_offset, ndec = 3)}')
-    # add_shift = -0.4837
+    add_shift = -0.8
     
-    # print(f'Shifting by additional {-add_shift} pixels...')
+    print(f'Shifting by additional {-add_shift} pixels...')
 
-    # for theta_idx in range(n_theta):
-        # aligned_proj[theta_idx] = ndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx], shift = (0, -(offset_init + add_shift)))
+    for theta_idx in range(n_theta):
+        aligned_proj[theta_idx] = ndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx], shift = (0, -(offset_init + add_shift)))
 
-    net_x_shifts_pc[0] -= offset_init
+    # net_x_shifts_pc[0] -= offset_init
     # net_x_shifts_pc[0] -= net_offset
-    # net_x_shifts_pc[0] -= (offset_init + add_shift)
+    net_x_shifts_pc[0] -= (offset_init + add_shift)
 
     
 
