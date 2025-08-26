@@ -302,10 +302,10 @@ cts = counts.copy()
 for theta_idx in range(n_theta):
     counts[theta_idx] = ndi.shift(counts[theta_idx], shift = (0, -(offset + add)))
 
-    # if theta_idx == 0:
-    #     plt.imshow(counts[theta_idx])
-    #     plt.show()
-    #     sys.exit()
+    if theta_idx == 0:
+        plt.imshow(counts[theta_idx])
+        plt.show()
+        sys.exit()
 
     # if theta_idx == 1:
     #     plt.plot(np.arange(cts.shape[-1]), cts[theta_idx, 151])

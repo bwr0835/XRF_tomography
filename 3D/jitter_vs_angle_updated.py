@@ -196,14 +196,14 @@ axs3.legend(frameon = False, fontsize = 14)
 fig1.tight_layout()
 fig3.tight_layout()
 
-nonzero_mask = aligned_proj_array[iter_idx_desired] > 0
+# nonzero_mask = aligned_proj_array[iter_idx_desired] > 0
 
 # aligned_proj_array[iter_idx_desired][nonzero_mask] = -np.log(aligned_proj_array[iter_idx_desired][nonzero_mask]/counts_inc) 
 
 vmin = np.min(aligned_proj_array[0])
 vmax = np.max(aligned_proj_array[0])
 
-# im2 = axs2.imshow(aligned_proj_array[iter_idx_desired][0], vmin = vmin, vmax = vmax)
+im2 = axs2.imshow(aligned_proj_array[iter_idx_desired][0], vmin = vmin, vmax = vmax)
 # text2 = axs2.text(0.02, 0.02, r'$\theta = {0}$\textdegree'.format(theta_array[0]), transform = axs2.transAxes, color = 'white')
 
 # axs2.axvline(x = 300, color = 'red')

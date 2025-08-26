@@ -178,6 +178,26 @@ def edge_gauss_filter(image, sigma, alpha, nx, ny):
     
     return (image + dc_value)
 
+def fluct_norm(img_array, sigma_1 = 5, alpha = 10, sigma_2 = 10):
+    n_theta, n_slices, n_columns = img_array.shape
+
+    img_array_avg = np.mean(img_array)
+
+    for theta_idx in range(n_theta):
+        img_vignetted = edge_gauss_filter(img_array[theta_idx], sigma = sigma_1, alpha = alpha, nx = n_columns, ny = n_slices)
+
+        convolution_mag = ndi.gaussian_filter(img_vignetted, sigma = sigma_2) # Blur the entire image using Gaussian filter/convolution
+
+        threshold = np.percentile(convolution_mag, 80) # Take top 20% of intensities for masking
+
+        mask = convolution_mag >= threshold
+
+        img_avg = np.mean(img_array[theta_idx, mask])
+
+        img_array[theta_idx] *= (img_array_avg/img_avg) # I0' = I0[avg(I0)/mask]
+
+    return img_array
+
 def find_theta_combos(theta_array_deg, dtheta):
     '''
     
@@ -200,7 +220,6 @@ def create_ref_pair_theta_idx_array(ref_pair_theta_array, theta_array):
     return np.array([ref_pair_theta_idx_1, ref_pair_theta_idx_2])
 
 def radon_manual(image, theta_array, circle = True):
-
     if image.dtype == np.float16:
         image = image.astype(np.float32)
 
@@ -532,12 +551,12 @@ def iter_reproj(ref_element,
     for theta_idx in range(n_theta):
         aligned_proj[theta_idx] = ndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx], shift = (0, -offset_init))
     
-    if offset_init != 0:
-        offset_crop_idx = int(np.ceil(np.abs(offset_init))) 
-        print(offset_crop_idx)
-        theta_idx_pairs_nparray = np.array(theta_idx_pairs).ravel()
+    # if offset_init != 0:
+        # offset_crop_idx = int(np.ceil(np.abs(offset_init))) 
+        # print(offset_crop_idx)
+        # theta_idx_pairs_nparray = np.array(theta_idx_pairs).ravel()
         
-        aligned_proj_temp = np.zeros((n_theta, n_slices, n_columns - offset_crop_idx))
+        # aligned_proj_temp = np.zeros((n_theta, n_slices, n_columns - offset_crop_idx))
 
         # if ((n_columns - offset_crop_idx) % 2) == 0:
         #     aligned_proj_temp = np.zeros((n_theta, n_slices, n_columns - offset_crop_idx))
@@ -547,23 +566,24 @@ def iter_reproj(ref_element,
             
         #     aligned_proj_temp = np.zeros((n_theta, n_slices, n_columns - offset_crop_idx))
 
-        print(aligned_proj_temp.shape)
+        # print(aligned_proj_temp.shape)
         
-        if offset_init > 0:
-            aligned_proj_temp[theta_idx_pairs_nparray] = aligned_proj[theta_idx_pairs_nparray, :, :-offset_crop_idx]
+        # if offset_init > 0:
+            # aligned_proj_temp[theta_idx_pairs_nparray] = aligned_proj[theta_idx_pairs_nparray, :, :-offset_crop_idx]
         
-        else:
-            aligned_proj_temp[theta_idx_pairs_nparray] = aligned_proj[theta_idx_pairs_nparray, :, offset_crop_idx:]
+        # else:
+            # aligned_proj_temp[theta_idx_pairs_nparray] = aligned_proj[theta_idx_pairs_nparray, :, offset_crop_idx:]
     
-    else:
-        aligned_proj_temp = aligned_proj
+    # else:
+        # aligned_proj_temp = aligned_proj
     
-    center_of_rotation_avg, _, _ = rot_center_avg(aligned_proj_temp, theta_idx_pairs, theta_array)
+    # center_of_rotation_avg, _, _ = rot_center_avg(aligned_proj_temp, theta_idx_pairs, theta_array)
+    center_of_rotation_avg, _, _ = rot_center_avg(aligned_proj, theta_idx_pairs, theta_array)
 
     offset = center_of_rotation_avg - center_geom
 
-    if offset_init < 0:
-        offset += offset_crop_idx
+    # if offset_init < 0:
+        # offset += offset_crop_idx
 
     # print(f'Final center of rotation after iterative correction: {round_correct(center_of_rotation_avg, ndec = 3)}')
     print(f'Final center of rotation after initial COR correction: {round_correct(center_of_rotation_avg, ndec = 3)}')
@@ -575,15 +595,16 @@ def iter_reproj(ref_element,
     # total_cor_shift_needed = final_center_of_rotation_avg - init_cor_avg
     
     # print(f'Total COR shift needed: {round_correct(-net_offset, ndec = 3)}')
-    add_shift = -0.4837
+    # add_shift = -0.4837
     
-    print(f'Shifting by additional {-add_shift} pixels...')
+    # print(f'Shifting by additional {-add_shift} pixels...')
 
-    for theta_idx in range(n_theta):
-        aligned_proj[theta_idx] = ndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx], shift = (0, -(offset_init + add_shift)))
+    # for theta_idx in range(n_theta):
+        # aligned_proj[theta_idx] = ndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx], shift = (0, -(offset_init + add_shift)))
 
+    net_x_shifts_pc[0] -= offset_init
     # net_x_shifts_pc[0] -= net_offset
-    net_x_shifts_pc[0] -= (offset_init + add_shift)
+    # net_x_shifts_pc[0] -= (offset_init + add_shift)
 
     
 
@@ -764,7 +785,7 @@ output_dir_path_base = '/home/bwr0835'
 # output_file_name_base = 'gridrec_5_iter_vacek_cor_and_shift_correction_padding_-22_deg_158_deg'
 # output_file_name_base = 'xrt_mlem_1_iter_no_shift_no_log_tomopy_default_cor_w_padding_07_03_2025'
 # output_file_name_base = 'xrt_mlem_1_iter_manual_shift_-20_no_log_tomopy_default_cor_w_padding_07_09_2025'
-output_file_name_base = 'xrt_gridrec_6_iter_initial_ps_cor_correction_updated_log_w_padding_add_shift_-0_150_aug_20_2025'
+output_file_name_base = 'xrt_gridrec_6_iter_initial_ps_cor_correction_norm_opt_dens_w_padding_08_26_2025'
 # output_file_name_base = 'xrt_gridrec_1_iter_no_shift_no_log_tomopy_default_cor_w_padding_07_03_2025'
 
 if output_file_name_base == '':
@@ -777,27 +798,33 @@ if output_file_name_base == '':
 # file_path_xrt = ''
 
 # try:
-    # elements_xrf, counts_xrf, theta_xrf, dataset_type_xrf = util.extract_h5_aggregate_xrt_data(file_path_xrf)
-elements_xrt, counts_xrt, theta_xrt, dataset_type_xrt, _ = util.extract_h5_aggregate_xrt_data(file_path_xrt)
+    # elements_xrt, counts_xrt, theta_xrt, dataset_type_xrt, _ = util.extract_h5_aggregate_xrt_data(file_path_xrt)
 
 # except:
     # print('Cannot upload HDF5 file. Check file structure. Ending...')
 
     # sys.exit()
 
+elements_xrt, counts_xrt, theta_xrt, dataset_type_xrt, _ = util.extract_h5_aggregate_xrt_data(file_path_xrt)
+
+n_elements = len(elements_xrt)
+
 desired_element = 'ds_ic'
-# desired_element = 'Fe'
-# desired_element_idx = elements_xrf.index(desired_element)
 desired_element_idx = elements_xrt.index(desired_element)
 
-nonzero_mask = counts_xrt[desired_element_idx] > 0
+pos_nonzero_mask = counts_xrt[desired_element_idx] > 0
 
-phi_inc = 8.67768e5
-t_dwell_s = 0.01 
+# phi_inc = 8.67768e5
+# t_dwell_s = 0.01 
 
-counts_inc = phi_inc*t_dwell_s
+# counts_inc = phi_inc*t_dwell_s
 
-counts_xrt[desired_element_idx][nonzero_mask] = -np.log(counts_xrt[desired_element_idx][nonzero_mask]/counts_inc)
+
+ds_ic_mean = np.mean(counts_xrt[desired_element_idx])
+
+counts_xrt[desired_element_idx] = fluct_norm(counts_xrt[desired_element_idx])
+
+counts_xrt[desired_element_idx][pos_nonzero_mask] = -np.log(counts_xrt[desired_element_idx][pos_nonzero_mask]/ds_ic_mean)
 
 # output_dir_path = filedialog.askdirectory(parent = root, title = "Choose directory to output NPY files to.")
 n_theta = counts_xrt.shape[1]

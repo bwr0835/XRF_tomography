@@ -1,8 +1,9 @@
-import numpy as np, h5_util
+import numpy as np, h5_util, os
 
 from matplotlib import pyplot as plt
 from numpy import fft
 from scipy import ndimage as ndi
+from imageio import v2 as iio2
 
 plt.rcParams['text.usetex'] = True
 plt.rcParams['font.family'] = 'serif'
@@ -50,6 +51,35 @@ def pad_row(array):
         array[theta_idx, :, :] = np.vstack((array[theta_idx, :, :], final_row))
 
     return array
+
+def fluct_norm(img_array, sigma_1 = 5, alpha = 10, sigma_2 = 10):
+    n_theta, n_slices, n_columns = img_array.shape
+
+    img_array_avg = np.mean(img_array)
+
+    intensity_avg_array = []
+    intensity_norm_avg_array = []
+    convolution_mag_array = []
+
+    for theta_idx in range(n_theta):
+        intensity_avg_array.append(img_array[theta_idx].copy().mean())
+
+        img_vignetted = edge_gauss_filter(img_array[theta_idx], sigma = sigma_1, alpha = alpha, nx = n_columns, ny = n_slices)
+
+        convolution_mag = ndi.gaussian_filter(img_vignetted, sigma = sigma_2) # Blur pretty much the entire image using Gaussian filter/convolution
+
+        threshold = np.percentile(convolution_mag, 80) # Take top 20% of intensities for masking
+
+        mask = convolution_mag >= threshold
+
+        img_avg = np.mean(img_array[theta_idx, mask])
+
+        img_array[theta_idx] *= (img_array_avg/img_avg) # I0' = I0[avg(I0)/mask]
+
+        convolution_mag_array.append(convolution_mag)
+        intensity_norm_avg_array.append(img_array[theta_idx, mask].mean())
+
+    return img_array, np.array(intensity_avg_array), np.array(convolution_mag_array), np.array(intensity_norm_avg_array)
 
 def gaussian_2d(nx, ny, center = None, sigma = 10):
     x = np.zeros(nx)
@@ -229,10 +259,13 @@ def convolve_2d(img1, img2, filter_enabled = True):
     return convolution_ifft
 
 file_path_xrt = '/Users/bwr0835/Documents/2_ide_aggregate_xrt.h5'
+output_dir = '/Users/bwr0835/Documents'
 
 elements_xrt, counts_xrt, theta_xrt, dataset_type_xrt, _ = h5_util.extract_h5_aggregate_xrt_data(file_path_xrt)
 
 ref_element = 'ds_ic'
+
+fps = 1
 
 ref_element_idx = elements_xrt.index(ref_element)
 counts = counts_xrt[ref_element_idx]
@@ -240,9 +273,6 @@ counts = counts_xrt[ref_element_idx]
 n_theta = counts.shape[0] # Number of projection angles (projection images)
 n_slices = counts.shape[1] # Number of rows in a projection image
 n_columns = counts.shape[2] # Number of columns in a projection image
-
-n_bins = 100
-
 
 if (n_slices % 2) or (n_columns % 2):
     if (n_slices % 2) and (n_columns % 2):
@@ -261,53 +291,100 @@ if (n_slices % 2) or (n_columns % 2):
 
         n_columns += 1
 
-_gaussian_2d = gaussian_2d(n_columns, n_slices)
-
-# counts[mask] = -np.log(counts[mask]/counts_inc)
-
-vmin = np.min(counts)
-vmax = np.max(counts)
-
 counts_copy = counts.copy()
 
+I0_avg = np.mean(counts_copy)
+
+opt_dens_copy = -np.log(counts_copy/I0_avg)
+
+counts_norm, cts_avg_array, convolution_mag_array, cts_norm_avg_array = fluct_norm(counts)
+
+opt_dens = -np.log(counts_norm/I0_avg)
+
+vmin = counts_copy.min()
+vmax = counts_copy.max()
+
+vmin_norm = counts_norm.min()
+vmax_norm = counts_norm.max()
+
+vmin_conv = convolution_mag_array.min()
+vmax_conv = convolution_mag_array.max()
+
+vmin_od = opt_dens_copy.min()
+vmax_od = opt_dens_copy.max()
+
+vmin_od_norm = opt_dens.min()
+vmax_od_norm = opt_dens.max()
+
+fig1, axs1 = plt.subplots(3, 2)
+fig2, axs2 = plt.subplots()
+
+threshold = np.percentile(convolution_mag_array[0], 80)
+
+conv_mask = np.where(convolution_mag_array[0] < threshold, convolution_mag_array[0], 0)
+
+im1_1 = axs1[0, 0].imshow(convolution_mag_array[0], vmin = vmin_conv, vmax = vmax_conv)
+im1_2 = axs1[0, 1].imshow(conv_mask, vmin = vmin_conv, vmax = vmax_conv)
+im1_3 = axs1[1, 0].imshow(counts_copy[0], vmin = vmin, vmax = vmax)
+im1_4 = axs1[1, 1].imshow(counts_norm[0], vmin = vmin_norm, vmax = vmax_norm)
+im1_5 = axs1[2, 0].imshow(opt_dens_copy[0], vmin = vmin_od, vmax = vmax_od)
+im1_6 = axs1[2, 1].imshow(opt_dens[0], vmin = vmin_od_norm, vmax = vmax_od_norm)
+
+curve1, = axs2.plot(theta_xrt, cts_avg_array, 'ko-', linewidth = 2, label = r'Raw XRT Avg.')
+curve2, = axs2.plot(theta_xrt, cts_norm_avg_array, 'ro-', linewidth = 2, label = r'Norm. XRT Avg.')
+
+y_min = np.min([cts_avg_array.min(), cts_norm_avg_array.min()])
+y_max = np.max([cts_avg_array.max(), cts_norm_avg_array.max()])
+
+axs2.tick_params(axis = 'both', which = 'major', labelsize = 14)
+axs2.tick_params(axis = 'both', which = 'minor', labelsize = 14)
+axs2.set_xlabel(r'$\theta$ (\textdegree)', fontsize = 16)
+axs2.set_xlabel(r'Intensity', fontsize = 16)
+axs2.set_xlim(theta_xrt.min(), theta_xrt.max())
+axs2.set_ylim(y_min, y_max)
+axs2.legend(frameon = False, fontsize = 14)
+
+text_1 = axs1[0, 0].text(0.02, 0.02, r'$\theta = {0}$\textdegree'.format(theta_xrt[0]), transform = axs1[0, 0].transAxes, color = 'white')
+
+for axs in fig1.axes:
+    axs.axis('off')
+    axs.axvline(x = 300, color = 'red', linewidth = 2)
+
+axs1[0, 0].set_title(r'Convolution $\rightarrow$', fontsize = 14)
+axs1[1, 0].set_title(r'Raw XRT data $\rightarrow$', fontsize = 14)
+axs1[2, 0].set_title(r'Raw OD data $\rightarrow$', fontsize = 14)
+
+theta_frames = []
+
 for theta_idx in range(n_theta):
-    # counts[theta_idx] = ndi.shift(counts[theta_idx], shift = (0, -7.9))
-    convolution_mag = fft.fftshift(np.abs(convolve_2d(counts[theta_idx], _gaussian_2d)))
-
-    # threshold = np.quantile(convolution_mag, [0.88, 0.9])
-    threshold = np.percentile(convolution_mag, 80)
-
-    mask = convolution_mag >= threshold
-
-    counts_avg = np.mean(counts[theta_idx, mask])
-
-    counts_copy[theta_idx, mask] /= counts_avg
-
-print(counts_copy.dtype)
-
-vmin_conv = np.min(convolution_mag)
-vmax_conv = np.max(convolution_mag)
-
-for theta_idx in range(n_theta):
-    if theta_idx % 7 == 0:  
-        fig, axs = plt.subplots(2, 2)
+    threshold = np.percentile(convolution_mag_array[theta_idx], 80)
         
-        a = convolution_mag.copy()
-        a[~mask] = 0
+    conv_mask = np.where(convolution_mag_array[theta_idx] >= threshold, convolution_mag_array[theta_idx], 0)
+
+    im1_1.set_data(convolution_mag_array[theta_idx])
+    im1_2.set_data(conv_mask)
+    im1_3.set_data(counts_copy[theta_idx])
+    im1_4.set_data(counts_norm[theta_idx])
+    im1_5.set_data(opt_dens_copy[theta_idx])
+    im1_6.set_data(opt_dens[theta_idx])
+
+    text_1.set_text(r'$\theta = {0}$\textdegree'.format(theta_xrt[theta_idx]))
         
-        axs[0, 0].imshow(convolution_mag, vmin = vmin_conv, vmax = vmax_conv)
-        axs[0, 1].imshow(a, vmin = vmin_conv, vmax = vmax_conv)
-        axs[1, 0].imshow(counts[theta_idx], vmin = vmin, vmax = vmax)
-        axs[1, 1].imshow(counts_copy[theta_idx], vmin = vmin, vmax = vmax)
-        axs[0, 0].axis('off')
-        axs[0, 1].axis('off')
-        axs[1, 0].axis('off')
-        axs[1, 1].axis('off')
-        axs[0, 0].set_title(r'Convolution $\rightarrow$'.format(theta_xrt[theta_idx]), fontsize = 16)
-        axs[1, 0].set_title(r'Raw data $\rightarrow$'.format(theta_xrt[theta_idx]), fontsize = 16)
-        fig.suptitle(r'$\theta = {0}$\textdegree'.format(theta_xrt[theta_idx]), fontsize = 18)
-        fig.tight_layout()
-        plt.show()
+    # fig1.suptitle(r'$\theta = {0}$\textdegree'.format(theta_xrt[theta_idx]), fontsize = 18)
+    # fig1.tight_layout()
+
+    fig1.canvas.draw() # Rasterize and store Matplotlib figure contents in special buffer
+
+    frame = np.array(fig1.canvas.renderer.buffer_rgba())[:, :, :3] # Rasterize the contents in the stored buffer, access 
+
+    theta_frames.append(frame)
+
+plt.close(fig1)
+
+iio2.mimsave(os.path.join(output_dir, 'xrt_norm.gif'), theta_frames, fps = 10)
+
+plt.show()
+        # plt.show()
 
 # counts[mask] = -np.log10(counts[mask]/counts_inc)
 
