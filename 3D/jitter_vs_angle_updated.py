@@ -112,6 +112,7 @@ def rot_center_avg(proj_img_array, theta_pair_array, theta_array):
 
 # dir_path = '/Users/bwr0835/Documents/xrt_gridrec_6_iter_initial_ps_cor_correction_norm_opt_dens_w_padding_08_28_2025'
 dir_path = '/Users/bwr0835/Documents/xrt_gridrec_6_iter_initial_ps_cor_correction_norm_opt_dens_add_shift_-0_8_w_padding_08_28_2025'
+# dir_path = '/Users/bwr0835/Documents/xrt_gridrec_6_iter_initial_ps_cor_correction_norm_opt_dens_add_shift_-0_8_tomopy_cor_300_8_w_padding_08_28_2025'
 
 aligned_proj_file = os.path.join(dir_path, 'aligned_proj_array_iter_ds_ic.npy')
 synth_proj_file = os.path.join(dir_path, 'synth_proj_array_iter_ds_ic.npy')
@@ -140,6 +141,29 @@ for iter_idx in iteration_idx_array:
 
     print(f'Iteration {iter_idx} - COR (exp.): {center_of_rotation_avg_exp}; Offset: {offset_exp}')
     print(f'Iteration {iter_idx} - COR (synth.): {center_of_rotation_avg_synth}; Offset: {offset_synth}\n')
+
+    for theta_idx in range(n_theta):
+        if theta_idx % 7 == 0:
+            print(f'Iteration {iter_idx} - required incremental shift: {dx_iter_array[iter_idx][theta_idx]} (Theta = {theta_array[theta_idx]} degrees)')
+    
+    print('\n')
+
+    for theta_idx in range(n_theta):
+        if theta_idx % 7 == 0:
+            print(f'Iteration {iter_idx} - required RMS shift: {np.sqrt((dx_iter_array[iter_idx]**2).mean())} (Theta = {theta_array[theta_idx]} degrees)')
+    
+    print('\n')
+
+    dx_min = dx_iter_array[iter_idx].min()
+    dx_max = dx_iter_array[iter_idx].max()
+
+    theta_dx_min = np.argmin(dx_iter_array[iter_idx])
+    theta_dx_max = np.argmax(dx_iter_array[iter_idx])
+
+    print(f'Iteration {iter_idx} - Min. required shift: {dx_min} (theta = {theta_array[theta_dx_min]})')
+    print(f'Iteration {iter_idx} - Max. required shift: {dx_max} (theta = {theta_array[theta_dx_max]})')
+
+    print('\n')
 
 fig1, axs1 = plt.subplots()
 fig2, axs2 = plt.subplots(1, 2)
