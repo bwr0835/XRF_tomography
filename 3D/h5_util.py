@@ -235,7 +235,7 @@ def extract_h5_aggregate_xrf_data(file_path):
     counts_h5 = h5['exchange/data']
     theta_h5 = h5['exchange/theta']
     elements_h5 = h5['exchange/elements']
-    dataset_type_h5 = h5['exchange/dataset_type']
+    dataset_type_h5 = h5['corresponding_file_info/dataset_type']
 
     counts = counts_h5[()]
     theta = theta_h5[()]

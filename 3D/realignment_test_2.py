@@ -22,39 +22,123 @@ def round_correct(num, ndec): # CORRECTLY round a number (num) to chosen number 
         else:
             return int(num*digit_value - 0.5)/digit_value
 
-def pad_col_row(array):
-    array_new = np.zeros((array.shape[0], array.shape[1], array.shape[2] + 1, array.shape[3] + 1))
+def pad_col_row(array, dataset):
+    if dataset == '' or array.ndim != 4:
+        print('Error: No dataset specified or number of array dimesions ≠ 4. Exiting program...')
 
-    for element_idx in range(array.shape[0]):
-        for theta_idx in range(array.shape[1]):
-            final_column = array[element_idx, theta_idx, :, -1].reshape(-1, 1) # Reshape to column vector (-1 means Python automatically determines missing dimension based on original orray length)
-            
-            # print(final_column.shape)
-            # print(array.shape)
+        sys.exit()
 
-            array_temp = np.hstack((array[element_idx, theta_idx, :, :], final_column))
-            
-            final_row = array_temp[-1, :]
+    n_elements, n_theta, n_slices, n_columns = array.shape
+    
+    # Create a new array with the expected final shape
+    new_shape = (n_elements, n_theta, n_slices + 1, n_columns + 1)
+    result_array = np.zeros(new_shape)
 
-            array_new[element_idx, theta_idx, :, :] = np.vstack((array_temp, final_row))
+    if dataset == 'xrt':
+        for element_idx in range(n_elements):
+            for theta_idx in range(n_theta):
+                array_avg = array[element_idx, theta_idx].mean()
 
-    return array_new
-
-def pad_col(array):
-    for element_idx in range(array.shape[0]):
-        for theta_idx in range(array.shape[1]):
-            final_column = array[element_idx, theta_idx, :, -1].T
+                padded_row = array_avg*np.ones(n_columns)
                 
-            array[element_idx, theta_idx, :, :] = np.hstack((array[element_idx, theta_idx, :, :], final_column))
+                # Add row first
+                temp_array = np.vstack((array[element_idx, theta_idx], padded_row))
 
+                # After adding row, the shape is now (n_slices + 1, n_columns)
+                # Get the current shape after row addition
+                current_shape = temp_array.shape
+                padded_column = array_avg*np.ones((current_shape[0], 1))
+
+                result_array[element_idx, theta_idx] = np.hstack((temp_array, padded_column))
+    
+    elif dataset == 'xrf':
+        for element_idx in range(n_elements):
+            for theta_idx in range(n_theta):
+                array_avg = array[element_idx, theta_idx].mean()
+
+                padded_row = array_avg*np.zeros(n_columns)
+                
+                # Add row first
+                temp_array = np.vstack((array[element_idx, theta_idx], padded_row))
+
+                # After adding row, the shape is now (n_slices + 1, n_columns)
+                # Get the current shape after row addition
+                current_shape = temp_array.shape
+                padded_column = array_avg*np.zeros((current_shape[0], 1))
+
+                result_array[element_idx, theta_idx] = np.hstack((temp_array, padded_column))
+
+    else:
+        print('Error: Invalid dataset. Exiting program...')
+
+        sys.exit()
+
+    return result_array
+
+def pad_col(array, dataset):
+    if dataset == '' or array.ndim != 4:
+        print('Error: No dataset specified or number of array dimesions ≠ 4. Exiting program...')
+
+        sys.exit()
+
+    n_elements, n_theta, n_slices, _ = array.shape
+
+    if dataset == 'xrt':
+        for element_idx in range(n_elements):
+            for theta_idx in range(n_theta):
+                array_avg = array[element_idx, theta_idx].mean()
+                # final_column = array_avg*array[element_idx, theta_idx, :, -1].T
+                final_column = array_avg*np.ones((n_slices, 1))
+                
+                array[element_idx, theta_idx] = np.hstack((array[element_idx, theta_idx], final_column))
+
+    elif dataset == 'xrf':
+        for element_idx in range(n_elements):
+            for theta_idx in range(n_theta):
+                # final_column = array[element_idx, theta_idx, :, -1].T
+                final_column = np.zeros((n_slices, 1))
+                
+                array[element_idx, theta_idx, :, :] = np.hstack((array[element_idx, theta_idx, :, :], final_column))
+
+    else:
+        print('Error: Invalid dataset. Exiting program...')
+
+        sys.exit()
+    
     return array
 
-def pad_row(array):
-    for element_idx in range(array.shape[0]):
-        for theta_idx in range(array.shape[1]):
-            final_row = array[element_idx, theta_idx, -1, :]
+def pad_row(array, dataset):
+    if dataset == '' or array.ndim != 4:
+        print('Error: No dataset specified or number of array dimesions ≠ 4. Exiting...')
+
+        sys.exit()
+    
+    n_elements, n_theta, _, n_columns = array.shape
+    
+    if dataset == 'xrt':
+        for element_idx in range(n_elements):
+            for theta_idx in range(n_theta):
+                array_avg = array[element_idx, theta_idx].mean()
                 
-            array[element_idx, theta_idx, :, :] = np.vstack((array[element_idx, theta_idx, :, :], final_row))
+                # final_row = array[element_idx, theta_idx, -1, :]
+                final_row = array_avg*np.ones(n_columns)
+
+                array[element_idx, theta_idx] = np.vstack((array[element_idx, theta_idx], final_row))
+
+    elif dataset == 'xrf':
+        for element_idx in range(n_elements):
+            for theta_idx in range(n_theta):
+                array_avg = array[element_idx, theta_idx].mean()
+                
+                # final_row = array[element_idx, theta_idx, -1, :]
+                final_row = array_avg*np.zeros(n_columns)
+
+                array[element_idx, theta_idx] = np.vstack((array[element_idx, theta_idx], final_row))
+
+    else:
+        print('Error: Invalid dataset. Exiting program...')
+
+        sys.exit()
 
     return array
 
@@ -352,7 +436,7 @@ def rot_center_avg(proj_img_array, theta_pair_array, theta_array):
 def iter_reproj(ref_element,
                 element_array, 
                 theta_array, 
-                xrf_proj_img_array,
+                xrt_proj_img_array,
                 algorithm, 
                 n_iterations,
                 init_x_shift = None, 
@@ -374,7 +458,7 @@ def iter_reproj(ref_element,
     
     theta_array: Array of projection angles (array-like; dtype: float)
     
-    xrf_proj_img_array: 4D XRF tomography data (elements, projection angles, slices, scan positions) (array-like; dtype: float)
+    xrt_proj_img_array: 4D XRT tomography data (elements, projection angles, slices, scan positions) (array-like; dtype: float)
 
     algorithm: Desired reconstruction algorithm (dtype: str)
     
@@ -405,35 +489,35 @@ def iter_reproj(ref_element,
 
     '''
     
-    n_elements = xrf_proj_img_array.shape[0]
-    n_theta = xrf_proj_img_array.shape[1]
-    n_slices = xrf_proj_img_array.shape[2] 
-    n_columns = xrf_proj_img_array.shape[3]
+    n_elements = xrt_proj_img_array.shape[0]
+    n_theta = xrt_proj_img_array.shape[1]
+    n_slices = xrt_proj_img_array.shape[2] 
+    n_columns = xrt_proj_img_array.shape[3]
 
     ref_element_idx = element_array.index(ref_element)
 
     if (n_slices % 2) or (n_columns % 2): # Padding for odd-integer detector positions and/or slices
 
         if (n_slices % 2) and (n_columns % 2):
-            xrf_proj_img_array = pad_col_row(xrf_proj_img_array)
+            xrt_proj_img_array = pad_col_row(xrt_proj_img_array, 'xrt')
             
             n_slices += 1
             n_columns += 1
         
         elif n_slices % 2:
-            xrf_proj_img_array = pad_row(xrf_proj_img_array)
+            xrt_proj_img_array = pad_row(xrt_proj_img_array, 'xrt')
 
             n_slices += 1
 
         else:
 
-            xrf_proj_img_array = pad_col(xrf_proj_img_array)
+            xrt_proj_img_array = pad_col(xrt_proj_img_array, 'xrt')
 
             n_columns += 1
 
-    print('XRF Tomography dataset dimensions: ' + str(xrf_proj_img_array.shape))
+    print('XRF Tomography dataset dimensions: ' + str(xrt_proj_img_array.shape))
 
-    orig_ref_proj = xrf_proj_img_array[ref_element_idx].copy()
+    orig_ref_proj = xrt_proj_img_array[ref_element_idx].copy()
     
     aligned_proj_total = np.zeros((n_elements, n_theta, n_slices, n_columns))
     aligned_proj = np.zeros((n_theta, n_slices, n_columns))
@@ -447,7 +531,7 @@ def iter_reproj(ref_element,
     recon_array = []
     aligned_exp_proj_array = []
     synth_proj_array = []
-    center_of_rotation_array = []
+
 # If no initial shift(s) given or scalar shifts given
     if init_x_shift is None:
         init_x_shift = np.zeros(n_theta)
@@ -465,33 +549,34 @@ def iter_reproj(ref_element,
         if np.any(init_x_shift) and np.any(init_y_shift):
             print('Executing intial shift(s) in x and y')
             
-            # net_x_shifts_pc[0] = init_x_shift
-            # net_y_shifts_pc[0] = init_y_shift
+            net_x_shifts_pc[0] += init_x_shift
+            net_y_shifts_pc[0] += init_y_shift
 
             for element_idx in range(n_elements):
                 for theta_idx in range(n_theta):
-                    xrf_proj_img_array[element_idx, theta_idx] = ndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx], shift = (init_y_shift[theta_idx], init_x_shift[theta_idx]))
+                    xrt_proj_img_array[element_idx, theta_idx] = ndi.shift(xrt_proj_img_array[ref_element_idx, theta_idx], shift = (init_y_shift[theta_idx], init_x_shift[theta_idx]))
         
         elif np.any(init_x_shift):
             print('Executing initial shift(s) in x')
             
-            # net_x_shifts_pc[0] = init_x_shift
+            net_x_shifts_pc[0] += init_x_shift
 
             for element_idx in range(n_elements):
                 for theta_idx in range(n_theta):
-                    xrf_proj_img_array[element_idx, theta_idx] = ndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx], shift = (0, init_x_shift[theta_idx]))
+                    xrt_proj_img_array[element_idx, theta_idx] = ndi.shift(xrt_proj_img_array[ref_element_idx, theta_idx], shift = (0, init_x_shift[theta_idx]))
                 
         else:
-            print('Executing initial shift(s) in x')
-            # net_y_shifts_pc[0] = init_y_shift
+            print('Executing initial shift(s) in y')
+            
+            net_y_shifts_pc[0] += init_y_shift
 
             for element_idx in range(n_elements):
                 for theta_idx in range(n_theta):
-                    xrf_proj_img_array[element_idx, theta_idx] = ndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx], shift = (init_y_shift[theta_idx], 0))
+                    xrt_proj_img_array[element_idx, theta_idx] = ndi.shift(xrt_proj_img_array[ref_element_idx, theta_idx], shift = (init_y_shift[theta_idx], 0))
     
     theta_idx_pairs = find_theta_combos(theta_array, dtheta = 1)
 
-    # center_of_rotation_avg, geom_center, offset = rot_center_avg(xrf_proj_img_array[ref_element_idx], theta_idx_pairs, theta_array)
+    # center_of_rotation_avg, geom_center, offset = rot_center_avg(xrt_proj_img_array[ref_element_idx], theta_idx_pairs, theta_array)
     # # offset_copy = offset.copy()
 
     # print(f'Average COR: {(center_of_rotation_avg)}')
@@ -502,7 +587,7 @@ def iter_reproj(ref_element,
 
     # for element_idx in range(n_elements):
     #     for theta_idx in range(n_theta):
-    #         xrf_proj_img_array[element_idx, theta_idx] = ndi.shift(xrf_proj_img_array[element_idx, theta_idx], shift = (0, -offset))
+    #         xrt_proj_img_array[element_idx, theta_idx] = ndi.shift(xrt_proj_img_array[element_idx, theta_idx], shift = (0, -offset))
     
     # Iterative center of rotation correction for reference element
     # print("Starting iterative center of rotation correction...")
@@ -510,7 +595,7 @@ def iter_reproj(ref_element,
     # max_cor_iterations = 20  # Maximum iterations for center of rotation correction
     # eps_cor = 0.001     # Tolerance for center of rotation convergence
 
-    aligned_proj = xrf_proj_img_array[ref_element_idx].copy()
+    aligned_proj = xrt_proj_img_array[ref_element_idx].copy()
     
     center_of_rotation_avg, center_geom, offset_init = rot_center_avg(aligned_proj, theta_idx_pairs, theta_array)
 
@@ -534,7 +619,7 @@ def iter_reproj(ref_element,
             # print(f'Center of rotation converged after {cor_iter + 1} iterations')
             
             # for theta_idx in range(n_theta):
-            #     aligned_proj[theta_idx] = ndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx], shift = (0, -(net_offset_copy - 1.2)))
+            #     aligned_proj[theta_idx] = ndi.shift(xrt_proj_img_array[ref_element_idx, theta_idx], shift = (0, -(net_offset_copy - 1.2)))
 
             # break
 
@@ -542,14 +627,14 @@ def iter_reproj(ref_element,
         # print(f'Applying center of rotation correction: {round_correct(-net_offset, ndec = 3)}')
         
         # for theta_idx in range(n_theta):
-            # aligned_proj[theta_idx] = ndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx], shift = (0, -net_offset))
+            # aligned_proj[theta_idx] = ndi.shift(xrt_proj_img_array[ref_element_idx, theta_idx], shift = (0, -net_offset))
     
     print(f'Geometric center: {center_geom}')
     print(f'Center of rotation error: {round_correct(offset_init, ndec = 3)}')
     print(f'Applying center of rotation correction: {round_correct(-offset_init, ndec = 3)}')
 
     for theta_idx in range(n_theta):
-        aligned_proj[theta_idx] = ndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx], shift = (0, -offset_init))
+        aligned_proj[theta_idx] = ndi.shift(xrt_proj_img_array[ref_element_idx, theta_idx], shift = (0, -offset_init))
     
     # if offset_init != 0:
         # offset_crop_idx = int(np.ceil(np.abs(offset_init))) 
@@ -600,7 +685,7 @@ def iter_reproj(ref_element,
     # print(f'Shifting by additional {-add_shift} pixels...')
 
     # for theta_idx in range(n_theta):
-        # aligned_proj[theta_idx] = ndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx], shift = (0, -(offset_init + add_shift)))
+        # aligned_proj[theta_idx] = ndi.shift(xrt_proj_img_array[ref_element_idx, theta_idx], shift = (0, -(offset_init + add_shift)))
 
     net_x_shifts_pc[0] -= offset_init
     # net_x_shifts_pc[0] -= net_offset
@@ -609,7 +694,7 @@ def iter_reproj(ref_element,
     
 
     # for theta_idx in range(n_theta):
-    #     aligned_proj[theta_idx] = xrf_proj_img_array[ref_element_idx, theta_idx].copy()
+    #     aligned_proj[theta_idx] = xrt_proj_img_array[ref_element_idx, theta_idx].copy()
 
     # plt.imshow(aligned_proj[0])
     # plt.show()
@@ -621,7 +706,7 @@ def iter_reproj(ref_element,
 
         # if i == 0:
         #     for theta_idx in range(n_theta):
-        #         aligned_proj[theta_idx] = xrf_proj_img_array[ref_element_idx, theta_idx]
+        #         aligned_proj[theta_idx] = xrt_proj_img_array[ref_element_idx, theta_idx]
             
         # else:
         if i > 0:
@@ -633,7 +718,7 @@ def iter_reproj(ref_element,
                     print(f'Shifting projection by net x shift = {round_correct(net_x_shift, ndec = 3)} (theta = {round_correct(theta_array[theta_idx], ndec = 1)})...')
                     print(f'Shifting projection by net y shift = {round_correct(net_y_shift, ndec = 3)}...')
 
-                aligned_proj[theta_idx] = ndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx], shift = (net_y_shift, net_x_shift))
+                aligned_proj[theta_idx] = ndi.shift(xrt_proj_img_array[ref_element_idx, theta_idx], shift = (net_y_shift, net_x_shift))
         
             # center_of_rotation_avg, center_geom, offset = rot_center_avg(aligned_proj, theta_idx_pairs, theta_array)
 
@@ -656,8 +741,8 @@ def iter_reproj(ref_element,
                         # print(f'Shifting projection by net x shift = {round_correct(net_x_shift - 1, ndec = 3)} (theta = {round_correct(theta_array[theta_idx], ndec = 1)})...')
                         # print(f'Shifting projection by net y shift = {round_correct(net_y_shift - 1, ndec = 3)}...')
                     
-                    # aligned_proj[theta_idx] = ndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx], shift = (net_y_shift, net_x_shift))
-                    # aligned_proj[theta_idx] = ndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx], shift = (net_y_shift, net_x_shift + 1.2))
+                    # aligned_proj[theta_idx] = ndi.shift(xrt_proj_img_array[ref_element_idx, theta_idx], shift = (net_y_shift, net_x_shift))
+                    # aligned_proj[theta_idx] = ndi.shift(xrt_proj_img_array[ref_element_idx, theta_idx], shift = (net_y_shift, net_x_shift + 1.2))
 
                 # net_x_shifts_pc[i, :] += 1.2
 
@@ -670,7 +755,7 @@ def iter_reproj(ref_element,
         aligned_exp_proj_array.append(aligned_proj.copy())
 
         if algorithm == 'gridrec':
-            recon = tomo.recon(aligned_proj, theta_array*np.pi/180, algorithm = algorithm, center = 299.93, filter_name = 'ramlak')
+            recon = tomo.recon(aligned_proj, theta_array*np.pi/180, algorithm = algorithm, filter_name = 'ramlak')
             print(recon.shape)
             # recon = tomo.recon(aligned_proj, theta_array*np.pi/180, center = (n_columns - 1)/2, algorithm = algorithm, filter_name = 'ramlak')
         
@@ -741,9 +826,7 @@ def iter_reproj(ref_element,
                     net_x_shift = net_x_shifts_pc_new[i]
                     net_y_shift = net_y_shifts_pc_new[i]
 
-                    aligned_proj_total[element_idx, theta_idx] = ndi.shift(xrf_proj_img_array[element_idx, theta_idx], shift = (net_y_shift, net_x_shift))
-            
-            # net_x_shifts_pc_new -= offset_copy
+                    aligned_proj_total[element_idx, theta_idx] = ndi.shift(xrt_proj_img_array[element_idx, theta_idx], shift = (net_y_shift, net_x_shift))
 
             print('Done')
 
@@ -764,9 +847,7 @@ def iter_reproj(ref_element,
                     net_x_shift = net_x_shifts_pc_new[i, theta_idx]
                     net_y_shift = net_y_shifts_pc_new[i, theta_idx]
                         
-                    aligned_proj_total[element_idx, theta_idx] = ndi.shift(xrf_proj_img_array[element_idx, theta_idx], shift = (net_y_shift, net_x_shift))
-
-            # net_x_shifts_pc_new -= offset_copy
+                    aligned_proj_total[element_idx, theta_idx] = ndi.shift(xrt_proj_img_array[element_idx, theta_idx], shift = (net_y_shift, net_x_shift))
             
             print('Done')
 
@@ -785,7 +866,7 @@ output_dir_path_base = '/home/bwr0835'
 # output_file_name_base = 'gridrec_5_iter_vacek_cor_and_shift_correction_padding_-22_deg_158_deg'
 # output_file_name_base = 'xrt_mlem_1_iter_no_shift_no_log_tomopy_default_cor_w_padding_07_03_2025'
 # output_file_name_base = 'xrt_mlem_1_iter_manual_shift_-20_no_log_tomopy_default_cor_w_padding_07_09_2025'
-output_file_name_base = 'xrt_gridrec_6_iter_initial_ps_cor_correction_norm_opt_dens_w_padding_08_26_2025'
+output_file_name_base = 'xrt_gridrec_6_iter_initial_ps_cor_correction_norm_opt_dens_w_padding_08_28_2025'
 # output_file_name_base = 'xrt_gridrec_1_iter_no_shift_no_log_tomopy_default_cor_w_padding_07_03_2025'
 
 if output_file_name_base == '':
@@ -825,6 +906,7 @@ ds_ic_mean = np.mean(counts_xrt[desired_element_idx])
 counts_xrt[desired_element_idx] = fluct_norm(counts_xrt[desired_element_idx])
 
 counts_xrt[desired_element_idx][pos_nonzero_mask] = -np.log(counts_xrt[desired_element_idx][pos_nonzero_mask]/ds_ic_mean)
+# counts_xrt[desired_element_idx][~pos_nonzero_mask] = 0
 
 # output_dir_path = filedialog.askdirectory(parent = root, title = "Choose directory to output NPY files to.")
 n_theta = counts_xrt.shape[1]

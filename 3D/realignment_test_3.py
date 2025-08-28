@@ -24,39 +24,111 @@ def round_correct(num, ndec): # CORRECTLY round a number (num) to chosen number 
         else:
             return int(num*digit_value - 0.5)/digit_value
 
-def pad_col_row(array):
-    array_new = np.zeros((array.shape[0], array.shape[1], array.shape[2] + 1, array.shape[3] + 1))
+def pad_col_row(array, dataset):
+    if dataset == '' or dataset.ndim != 3:
+        print('Error: No dataset specified or number of array dimesions ≠ 3. Exiting program...')
 
-    for element_idx in range(array.shape[0]):
-        for theta_idx in range(array.shape[1]):
-            final_column = array[element_idx, theta_idx, :, -1].reshape(-1, 1) # Reshape to column vector (-1 means Python automatically determines missing dimension based on original orray length)
-            
-            # print(final_column.shape)
-            # print(array.shape)
+        sys.exit()
 
-            array_temp = np.hstack((array[element_idx, theta_idx, :, :], final_column))
-            
-            final_row = array_temp[-1, :]
+    n_elements, n_theta, n_slices, n_columns = array.shape
 
-            array_new[element_idx, theta_idx, :, :] = np.vstack((array_temp, final_row))
+    if dataset == 'xrt':
+        for element_idx in range(n_elements):
+            for theta_idx in range(n_theta):
+                array_avg = array[element_idx, theta_idx].mean()
 
-    return array_new
-
-def pad_col(array):
-    for element_idx in range(array.shape[0]):
-        for theta_idx in range(array.shape[1]):
-            final_column = array[element_idx, theta_idx, :, -1].T
+                padded_row = array_avg*np.ones(n_columns)
                 
-            array[element_idx, theta_idx, :, :] = np.hstack((array[element_idx, theta_idx, :, :], final_column))
+                array[element_idx, theta_idx] = np.vstack((array[element_idx, theta_idx], padded_row))
+
+                padded_column = array_avg*np.ones((n_slices + 1, 1))
+
+                array[element_idx, theta_idx] = np.hstack((array[element_idx, theta_idx], padded_column))
+    
+    elif dataset == 'xrf':
+        for element_idx in range(n_elements):
+            for theta_idx in range(n_theta):
+                array_avg = array[element_idx, theta_idx].mean()
+
+                padded_row = array_avg*np.zeros(n_columns)
+                
+                array[element_idx, theta_idx] = np.vstack((array[element_idx, theta_idx], padded_row))
+
+                padded_column = array_avg*np.zeros((n_slices + 1, 1))
+
+                array[element_idx, theta_idx] = np.hstack((array[element_idx, theta_idx], padded_column))
+
+    else:
+        print('Error: Invalid dataset. Exiting program...')
+
+        sys.exit()
 
     return array
 
-def pad_row(array):
-    for element_idx in range(array.shape[0]):
-        for theta_idx in range(array.shape[1]):
-            final_row = array[element_idx, theta_idx, -1, :]
+def pad_col(array, dataset):
+    if dataset == '' or dataset.ndim != 4:
+        print('Error: No dataset specified or number of array dimesions ≠ 4. Exiting program...')
+
+        sys.exit()
+
+    n_elements, n_theta, n_slices, _ = array.shape
+
+    if dataset == 'xrt':
+        for element_idx in range(n_elements):
+            for theta_idx in range(n_theta):
+                array_avg = array[element_idx, theta_idx].mean()
+                # final_column = array_avg*array[element_idx, theta_idx, :, -1].T
+                final_column = array_avg*np.ones((n_slices, 1))
                 
-            array[element_idx, theta_idx, :, :] = np.vstack((array[element_idx, theta_idx, :, :], final_row))
+                array[element_idx, theta_idx] = np.hstack((array[element_idx, theta_idx], final_column))
+
+    elif dataset == 'xrf':
+        for element_idx in range(n_elements):
+            for theta_idx in range(n_theta):
+                # final_column = array[element_idx, theta_idx, :, -1].T
+                final_column = np.zeros((n_slices, 1))
+                
+                array[element_idx, theta_idx, :, :] = np.hstack((array[element_idx, theta_idx, :, :], final_column))
+
+    else:
+        print('Error: Invalid dataset. Exiting program...')
+
+        sys.exit()
+    
+    return array
+
+def pad_row(array, dataset):
+    if dataset == '' or dataset.ndim != 4:
+        print('Error: No dataset specified or number of array dimesions ≠ 4. Exiting...')
+
+        sys.exit()
+    
+    n_elements, n_theta, _, n_columns = array.shape
+    
+    if dataset == 'xrt':
+        for element_idx in range(n_elements):
+            for theta_idx in range(n_theta):
+                array_avg = array[element_idx, theta_idx].mean()
+                
+                # final_row = array[element_idx, theta_idx, -1, :]
+                final_row = array_avg*np.ones(n_columns)
+
+                array[element_idx, theta_idx] = np.vstack((array[element_idx, theta_idx], final_row))
+
+    elif dataset == 'xrf':
+        for element_idx in range(n_elements):
+            for theta_idx in range(n_theta):
+                array_avg = array[element_idx, theta_idx].mean()
+                
+                # final_row = array[element_idx, theta_idx, -1, :]
+                final_row = array_avg*np.zeros(n_columns)
+
+                array[element_idx, theta_idx] = np.vstack((array[element_idx, theta_idx], final_row))
+
+    else:
+        print('Error: Invalid dataset. Exiting program...')
+
+        sys.exit()
 
     return array
 
@@ -180,6 +252,44 @@ def edge_gauss_filter(image, sigma, alpha, nx, ny):
     
     return (image + dc_value)
 
+def joint_fluct_norm(xrt_array, xrf_array, sigma_1 = 5, alpha = 10, sigma_2 = 10):
+    if xrt_array.ndim != 3 and xrf_array != 4:
+        print('Error: Number of XRT dimensions ≠ 3 and/or number of XRF array dimesions ≠ 4. Exiting program...')
+
+        sys.exit()
+
+    n_theta, n_slices, n_columns = xrt_array.shape
+    n_elements, _, _, _ = xrf_array.shape
+
+    xrt_array_avg = xrt_array.mean()
+    
+    intensity_avg_array = []
+    intensity_norm_avg_array = []
+    convolution_mag_array = []
+    
+    for theta_idx in range(n_theta):
+        intensity_avg_array.append(xrt_array[theta_idx].copy().mean())
+
+        xrt_vignetted = edge_gauss_filter(xrt_array[theta_idx], sigma = sigma_1, alpha = alpha, nx = n_columns, ny = n_slices)
+
+        convolution_mag = ndi.gaussian_filter(xrt_vignetted, sigma = sigma_2) # Blur the entire image using Gaussian filter/convolution
+
+        threshold = np.percentile(convolution_mag, 80) # Take top 20% of intensities for masking
+
+        mask = convolution_mag >= threshold
+
+        xrt_avg = np.mean(xrt_array[theta_idx, mask])
+
+        xrt_array[theta_idx] *= (xrt_array_avg/xrt_avg) # I0' = I0[avg(I0)/mask]
+        
+        for element_idx in range(n_elements):
+            xrf_array[element_idx, theta_idx] *= (xrt_array_avg/xrt_avg)
+
+        convolution_mag_array.append(convolution_mag)
+        intensity_norm_avg_array.append(xrt_array[theta_idx, mask].mean())
+    
+    return xrt_array, xrf_array, np.array(intensity_avg_array), np.array(convolution_mag_array), np.array(intensity_norm_avg_array)
+
 def find_theta_combos(theta_array_deg, dtheta):
     '''
     
@@ -224,13 +334,14 @@ def rot_center(theta_sum):
     Parameters
     ----------
     thetasum: array-like
-        The 2D theta-sum array (z,theta).
+        The 2D theta-sum array (z, t).
 
     Returns
     -------
     COR: float
         The center of rotation.
     """
+    
     Nz = theta_sum.shape[0] # Number of slices
     Nt = theta_sum.shape[1] # Number of scan positions
 
@@ -250,7 +361,7 @@ def rot_center(theta_sum):
 
     phase = np.arctan2(imag*np.sign(real), real*np.sign(real)) 
     
-    COR = Nt*(1 - phase/np.pi)/2 - 1/2 # Extra -1/2 since Python starts indexing at zero
+    COR = Nt//2 - Nt*phase/(2*np.pi)
 
     return COR
 
@@ -270,7 +381,7 @@ def rot_center_avg(proj_img_array, theta_pair_array, theta_array):
     
     center_rotation_avg = center_of_rotation_sum/len(theta_pair_array)
 
-    geom_center = (n_columns - 1)/2
+    geom_center = n_columns//2
 
     offset = center_rotation_avg - geom_center
 
@@ -278,8 +389,9 @@ def rot_center_avg(proj_img_array, theta_pair_array, theta_array):
 
 def iter_reproj(ref_element,
                 element_array_xrt,
-                element_array_xrf, 
-                theta_array, 
+                theta_array,
+                intensity_inc,
+                opt_dens_proj_img_array,
                 xrt_proj_img_array,
                 xrf_proj_img_array,
                 algorithm, 
@@ -368,7 +480,8 @@ def iter_reproj(ref_element,
 
     orig_ref_proj = xrt_proj_img_array[ref_element_idx].copy()
     
-    aligned_proj_total_xrt = np.zeros((n_elements_xrt, n_theta, n_slices, n_columns))
+    aligned_proj_total_xrt = np.zeros((n_theta, n_slices, n_columns))
+    aligned_proj_total_opt_dens = np.zeros((n_theta, n_slices, n_columns))
     aligned_proj_total_xrf = np.zeros((n_elements_xrf, n_theta, n_slices, n_columns))
     aligned_proj = np.zeros((n_theta, n_slices, n_columns))
     synth_proj = np.zeros((n_theta, n_slices, n_columns))
@@ -397,100 +510,62 @@ def iter_reproj(ref_element,
     if np.isscalar(init_y_shift):
         init_y_shift *= np.ones(n_theta)
     
+    aligned_proj = opt_dens_proj_img_array.copy()
+
     if np.any(init_x_shift) or np.any(init_y_shift):
         if np.any(init_x_shift) and np.any(init_y_shift):
             print('Executing intial shift(s) in x and y')
             
-            # net_x_shifts_pc[0] = init_x_shift
-            # net_y_shifts_pc[0] = init_y_shift
+            net_x_shifts_pc[0] += init_x_shift
+            net_y_shifts_pc[0] += init_y_shift
 
-            for element_idx in range(n_elements_xrt):
-                for theta_idx in range(n_theta):
-                    xrt_proj_img_array[element_idx, theta_idx] = ndi.shift(xrt_proj_img_array[ref_element_idx, theta_idx], shift = (init_y_shift[theta_idx], init_x_shift[theta_idx]))
+            for theta_idx in range(n_theta):
+                aligned_proj[theta_idx] = ndi.shift(opt_dens_proj_img_array[theta_idx], shift = (init_y_shift[theta_idx], init_x_shift[theta_idx]))
         
         elif np.any(init_x_shift):
             print('Executing initial shift(s) in x')
             
-            # net_x_shifts_pc[0] = init_x_shift
+            net_x_shifts_pc[0] += init_x_shift
 
-            for element_idx in range(n_elements_xrt):
-                for theta_idx in range(n_theta):
-                    xrt_proj_img_array[element_idx, theta_idx] = ndi.shift(xrt_proj_img_array[ref_element_idx, theta_idx], shift = (0, init_x_shift[theta_idx]))
+            for theta_idx in range(n_theta):
+                aligned_proj[theta_idx] = ndi.shift(opt_dens_proj_img_array[theta_idx], shift = (0, init_x_shift[theta_idx]))
                 
         else:
             print('Executing initial shift(s) in x')
-            # net_y_shifts_pc[0] = init_y_shift
+            
+            net_y_shifts_pc[0] += init_y_shift
 
-            for element_idx in range(n_elements_xrt):
-                for theta_idx in range(n_theta):
-                    xrt_proj_img_array[element_idx, theta_idx] = ndi.shift(xrt_proj_img_array[ref_element_idx, theta_idx], shift = (init_y_shift[theta_idx], 0))
+            for theta_idx in range(n_theta):
+                aligned_proj[theta_idx] = ndi.shift(opt_dens_proj_img_array[theta_idx], shift = (init_y_shift[theta_idx], 0))
 
     theta_idx_pairs = find_theta_combos(theta_array, dtheta = 1)
 
-    # center_of_rotation_avg, geom_center, offset = rot_center_avg(xrt_proj_img_array[ref_element_idx], theta_idx_pairs, theta_array)
-    # # offset_copy = offset.copy()
+    center_of_rotation_avg, center_geom, offset_init = rot_center_avg(aligned_proj, theta_idx_pairs, theta_array)
 
-    # print(f'Average COR: {(center_of_rotation_avg)}')
+    print(f'Geometric center: {center_geom}')
+    print(f'Center of rotation error: {round_correct(offset_init, ndec = 3)}')
+    print(f'Applying initial center of rotation correction: {round_correct(-offset_init, ndec = 3)}')
 
-    # print(f'Average center of rotation: {round_correct(center_of_rotation_avg, ndec = 3)}')
-    # print(f'Geometric center: {geom_center}')
-    # print(f'Center of rotation error: {round_correct(offset, ndec = 3)}')
-    # print(f'Incorporating x-shift = {round_correct(-offset, ndec = 3)} to all projection images...')
+    for theta_idx in range(n_theta):
+        aligned_proj[theta_idx] = ndi.shift(opt_dens_proj_img_array[theta_idx], shift = (0, -offset_init))
 
-    # for element_idx in range(n_elements):
-    #     for theta_idx in range(n_theta):
-    #         xrt_proj_img_array[element_idx, theta_idx] = ndi.shift(xrt_proj_img_array[element_idx, theta_idx], shift = (0, -offset))
-    
-    # Iterative center of rotation correction for reference element
-    print("Starting iterative center of rotation correction...")
-    
-    max_cor_iterations = 10  # Maximum iterations for center of rotation correction
-    eps_cor = 0.001     # Tolerance for center of rotation convergence
+    center_of_rotation_avg, _, _ = rot_center_avg(aligned_proj, theta_idx_pairs, theta_array)
 
-    aligned_proj = xrt_proj_img_array[ref_element_idx].copy()
-    
-    for cor_iter in range(max_cor_iterations):
-        # Calculate current center of rotation
-        center_of_rotation_avg, center_geom, offset = rot_center_avg(aligned_proj, theta_idx_pairs, theta_array)
+    offset = center_of_rotation_avg - center_geom
 
-        if cor_iter == 0:
-            net_offset = offset.copy()
-        
-        else:
-            net_offset_copy = net_offset.copy()
-            net_offset += offset
-        
-        print(f'COR iteration {cor_iter + 1}: Center of rotation = {round_correct(center_of_rotation_avg, ndec = 3)}')
-        print(f'Geometric center: {center_geom}')
-        print(f'Center of rotation error: {round_correct(offset, ndec = 3)}')
-        
-        # Check if we've converged
-        if abs(offset) < eps_cor:
-            print(f'Center of rotation converged after {cor_iter + 1} iterations')
-            
-            for theta_idx in range(n_theta):
-                aligned_proj[theta_idx] = ndi.shift(xrt_proj_img_array[ref_element_idx, theta_idx], shift = (0, -(net_offset_copy - 1.2)))
+    print(f'Center of rotation after initial COR correction: {round_correct(center_of_rotation_avg, ndec = 3)}')
+    print(f'Geometric center: {center_geom}')
+    print(f'Center of rotation error: {round_correct(offset, ndec = 3)}')
+    
+    # add_shift = -0.8
+    
+    # print(f'Shifting by additional {-add_shift} pixels...')
 
-            break
-
-        # Apply correction to reference element
-        print(f'Applying center of rotation correction: {round_correct(-net_offset, ndec = 3)}')
-        
-        for theta_idx in range(n_theta):
-            aligned_proj[theta_idx] = ndi.shift(xrt_proj_img_array[ref_element_idx, theta_idx], shift = (0, -net_offset))
-    
-    print(f'Final center of rotation after iterative correction: {round_correct(center_of_rotation_avg, ndec = 3)}')
-    print(f'Final center of rotation error: {round_correct(offset, ndec = 3)}')
-    
-    # Calculate the total shift needed as the difference between final and initial COR
-    # total_cor_shift_needed = final_center_of_rotation_avg - init_cor_avg
-    
-    print(f'Total COR shift needed: {round_correct(-net_offset, ndec = 3)}')
-    
-    # net_x_shifts_pc[0] -= net_offset
-    net_x_shifts_pc[0] -= (net_offset - 1.2)
     # for theta_idx in range(n_theta):
-    #     aligned_proj[theta_idx] = xrt_proj_img_array[ref_element_idx, theta_idx].copy()
+        # aligned_proj[theta_idx] = ndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx], shift = (0, -(offset_init + add_shift)))
+
+    net_x_shifts_pc[0] -= offset_init
+    # net_x_shifts_pc[0] -= net_offset
 
     for i in range(n_iterations):
         iterations.append(i)
@@ -499,7 +574,7 @@ def iter_reproj(ref_element,
 
         # if i == 0:
         #     for theta_idx in range(n_theta):
-        #         aligned_proj[theta_idx] = xrt_proj_img_array[ref_element_idx, theta_idx]
+        #         aligned_proj[theta_idx] = xrf_proj_img_array[ref_element_idx, theta_idx]
             
         # else:
         if i > 0:
@@ -511,50 +586,24 @@ def iter_reproj(ref_element,
                     print(f'Shifting projection by net x shift = {round_correct(net_x_shift, ndec = 3)} (theta = {round_correct(theta_array[theta_idx], ndec = 1)})...')
                     print(f'Shifting projection by net y shift = {round_correct(net_y_shift, ndec = 3)}...')
 
-                aligned_proj[theta_idx] = ndi.shift(xrt_proj_img_array[ref_element_idx, theta_idx], shift = (net_y_shift, net_x_shift))
-        
-            center_of_rotation_avg, center_geom, offset = rot_center_avg(aligned_proj, theta_idx_pairs, theta_array)
+                aligned_proj[theta_idx] = ndi.shift(opt_dens_proj_img_array[theta_idx], shift = (net_y_shift, net_x_shift))
 
-            print(f'New average center of rotation after jitter correction: {round_correct(center_of_rotation_avg, ndec = 3)}')
+            center_of_rotation_avg, _, offset = rot_center_avg(aligned_proj, theta_idx_pairs, theta_array)
+
+            print(f'Center of rotation after initial COR correction: {round_correct(center_of_rotation_avg, ndec = 3)}')
             print(f'Geometric center: {center_geom}')
             print(f'Center of rotation error: {round_correct(offset, ndec = 3)}')
-            
-            if offset != 0:
-                # net_x_shifts_pc[i - 1, :] -= (offset - 1.2)
-                net_x_shifts_pc[i - 1, :] -= offset
-                
-                print(f'Incorporating x shift = {round_correct(-offset, ndec = 3)} + 1.2 pixels to all projection images for reference element {element_array_xrt[ref_element_idx]}...')
-                # print(f'Incorporating x shift = {round_correct(-offset, ndec = 3)} pixels to all projection images for reference element {element_array[ref_element_idx]}...')
-
-                for theta_idx in range(n_theta):
-                    net_x_shift = net_x_shifts_pc[i - 1, theta_idx]
-                    net_y_shift = net_y_shifts_pc[i - 1, theta_idx]
-
-                    if (theta_idx % 7) == 0:
-                        print(f'Shifting projection by net x shift = {round_correct(net_x_shift - 1, ndec = 3)} (theta = {round_correct(theta_array[theta_idx], ndec = 1)})...')
-                        print(f'Shifting projection by net y shift = {round_correct(net_y_shift - 1, ndec = 3)}...')
-                    
-                    aligned_proj[theta_idx] = ndi.shift(xrt_proj_img_array[ref_element_idx, theta_idx], shift = (net_y_shift, net_x_shift + 1.2))
-
-                net_x_shifts_pc[i, :] += 1.2
-
-                center_of_rotation_avg, _, offset = rot_center_avg(aligned_proj, theta_idx_pairs, theta_array)
-
-                print(f'New average center of rotation after dynamic COR correction: {round_correct(center_of_rotation_avg, ndec = 3)}')
-                print(f'Geometric center: {center_geom}')
-                print(f'Center of rotation error: {round_correct(offset, ndec = 3)}')
-
+    
         aligned_exp_proj_array.append(aligned_proj.copy())
 
         if algorithm == 'gridrec':
             recon = tomo.recon(aligned_proj, theta_array*np.pi/180, algorithm = algorithm, filter_name = 'ramlak')
-            # recon = tomo.recon(aligned_proj, theta_array*np.pi/180, center = (n_columns - 1)/2, algorithm = algorithm, filter_name = 'ramlak')
         
         elif algorithm == 'mlem':
             recon = tomo.recon(aligned_proj, theta_array*np.pi/180, algorithm = algorithm, num_iter = 60)
 
         else:
-            print('Error: Algorithm not available. Exiting...')
+            print('Error: Algorithm not available. Exiting program...')
             
             sys.exit()
         
@@ -562,8 +611,9 @@ def iter_reproj(ref_element,
 
         for slice_idx in range(n_slices):
             print(f'Slice {slice_idx + 1}/{n_slices}')
-
+            
             sinogram = (xform.radon(recon[slice_idx].copy(), theta_array)).T
+            # sinogram = radon_manual(recon[slice_idx].copy(), theta_array)
 
             synth_proj[:, slice_idx, :] = sinogram
         
@@ -575,10 +625,7 @@ def iter_reproj(ref_element,
             dx_array_pc[i, theta_idx] = dx
             dy_array_pc[i, theta_idx] = dy
             
-            if i == 0: 
-                # net_x_shifts_pc[i, theta_idx] = init_x_shift[theta_idx] + dx
-                # net_y_shifts_pc[i, theta_idx] = init_y_shift[theta_idx] + dy
-
+            if i == 0:                 
                 net_x_shifts_pc[i, theta_idx] += dx
                 net_y_shifts_pc[i, theta_idx] += dy
             
@@ -596,59 +643,60 @@ def iter_reproj(ref_element,
         print(f'Geometric center: {center_geom}')
         print(f'Center of rotation error: {round_correct(offset_synth, ndec = 3)}')
         
-        dx_max = np.max(dx_array_pc[i])
-        dx_min = np.min(dx_array_pc[i])
-
-        print(f'Maximum incremental shift: {dx_max} ({theta_array[np.argmax(dx_array_pc[i])]})')
-        print(f'Minimum incremental shift: {dx_min} ({theta_array[np.argmin(dx_array_pc[i])]})')
-        
-        # Look at RMS shift per iteration for convergence (show that typical shifts between images are settling down)
+        if i == 1:
+            sys.exit()
 
         if i > (n_iter_converge - 1):
-            if np.max(np.abs(dx_array_pc[i] - dx_array_pc[i - 1])) < eps:
+            rms_x_shift_current = np.sqrt((dx_array_pc[i]**2).mean())  # Look at RMS shift per iteration for convergence (show that typical shifts between images are settling down)
+            
+            if np.abs(rms_x_shift_current - rms_x_shift_prev) <= eps:
                 iterations = np.array(iterations)
+
+                dx_array_new = dx_array_pc[:len(iterations)]
+                dy_array_new = dy_array_pc[:len(iterations)]
            
-            net_x_shifts_pc_new = net_x_shifts_pc[:len(iterations)]
-            net_y_shifts_pc_new = net_y_shifts_pc[:len(iterations)]
+                net_x_shifts_pc_new = net_x_shifts_pc[:len(iterations)]
+                net_y_shifts_pc_new = net_y_shifts_pc[:len(iterations)]
 
-            print(f'Number of iterations taken: {len(iterations)}')
-            print('Shifting all elements in XRT aggregate projection array by current net shifts...')
+                print(f'Number of iterations taken: {len(iterations)}')
+                print('Shifting all elements in XRT aggregate projection array by current net shifts...')
 
-            for element_idx in range(n_elements_xrt):
                 for theta_idx in range(n_theta):
                     net_x_shift = net_x_shifts_pc_new[i]
                     net_y_shift = net_y_shifts_pc_new[i]
 
-                    aligned_proj_total_xrt[element_idx, theta_idx] = ndi.shift(xrt_proj_img_array[element_idx, theta_idx], shift = (net_y_shift, net_x_shift))
+                    aligned_proj_total_xrt[theta_idx] = ndi.shift(opt_dens_proj_img_array[theta_idx], shift = (net_y_shift, net_x_shift), cval = intensity_inc)
+                    aligned_proj_total_opt_dens[theta_idx] = ndi.shift(xrt_proj_img_array[theta_idx], shift = (net_y_shift, net_x_shift))
+                    
+                print('Shifting all elements in XRF aggregate projection array by current net shifts...')
+
+                for element_idx in range(n_elements_xrf):
+                    for theta_idx in range(n_theta):
+                        net_x_shift = net_x_shifts_pc_new[i]
+                        net_y_shift = net_y_shifts_pc_new[i]
+
+                        aligned_proj_total_xrf[element_idx, theta_idx] = ndi.shift(xrf_proj_img_array[element_idx, theta_idx], shift = (net_y_shift, net_x_shift))
+
+                print('Done')
+
+                break
             
-            print('Shifting all elements in XRF aggregate projection array by current net shifts...')
-
-            for element_idx in range(n_elements_xrf):
-                for theta_idx in range(n_theta):
-                    net_x_shift = net_x_shifts_pc_new[i]
-                    net_y_shift = net_y_shifts_pc_new[i]
-
-                    aligned_proj_total_xrf[element_idx, theta_idx] = ndi.shift(xrf_proj_img_array[element_idx, theta_idx], shift = (net_y_shift, net_x_shift))
-            
-            # net_x_shifts_pc_new -= offset_copy
-
-            print('Done')
-
-            break
+            rms_x_shift_prev = rms_x_shift_current.copy()
 
         if i == n_iterations - 1:
-            print('Iterative reprojection complete. Shifting all XRT elements by current net shifts...')
+            print('Iterative reprojection complete. Shifting XRT intensities and optical densities by current net shifts...')
 
             iterations = np.array(iterations)
 
+            dx_array_new, dy_array_new = dx_array_pc, dy_array_pc
             net_x_shifts_pc_new, net_y_shifts_pc_new = net_x_shifts_pc, net_y_shifts_pc
             
-            for element_idx in range(n_elements_xrt):
-                for theta_idx in range(n_theta):
-                    net_x_shift = net_x_shifts_pc_new[i, theta_idx]
-                    net_y_shift = net_y_shifts_pc_new[i, theta_idx]
-                        
-                    aligned_proj_total_xrt[element_idx, theta_idx] = ndi.shift(xrt_proj_img_array[element_idx, theta_idx], shift = (net_y_shift, net_x_shift))
+            for theta_idx in range(n_theta):
+                net_x_shift = net_x_shifts_pc_new[i]
+                net_y_shift = net_y_shifts_pc_new[i]
+
+                aligned_proj_total_xrt[theta_idx] = ndi.shift(opt_dens_proj_img_array[theta_idx], shift = (net_y_shift, net_x_shift), cval = intensity_inc)
+                aligned_proj_total_opt_dens[theta_idx] = ndi.shift(xrt_proj_img_array[theta_idx], shift = (net_y_shift, net_x_shift))
             
             print('Shifting all XRF elements by current net shifts...')
 
@@ -657,9 +705,7 @@ def iter_reproj(ref_element,
                     net_x_shift = net_x_shifts_pc_new[i, theta_idx]
                     net_y_shift = net_y_shifts_pc_new[i, theta_idx]
                         
-                    aligned_proj_total_xrf[element_idx, theta_idx] = ndi.shift(xrt_proj_img_array[element_idx, theta_idx], shift = (net_y_shift, net_x_shift))
-
-            # net_x_shifts_pc_new -= offset_copy
+                    aligned_proj_total_xrf[element_idx, theta_idx] = ndi.shift(xrf_proj_img_array[element_idx, theta_idx], shift = (net_y_shift, net_x_shift))
             
             print('Done')
 
@@ -667,14 +713,23 @@ def iter_reproj(ref_element,
     synth_proj_array = np.array(synth_proj_array)
     recon_array = np.array(recon_array)
     
-    return orig_ref_proj, aligned_proj_total_xrt, aligned_proj_total_xrf, aligned_exp_proj_array, synth_proj_array, recon_array, net_x_shifts_pc_new, net_y_shifts_pc_new
+    return orig_ref_proj, \
+           aligned_proj_total_xrt, \
+           aligned_proj_total_opt_dens, \
+           aligned_proj_total_xrf, \
+           aligned_exp_proj_array, \
+           synth_proj_array, \
+           recon_array, \
+           net_x_shifts_pc_new, \
+           net_y_shifts_pc_new, \
+           dx_array_new, \
+           dy_array_new
 
 file_path_xrf = '/home/bwr0835/2_ide_aggregate_xrf.h5'
 file_path_xrt = '/home/bwr0835/2_ide_aggregate_xrt.h5'
 
 output_dir_path_base = '/home/bwr0835'
 
-# output_file_name_base = input('Choose a base file name: ')
 # output_file_name_base = 'gridrec_5_iter_vacek_cor_and_shift_correction_padding_-22_deg_158_deg'
 # output_file_name_base = 'xrt_mlem_1_iter_no_shift_no_log_tomopy_default_cor_w_padding_07_03_2025'
 # output_file_name_base = 'xrt_mlem_1_iter_manual_shift_-20_no_log_tomopy_default_cor_w_padding_07_09_2025'
@@ -688,76 +743,81 @@ if output_file_name_base == '':
 
 # create_aggregate_xrf_h5(file_path_array, file_path_xrf, synchrotron = 'aps')
 
-# file_path_xrt = ''
+try:
+    elements_xrt, counts_xrt, theta_xrt, dataset_type_xrt, filenames = util.extract_h5_aggregate_xrt_data(file_path_xrt)
 
-# try:
+except:
+    print('Cannot open XRT HDF5 file')
+    
+    sys.exit()
 
-elements_xrt, counts_xrt, theta_xrt, dataset_type_xrt, filenames = util.extract_h5_aggregate_xrt_data(file_path_xrt)
-elements_xrf, counts_xrf, _, dataset_type_xrf = util.extract_h5_aggregate_xrt_data(file_path_xrf)
+try:
+    elements_xrf, counts_xrf, _, dataset_type_xrf = util.extract_h5_aggregate_xrt_data(file_path_xrf)
 
+except:
+    print('Cannot open XRF HDF5 file')
 
-# except:
-    # print('Cannot upload HDF5 file. Check file structure. Ending...')
-
-    # sys.exit()
-
-desired_element = 'ds_ic'
-# desired_element = 'Fe'
-# desired_element_idx = elements_xrf.index(desired_element)
-desired_element_idx = elements_xrt.index(desired_element)
-
-nonzero_mask = counts_xrt[desired_element_idx] > 0
+    sys.exit()
 
 phi_inc = 8.67768e5
 t_dwell_s = 0.01 
 
 counts_inc = phi_inc*t_dwell_s
 
+desired_element = 'ds_ic'
+desired_element_idx = elements_xrt.index(desired_element)
+
+nonzero_mask = counts_xrt[desired_element_idx] > 0
+
 counts_xrt[desired_element_idx][nonzero_mask] = -np.log(counts_xrt[desired_element_idx][nonzero_mask]/counts_inc)
 
-# output_dir_path = filedialog.askdirectory(parent = root, title = "Choose directory to output NPY files to.")
-n_theta = counts_xrt.shape[1]
-n_slices = counts_xrt.shape[2]
-# n_theta = counts_xrf.shape[1]
-# n_slices = counts_xrf.shape[2]
+n_theta, n_slices, n_columns = counts_xrt.shape
 
-# init_x_shift = -20*np.ones(n_theta)
 init_x_shift = 0
 
 n_desired_iter = 6 # For the reprojection scheme, NOT for reconstruction by itself
 
 algorithm = 'gridrec'
 
-# orig_proj_ref, \
-# aligned_proj_total, \
-# aligned_exp_proj_array, \
-# synth_proj_array, \
-# recon_array, \
-# net_x_shifts, \
-# net_y_shifts = iter_reproj(desired_element, 
-#                            elements_xrf, 
-#                            theta_xrf, 
-#                            counts_xrf, 
-#                            algorithm, 
-#                            n_desired_iter,
-#                            init_x_shift = init_x_shift)
+if (n_slices % 2) or (n_columns % 2): # Padding for odd-integer detector positions and/or slices
+    if (n_slices % 2) and (n_columns % 2):
+        xrt_proj_img_array = pad_col_row(counts_xrt)
+        xrf_proj_img_array = pad_col_row(counts_xrf)
+            
+        n_slices += 1
+        n_columns += 1
+        
+    elif n_slices % 2:
+        xrt_proj_img_array = pad_row(counts_xrt)
+        xrf_proj_img_array = pad_row(counts_xrf)
+
+        n_slices += 1
+
+    else:
+
+        xrt_proj_img_array = pad_col(counts_xrt)
+        xrf_proj_img_array = pad_col(counts_xrf)
+
+        n_columns += 1
 
 orig_proj_ref, \
 aligned_proj_total_xrt, \
+aligned_proj_total_opt_dens, \
 aligned_proj_total_xrf, \
 aligned_exp_proj_array, \
 synth_proj_array, \
 recon_array, \
 net_x_shifts, \
-net_y_shifts = iter_reproj(desired_element, 
-                           elements_xrt,
-                           elements_xrf, 
-                           theta_xrt, 
-                           counts_xrt, 
-                           counts_xrf,
-                           algorithm, 
-                           n_desired_iter,
-                           init_x_shift = init_x_shift)
+net_y_shifts, \
+dx_array, \
+dy_array = iter_reproj(desired_element, 
+                       elements_xrt,
+                       theta_xrt,
+                       counts_inc, 
+                       counts_xrt, 
+                       counts_xrf,
+                       algorithm, 
+                       n_desired_iter)
 
 print('Saving XRT aux files...')
 
@@ -766,7 +826,6 @@ full_output_dir_path = os.path.join(output_dir_path_base, 'iter_reproj', output_
 os.makedirs(full_output_dir_path, exist_ok = True)
 
 np.save(os.path.join(full_output_dir_path, 'theta_array.npy'), theta_xrt)
-# np.save(os.path.join(full_output_dir_path, 'theta_array.npy'), theta_xrf)
 np.save(os.path.join(full_output_dir_path, 'aligned_proj_all_elements.npy'), aligned_proj_total_xrt)
 np.save(os.path.join(full_output_dir_path, 'aligned_proj_array_iter_' + desired_element + '.npy'), aligned_exp_proj_array)
 np.save(os.path.join(full_output_dir_path, 'synth_proj_array_iter_' + desired_element + '.npy'), synth_proj_array)
@@ -775,7 +834,7 @@ np.save(os.path.join(full_output_dir_path, 'net_x_shifts_' + desired_element + '
 np.save(os.path.join(full_output_dir_path, 'net_y_shifts_' + desired_element + '.npy'), net_y_shifts)
 np.save(os.path.join(full_output_dir_path, 'orig_exp_proj_' + desired_element + '.npy'), orig_proj_ref)
 
-print('Exporting aligned XRT data to HDF5 file...')
+print('Exporting aligned XR and optical density data to HDF5 file...')
 
 with h5py.File(os.path.join(output_dir_path_base, '2_ide_aggregate_xrt_aligned.h5'), 'w') as f:
     exchange = f.create_group('exchange')
@@ -788,7 +847,7 @@ with h5py.File(os.path.join(output_dir_path_base, '2_ide_aggregate_xrt_aligned.h
     file_info.create_dataset('filenames', data = filenames)
     file_info.create_dataset('dataset_type', data = 'xrt')
 
-print('Exporting aligned XRT data to HDF5 file...')
+print('Exporting aligned XRF data to HDF5 file...')
 
 with h5py.File(os.path.join(output_dir_path_base, '2_ide_aggregate_xrf_aligned.h5'), 'w') as f:
     exchange = f.create_group('exchange')
