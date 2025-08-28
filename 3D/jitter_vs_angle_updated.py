@@ -110,7 +110,8 @@ def rot_center_avg(proj_img_array, theta_pair_array, theta_array):
 
     return center_rotation_avg, geom_center_index, offset
 
-dir_path = 'xrt_gridrec_6_iter_initial_ps_cor_correction_norm_opt_dens_w_padding_08_28_2025'
+# dir_path = '/Users/bwr0835/Documents/xrt_gridrec_6_iter_initial_ps_cor_correction_norm_opt_dens_w_padding_08_28_2025'
+dir_path = '/Users/bwr0835/Documents/xrt_gridrec_6_iter_initial_ps_cor_correction_norm_opt_dens_add_shift_-0_8_w_padding_08_28_2025'
 
 aligned_proj_file = os.path.join(dir_path, 'aligned_proj_array_iter_ds_ic.npy')
 synth_proj_file = os.path.join(dir_path, 'synth_proj_array_iter_ds_ic.npy')
@@ -139,11 +140,6 @@ for iter_idx in iteration_idx_array:
 
     print(f'Iteration {iter_idx} - COR (exp.): {center_of_rotation_avg_exp}; Offset: {offset_exp}')
     print(f'Iteration {iter_idx} - COR (synth.): {center_of_rotation_avg_synth}; Offset: {offset_synth}\n')
-
-# sys.exit()
-
-# plt.imshow(aligned_proj_array[0][0])
-# plt.show()
 
 fig1, axs1 = plt.subplots()
 fig2, axs2 = plt.subplots(1, 2)
@@ -194,15 +190,17 @@ axs3.legend(frameon = False, fontsize = 14)
 fig1.tight_layout()
 fig3.tight_layout()
 
-# nonzero_mask = aligned_proj_array[iter_idx_desired] > 0
+fig1.savefig(os.path.join(dir_path, 'jitter_vs_angle.svg'), dpi = 400)
+fig3.savefig(os.path.join(dir_path, 'opt_dens_vs_scan_pos_idx.svg'), dpi = 400)
 
-# aligned_proj_array[iter_idx_desired][nonzero_mask] = -np.log(aligned_proj_array[iter_idx_desired][nonzero_mask]/counts_inc) 
+plt.close(fig1)
+plt.close(fig3)
 
 vmin = np.min(aligned_proj_array[0])
 vmax = np.max(aligned_proj_array[0])
 
 im2_1 = axs2[0].imshow(aligned_proj_array[iter_idx_desired][0], vmin = vmin, vmax = vmax)
-im2_2 = axs2[1].imshow(aligned_proj_array[iter_idx + 2][0], vmin = vmin, vmax = vmax)
+im2_2 = axs2[1].imshow(aligned_proj_array[iter_idx_desired + 2][0], vmin = vmin, vmax = vmax)
 
 text2 = axs2[0].text(0.02, 0.02, r'$\theta = {0}$\textdegree'.format(theta_array[0]), transform = axs2[0].transAxes, color = 'white')
 
@@ -210,33 +208,26 @@ for axs in fig2.axes:
     axs.axvline(x = 300, color = 'red')
     axs.axis('off')
 
-# axs2.set_title(r'Iteration index {0}'.format(iter_idx_desired))
+axs2[0].set_title(r'Iter. index {0}'.format(iter_idx_desired))
+axs2[1].set_title(r'Iter. index {0}'.format(iter_idx_desired + 2))
 
-# fig2.tight_layout()
+fig2.suptitle(r'Optical density', y = 0.75)
+fig2.tight_layout()
 
-# fps = 25
+fps = 10
 
-# for theta_idx, theta in enumerate(theta_array):
-#     im2.set_data(aligned_proj_array[iter_idx_desired][theta_idx])
-#     text2.set_text(r'$\theta = {0}$\textdegree'.format(theta))
+for theta_idx, theta in enumerate(theta_array):
+    im2_1.set_data(aligned_proj_array[iter_idx_desired][theta_idx])
+    im2_2.set_data(aligned_proj_array[iter_idx_desired + 2][theta_idx])
+    
+    text2.set_text(r'$\theta = {0}$\textdegree'.format(theta))
 
-#     # if theta_idx == 18:
-#         # plt.show()
+    fig2.canvas.draw() # Rasterize and store Matplotlib figure contents in special buffer
 
-#     fig2.canvas.draw() # Rasterize and store Matplotlib figure contents in special buffer
+    frame = np.array(fig2.canvas.renderer.buffer_rgba())[:, :, :3] # Rasterize the contents in the stored buffer, access 
 
-#     frame = np.array(fig2.canvas.renderer.buffer_rgba())[:, :, :3] # Rasterize the contents in the stored buffer, access 
+    theta_frames.append(frame)
 
-#     theta_frames.append(frame)
+plt.close(fig2)
 
-
-# plt.close(fig2)
-
-# iio2.mimsave(os.path.join(dir_path, f'cor_aligned_object_iter_idx_{iter_idx_desired}_opt_dens.gif'), theta_frames, duration = 1/fps)
-
-plt.show()
-
-# create_gif(filename2_array, os.path.join(dir_path, 'cor_aligned_object_iter_idx_0_opt_dens.gif'), fps = 25)
-
-# gif_to_animated_svg_write(os.path.join(dir_path, 'cor_aligned_object_iter_idx_0_opt_dens.gif'), os.path.join(dir_path, 'cor_aligned_object_iter_idx_0_opt_dens.svg'), fps = 25)
-
+iio2.mimsave(os.path.join(dir_path, f'cor_aligned_object_opt_dens.gif'), theta_frames, fps = fps)
