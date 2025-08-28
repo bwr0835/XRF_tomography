@@ -110,11 +110,7 @@ def rot_center_avg(proj_img_array, theta_pair_array, theta_array):
 
     return center_rotation_avg, geom_center_index, offset
 
-# dir_path = '/Users/bwr0835/Documents/xrt_gridrec_6_iter_initial_ps_cor_correction_updated_log_w_padding_aug_20_2025'
-# dir_path = '/Users/bwr0835/Documents/xrt_gridrec_6_iter_initial_ps_cor_correction_updated_log_w_padding_tomopy_cor_300_154_aug_20_2025'
-# dir_path = '/Users/bwr0835/Documents/xrt_gridrec_6_iter_initial_ps_cor_correction_updated_log_w_padding_tomopy_cor_299_516_aug_20_2025'
-dir_path = '/Users/bwr0835/Documents/xrt_gridrec_6_iter_initial_ps_cor_correction_updated_log_w_padding_add_shift_-0_4837_tomopy_center_300_655_aug_20_2025'
-# dir_path = '/Users/bwr0835/Documents/xrt_gridrec_6_iter_initial_ps_cor_correction_updated_log_w_padding_add_shift_-0_4837_aug_20_2025'
+dir_path = 'xrt_gridrec_6_iter_initial_ps_cor_correction_norm_opt_dens_w_padding_08_28_2025'
 
 aligned_proj_file = os.path.join(dir_path, 'aligned_proj_array_iter_ds_ic.npy')
 synth_proj_file = os.path.join(dir_path, 'synth_proj_array_iter_ds_ic.npy')
@@ -150,7 +146,7 @@ for iter_idx in iteration_idx_array:
 # plt.show()
 
 fig1, axs1 = plt.subplots()
-# fig2, axs2 = plt.subplots(dpi = 200)
+fig2, axs2 = plt.subplots(1, 2)
 fig3, axs3 = plt.subplots()
 
 theta_frames = []
@@ -205,11 +201,15 @@ fig3.tight_layout()
 vmin = np.min(aligned_proj_array[0])
 vmax = np.max(aligned_proj_array[0])
 
-im2 = axs2.imshow(aligned_proj_array[iter_idx_desired][0], vmin = vmin, vmax = vmax)
-# text2 = axs2.text(0.02, 0.02, r'$\theta = {0}$\textdegree'.format(theta_array[0]), transform = axs2.transAxes, color = 'white')
+im2_1 = axs2[0].imshow(aligned_proj_array[iter_idx_desired][0], vmin = vmin, vmax = vmax)
+im2_2 = axs2[1].imshow(aligned_proj_array[iter_idx + 2][0], vmin = vmin, vmax = vmax)
 
-# axs2.axvline(x = 300, color = 'red')
-# axs2.axis('off')
+text2 = axs2[0].text(0.02, 0.02, r'$\theta = {0}$\textdegree'.format(theta_array[0]), transform = axs2[0].transAxes, color = 'white')
+
+for axs in fig2.axes:
+    axs.axvline(x = 300, color = 'red')
+    axs.axis('off')
+
 # axs2.set_title(r'Iteration index {0}'.format(iter_idx_desired))
 
 # fig2.tight_layout()
