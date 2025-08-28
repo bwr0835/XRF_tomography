@@ -138,9 +138,11 @@ iteration_idx_array = np.arange(dx_iter_array.shape[0])
 theta_idx_pairs = find_theta_combos(theta_array, dtheta = 1)
 
 for iter_idx in iteration_idx_array:
-    center_of_rotation_avg, center_geom, offset = rot_center_avg(synth_proj_array[iter_idx], theta_idx_pairs, theta_array)
+    center_of_rotation_avg_exp, center_geom_exp, offset_exp = rot_center_avg(aligned_proj_array[iter_idx], theta_idx_pairs, theta_array)
+    center_of_rotation_avg_synth, _, offset_synth = rot_center_avg(synth_proj_array[iter_idx], theta_idx_pairs, theta_array)
 
-    print(f'Iteration {iter_idx} - COR: {center_of_rotation_avg}; Offset: {offset}')
+    print(f'Iteration {iter_idx} - COR (exp.): {center_of_rotation_avg_exp}; Offset: {offset_exp}')
+    print(f'Iteration {iter_idx} - COR (synth.): {center_of_rotation_avg_synth}; Offset: {offset_synth}\n')
 
 # sys.exit()
 
