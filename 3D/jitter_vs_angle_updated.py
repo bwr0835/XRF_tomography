@@ -245,10 +245,11 @@ def phase_correlate(recon_proj, exp_proj):
 
     return phase_cross_corr
 
-dir_path = '/Users/bwr0835/Documents/xrt_gridrec_6_iter_initial_ps_cor_correction_norm_opt_dens_w_padding_08_28_2025'
+# dir_path = '/Users/bwr0835/Documents/xrt_gridrec_6_iter_initial_ps_cor_correction_norm_opt_dens_w_padding_08_28_2025'
 # dir_path = '/Users/bwr0835/Documents/xrt_gridrec_6_iter_initial_ps_cor_correction_norm_opt_dens_add_shift_-0_8_w_padding_08_28_2025'
 # dir_path = '/Users/bwr0835/Documents/xrt_gridrec_6_iter_initial_ps_cor_correction_norm_opt_dens_add_shift_-0_8_tomopy_cor_300_8_w_padding_08_28_2025'
 # dir_path = '/Users/bwr0835/Documents/xrt_gridrec_6_iter_initial_ps_cor_correction_norm_opt_dens_add_shift_0_8_w_padding_08_28_2025'
+dir_path = '/Users/bwr0835/Documents/xrt_gridrec_6_iter_initial_ps_cor_correction_norm_opt_dens_w_padding_corrected_fluct_norm_fxn_08_28_2025'
 
 aligned_proj_file = os.path.join(dir_path, 'aligned_proj_array_iter_ds_ic.npy')
 synth_proj_file = os.path.join(dir_path, 'synth_proj_array_iter_ds_ic.npy')
@@ -402,8 +403,8 @@ print(neg_22)
 phase_xcorr_neg_30 = phase_correlate(synth_proj_array[iter_idx_desired][neg_30], aligned_proj_array[iter_idx_desired][neg_30])
 phase_xcorr_neg_22 = phase_correlate(synth_proj_array[iter_idx_desired][neg_22], aligned_proj_array[iter_idx_desired][neg_22])
 
-curve13, = axs5.plot(np.arange(n_slices), fft.fftshift(phase_xcorr_neg_30)[:, n_columns//2], 'k', linewidth = 2, label = r'$\theta = -30$\textdegree')
-curve14, = axs5.plot(np.arange(n_slices), fft.fftshift(phase_xcorr_neg_22)[:, n_columns//2], 'r', linewidth = 2, label = r'$\theta = -22$\textdegree')
+curve13, = axs5.plot(np.arange(n_slices)[125:176], fft.fftshift(phase_xcorr_neg_30)[125:176, n_columns//2], 'k', linewidth = 2, label = r'$\theta = -30$\textdegree')
+curve14, = axs5.plot(np.arange(n_slices)[125:176], fft.fftshift(phase_xcorr_neg_22)[125:176, n_columns//2], 'r', linewidth = 2, label = r'$\theta = -22$\textdegree')
 
 axs5.tick_params(axis = 'both', which = 'major', labelsize = 14)
 axs5.tick_params(axis = 'both', which = 'minor', labelsize = 14)

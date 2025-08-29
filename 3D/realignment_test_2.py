@@ -447,6 +447,7 @@ def iter_reproj(ref_element,
                 element_array, 
                 theta_array, 
                 xrt_proj_img_array,
+                I0_mask_global_avg,
                 algorithm, 
                 n_iterations,
                 init_x_shift = None, 
@@ -644,7 +645,8 @@ def iter_reproj(ref_element,
     print(f'Applying center of rotation correction: {round_correct(-offset_init, ndec = 3)}')
 
     for theta_idx in range(n_theta):
-        aligned_proj[theta_idx] = ndi.shift(xrt_proj_img_array[ref_element_idx, theta_idx], shift = (0, -offset_init))
+        # aligned_proj[theta_idx] = ndi.shift(xrt_proj_img_array[ref_element_idx, theta_idx], shift = (0, -offset_init))
+        aligned_proj[theta_idx] = ndi.shift(xrt_proj_img_array[ref_element_idx, theta_idx], shift = (0, -offset_init), cval = I0_mask_global_avg)
     
     # if offset_init != 0:
         # offset_crop_idx = int(np.ceil(np.abs(offset_init))) 
@@ -728,7 +730,9 @@ def iter_reproj(ref_element,
                     print(f'Shifting projection by net x shift = {round_correct(net_x_shift, ndec = 3)} (theta = {round_correct(theta_array[theta_idx], ndec = 1)})...')
                     print(f'Shifting projection by net y shift = {round_correct(net_y_shift, ndec = 3)}...')
 
-                aligned_proj[theta_idx] = ndi.shift(xrt_proj_img_array[ref_element_idx, theta_idx], shift = (net_y_shift, net_x_shift))
+                # aligned_proj[theta_idx] = ndi.shift(xrt_proj_img_array[ref_element_idx, theta_idx], shift = (net_y_shift, net_x_shift))
+                aligned_proj[theta_idx] = ndi.shift(xrt_proj_img_array[ref_element_idx, theta_idx], shift = (net_y_shift, net_x_shift), cval = I0_mask_global_avg)
+        
         
             # center_of_rotation_avg, center_geom, offset = rot_center_avg(aligned_proj, theta_idx_pairs, theta_array)
 
@@ -782,10 +786,10 @@ def iter_reproj(ref_element,
         for slice_idx in range(n_slices):
             print(f'Slice {slice_idx + 1}/{n_slices}')
             
-            sinogram = (xform.radon(recon[slice_idx].copy(), theta_array)).T
+            _synth_proj = (xform.radon(recon[slice_idx].copy(), theta_array)).T
             # sinogram = radon_manual(recon[slice_idx].copy(), theta_array)
 
-            synth_proj[:, slice_idx, :] = sinogram
+            synth_proj[:, slice_idx, :] = _synth_proj
         
         synth_proj_array.append(synth_proj.copy())
         
@@ -836,7 +840,8 @@ def iter_reproj(ref_element,
                     net_x_shift = net_x_shifts_pc_new[i]
                     net_y_shift = net_y_shifts_pc_new[i]
 
-                    aligned_proj_total[element_idx, theta_idx] = ndi.shift(xrt_proj_img_array[element_idx, theta_idx], shift = (net_y_shift, net_x_shift))
+                    # aligned_proj_total[element_idx, theta_idx] = ndi.shift(xrt_proj_img_array[element_idx, theta_idx], shift = (net_y_shift, net_x_shift))
+                    aligned_proj_total[element_idx, theta_idx] = ndi.shift(xrt_proj_img_array[element_idx, theta_idx], shift = (net_y_shift, net_x_shift), cval = I0_mask_global_avg)
 
             print('Done')
 
@@ -857,7 +862,8 @@ def iter_reproj(ref_element,
                     net_x_shift = net_x_shifts_pc_new[i, theta_idx]
                     net_y_shift = net_y_shifts_pc_new[i, theta_idx]
                         
-                    aligned_proj_total[element_idx, theta_idx] = ndi.shift(xrt_proj_img_array[element_idx, theta_idx], shift = (net_y_shift, net_x_shift))
+                    # aligned_proj_total[element_idx, theta_idx] = ndi.shift(xrt_proj_img_array[element_idx, theta_idx], shift = (net_y_shift, net_x_shift))
+                    aligned_proj_total[element_idx, theta_idx] = ndi.shift(xrt_proj_img_array[element_idx, theta_idx], shift = (net_y_shift, net_x_shift), cval = I0_mask_global_avg)
             
             print('Done')
 
@@ -876,7 +882,7 @@ output_dir_path_base = '/home/bwr0835'
 # output_file_name_base = 'gridrec_5_iter_vacek_cor_and_shift_correction_padding_-22_deg_158_deg'
 # output_file_name_base = 'xrt_mlem_1_iter_no_shift_no_log_tomopy_default_cor_w_padding_07_03_2025'
 # output_file_name_base = 'xrt_mlem_1_iter_manual_shift_-20_no_log_tomopy_default_cor_w_padding_07_09_2025'
-output_file_name_base = 'xrt_gridrec_6_iter_initial_ps_cor_correction_norm_opt_dens_w_padding_corrected_fluct_norm_fxn_08_28_2025'
+output_file_name_base = 'xrt_gridrec_6_iter_initial_ps_cor_correction_norm_xrt_intens_w_padding_corrected_fluct_norm_fxn_08_29_2025'
 # output_file_name_base = 'xrt_gridrec_1_iter_no_shift_no_log_tomopy_default_cor_w_padding_07_03_2025'
 
 if output_file_name_base == '':
@@ -913,7 +919,7 @@ pos_nonzero_mask = counts_xrt[desired_element_idx] > 0
 
 counts_xrt[desired_element_idx], I0_mask_global_avg = fluct_norm(counts_xrt[desired_element_idx])
 
-counts_xrt[desired_element_idx][pos_nonzero_mask] = -np.log(counts_xrt[desired_element_idx][pos_nonzero_mask]/I0_mask_global_avg)
+# counts_xrt[desired_element_idx][pos_nonzero_mask] = -np.log(counts_xrt[desired_element_idx][pos_nonzero_mask]/I0_mask_global_avg)
 # counts_xrt[desired_element_idx][~pos_nonzero_mask] = 0
 
 # output_dir_path = filedialog.askdirectory(parent = root, title = "Choose directory to output NPY files to.")
@@ -943,6 +949,22 @@ algorithm = 'gridrec'
 #                            n_desired_iter,
 #                            init_x_shift = init_x_shift)
 
+# orig_proj_ref, \
+# aligned_proj_total, \
+# aligned_exp_proj_array, \
+# synth_proj_array, \
+# recon_array, \
+# net_x_shifts, \
+# net_y_shifts, \
+# dx_array, \
+# dy_array = iter_reproj(desired_element, 
+#                        elements_xrt, 
+#                        theta_xrt, 
+#                        counts_xrt, 
+#                        algorithm, 
+#                        n_desired_iter,
+#                        init_x_shift = init_x_shift)
+
 orig_proj_ref, \
 aligned_proj_total, \
 aligned_exp_proj_array, \
@@ -954,7 +976,8 @@ dx_array, \
 dy_array = iter_reproj(desired_element, 
                        elements_xrt, 
                        theta_xrt, 
-                       counts_xrt, 
+                       counts_xrt,
+                       I0_mask_global_avg, 
                        algorithm, 
                        n_desired_iter,
                        init_x_shift = init_x_shift)
