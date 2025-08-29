@@ -3,6 +3,7 @@ import numpy as np, os, sys
 from matplotlib import pyplot as plt
 from imageio import v2 as iio2
 from numpy import fft
+from skimage import registration as reg
 from itertools import combinations as combos
 
 plt.rcParams['text.usetex'] = True
@@ -110,22 +111,160 @@ def rot_center_avg(proj_img_array, theta_pair_array, theta_array):
 
     return center_rotation_avg, geom_center_index, offset
 
-# dir_path = '/Users/bwr0835/Documents/xrt_gridrec_6_iter_initial_ps_cor_correction_norm_opt_dens_w_padding_08_28_2025'
-dir_path = '/Users/bwr0835/Documents/xrt_gridrec_6_iter_initial_ps_cor_correction_norm_opt_dens_add_shift_-0_8_w_padding_08_28_2025'
+def edge_gauss_filter(image, sigma, alpha, nx, ny):
+    n_rolloff = int(0.5 + alpha*sigma)
+    
+    if n_rolloff > 2:
+        exp_arg =  np.arange(n_rolloff)/float(sigma)
+
+        rolloff = 1 - np.exp(-0.5*exp_arg**2)
+    
+    edge_total = 0
+        
+    # Bottom edge
+ 
+    y1 = ny - sigma
+    y2 = ny
+
+    edge_total = edge_total + np.sum(image[y1:y2, 0:nx])
+
+    # Top edge
+        
+    y3 = 0
+    y4 = sigma
+        
+        
+    edge_total = edge_total + np.sum(image[y3:y4, 0:nx])
+
+    # Left edge
+
+    x1 = 0
+    x2 = sigma
+
+    edge_total = edge_total + np.sum(image[y4:y1, x1:x2])
+
+    # Right edge
+
+    x3 = nx - sigma
+    x4 = nx
+
+    edge_total = edge_total + np.sum(image[y4:y1, x3:x4])
+
+    n_pixels = 2*sigma*(nx + ny - 2*sigma) # Total number of edge pixels for this "vignetting"
+                                           # sigma*nx + sigma*nx + [(ny - sigma) - sigma]*sigma + (ny - sigma) - sigma]*sigma
+    
+    dc_value = edge_total/n_pixels # Average of edge_total over total number of edge pixels
+
+    image = np.copy(image) - dc_value
+    
+    # Top edge
+
+    xstart = 0
+    xstop = nx - 1
+    idy = 0
+
+    for i_rolloff in range(n_rolloff):
+        image[idy, xstart:(xstop+1)] = image[idy, xstart:(xstop+1)]*rolloff[idy]
+        
+        if xstart < (nx/2 - 1):
+            xstart += 1
+        
+        if xstop > (nx/2):
+            xstop -= 1
+        
+        if idy < (ny - 1):
+            idy += 1
+
+    # Bottom edge
+    
+    xstart = 0
+    xstop = nx - 1
+    idy = ny - 1
+
+    for i_rolloff in range(n_rolloff):
+        image[idy, xstart:(xstop+1)] = image[idy, xstart:(xstop+1)]*rolloff[ny - 1 - idy]
+
+        if xstart < (nx/2 - 1):
+            xstart += 1
+        
+        if xstop > nx/2:
+            xstop -= 1
+        
+        if idy > 0:
+            idy -= 1
+
+    # Left edge
+
+    ystart = 1
+    ystop = ny - 2
+    idx = 0
+
+    for i_rolloff in range(n_rolloff):
+        image[ystart:(ystop+1), idx] = image[ystart:(ystop+1), idx]*rolloff[idx]
+
+        if ystart < (ny/2 - 1):
+            ystart += 1
+       
+        if ystop > (ny/2):
+            ystop -= 1
+        
+        if idx < (nx - 1):
+            idx += 1
+
+    # Right edge
+
+    ystart = 1
+    ystop = ny - 2
+    idx = nx - 1
+
+    for i_rolloff in range(n_rolloff):
+        image[ystart:(ystop+1), idx] = image[ystart:(ystop+1), idx]*rolloff[nx - 1 - idx]
+
+        if ystart < (ny/2 - 1):
+            ystart += 1
+        
+        if ystop > (ny/2):
+            ystop -= 1
+        
+        if idx > 0:
+            idx -= 1
+    
+    return (image + dc_value)
+
+def phase_correlate(recon_proj, exp_proj):
+    n_columns = recon_proj.shape[1]
+    n_slices = recon_proj.shape[0]
+
+    recon_proj_filtered = edge_gauss_filter(recon_proj, sigma = 5, alpha = 10, nx = n_columns, ny = n_slices)
+    exp_proj_filtered = edge_gauss_filter(exp_proj, sigma = 5, alpha = 10, nx = n_columns, ny = n_slices)
+
+    recon_proj_fft = fft.fft2(recon_proj_filtered)
+    orig_proj_fft = fft.fft2(exp_proj_filtered)
+
+    phase_cross_corr = np.abs(fft.ifft2(recon_proj_fft*orig_proj_fft.conjugate()/np.abs(recon_proj_fft*orig_proj_fft.conjugate())))
+
+    return phase_cross_corr
+
+dir_path = '/Users/bwr0835/Documents/xrt_gridrec_6_iter_initial_ps_cor_correction_norm_opt_dens_w_padding_08_28_2025'
+# dir_path = '/Users/bwr0835/Documents/xrt_gridrec_6_iter_initial_ps_cor_correction_norm_opt_dens_add_shift_-0_8_w_padding_08_28_2025'
 # dir_path = '/Users/bwr0835/Documents/xrt_gridrec_6_iter_initial_ps_cor_correction_norm_opt_dens_add_shift_-0_8_tomopy_cor_300_8_w_padding_08_28_2025'
+# dir_path = '/Users/bwr0835/Documents/xrt_gridrec_6_iter_initial_ps_cor_correction_norm_opt_dens_add_shift_0_8_w_padding_08_28_2025'
 
 aligned_proj_file = os.path.join(dir_path, 'aligned_proj_array_iter_ds_ic.npy')
 synth_proj_file = os.path.join(dir_path, 'synth_proj_array_iter_ds_ic.npy')
 dx_file = os.path.join(dir_path, 'dx_array_iter_ds_ic.npy')
+dy_file = os.path.join(dir_path, 'dy_array_iter_ds_ic.npy')
 theta_file = os.path.join(dir_path, 'theta_array.npy')
 
 aligned_proj_array = np.load(aligned_proj_file)
 synth_proj_array = np.load(synth_proj_file)
 dx_iter_array = np.load(dx_file)
+dy_iter_array = np.load(dy_file)
 theta_array = np.load(theta_file)
 
 
 n_columns = aligned_proj_array[0].shape[2]
+n_slices = aligned_proj_array[0].shape[1]
 n_theta = len(theta_array)
 
 iter_idx_desired = 0
@@ -156,6 +295,8 @@ for iter_idx in iteration_idx_array:
 
     dx_min = dx_iter_array[iter_idx].min()
     dx_max = dx_iter_array[iter_idx].max()
+    
+    dy_min = dy_iter_array
 
     theta_dx_min = np.argmin(dx_iter_array[iter_idx])
     theta_dx_max = np.argmax(dx_iter_array[iter_idx])
@@ -168,6 +309,8 @@ for iter_idx in iteration_idx_array:
 fig1, axs1 = plt.subplots()
 fig2, axs2 = plt.subplots(1, 2)
 fig3, axs3 = plt.subplots()
+fig4, axs4 = plt.subplots()
+fig5, axs5 = plt.subplots()
 
 theta_frames = []
 
@@ -182,7 +325,6 @@ curve4, = axs1.plot(theta_array, dx_iter_array[-1], 'r-o', markersize = 3, linew
 
 axs1.tick_params(axis = 'both', which = 'major', labelsize = 14)
 axs1.tick_params(axis = 'both', which = 'minor', labelsize = 14)
-# axs1.set_title(r'Iteration index {0}'.format(iter_idx_desired), fontsize = 18)
 axs1.set_xlabel(r'$\theta$ (\textdegree{})', fontsize = 16)
 axs1.set_ylabel(r'$\delta x$', fontsize = 16)
 axs1.legend(frameon = False, fontsize = 14)
@@ -191,6 +333,17 @@ curve5, = axs3.plot(np.arange(n_columns), aligned_proj_array[iter_idx_desired][t
 curve6, = axs3.plot(np.arange(n_columns), aligned_proj_array[iter_idx_desired][theta_idx_pair[1], slice_idx_desired], 'k--', linewidth = 2, label = r'$\theta = {0}^{{\circ}}$'.format(theta_array[theta_idx_pair[1]]))
 curve7, = axs3.plot(np.arange(n_columns), synth_proj_array[iter_idx_desired][theta_idx_pair[0], slice_idx_desired], 'r', linewidth = 2, label = r'$\theta = {0}^{{\circ}}$ (synth.)'.format(theta_array[theta_idx_pair[0]]))
 curve8, = axs3.plot(np.arange(n_columns), synth_proj_array[iter_idx_desired][theta_idx_pair[1], slice_idx_desired], 'r--', linewidth = 2, label = r'$\theta = {0}^{{\circ}}$'.format(theta_array[theta_idx_pair[1]]))
+
+curve9, = axs4.plot(theta_array, dy_iter_array[iter_idx_desired], 'k-o', markersize = 3, linewidth = 2, label = r'Iteration {0}'.format(iteration_idx_array[iter_idx_desired]))
+curve10, = axs4.plot(theta_array, dy_iter_array[iter_idx_desired + 2], 'b-o',  markersize = 3, linewidth = 2, label = r'Iteration {0}'.format(iteration_idx_array[iter_idx_desired + 2]))
+curve11, = axs4.plot(theta_array, dy_iter_array[iter_idx_desired + 3], 'g-o', markersize = 3, linewidth = 2, label = r'Iteration {0}'.format(iteration_idx_array[iter_idx_desired + 3]))
+curve12, = axs4.plot(theta_array, dy_iter_array[-1], 'r-o', markersize = 3, linewidth = 2, label = r'Iteration {0}'.format(iteration_idx_array[-1]))
+
+axs4.tick_params(axis = 'both', which = 'major', labelsize = 14)
+axs4.tick_params(axis = 'both', which = 'minor', labelsize = 14)
+axs4.set_xlabel(r'$\theta$ (\textdegree{})', fontsize = 16)
+axs4.set_ylabel(r'$\delta y$', fontsize = 16)
+axs4.legend(frameon = False, fontsize = 14)
 
 global_min = np.min([np.min(aligned_proj_array[iter_idx_desired][theta_idx_pair[0], slice_idx_desired]), 
                      np.min(aligned_proj_array[iter_idx_desired][theta_idx_pair[1], slice_idx_desired]),
@@ -213,12 +366,15 @@ axs3.legend(frameon = False, fontsize = 14)
 
 fig1.tight_layout()
 fig3.tight_layout()
+fig4.tight_layout()
 
-fig1.savefig(os.path.join(dir_path, 'jitter_vs_angle.svg'), dpi = 400)
+fig1.savefig(os.path.join(dir_path, 'x_jitter_vs_angle.svg'), dpi = 400)
 fig3.savefig(os.path.join(dir_path, 'opt_dens_vs_scan_pos_idx.svg'), dpi = 400)
+fig4.savefig(os.path.join(dir_path, 'y_jitter_vs_angle.svg'), dpi = 400)
 
 plt.close(fig1)
 plt.close(fig3)
+plt.close(fig4)
 
 vmin = np.min(aligned_proj_array[0])
 vmax = np.max(aligned_proj_array[0])
@@ -238,6 +394,25 @@ axs2[1].set_title(r'Iter. index {0}'.format(iter_idx_desired + 2))
 fig2.suptitle(r'Optical density', y = 0.75)
 fig2.tight_layout()
 
+neg_30 = np.where(theta_array == -30)[0][0]
+neg_22 = np.where(theta_array == -22)[0][0]
+
+print(neg_22)
+
+phase_xcorr_neg_30 = phase_correlate(synth_proj_array[iter_idx_desired][neg_30], aligned_proj_array[iter_idx_desired][neg_30])
+phase_xcorr_neg_22 = phase_correlate(synth_proj_array[iter_idx_desired][neg_22], aligned_proj_array[iter_idx_desired][neg_22])
+
+curve13, = axs5.plot(np.arange(n_slices), fft.fftshift(phase_xcorr_neg_30)[:, n_columns//2], 'k', linewidth = 2, label = r'$\theta = -30$\textdegree')
+curve14, = axs5.plot(np.arange(n_slices), fft.fftshift(phase_xcorr_neg_22)[:, n_columns//2], 'r', linewidth = 2, label = r'$\theta = -22$\textdegree')
+
+axs5.tick_params(axis = 'both', which = 'major', labelsize = 14)
+axs5.tick_params(axis = 'both', which = 'minor', labelsize = 14)
+axs5.set_xlabel(r'$y$ scan index', fontsize = 16)
+axs5.set_ylabel(r'Phase cross-correlation', fontsize = 16)
+axs5.legend(frameon = False, fontsize = 14)
+
+fig5.tight_layout()
+
 fps = 10
 
 for theta_idx, theta in enumerate(theta_array):
@@ -255,3 +430,5 @@ for theta_idx, theta in enumerate(theta_array):
 plt.close(fig2)
 
 iio2.mimsave(os.path.join(dir_path, f'cor_aligned_object_opt_dens.gif'), theta_frames, fps = fps)
+
+plt.show()

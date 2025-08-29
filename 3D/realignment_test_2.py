@@ -262,25 +262,35 @@ def edge_gauss_filter(image, sigma, alpha, nx, ny):
     
     return (image + dc_value)
 
-def fluct_norm(img_array, sigma_1 = 5, alpha = 10, sigma_2 = 10):
-    n_theta, n_slices, n_columns = img_array.shape
+def fluct_norm(xrt_array, sigma_1 = 5, alpha = 10, sigma_2 = 10):
+    n_theta, n_slices, n_columns = xrt_array.shape
 
-    img_array_avg = np.mean(img_array)
+    convolution_mag_array = []
 
+    xrt_mask_avg_sum = 0
+    
     for theta_idx in range(n_theta):
-        img_vignetted = edge_gauss_filter(img_array[theta_idx], sigma = sigma_1, alpha = alpha, nx = n_columns, ny = n_slices)
+        xrt_vignetted = edge_gauss_filter(xrt_array[theta_idx], sigma = sigma_1, alpha = alpha, nx = n_columns, ny = n_slices)
 
-        convolution_mag = ndi.gaussian_filter(img_vignetted, sigma = sigma_2) # Blur the entire image using Gaussian filter/convolution
+        convolution_mag = ndi.gaussian_filter(xrt_vignetted, sigma = sigma_2) # Blur the entire image using Gaussian filter/convolution
 
         threshold = np.percentile(convolution_mag, 80) # Take top 20% of intensities for masking
 
         mask = convolution_mag >= threshold
 
-        img_avg = np.mean(img_array[theta_idx, mask])
+        xrt_mask_avg = xrt_array[theta_idx, mask].mean()
 
-        img_array[theta_idx] *= (img_array_avg/img_avg) # I0' = I0[avg(I0)/mask]
+        xrt_array[theta_idx] /= xrt_mask_avg # First part of I0' = I0(<I_theta,mask,avg>/I_theta,mask,avg)
 
-    return img_array
+        xrt_mask_avg_sum += xrt_mask_avg
+
+        convolution_mag_array.append(convolution_mag)
+    
+    global_xrt_mask_avg = xrt_mask_avg_sum/n_theta
+
+    xrt_array *= global_xrt_mask_avg # Second part of I0' = I0(<I_theta,mask,avg>/I_theta,mask,avg)
+    
+    return xrt_array, global_xrt_mask_avg
 
 def find_theta_combos(theta_array_deg, dtheta):
     '''
@@ -866,7 +876,7 @@ output_dir_path_base = '/home/bwr0835'
 # output_file_name_base = 'gridrec_5_iter_vacek_cor_and_shift_correction_padding_-22_deg_158_deg'
 # output_file_name_base = 'xrt_mlem_1_iter_no_shift_no_log_tomopy_default_cor_w_padding_07_03_2025'
 # output_file_name_base = 'xrt_mlem_1_iter_manual_shift_-20_no_log_tomopy_default_cor_w_padding_07_09_2025'
-output_file_name_base = 'xrt_gridrec_6_iter_initial_ps_cor_correction_norm_opt_dens_add_shift_0_8_tomopy_cor_300_8_w_padding_08_28_2025'
+output_file_name_base = 'xrt_gridrec_6_iter_initial_ps_cor_correction_norm_opt_dens_w_padding_corrected_fluct_norm_fxn_08_28_2025'
 # output_file_name_base = 'xrt_gridrec_1_iter_no_shift_no_log_tomopy_default_cor_w_padding_07_03_2025'
 
 if output_file_name_base == '':
@@ -901,11 +911,9 @@ pos_nonzero_mask = counts_xrt[desired_element_idx] > 0
 # counts_inc = phi_inc*t_dwell_s
 
 
-ds_ic_mean = np.mean(counts_xrt[desired_element_idx])
+counts_xrt[desired_element_idx], I0_mask_global_avg = fluct_norm(counts_xrt[desired_element_idx])
 
-counts_xrt[desired_element_idx] = fluct_norm(counts_xrt[desired_element_idx])
-
-counts_xrt[desired_element_idx][pos_nonzero_mask] = -np.log(counts_xrt[desired_element_idx][pos_nonzero_mask]/ds_ic_mean)
+counts_xrt[desired_element_idx][pos_nonzero_mask] = -np.log(counts_xrt[desired_element_idx][pos_nonzero_mask]/I0_mask_global_avg)
 # counts_xrt[desired_element_idx][~pos_nonzero_mask] = 0
 
 # output_dir_path = filedialog.askdirectory(parent = root, title = "Choose directory to output NPY files to.")

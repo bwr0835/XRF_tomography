@@ -142,15 +142,11 @@ def joint_fluct_norm(xrt_array, xrf_array, sigma_1 = 5, alpha = 10, sigma_2 = 10
 
     n_theta, n_slices, n_columns = xrt_array.shape
 
-    xrt_array_avg = xrt_array.mean()
-    
-    intensity_avg_array = []
-    intensity_norm_avg_array = []
     convolution_mag_array = []
+
+    xrt_mask_avg_sum = 0
     
     for theta_idx in range(n_theta):
-        intensity_avg_array.append(xrt_array[theta_idx].copy().mean())
-
         xrt_vignetted = edge_gauss_filter(xrt_array[theta_idx], sigma = sigma_1, alpha = alpha, nx = n_columns, ny = n_slices)
 
         convolution_mag = ndi.gaussian_filter(xrt_vignetted, sigma = sigma_2) # Blur the entire image using Gaussian filter/convolution
@@ -159,15 +155,21 @@ def joint_fluct_norm(xrt_array, xrf_array, sigma_1 = 5, alpha = 10, sigma_2 = 10
 
         mask = convolution_mag >= threshold
 
-        xrt_avg = np.mean(xrt_array[theta_idx, mask])
+        xrt_mask_avg = xrt_array[theta_idx, mask].mean()
 
-        xrt_array[theta_idx] *= (xrt_array_avg/xrt_avg) # I0' = I0[avg(I0)/mask]
-        xrf_array[theta_idx] *= (xrt_array_avg/xrt_avg)
+        xrt_array[theta_idx] /= xrt_mask_avg # First part of I0' = I0(<I_theta,mask,avg>/I_theta,mask,avg)
+        xrf_array[theta_idx] /= xrt_mask_avg
+
+        xrt_mask_avg_sum += xrt_mask_avg
 
         convolution_mag_array.append(convolution_mag)
-        intensity_norm_avg_array.append(xrt_array[theta_idx, mask].mean())
     
-    return xrt_array, xrf_array, np.array(intensity_avg_array), np.array(convolution_mag_array), np.array(intensity_norm_avg_array)
+    global_xrt_mask_avg = xrt_mask_avg_sum/n_theta
+
+    xrt_array *= global_xrt_mask_avg # Second part of I0' = I0(<I_theta,mask,avg>/I_theta,mask,avg)
+    xrf_array *= global_xrt_mask_avg
+    
+    return xrt_array, xrf_array, global_xrt_mask_avg, np.array(convolution_mag_array)
 
 def edge_gauss_filter(image, sigma, alpha, nx, ny):
     n_rolloff = int(0.5 + alpha*sigma)
@@ -339,7 +341,7 @@ I0_avg = np.mean(cts_copy)
 
 opt_dens_copy = -np.log(cts_copy/I0_avg)
 
-counts_xrt_norm, counts_xrf_norm, cts_avg_array, convolution_mag_array, cts_norm_avg_array = joint_fluct_norm(cts, counts)
+counts_xrt_norm, counts_xrf_norm, counts_xrt_mask_global_avg, convolution_mag_array = joint_fluct_norm(cts, counts)
 
 opt_dens = -np.log(counts_xrt_norm/I0_avg)
 
@@ -398,11 +400,22 @@ text_1 = axs1[0, 0].text(0.02, 0.02, r'$\theta = {0}$\textdegree'.format(theta_x
 text_2 = axs2[0, 0].text(0.02, 0.02, r'$\theta = {0}$\textdegree'.format(theta_xrf[0]), transform = axs2[0, 0].transAxes, color = 'white')
 text_3 = axs3[0, 0].text(0.02, 0.02, r'$\theta = {0}$\textdegree'.format(theta_xrf[0]), transform = axs3[2, 0].transAxes, color = 'white')
 
-curve1, = axs4.plot(theta_xrf, cts_avg_array, 'ko-', linewidth = 2, label = r'Raw XRT Avg.')
-curve2, = axs4.plot(theta_xrf, cts_norm_avg_array, 'ro-', linewidth = 2, label = r'Norm. XRT Avg.')
+cts_xrt_mask_avg = np.zeros(n_theta)
+cts_xrt_mask_avg_norm = np.zeros(n_theta)
 
-y_min = np.min([cts_avg_array.min(), cts_norm_avg_array.min()])
-y_max = np.max([cts_avg_array.max(), cts_norm_avg_array.max()])
+for theta_idx in range(n_theta):
+    threshold = np.percentile(convolution_mag_array[theta_idx], 80)
+
+    mask = convolution_mag_array[theta_idx] >= threshold
+
+    cts_xrt_mask_avg[theta_idx] = cts_copy[theta_idx, mask].mean()
+    cts_xrt_mask_avg_norm[theta_idx] = counts_xrt_norm[theta_idx, mask].mean()
+
+curve1, = axs4.plot(theta_xrf, cts_xrt_mask_avg, 'ko-', linewidth = 2, label = r'Raw XRT Avg.')
+curve2, = axs4.plot(theta_xrf, cts_xrt_mask_avg_norm, 'ro-', linewidth = 2, label = r'Norm. XRT Avg.')
+
+y_min = np.min([cts_xrt_mask_avg.min(), cts_xrt_mask_avg_norm.min()])
+y_max = np.max([cts_xrt_mask_avg.max(), cts_xrt_mask_avg_norm.max()])
 
 axs4.tick_params(axis = 'both', which = 'major', labelsize = 14)
 axs4.tick_params(axis = 'both', which = 'minor', labelsize = 14)
