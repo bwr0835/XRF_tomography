@@ -2,7 +2,7 @@ import numpy as np, h5py
 
 from matplotlib import pyplot as plt
 
-mda_array = ['0117', '0118', '0119', '0120', '0121', '0122', '0123', '0124', '0125', '0126']
+mda_array = ['0116', '0117', '0118', '0119', '0120', '0121', '0122', '0123', '0124', '0125', '0126']
 
 for mda, MDA in enumerate(mda_array):
     try:
