@@ -15,7 +15,7 @@ for mda, MDA in enumerate(mda_array):
 
         z = extra_pv_values[z_idx]
 
-        print(MDA)
+        print(f'MDA {MDA}: z = {z}')
 
     except:
         print('None')
