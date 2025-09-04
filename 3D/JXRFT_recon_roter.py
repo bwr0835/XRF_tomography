@@ -158,6 +158,7 @@ params_124_124_32_cabead_2 = {'f_recon_parameters': 'recon_parameters.txt', # Te
                               'fl_L': fl["L"], # doesn't need to change                    
                               'fl_M': fl["M"]}  # doesn't need to change
 
+# XRF detector z position (for 2-ID-E data): 2xfm:m25.VAL
 
 params = params_124_124_32_cabead_2
 

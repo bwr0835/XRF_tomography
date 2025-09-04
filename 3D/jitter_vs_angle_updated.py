@@ -308,12 +308,13 @@ for iter_idx in iteration_idx_array:
     print('\n')
 
 fig1, axs1 = plt.subplots()
-fig2, axs2 = plt.subplots(1, 2)
+fig2, axs2 = plt.subplots(2, 2)
 fig3, axs3 = plt.subplots()
 fig4, axs4 = plt.subplots()
 fig5, axs5 = plt.subplots()
 
-theta_frames = []
+theta_frames1 = []
+theta_frames2 = []
 
 theta_pair_idx_desired = 0
 
@@ -380,19 +381,26 @@ plt.close(fig4)
 vmin = np.min(aligned_proj_array[0])
 vmax = np.max(aligned_proj_array[0])
 
-im2_1 = axs2[0].imshow(aligned_proj_array[iter_idx_desired][0], vmin = vmin, vmax = vmax)
-im2_2 = axs2[1].imshow(aligned_proj_array[iter_idx_desired + 2][0], vmin = vmin, vmax = vmax)
+vmin_synth = synth_proj_array[0].min()
+vmax_synth = synth_proj_array[0].max()
 
-text2 = axs2[0].text(0.02, 0.02, r'$\theta = {0}$\textdegree'.format(theta_array[0]), transform = axs2[0].transAxes, color = 'white')
+im2_1 = axs2[0, 0].imshow(aligned_proj_array[iter_idx_desired][0], vmin = vmin, vmax = vmax)
+im2_2 = axs2[0, 1].imshow(aligned_proj_array[iter_idx_desired + 2][0], vmin = vmin, vmax = vmax)
+im2_3 = axs2[1, 0].imshow(synth_proj_array[iter_idx_desired][0], vmin = vmin, vmax = vmax)
+im2_4 = axs2[1, 1].imshow(synth_proj_array[iter_idx_desired + 2][0], vmin = vmin, vmax = vmax)
+
+text2 = axs2[0, 0].text(0.02, 0.02, r'$\theta = {0}$\textdegree'.format(theta_array[0]), transform = axs2[0, 0].transAxes, color = 'white')
 
 for axs in fig2.axes:
     axs.axvline(x = 300, color = 'red')
     axs.axis('off')
 
-axs2[0].set_title(r'Iter. index {0}'.format(iter_idx_desired))
-axs2[1].set_title(r'Iter. index {0}'.format(iter_idx_desired + 2))
+axs2[0, 0].set_title(r'Raw; Iter. index {0}'.format(iter_idx_desired)) 
+axs2[1, 0].set_title(r'Reproj.; Iter. index {0}'.format(iter_idx_desired))
+axs2[0, 1].set_title(r'Raw; Iter. index {0}'.format(iter_idx_desired + 2))
+axs2[1, 1].set_title(r'Reproj.; Iter. index {0}'.format(iter_idx_desired + 2))
 
-fig2.suptitle(r'Optical density', y = 0.75)
+fig2.suptitle(r'Optical density')
 fig2.tight_layout()
 
 neg_30 = np.where(theta_array == -30)[0][0]
@@ -419,17 +427,19 @@ fps = 10
 for theta_idx, theta in enumerate(theta_array):
     im2_1.set_data(aligned_proj_array[iter_idx_desired][theta_idx])
     im2_2.set_data(aligned_proj_array[iter_idx_desired + 2][theta_idx])
-    
+    im2_3.set_data(synth_proj_array[iter_idx_desired][theta_idx])
+    im2_4.set_data(synth_proj_array[iter_idx_desired + 2][theta_idx])
+
     text2.set_text(r'$\theta = {0}$\textdegree'.format(theta))
 
     fig2.canvas.draw() # Rasterize and store Matplotlib figure contents in special buffer
 
     frame = np.array(fig2.canvas.renderer.buffer_rgba())[:, :, :3] # Rasterize the contents in the stored buffer, access 
 
-    theta_frames.append(frame)
+    theta_frames1.append(frame)
 
 plt.close(fig2)
 
-iio2.mimsave(os.path.join(dir_path, f'cor_aligned_object_opt_dens.gif'), theta_frames, fps = fps)
+iio2.mimsave(os.path.join(dir_path, f'cor_aligned_object_opt_dens.gif'), theta_frames1, fps = fps)
 
-plt.show()
+# plt.show()
