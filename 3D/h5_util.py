@@ -177,6 +177,8 @@ def create_aggregate_xrf_h5(file_path_array, output_h5_file, synchrotron):
     
         theta_array_sorted = theta_array[theta_idx_sorted]
         counts_array_sorted = counts_array[:, theta_idx_sorted, :, :]
+
+        file_path_array_sorted = [file_path_array[theta_idx] for theta_idx in theta_idx_sorted]
     
     else:
         # This assumes all angles are in order over 360° (scan from -90° to 90°, flip sample, scan from -90° to 90°) AND -90° is included in BOTH sample orientations
@@ -188,9 +190,9 @@ def create_aggregate_xrf_h5(file_path_array, output_h5_file, synchrotron):
 
         theta_array_sorted = theta_array
         counts_array_sorted = counts_array
-    
-    file_path_array_sorted = [file_path_array[theta_idx] for theta_idx in theta_idx_sorted]
 
+        file_path_array_sorted = [file_path_array[theta_idx] for theta_idx in range(n_theta)]
+    
     with h5py.File(output_h5_file, 'w') as f:
         exchange = f.create_group('exchange')
         file_info = f.create_group('corresponding_file_info')
@@ -223,11 +225,13 @@ def create_aggregate_xrt_h5(file_path_array, output_h5_file, synchrotron):
         theta_array[theta_idx] = theta
         file_path_array[theta_idx] = os.path.basename(file_path)
     
-    if synchrotron != "National Synchrotron Light Source II (NSLS-II)" or synchrotron != "National Synchrotron Light Source II" or synchrotron != "nsls-ii" or synchrotron != "NSLSII" or synchrotron != "nslsii":
+    if synchrotron != "National Synchrotron Light Source II (NSLS-II)" and synchrotron != "National Synchrotron Light Source II" and synchrotron != "nsls-ii" and synchrotron != "NSLSII" and synchrotron != "nslsii":
         theta_idx_sorted = np.argsort(theta_array) # Get indices for angles for sorting them in ascending order
     
         theta_array_sorted = theta_array[theta_idx_sorted]
         counts_array_sorted = counts_array[:, theta_idx_sorted, :, :]
+
+        file_path_array_sorted = [file_path_array[theta_idx] for theta_idx in theta_idx_sorted]
     
     else:
         # This assumes all angles are in order over 360° (scan from -90° to 90°, flip sample, scan from -90° to 90°) AND -90° is included in BOTH sample orientations
@@ -239,8 +243,8 @@ def create_aggregate_xrt_h5(file_path_array, output_h5_file, synchrotron):
 
         theta_array_sorted = theta_array
         counts_array_sorted = counts_array
-    
-    file_path_array_sorted = [file_path_array[theta_idx] for theta_idx in theta_idx_sorted]
+
+        file_path_array_sorted = [file_path_array[theta_idx] for theta_idx in range(n_theta)]
 
     with h5py.File(output_h5_file, 'w') as f:
         exchange = f.create_group('exchange')
