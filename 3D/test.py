@@ -134,7 +134,9 @@ while sid < sid_end:
 
     try:
         _, _, theta, nx, ny, _, _ = h5_util.extract_h5_xrf_data(filename, synchrotron = 'nsls-ii')
-    
+
+        print(f'SID: {sid}; {nx} x {ny} (theta = {theta})')
+        
     except:
         pass
 
