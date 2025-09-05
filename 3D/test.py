@@ -148,11 +148,11 @@ sid_array = [235324,
 
 #     sid += 1
 
-# for sid in sid_array:
-#     filename = f'/raid/users/roter/Jacobsen-nslsii/data/xrf/scan2D_{sid}.h5'
+for sid in sid_array:
+    filename = f'/raid/users/roter/Jacobsen-nslsii/data/xrf/scan2D_{sid}.h5'
 
-#     filename_array.append(filename)
+    filename_array.append(filename)
 
-# output_filename = '/home/bwr0835/hxn_aggregate_xrf.h5'
+output_filename = '/home/bwr0835/hxn_aggregate_xrf.h5'
 
-# h5_util.create_aggregate_xrf_h5(filename_array, output_filename, synchrotron = 'nsls-ii')
+h5_util.create_aggregate_xrf_h5(filename_array, output_filename, synchrotron = 'nsls-ii')
