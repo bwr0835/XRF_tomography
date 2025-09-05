@@ -172,7 +172,7 @@ def create_aggregate_xrf_h5(file_path_array, output_h5_file, synchrotron):
         theta_array[theta_idx] = theta
         file_path_array[theta_idx] = os.path.basename(file_path)
     
-    if synchrotron != "National Synchrotron Light Source II (NSLS-II)" or synchrotron != "National Synchrotron Light Source II" or synchrotron != "nsls-ii" or synchrotron != "NSLSII" or synchrotron != "nslsii":
+    if synchrotron != "National Synchrotron Light Source II (NSLS-II)" and synchrotron != "National Synchrotron Light Source II" and synchrotron != "nsls-ii" and synchrotron != "NSLSII" and synchrotron != "nslsii":
         print('Yes')
 
         sys.exit()
