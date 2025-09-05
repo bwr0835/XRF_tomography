@@ -26,9 +26,9 @@ while sid < 235676:
     try:
         filename = f'/raid/users/roter/Jacobsen-nslsii/data/xrf/scan2D_{sid}.h5'
 
-        _, _, _, nx, ny, _, _ = h5_util.extract_h5_xrf_data(filename, 'nsls-ii')
+        _, _, theta, nx, ny, _, _ = h5_util.extract_h5_xrf_data(filename, 'nsls-ii')
 
-        print(f'SID: {sid}; {nx} x {ny}')
+        print(f'SID: {sid}; {nx} x {ny}; theta = {theta} degrees')
     
     except:
         pass
