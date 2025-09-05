@@ -30,10 +30,12 @@ while sid < 235676:
 
         print(f'SID: {sid}; {nx} x {ny}; theta = {theta} degrees')
 
-        sid += 1
+    
     
     except:
         pass
+
+    sid += 1
 
  
 
