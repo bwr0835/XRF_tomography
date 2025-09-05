@@ -158,7 +158,9 @@ params_124_124_32_cabead_2 = {'f_recon_parameters': 'recon_parameters.txt', # Te
                               'fl_L': fl["L"], # doesn't need to change                    
                               'fl_M': fl["M"]}  # doesn't need to change
 
-# XRF detector z position (for 2-ID-E data): 2xfm:m25.VAL
+# Solid angle info for 2-ID-E data
+# XRF detector z position indicator in HDF5 file: 2xfm:m11.VAL (no idea why MAPS has this as an x-coord., but y- and z-coords. were constant with MDA # - including for final tomography scan)
+# MDA #s: 0124 (∆d = 0), 0125 (∆d = 5 mm), 0126 (∆d = 7 mm)
 
 params = params_124_124_32_cabead_2
 
