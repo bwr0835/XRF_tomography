@@ -135,7 +135,11 @@ while sid < sid_end:
     try:
         elements_string, _, theta, nx, ny, _, _ = h5_util.extract_h5_xrf_data(filename, synchrotron = 'nsls-ii')
 
-        print(f'SID: {sid}; n_elements = {len(elements_string)}; {nx} x {ny} (theta = {theta})')
+        if 'Si_K' not in elements_string:
+            print(f'SID: {sid}; n_elements = {len(elements_string)}; {nx} x {ny} (theta = {theta}); No Si')
+        
+        else:
+            print(f'SID: {sid}; n_elements = {len(elements_string)}; {nx} x {ny} (theta = {theta})')
 
     except:
         pass
