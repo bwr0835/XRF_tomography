@@ -155,4 +155,4 @@ for sid in sid_array:
 
 output_filename = '/home/bwr0835/hxn_aggregate_xrf.h5'
 
-h5_util.create_aggregate_xrf_h5(filename_array, output_filename, synchrotron = 'nsls-ii')
+h5_util.create_aggregate_xrf_h5(filename_array, output_filename, synchrotron = "nsls-ii")
