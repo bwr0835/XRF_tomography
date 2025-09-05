@@ -133,10 +133,10 @@ while sid < sid_end:
     filename = f'/raid/users/roter/Jacobsen-nslsii/data/xrf/scan2D_{sid}.h5'
 
     try:
-        _, _, theta, nx, ny, _, _ = h5_util.extract_h5_xrf_data(filename, synchrotron = 'nsls-ii')
+        elements_string, _, theta, nx, ny, _, _ = h5_util.extract_h5_xrf_data(filename, synchrotron = 'nsls-ii')
 
-        print(f'SID: {sid}; {nx} x {ny} (theta = {theta})')
-        
+        print(f'SID: {sid}; n_elements = {len(elements_string)}; {nx} x {ny} (theta = {theta})')
+
     except:
         pass
 
