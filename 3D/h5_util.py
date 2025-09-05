@@ -173,6 +173,9 @@ def create_aggregate_xrf_h5(file_path_array, output_h5_file, synchrotron):
         file_path_array[theta_idx] = os.path.basename(file_path)
     
     if synchrotron != "National Synchrotron Light Source II (NSLS-II)" or synchrotron != "National Synchrotron Light Source II" or synchrotron != "nsls-ii" or synchrotron != "NSLSII" or synchrotron != "nslsii":
+        print('Yes')
+
+        sys.exit()
         theta_idx_sorted = np.argsort(theta_array) # Get indices for angles for sorting them in ascending order
     
         theta_array_sorted = theta_array[theta_idx_sorted]
