@@ -29,6 +29,8 @@ while sid < 235676:
         _, _, theta, nx, ny, _, _ = h5_util.extract_h5_xrf_data(filename, 'nsls-ii')
 
         print(f'SID: {sid}; {nx} x {ny}; theta = {theta} degrees')
+
+        sid += 1
     
     except:
         pass
