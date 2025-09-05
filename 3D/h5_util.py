@@ -211,10 +211,22 @@ def create_aggregate_xrt_h5(file_path_array, output_h5_file, synchrotron):
         theta_array[theta_idx] = theta
         file_path_array[theta_idx] = os.path.basename(file_path)
     
-    theta_idx_sorted = np.argsort(theta_array) # Get indices for angles for sorting them in ascending order
+    if synchrotron != "National Synchrotron Light Source II (NSLS-II)" or synchrotron != "National Synchrotron Light Source II" or synchrotron != "nsls-ii" or synchrotron != "NSLSII" or synchrotron != "nslsii":
+        theta_idx_sorted = np.argsort(theta_array) # Get indices for angles for sorting them in ascending order
     
-    theta_array_sorted = theta_array[theta_idx_sorted]
-    counts_array_sorted = counts_array[:, theta_idx_sorted, :, :]
+        theta_array_sorted = theta_array[theta_idx_sorted]
+        counts_array_sorted = counts_array[:, theta_idx_sorted, :, :]
+    
+    else:
+        # This assumes all angles are in order over 360° (scan from -90° to 90°, flip sample, scan from -90° to 90°) AND -90° is included in BOTH sample orientations
+        
+        second_neg_90_deg_idx = (np.where(theta_array == -90)[0])[-1]
+
+        theta_array[:second_neg_90_deg_idx] -= 90 # Make all angles before flipping go from -180° to 0
+        theta_array[second_neg_90_deg_idx:] += 90 # Make all angles after flipping go from 0 to 180°
+
+        theta_array_sorted = theta_array
+        counts_array_sorted = counts_array
     
     file_path_array_sorted = [file_path_array[theta_idx] for theta_idx in theta_idx_sorted]
 
