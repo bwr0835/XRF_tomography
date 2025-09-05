@@ -1,4 +1,4 @@
-import numpy as np, h5py, os
+import numpy as np, h5py, os, sys
 
 def extract_h5_xrf_data(file_path, synchrotron):
     h5 = h5py.File(file_path, 'r')
@@ -181,7 +181,11 @@ def create_aggregate_xrf_h5(file_path_array, output_h5_file, synchrotron):
     else:
         # This assumes all angles are in order over 360° (scan from -90° to 90°, flip sample, scan from -90° to 90°) AND -90° is included in BOTH sample orientations
         
-        second_neg_90_deg_idx = (np.where(theta_array == -90)[0])[-1]
+        second_neg_90_deg_idx = (np.where(theta_array == -90)[0])
+
+        print(second_neg_90_deg_idx)
+
+        sys.exit()
 
         theta_array[:second_neg_90_deg_idx] -= 90 # Make all angles before flipping go from -180° to 0
         theta_array[second_neg_90_deg_idx:] += 90 # Make all angles after flipping go from 0 to 180°
