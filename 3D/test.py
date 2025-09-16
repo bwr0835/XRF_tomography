@@ -12,8 +12,8 @@ for mda, MDA in enumerate(mda_array):
         extra_pv_names = h5['MAPS/Scan/Extra_PVs/Names'][()]
         extra_pv_values = h5['MAPS/Scan/Extra_PVs/Values'][()]
         
-        scalers_names = h5['MAPS/Scalers/Names']
-        scalers_values = h5['MAPS/Scalers/Values']
+        scalers_names = h5['MAPS/Scalers/Names'][()]
+        scalers_values = h5['MAPS/Scalers/Values'][()]
 
         z_idx = np.ndarray.item(np.where(extra_pv_names == b'2xfm:m11.VAL')[0])
         us_ic_idx = np.ndarray.item(np.where(scalers_names == b'US_IC')[0])
