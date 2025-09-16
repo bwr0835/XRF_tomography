@@ -35,12 +35,13 @@ file_name_0125 = "/raid/users/roter/Jacobsen/img.dat/2xfm_0125.mda.h5" # ∆d = 
 file_name_0126 = "/raid/users/roter/Jacobsen/img.dat/2xfm_0126.mda.h5" # ∆d = 7 mm
 
 elements_0124, cts_0124, theta, _, _, _, _ = eh5(file_name_0124, synchrotron = 'aps')
-elements_0125, cts_0125, _, _, _, _, _ = eh5(file_name_0125, synchrotron = 'aps')
-elements_0126, cts_0126, _, _, _, _, _ = eh5(file_name_0126, synchrotron = 'aps')
+_, cts_0125, _, _, _, _, _ = eh5(file_name_0125, synchrotron = 'aps')
+_, cts_0126, _, _, _, _, _ = eh5(file_name_0126, synchrotron = 'aps')
 
 print(f'Theta = {theta} degrees')
 
-element_index = np.ndarray.item(np.where(elements_0124 == 'Fe')[0])
+# element_index = np.ndarray.item(np.where(elements_0124 == 'Fe')[0])
+element_index = elements_0124.index('Fe')
 
 fe_0124 = cts_0124[element_index] # z = -6 mm (dz = -3 mm)
 fe_0125 = cts_0125[element_index] # z = -3 mm (dz = 0)
