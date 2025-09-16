@@ -64,10 +64,9 @@ def generate_reconstructed_FL_signal(dev, use_simulation_sample, simulation_prob
     stdout_options = {'root':0, 'output_folder': recon_path, 'save_stdout': True, 'print_terminal': False}
     
     detected_fl_unit_concentration = tc.as_tensor(fl_all_lines_dic["detected_fl_unit_concentration"]).float().to(dev)
-    
-    #TODO # FL_line_attCS_ls = tc.as_tensor(xlib_np.CS_FluorShell_Cascade(aN_ls, fl_all_lines_dic["fl_energy"])/xlib_np.FluorYield(aN_ls, o))
    
     FL_line_attCS_ls = tc.as_tensor(xlib_np.CS_Total(aN_ls, fl_all_lines_dic["fl_energy"])).float().to(dev) #dev
+    # TODO: Should this use xlib_np.CS_Total_Kissel()?
     
     n_line_group_each_element = tc.IntTensor(fl_all_lines_dic["n_line_group_each_element"]).to(dev)
     n_lines = fl_all_lines_dic["n_lines"] #scalar
@@ -75,6 +74,7 @@ def generate_reconstructed_FL_signal(dev, use_simulation_sample, simulation_prob
     
     #### Calculate the MAC of probe ####
     probe_attCS_ls = tc.as_tensor(xlib_np.CS_Total(aN_ls, probe_energy).flatten()).to(dev)
+    # TODO: Should this use xlib_np.CS_Total_Kissel()?
     ####----------------------------####
     
     

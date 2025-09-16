@@ -129,6 +129,7 @@ def attenuation_3d(src_path, theta_st, theta_end, n_theta, sample_height_n, samp
     grid_concentration = tc.tensor(np.load(src_path)).float().to(dev)
     aN_ls = np.array(list(this_aN_dic.values()))
     probe_attCS_ls = tc.tensor(xlib_np.CS_Total(aN_ls, probe_energy).flatten()).float().to(dev)
+    # TODO: Should this use xlib_np.CS_Total_Kissel()?
     
     att_exponent_acc_map = tc.zeros((len(theta_ls), sample_height_n, sample_size_n, sample_size_n+1), device=dev)
     for i , theta in enumerate(theta_ls):
@@ -1585,6 +1586,7 @@ def self_absorption_att_ratio_single_theta_3d(src_path, n_det, P, det_size_cm, d
     # generate an arrary of total attenuation cross section with the dimension: (n_element, n_elemental_lines)
     # The component in the array represents the total attenuation cross section at some line energy in some element (with unitary concentration)
     FL_line_attCS_ls = tc.as_tensor(xlib_np.CS_Total(aN_ls, fl_all_lines_dic["fl_energy"])).float().to(dev)
+    # TODO: Should this use xlib_np.CS_Total_Kissel()?
 
     concentration_map_rot = rotate(grid_concentration, theta, dev).float()
     concentration_map_rot_flat = concentration_map_rot.view(n_element, n_voxel).float()

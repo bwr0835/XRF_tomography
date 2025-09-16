@@ -370,9 +370,9 @@ fig1.tight_layout()
 fig3.tight_layout()
 fig4.tight_layout()
 
-fig1.savefig(os.path.join(dir_path, 'x_jitter_vs_angle.svg'), dpi = 400)
-fig3.savefig(os.path.join(dir_path, 'opt_dens_vs_scan_pos_idx.svg'), dpi = 400)
-fig4.savefig(os.path.join(dir_path, 'y_jitter_vs_angle.svg'), dpi = 400)
+# fig1.savefig(os.path.join(dir_path, 'x_jitter_vs_angle.svg'), dpi = 400)
+# fig3.savefig(os.path.join(dir_path, 'opt_dens_vs_scan_pos_idx.svg'), dpi = 400)
+# fig4.savefig(os.path.join(dir_path, 'y_jitter_vs_angle.svg'), dpi = 400)
 
 plt.close(fig1)
 plt.close(fig3)
@@ -421,25 +421,26 @@ axs5.set_ylabel(r'Phase cross-correlation', fontsize = 16)
 axs5.legend(frameon = False, fontsize = 14)
 
 fig5.tight_layout()
+# fig5.savefig(os.path.join(dir_path, 'neg_30_neg_22_phase_xcorr.svg'), dpi = 400)
 
 fps = 10
 
-for theta_idx, theta in enumerate(theta_array):
-    im2_1.set_data(aligned_proj_array[iter_idx_desired][theta_idx])
-    im2_2.set_data(aligned_proj_array[iter_idx_desired + 2][theta_idx])
-    im2_3.set_data(synth_proj_array[iter_idx_desired][theta_idx])
-    im2_4.set_data(synth_proj_array[iter_idx_desired + 2][theta_idx])
+# for theta_idx, theta in enumerate(theta_array):
+#     im2_1.set_data(aligned_proj_array[iter_idx_desired][theta_idx])
+#     im2_2.set_data(aligned_proj_array[iter_idx_desired + 2][theta_idx])
+#     im2_3.set_data(synth_proj_array[iter_idx_desired][theta_idx])
+#     im2_4.set_data(synth_proj_array[iter_idx_desired + 2][theta_idx])
 
-    text2.set_text(r'$\theta = {0}$\textdegree'.format(theta))
+#     text2.set_text(r'$\theta = {0}$\textdegree'.format(theta))
 
-    fig2.canvas.draw() # Rasterize and store Matplotlib figure contents in special buffer
+#     fig2.canvas.draw() # Rasterize and store Matplotlib figure contents in special buffer
 
-    frame = np.array(fig2.canvas.renderer.buffer_rgba())[:, :, :3] # Rasterize the contents in the stored buffer, access 
+#     frame = np.array(fig2.canvas.renderer.buffer_rgba())[:, :, :3] # Rasterize the contents in the stored buffer, access 
 
-    theta_frames1.append(frame)
+#     theta_frames1.append(frame)
 
-plt.close(fig2)
+# plt.close(fig2)
 
-iio2.mimsave(os.path.join(dir_path, f'cor_aligned_object_opt_dens.gif'), theta_frames1, fps = fps)
+# iio2.mimsave(os.path.join(dir_path, f'cor_aligned_object_opt_dens.gif'), theta_frames1, fps = fps)
 
-# plt.show()
+plt.show()

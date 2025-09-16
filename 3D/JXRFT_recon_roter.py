@@ -51,7 +51,9 @@ params_124_124_32_cabead = {
                               'probe_intensity': None,
                               'std_path': './data/Cabead/axo_std',
                               'f_std': 'axo_std.mda.h5',
-                              'std_element_lines_roi': np.array([['Ca', 'K'], ['Fe', 'K'], ['Cu', 'K']]),
+                              'std_element_lines_roi': np.array([['Ca', 'K'], 
+                                                                 ['Fe', 'K'], 
+                                                                 ['Cu', 'K']]),
                               'density_std_elements': np.array([1.931, 0.504, 0.284])*1.0E-6, 
                               'fitting_method':'XRF_roi_plus',
                               'selfAb': False,
@@ -71,9 +73,18 @@ params_124_124_32_cabead = {
                               'XRT_ratio_dataset_idx':21,   
                               'theta_ls_dataset': 'exchange/theta', 
                               'channel_names': 'exchange/elements',  
-                              'this_aN_dic': {"Si": 14, "Ti": 22, "Cr": 24, "Fe": 26, "Ni":28, "Ba": 56},
-                              'element_lines_roi': np.array([['Si', 'K'], ['Ti', 'K'], ['Cr', 'K'],
-                                                             ['Fe', 'K'], ['Ni', 'K'], ['Ba', 'L']]),  # np.array([["Si, K"], ["Ca, K"]])
+                              'this_aN_dic': {"Si": 14, 
+                                              "Ti": 22, 
+                                              "Cr": 24, 
+                                              "Fe": 26, 
+                                              "Ni": 28, 
+                                              "Ba": 56},
+                              'element_lines_roi': np.array([['Si', 'K'], 
+                                                             ['Ti', 'K'], 
+                                                             ['Cr', 'K'],
+                                                             ['Fe', 'K'], 
+                                                             ['Ni', 'K'], 
+                                                             ['Ba', 'L']]),  # np.array([["Si, K"], ["Ca, K"]])
                               'n_line_group_each_element': np.array([1, 1, 1, 1, 1, 1]),
                               'sample_size_n': 124, 
                               'sample_height_n': 32,
@@ -86,7 +97,10 @@ params_124_124_32_cabead = {
                               'b2': 0.0,
                               'lr': 1.0E-3,                          
                               'manual_det_coord': True,
-                              'set_det_coord_cm': np.array([[0.70, 1.69, 0.70], [0.70, 1.69, -0.70], [-0.70, 1.69, 0.70], [-0.70, 1.69, -0.70]]),
+                              'set_det_coord_cm': np.array([[0.70, 1.69, 0.70], 
+                                                            [0.70, 1.69, -0.70], 
+                                                            [-0.70, 1.69, 0.70], 
+                                                            [-0.70, 1.69, -0.70]]),
                               'det_on_which_side': "positive",
                               'det_from_sample_cm': None,
                               'det_ds_spacing_cm': None,
@@ -106,7 +120,9 @@ params_124_124_32_cabead_2 = {'f_recon_parameters': 'recon_parameters.txt', # Te
                               'probe_intensity': None, # ONLY FOR SIMULATIONS OR LACK OF CALIBRATION DATA
                               'std_path': './data/Cabead/axo_std', # File path for mass calibration standard
                               'f_std': 'axo_std.mda.h5', # File name for mass calibration standard
-                              'std_element_lines_roi': np.array([['Ca', 'K'], ['Fe', 'K'], ['Cu', 'K']]), # Element flurescence lines used for mass calibration
+                              'std_element_lines_roi': np.array([['Ca', 'K'], 
+                                                                 ['Fe', 'K'], 
+                                                                 ['Cu', 'K']]), # Element flurescence lines used for mass calibration
                               'density_std_elements': np.array([1.931, 0.504, 0.284])*1e-6, # Densities of desired elements in calibration standard (g/cm^2) (obtained from HDF$ file)
                               'fitting_method':'XRF_roi_plus', # Raw fluorescence spectrum fitting algorithm # TODO
                               'selfAb': False, # Self-absorption enabled
@@ -126,9 +142,18 @@ params_124_124_32_cabead_2 = {'f_recon_parameters': 'recon_parameters.txt', # Te
                               'XRT_ratio_dataset_idx':21, # TODO
                               'theta_ls_dataset': 'exchange/theta', # TODO
                               'channel_names': 'exchange/elements', # TODO
-                              'this_aN_dic': {"Si": 14, "Ti": 22, "Cr": 24, "Fe": 26, "Ni":28, "Ba": 56},
-                              'element_lines_roi': np.array([['Si', 'K'], ['Ti', 'K'], ['Cr', 'K'],
-                                                             ['Fe', 'K'], ['Ni', 'K'], ['Ba', 'L']]),  # np.array([["Si, K"], ["Ca, K"]])
+                              'this_aN_dic': {"Si": 14, 
+                                              "Ti": 22, 
+                                              "Cr": 24, 
+                                              "Fe": 26, 
+                                              "Ni": 28, 
+                                              "Ba": 56},
+                              'element_lines_roi': np.array([['Si', 'K'], 
+                                                             ['Ti', 'K'], 
+                                                             ['Cr', 'K'],
+                                                             ['Fe', 'K'], 
+                                                             ['Ni', 'K'], 
+                                                             ['Ba', 'L']]),  # np.array([["Si, K"], ["Ca, K"]])
                               'n_line_group_each_element': np.array([1, 1, 1, 1, 1, 1]),
                               'sample_size_n': 124, # Set to number of pixels along width of projection images when rotation axis is up-down TODO
                               'sample_height_n': 32, # Set to number of pixels along height of projection images when rotation axis is up-down (e.g. # of slices) TODO
@@ -138,7 +163,7 @@ params_124_124_32_cabead_2 = {'f_recon_parameters': 'recon_parameters.txt', # Te
                               'save_every_n_epochs': 5,
                               'minibatch_size': 124,
                               'b1': 1.0e4, # Regularization prefactor of XRT cost term
-                              'b2': 1.0, # Second prefactor inside of XRT cost term (from W. Di's MLEM cost function (2017))
+                              'b2': 1.0, # Second prefactor inside of XRT cost term (from W. Di's MLEM cost function (2017)) # TODO No idea why she (Di) included that
                               'lr': 1.0e-3, # Learning rate TODO                         
                               'manual_det_coord': True,
                               'set_det_coord_cm': np.array([[0.70, 1.69, 0.70], 
@@ -152,15 +177,11 @@ params_124_124_32_cabead_2 = {'f_recon_parameters': 'recon_parameters.txt', # Te
                               'manual_det_area': True, # Experimental detector active area enable
                               'det_area_cm2': 1.68, # Experimental detector active area (cm^2)
                               'det_dia_cm': None, # SIMULATION ONLY
-                              'P_folder': 'data/P_array/sample_124_124_32/Dis_1.69_manual_dpts_3',       
+                              'P_folder': 'data/P_array/sample_124_124_32/Dis_1.69_manual_dpts_3', #       
                               'f_P': 'Intersecting_Length_124_124_32',
                               'fl_K': fl["K"], # doesn't need to change 
                               'fl_L': fl["L"], # doesn't need to change                    
                               'fl_M': fl["M"]}  # doesn't need to change
-
-# Solid angle info for 2-ID-E data
-# XRF detector z position indicator in HDF5 file: 2xfm:m11.VAL (no idea why MAPS has this as an x-coord., but y- and z-coords. were constant with MDA # - including for final tomography scan)
-# MDA #s: 0124 (∆d = 0), 0125 (∆d = 5 mm), 0126 (∆d = 7 mm)
 
 params = params_124_124_32_cabead_2
 

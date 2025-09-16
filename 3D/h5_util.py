@@ -151,7 +151,7 @@ def extract_h5_xrt_data(file_path, synchrotron):
 
         return elements, cts_combined, theta, nx, ny, dx_cm, dy_cm
 
-def create_aggregate_xrf_h5(file_path_array, output_h5_file, synchrotron):
+def create_aggregate_xrf_h5(file_path_array, output_h5_file, synchrotron, solid_angle = False):
     n_theta = len(file_path_array)
 
     theta_array = np.zeros(n_theta) 
