@@ -67,8 +67,8 @@ dz = [0, 5, 8]
 # i_tot_xrf = [i_tot_xrf_0124, i_tot_xrf_0125, i_tot_xrf_0126]
 # i_tot_us_ic = [i_tot_us_ic_0124, i_tot_us_ic_0125, i_tot_us_ic_0126]
 
-i_tot_xrf = [i_tot_xrf_0126, i_tot_xrf_0125, i_tot_xrf_0124]
-i_tot_us_ic = [i_tot_us_ic_0126, i_tot_us_ic_0125, i_tot_us_ic_0124]
+i_tot_xrf = [i_tot_xrf_0124, i_tot_xrf_0125, i_tot_xrf_0126]
+i_tot_us_ic = [i_tot_us_ic_0124, i_tot_us_ic_0125, i_tot_us_ic_0126]
 
 print(i_tot_us_ic)
 print(i_tot_xrf)
