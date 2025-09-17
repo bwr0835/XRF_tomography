@@ -19,7 +19,7 @@ for mda, MDA in enumerate(mda_array):
         us_ic_idx = np.ndarray.item(np.where(scalers_names == b'US_IC')[0])
 
         z = extra_pv_values[z_idx]
-        us_ic = scalers_values[us_ic_idx]
+        us_ic = scalers_values[us_ic_idx].astype(float)
 
         print(f'MDA {MDA}: z = {z}; US_IC Total = {us_ic.sum()}')
 

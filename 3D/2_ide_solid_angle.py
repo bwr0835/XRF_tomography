@@ -3,7 +3,8 @@ import numpy as np, sys
 from matplotlib import pyplot as plt
 from scipy.optimize import curve_fit as cf
 from lmfit import Model
-from h5_util import extract_h5_xrf_data as eh5
+
+import h5_util
 
 plt.rcParams['text.usetex'] = True
 plt.rcParams['font.family'] = 'serif'
@@ -26,35 +27,48 @@ def round_correct(num, ndec): # CORRECTLY round a number (num) to chosen number 
             return int(num*digit_value - 0.5)/digit_value
 
 # Solid angle info for 2-ID-E data
-# XRF detector z position indicator in HDF5 file: 2xfm:m11.VAL (no idea why MAPS has this as an x-coord., but y- and z-coords. were constant with MDA # - including for final tomography scan)
-# MDA #s: 0124 (∆d = 0), 0125 (∆d = 5 mm), 0126 (∆d = 7 mm)
+# XRF detector z position indicator in HDF5 file: 2xfm:m26.VAL (no idea why MAPS has this as an x-coord., but y- and z-coords. were constant with MDA # - including for final tomography scan)
 
+file_name_0124 = "/raid/users/roter/Jacobsen/img.dat/2xfm_0124.mda.h5"
+file_name_0125 = "/raid/users/roter/Jacobsen/img.dat/2xfm_0125.mda.h5"
+file_name_0126 = "/raid/users/roter/Jacobsen/img.dat/2xfm_0126.mda.h5"
 
-file_name_0124 = "/raid/users/roter/Jacobsen/img.dat/2xfm_0124.mda.h5" # ∆d = 0
-file_name_0125 = "/raid/users/roter/Jacobsen/img.dat/2xfm_0125.mda.h5" # ∆d = 5 mm
-file_name_0126 = "/raid/users/roter/Jacobsen/img.dat/2xfm_0126.mda.h5" # ∆d = 7 mm
+elements_xrf, cts_xrf_0124, theta, _, _, _, _ = h5_util.extract_h5_xrf_data(file_name_0124, synchrotron = 'aps')
+_, cts_xrf_0125, _, _, _, _, _ = h5_util.extract_h5_xrf_data(file_name_0125, synchrotron = 'aps')
+_, cts_xrf_0126, _, _, _, _, _ = h5_util.extract_h5_xrf_data(file_name_0126, synchrotron = 'aps')
 
-elements_0124, cts_0124, theta, _, _, _, _ = eh5(file_name_0124, synchrotron = 'aps')
-_, cts_0125, _, _, _, _, _ = eh5(file_name_0125, synchrotron = 'aps')
-_, cts_0126, _, _, _, _, _ = eh5(file_name_0126, synchrotron = 'aps')
+elements_xrt, cts_xrt_0124, _, _, _, _, _, _ = h5_util.extract_h5_xrt_data(file_name_0124, synchrotron = 'aps')
+_, cts_xrt_0125, _, _, _, _, _, _ = h5_util.extract_h5_xrt_data(file_name_0125, synchrotron = 'aps')
+_, cts_xrt_0126, _, _, _, _, _, _ = h5_util.extract_h5_xrt_data(file_name_0126, synchrotron = 'aps')
 
 print(f'Theta = {theta} degrees')
 
-# element_index = np.ndarray.item(np.where(elements_0124 == 'Fe')[0])
-element_index = elements_0124.index('Fe')
+element_index_xrf = elements_xrf.index('Fe')
+element_index_xrt = elements_xrt.index('us_ic')
 
-fe_0124 = cts_0124[element_index] # z = -6 mm (dz = -3 mm)
-fe_0125 = cts_0125[element_index] # z = -3 mm (dz = 0)
-fe_0126 = cts_0126[element_index] # z = -9 mm (dz = -6 mm)
+fe_0124 = cts_xrf_0124[element_index_xrf] # z = 12 mm (dz = 0)
+fe_0125 = cts_xrf_0125[element_index_xrf] # z = 17 mm (dz = 5 mm)
+fe_0126 = cts_xrf_0126[element_index_xrf] # z = 20 mm (dz = 8 mm)
 
-i_tot_0124 = np.sum(fe_0124)
-i_tot_0125 = np.sum(fe_0125)
-i_tot_0126 = np.sum(fe_0126)
+i_tot_xrf_0124 = fe_0124.sum()
+i_tot_xrf_0125 = fe_0125.sum()
+i_tot_xrf_0126 = fe_0126.sum()
 
-dz = [0, 3, 6]
+us_ic_0124 = cts_xrt_0124[element_index_xrt]
+us_ic_0125 = cts_xrt_0125[element_index_xrt]
+us_ic_0126 = cts_xrt_0126[element_index_xrt]
 
-i_tot = [i_tot_0125, i_tot_0124, i_tot_0126]
-print(i_tot)
+i_tot_us_ic_0124 = us_ic_0124.sum()
+i_tot_us_ic_0125 = us_ic_0125.sum()
+i_tot_us_ic_0126 = us_ic_0126.sum()
+
+dz = [0, 5, 8]
+
+i_tot_xrf = [i_tot_xrf_0124, i_tot_xrf_0125, i_tot_xrf_0126]
+i_tot_us_ic = [i_tot_us_ic_0124, i_tot_us_ic_0125, i_tot_us_ic_0126]
+
+print(i_tot_us_ic)
+print(i_tot_xrf)
 
 sys.exit()
 
