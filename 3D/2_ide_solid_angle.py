@@ -37,9 +37,9 @@ elements_xrf, cts_xrf_0124, theta, _, _, _, _ = h5_util.extract_h5_xrf_data(file
 _, cts_xrf_0125, _, _, _, _, _ = h5_util.extract_h5_xrf_data(file_name_0125, synchrotron = 'aps')
 _, cts_xrf_0126, _, _, _, _, _ = h5_util.extract_h5_xrf_data(file_name_0126, synchrotron = 'aps')
 
-elements_xrt, cts_xrt_0124, _, _, _, _, _, _ = h5_util.extract_h5_xrt_data(file_name_0124, synchrotron = 'aps')
-_, cts_xrt_0125, _, _, _, _, _, _ = h5_util.extract_h5_xrt_data(file_name_0125, synchrotron = 'aps')
-_, cts_xrt_0126, _, _, _, _, _, _ = h5_util.extract_h5_xrt_data(file_name_0126, synchrotron = 'aps')
+elements_xrt, cts_xrt_0124, _, _, _, _, _ = h5_util.extract_h5_xrt_data(file_name_0124, synchrotron = 'aps')
+_, cts_xrt_0125, _, _, _, _, _ = h5_util.extract_h5_xrt_data(file_name_0125, synchrotron = 'aps')
+_, cts_xrt_0126, _, _, _, _, _ = h5_util.extract_h5_xrt_data(file_name_0126, synchrotron = 'aps')
 
 print(f'Theta = {theta} degrees')
 
