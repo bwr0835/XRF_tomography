@@ -73,6 +73,8 @@ i_tot_us_ic = [i_tot_us_ic_0126, i_tot_us_ic_0125, i_tot_us_ic_0124]
 print(i_tot_us_ic)
 print(i_tot_xrf)
 
+sys.exit()
+
 mod = Model(i_obj)
 
 params = mod.make_params(A = 1, B = 1)
