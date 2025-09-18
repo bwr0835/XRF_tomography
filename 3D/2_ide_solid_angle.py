@@ -91,6 +91,10 @@ a_coeff, a_exponent = a.split("e+0")
 
 z_det_nom = result.params['B'].value
 
+print(z_det_nom)
+
+sys.exit()
+
 x1 = np.linspace(np.min(dz), np.max(dz), 1000)
 yfit = result.eval(x = x1)
 
