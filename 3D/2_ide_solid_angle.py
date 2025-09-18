@@ -75,7 +75,7 @@ i_tot_us_ic = [i_tot_us_ic_0124, i_tot_us_ic_0125, i_tot_us_ic_0126]
 print(i_tot_us_ic)
 print(i_tot_xrf)
 
-sys.exit()
+# sys.exit()
 
 mod = Model(i_obj)
 
