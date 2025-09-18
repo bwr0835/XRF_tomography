@@ -18,12 +18,6 @@ fl = {"K": np.array([xlib.KA1_LINE, xlib.KA2_LINE, xlib.KA3_LINE, xlib.KB1_LINE,
       "M": np.array([xlib.MA1_LINE, xlib.MA2_LINE, xlib.MB_LINE])               
      }
 
-#TODO
-# shells = {"K": np.array([xlib.K_SHELL]),
-#           "L": np.array([xlib.L1_SHELL, xlib.L2_SHELL, xlib.L3_SHELL]),
-#           "M": np.array([xlib.M1_SHELL, xlib.M2_SHELL, xlib.M3_SHELL, xlib.M4_SHELL, xlib.M5_SHELL])
-#          }
-
 def calibrate_incident_probe_intensity(std_path, f_std, fitting_method, std_element_lines_roi, density_std_elements, probe_energy):
     
     XRF_pcs_sum = np.zeros((std_element_lines_roi.shape[0]))

@@ -128,8 +128,8 @@ def attenuation_3d(src_path, theta_st, theta_end, n_theta, sample_height_n, samp
     theta_ls = - tc.linspace(theta_st, theta_end, n_theta + 1)[:-1]
     grid_concentration = tc.tensor(np.load(src_path)).float().to(dev)
     aN_ls = np.array(list(this_aN_dic.values()))
-    probe_attCS_ls = tc.tensor(xlib_np.CS_Total(aN_ls, probe_energy).flatten()).float().to(dev)
-    # TODO: Should this use xlib_np.CS_Total_Kissel()?
+    # probe_attCS_ls = tc.tensor(xlib_np.CS_Total(aN_ls, probe_energy).flatten()).float().to(dev)
+    probe_attCS_ls = tc.tensor(xlib_np.CS_Total_Kissel(aN_ls, probe_energy).flatten()).float().to(dev)
     
     att_exponent_acc_map = tc.zeros((len(theta_ls), sample_height_n, sample_size_n, sample_size_n+1), device=dev)
     for i , theta in enumerate(theta_ls):
@@ -408,7 +408,7 @@ def generate_fl_signal_from_each_voxel_3d(src_path, theta_st, theta_end, n_theta
 
     fl_all_lines_dic = MakeFLlinesDictionary(this_aN_dic, probe_energy,
                               sample_size_n.cpu().numpy(), sample_size_cm.cpu().numpy(),
-                              fl_line_groups = np.array(["K", "L", "M"]), fl_K = fl_K, fl_L = fl_L, fl_M = fl_M,
+                              fl_line_groups = np.array(["K", "L", "M"]), fl_K = fl["K"], fl_L = fl["L"], fl_M = fl["M"],
                               group_lines = True)
 
     fl_map_tot = tc.zeros((n_theta, fl_all_lines_dic["n_lines"], sample_height_n * sample_size_n * sample_size_n), device=dev)
@@ -1574,7 +1574,7 @@ def self_absorption_att_ratio_single_theta_3d(src_path, n_det, P, det_size_cm, d
                                              this_aN_dic, probe_energy, dev, theta):
     
     fl_all_lines_dic = MakeFLlinesDictionary(this_aN_dic, probe_energy, sample_size_n.cpu().numpy(), sample_size_cm.cpu().numpy(),
-                          fl_line_groups = np.array(["K", "L", "M"]), fl_K = fl_K, fl_L = fl_L, fl_M = fl_M, group_lines = True)
+                          fl_line_groups = np.array(["K", "L", "M"]), fl_K = fl["K"], fl_L = fl["L"], fl_M = fl["M"], group_lines = True)
 
     n_voxel = sample_height_n * sample_size_n * sample_size_n
     dia_len_n = int((sample_height_n**2 + sample_size_n**2 + sample_size_n**2)**0.5)
@@ -1585,12 +1585,12 @@ def self_absorption_att_ratio_single_theta_3d(src_path, n_det, P, det_size_cm, d
     
     # generate an arrary of total attenuation cross section with the dimension: (n_element, n_elemental_lines)
     # The component in the array represents the total attenuation cross section at some line energy in some element (with unitary concentration)
-    FL_line_attCS_ls = tc.as_tensor(xlib_np.CS_Total(aN_ls, fl_all_lines_dic["fl_energy"])).float().to(dev)
-    # TODO: Should this use xlib_np.CS_Total_Kissel()?
+    
+    # FL_line_attCS_ls = tc.as_tensor(xlib_np.CS_Total(aN_ls, fl_all_lines_dic["fl_energy"])).float().to(dev)
+    FL_line_attCS_ls = tc.as_tensor(xlib_np.CS_Total_Kissel(aN_ls, fl_all_lines_dic["fl_energy"])).float().to(dev)
 
     concentration_map_rot = rotate(grid_concentration, theta, dev).float()
     concentration_map_rot_flat = concentration_map_rot.view(n_element, n_voxel).float()
-
 
     # lac: linear attenuation coefficient = concentration * attenuation_cross_section, 
     # dimension: n_element, n_lines, n_voxel(FL source), n_voxel)

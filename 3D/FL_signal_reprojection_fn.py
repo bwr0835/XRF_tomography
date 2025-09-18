@@ -103,8 +103,8 @@ def generate_reconstructed_FL_signal(dev, use_simulation_sample, simulation_prob
     n_batch = (sample_height_n * sample_size_n) // (n_ranks * minibatch_size) #scalar
      
     if manual_det_area == True:
-#         det_solid_angle_ratio = det_area_cm2 / (4 * np.pi * det_from_sample_cm**2)
-        det_solid_angle_ratio = 1.0
+        det_solid_angle_ratio = det_area_cm2 / (4 * np.pi * det_from_sample_cm**2)
+        # det_solid_angle_ratio = 1.0
         signal_attenuation_factor = 1.0
         
     else:

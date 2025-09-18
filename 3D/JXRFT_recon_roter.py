@@ -174,8 +174,8 @@ params_124_124_32_cabead_2 = {'f_recon_parameters': 'recon_parameters.txt', # Te
                               'det_on_which_side': "positive", # Which side of each projection image the XRF detector is on TODO
                               'det_from_sample_cm': None, # SIMULATION ONLY
                               'det_ds_spacing_cm': None, # SIMULATION ONLY
-                              'manual_det_area': True, # Experimental detector active area enable
-                              'det_area_cm2': 1.68, # Experimental detector active area (cm^2)
+                              'manual_det_area': True, # Experimental detector active area enable 
+                              'det_area_cm2': 1.68, # TOTAL experimental detector active area (cm^2) (NOTE: Program assumes all detector elements have same active area)
                               'det_dia_cm': None, # SIMULATION ONLY
                               'P_folder': 'data/P_array/sample_124_124_32/Dis_1.69_manual_dpts_3', #       
                               'f_P': 'Intersecting_Length_124_124_32',
