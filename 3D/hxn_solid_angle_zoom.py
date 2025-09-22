@@ -57,7 +57,7 @@ pixel_height = y3_coarse_idx - y1_coarse_idx
 # pixel_width = x1_fine - x0_fine
 # pixel_height = y1_fine - y0_fine
 
-
+print(np.max(fe_fine/us_ic))
 
 axs[0].imshow(fe_coarse)
 axs[1].imshow(fe_fine/us_ic)
