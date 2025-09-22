@@ -39,4 +39,6 @@ axs[0].add_patch(rect)
 for axes in fig.axes:
     axes.axis('off')
 
+fig.tight_layout()
+
 plt.show()
