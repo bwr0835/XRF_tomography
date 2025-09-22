@@ -60,9 +60,9 @@ pixel_height = y1_coarse_idx - y0_coarse_idx
 axs[0].imshow(fe_coarse)
 axs[1].imshow(fe_fine)
 
-rect = pat.Rectangle((x0_coarse_idx, y1_coarse_idx), pixel_width, pixel_height, edgecolor = 'white', facecolor = 'none')
+rect = pat.Rectangle((x0_coarse_idx - 0.5, y1_coarse_idx - 0.5), pixel_width, pixel_height, edgecolor = 'white', facecolor = 'none')
 
-# axs[0].add_patch(rect)
+axs[0].add_patch(rect)
 
 for axes in fig.axes:
     axes.axis('off')
