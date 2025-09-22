@@ -24,11 +24,11 @@ x1_coarse_idx, y1_coarse_idx = np.argmin(np.abs(x_um_coarse - x1_fine)), np.argm
 x2_coarse_idx, y2_coarse_idx = np.argmin(np.abs(x_um_coarse - x2_fine)), np.argmin(np.abs(y_um_coarse - y2_fine))
 x3_coarse_idx, y3_coarse_idx = np.argmin(np.abs(x_um_coarse - x3_fine)), np.argmin(np.abs(y_um_coarse - y3_fine))
 
-fig, axs = plt.subplots(1, 2)
-
 print(x0_coarse_idx)
 
 sys.exit()
+
+fig, axs = plt.subplots(1, 2)
 
 pixel_width = x1_coarse_idx[1] - x0_coarse_idx[1]
 pixel_height = y1_coarse_idx[0] - y0_coarse_idx[0]
