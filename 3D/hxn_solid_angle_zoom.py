@@ -55,12 +55,12 @@ fig, axs = plt.subplots(1, 2)
 pixel_width = x1_fine - x0_fine
 pixel_height = y1_fine - y0_fine
 
-axs[0].imshow(fe_coarse, extent = [x0_coarse, x1_coarse, y0_coarse, y1_coarse], origin = 'lower')
+axs[0].imshow(fe_coarse, extent = [x0_coarse, x1_coarse, y0_coarse, y1_coarse])
 # axs[1].imshow(fe_fine, extent = [x0_fine, x1_fine, y0_fine, y1_fine])
 
-rect = pat.Rectangle((x0_fine, y0_fine), pixel_width, pixel_height, edgecolor = 'white', facecolor = 'none')
+# rect = pat.Rectangle((x0_fine, y0_fine), pixel_width, pixel_height, edgecolor = 'white', facecolor = 'none')
 
-axs[0].add_patch(rect)
+# axs[0].add_patch(rect)
 
 for axes in fig.axes:
     axes.axis('off')
