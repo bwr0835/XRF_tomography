@@ -36,4 +36,7 @@ axs[1].imshow(fe_fine)
 
 axs[0].add_patch(rect)
 
+for axes in fig.axes:
+    axes.axis('off')
+
 plt.show()
