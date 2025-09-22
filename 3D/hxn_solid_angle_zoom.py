@@ -34,4 +34,6 @@ rect = pat.Rectangle(x0_coarse_idx[1] - 0.5, y0_coarse_idx[0] - 0.5, pixel_width
 axs[0].imshow(fe_coarse)
 axs[1].imshow(fe_fine)
 
+axs[0].add_patch(rect)
+
 plt.show()
