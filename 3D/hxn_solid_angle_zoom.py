@@ -19,6 +19,11 @@ x1_fine, y1_fine = x_um_fine[0, -1], y_um_fine[0, -1] # Top right corner
 x2_fine, y2_fine = x_um_fine[-1, 0], y_um_fine[-1, 0] # Bottom left corner
 x3_fine, y3_fine = x_um_fine[-1, -1], y_um_fine[-1, -1] # Bottom right corner
 
+x0_coarse, y0_coarse = x_um_coarse[0, 0], y_um_coarse[0, 0] # Top left corner
+x1_coarse, y1_coarse = x_um_coarse[0, -1], y_um_coarse[0, -1] # Top right corner
+x2_coarse, y2_coarse = x_um_coarse[-1, 0], y_um_coarse[-1, 0] # Bottom left corner
+x3_coarse, y3_coarse = x_um_coarse[-1, -1], y_um_coarse[-1, -1] # Bottom right corner
+
 # print(f'{x0_fine}, {y0_fine}')
 # print(f'{x1_fine}, {y1_fine}')
 # print(f'{x2_fine}, {y2_fine}')
@@ -30,29 +35,30 @@ x3_fine, y3_fine = x_um_fine[-1, -1], y_um_fine[-1, -1] # Bottom right corner
 # x2_coarse_idx, y2_coarse_idx = np.unravel_index(np.argmin(np.abs(x_um_coarse - x2_fine)), x_um_coarse.shape), np.unravel_index(np.argmin(np.abs(y_um_coarse - y2_fine)), y_um_coarse.shape)
 # x3_coarse_idx, y3_coarse_idx = np.unravel_index(np.argmin(np.abs(x_um_coarse - x3_fine)), x_um_coarse.shape), np.unravel_index(np.argmin(np.abs(y_um_coarse - y3_fine)), y_um_coarse.shape)
 
-x0_coarse_idx, y0_coarse_idx = np.unravel_index(np.argmin(np.sqrt((x_um_coarse - x0_fine)**2 + (y_um_coarse - y0_fine)**2)), x_um_coarse.shape)
-x1_coarse_idx, y1_coarse_idx = np.unravel_index(np.argmin(np.sqrt((x_um_coarse - x1_fine)**2 + (y_um_coarse - y1_fine)**2)), x_um_coarse.shape)
-x2_coarse_idx, y2_coarse_idx = np.unravel_index(np.argmin(np.sqrt((x_um_coarse - x2_fine)**2 + (y_um_coarse - y2_fine)**2)), x_um_coarse.shape)
-x3_coarse_idx, y3_coarse_idx = np.unravel_index(np.argmin(np.sqrt((x_um_coarse - x3_fine)**2 + (y_um_coarse - y3_fine)**2)), x_um_coarse.shape)
+# x0_coarse_idx, y0_coarse_idx = np.unravel_index(np.argmin(np.sqrt((x_um_coarse - x0_fine)**2 + (y_um_coarse - y0_fine)**2)), x_um_coarse.shape)
+# x1_coarse_idx, y1_coarse_idx = np.unravel_index(np.argmin(np.sqrt((x_um_coarse - x1_fine)**2 + (y_um_coarse - y1_fine)**2)), x_um_coarse.shape)
+# x2_coarse_idx, y2_coarse_idx = np.unravel_index(np.argmin(np.sqrt((x_um_coarse - x2_fine)**2 + (y_um_coarse - y2_fine)**2)), x_um_coarse.shape)
+# x3_coarse_idx, y3_coarse_idx = np.unravel_index(np.argmin(np.sqrt((x_um_coarse - x3_fine)**2 + (y_um_coarse - y3_fine)**2)), x_um_coarse.shape)
 
-print(f'{x0_coarse_idx}, {y0_coarse_idx}')
-print(f'{x1_coarse_idx}, {y1_coarse_idx}')
-print(f'{x2_coarse_idx}, {y2_coarse_idx}')
-print(f'{x3_coarse_idx}, {y3_coarse_idx}')
+# print(f'{x0_coarse_idx}, {y0_coarse_idx}')
+# print(f'{x1_coarse_idx}, {y1_coarse_idx}')
+# print(f'{x2_coarse_idx}, {y2_coarse_idx}')
+# print(f'{x3_coarse_idx}, {y3_coarse_idx}')
 
-sys.exit()
+# sys.exit()
 
 fig, axs = plt.subplots(1, 2)
 
-pixel_width = x1_coarse_idx[1] - x0_coarse_idx[1]
-pixel_height = y1_coarse_idx[0] - y0_coarse_idx[0]
+# pixel_width = x1_coarse_idx[1] - x0_coarse_idx[1]
+# pixel_height = y1_coarse_idx[0] - y0_coarse_idx[0]
 
-# x0_coarse_idx_interp = ((x1_coarse_idx[1] - x0_coarse_idx[1])/(y1_coarse_idx[0] - y0_coarse_idx[0]))*()
+pixel_width = x1_fine - x0_fine
+pixel_height = y1_fine - y0_fine
 
-rect = pat.Rectangle(x0_coarse_idx[1] - 0.5, y0_coarse_idx[0] - 0.5, pixel_width, pixel_height, edge_color = 'white', facecolor = 'none')
+axs[0].imshow(fe_coarse, extent = [x0_coarse, x1_coarse, y0_coarse, y1_coarse])
+axs[1].imshow(fe_fine, extent = [x0_fine, x1_fine, y0_fine, y1_fine])
 
-axs[0].imshow(fe_coarse)
-axs[1].imshow(fe_fine)
+rect = pat.Rectangle((x0_fine, y0_fine), pixel_width, pixel_height, edge_color = 'white', facecolor = 'none')
 
 axs[0].add_patch(rect)
 
