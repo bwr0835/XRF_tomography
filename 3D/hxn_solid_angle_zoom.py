@@ -19,7 +19,7 @@ x1_fine, y1_fine = x_um_fine[0, -1], y_um_fine[0, -1] # Top right corner
 x2_fine, y2_fine = x_um_fine[-1, 0], y_um_fine[-1, 0] # Bottom left corner
 x3_fine, y3_fine = x_um_fine[-1, -1], y_um_fine[-1, -1] # Bottom right corner
 
-x0_coarse_idx, y0_coarse_idx = np.argmin(np.abs(x_um_coarse - x0_fine), keepdims = True), np.argmin(np.abs(y_um_coarse - y0_fine))
+x0_coarse_idx, y0_coarse_idx = np.unravel(np.argmin(np.abs(x_um_coarse - x0_fine)), x_um_coarse.shape), np.argmin(np.abs(y_um_coarse - y0_fine))
 x1_coarse_idx, y1_coarse_idx = np.argmin(np.abs(x_um_coarse - x1_fine)), np.argmin(np.abs(y_um_coarse - y1_fine))
 x2_coarse_idx, y2_coarse_idx = np.argmin(np.abs(x_um_coarse - x2_fine)), np.argmin(np.abs(y_um_coarse - y2_fine))
 x3_coarse_idx, y3_coarse_idx = np.argmin(np.abs(x_um_coarse - x3_fine)), np.argmin(np.abs(y_um_coarse - y3_fine))
