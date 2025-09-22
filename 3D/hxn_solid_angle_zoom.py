@@ -30,17 +30,19 @@ x1_coarse_idx, y1_coarse_idx = np.unravel_index(np.argmin(np.abs(x_um_coarse - x
 x2_coarse_idx, y2_coarse_idx = np.unravel_index(np.argmin(np.abs(x_um_coarse - x2_fine)), x_um_coarse.shape), np.unravel_index(np.argmin(np.abs(y_um_coarse - y2_fine)), y_um_coarse.shape)
 x3_coarse_idx, y3_coarse_idx = np.unravel_index(np.argmin(np.abs(x_um_coarse - x3_fine)), x_um_coarse.shape), np.unravel_index(np.argmin(np.abs(y_um_coarse - y3_fine)), y_um_coarse.shape)
 
-# print(f'{x0_coarse_idx}, {y0_coarse_idx}')
-# print(f'{x1_coarse_idx}, {y1_coarse_idx}')
-# print(f'{x2_coarse_idx}, {y2_coarse_idx}')
-# print(f'{x3_coarse_idx}, {y3_coarse_idx}')
+print(f'{x0_coarse_idx}, {y0_coarse_idx}')
+print(f'{x1_coarse_idx}, {y1_coarse_idx}')
+print(f'{x2_coarse_idx}, {y2_coarse_idx}')
+print(f'{x3_coarse_idx}, {y3_coarse_idx}')
 
-# sys.exit()
+sys.exit()
 
 fig, axs = plt.subplots(1, 2)
 
 pixel_width = x1_coarse_idx[1] - x0_coarse_idx[1]
 pixel_height = y1_coarse_idx[0] - y0_coarse_idx[0]
+
+# x0_coarse_idx_interp = ((x1_coarse_idx[1] - x0_coarse_idx[1])/(y1_coarse_idx[0] - y0_coarse_idx[0]))*()
 
 rect = pat.Rectangle(x0_coarse_idx[1] - 0.5, y0_coarse_idx[0] - 0.5, pixel_width, pixel_height, edge_color = 'white', facecolor = 'none')
 
