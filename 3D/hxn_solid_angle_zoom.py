@@ -19,23 +19,23 @@ x1_fine, y1_fine = x_um_fine[0, -1], y_um_fine[0, -1] # Top right corner
 x2_fine, y2_fine = x_um_fine[-1, 0], y_um_fine[-1, 0] # Bottom left corner
 x3_fine, y3_fine = x_um_fine[-1, -1], y_um_fine[-1, -1] # Bottom right corner
 
-print(f'{x0_fine}, {y0_fine}')
-print(f'{x1_fine}, {y1_fine}')
-print(f'{x2_fine}, {y2_fine}')
-print(f'{x3_fine}, {y3_fine}')
-print('---------------------')
+# print(f'{x0_fine}, {y0_fine}')
+# print(f'{x1_fine}, {y1_fine}')
+# print(f'{x2_fine}, {y2_fine}')
+# print(f'{x3_fine}, {y3_fine}')
+# print('---------------------')
 
-x0_coarse_idx, y0_coarse_idx = np.array(np.unravel_index(np.argmin(np.abs(x_um_coarse - x0_fine)), x_um_coarse.shape)), np.unravel_index(np.argmin(np.abs(y_um_coarse - y0_fine)), y_um_coarse.shape)
+x0_coarse_idx, y0_coarse_idx = np.unravel_index(np.argmin(np.abs(x_um_coarse - x0_fine)), x_um_coarse.shape), np.unravel_index(np.argmin(np.abs(y_um_coarse - y0_fine)), y_um_coarse.shape)
 x1_coarse_idx, y1_coarse_idx = np.unravel_index(np.argmin(np.abs(x_um_coarse - x1_fine)), x_um_coarse.shape), np.unravel_index(np.argmin(np.abs(y_um_coarse - y1_fine)), y_um_coarse.shape)
 x2_coarse_idx, y2_coarse_idx = np.unravel_index(np.argmin(np.abs(x_um_coarse - x2_fine)), x_um_coarse.shape), np.unravel_index(np.argmin(np.abs(y_um_coarse - y2_fine)), y_um_coarse.shape)
 x3_coarse_idx, y3_coarse_idx = np.unravel_index(np.argmin(np.abs(x_um_coarse - x3_fine)), x_um_coarse.shape), np.unravel_index(np.argmin(np.abs(y_um_coarse - y3_fine)), y_um_coarse.shape)
 
-print(f'{x0_coarse_idx}, {y0_coarse_idx}')
-print(f'{x1_coarse_idx}, {y1_coarse_idx}')
-print(f'{x2_coarse_idx}, {y2_coarse_idx}')
-print(f'{x3_coarse_idx}, {y3_coarse_idx}')
+# print(f'{x0_coarse_idx}, {y0_coarse_idx}')
+# print(f'{x1_coarse_idx}, {y1_coarse_idx}')
+# print(f'{x2_coarse_idx}, {y2_coarse_idx}')
+# print(f'{x3_coarse_idx}, {y3_coarse_idx}')
 
-sys.exit()
+# sys.exit()
 
 fig, axs = plt.subplots(1, 2)
 
