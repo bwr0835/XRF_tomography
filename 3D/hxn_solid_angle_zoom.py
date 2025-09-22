@@ -7,8 +7,8 @@ plt.rcParams["figure.autolayout"] = True
 coarse_scan_filename = '/raid/users/roter/Jacobsen-nslsii/data/xrf/scan2D_235675.h5'
 fine_scan_filename = '/raid/users/roter/Jacobsen-nslsii/data/xrf/scan2D_235676.h5'
 
-elements, counts_coarse, _,  _, x_um_coarse, y_um_coarse, nx_coarse, ny_coarse, dx_cm_coarse, dy_cm_coarse = util.extract_h5_xrf_data(coarse_scan_filename, synchrotron = 'nsls-ii', scan_coords = True, US_IC = True)
-_, counts_fine, us_ic, _, x_um_fine, y_um_fine, nx_fine, ny_fine, dx_cm_fine, dy_cm_fine = util.extract_h5_xrf_data(fine_scan_filename, synchrotron = 'nsls-ii', scan_coords = True, US_IC = True)
+elements, counts_coarse, us_ic_coarse,  _, x_um_coarse, y_um_coarse, nx_coarse, ny_coarse, dx_cm_coarse, dy_cm_coarse = util.extract_h5_xrf_data(coarse_scan_filename, synchrotron = 'nsls-ii', scan_coords = True, US_IC = True)
+_, counts_fine, us_ic_fine, _, x_um_fine, y_um_fine, nx_fine, ny_fine, dx_cm_fine, dy_cm_fine = util.extract_h5_xrf_data(fine_scan_filename, synchrotron = 'nsls-ii', scan_coords = True, US_IC = True)
 
 desired_element = 'Fe_K'
 desired_element_index = elements.index(desired_element)
@@ -57,10 +57,10 @@ pixel_height = y3_coarse_idx - y1_coarse_idx
 # pixel_width = x1_fine - x0_fine
 # pixel_height = y1_fine - y0_fine
 
-print(np.max(fe_fine/us_ic))
+print(np.max(fe_fine/us_ic_fine))
 
-axs[0].imshow(fe_coarse)
-axs[1].imshow(fe_fine/us_ic)
+axs[0].imshow(fe_coarse/us_ic_coarse)
+axs[1].imshow(fe_fine/us_ic_fine)
 
 rect = pat.Rectangle((x0_coarse_idx - 0.5, y1_coarse_idx - 0.5), pixel_width, pixel_height, edgecolor = 'white', facecolor = 'none')
 
