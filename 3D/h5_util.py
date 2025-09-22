@@ -103,8 +103,17 @@ def extract_h5_xrf_data(file_path, synchrotron, **kwargs):
             
         elements_string = [element.decode() for element in elements] # Convert the elements array from a list of bytes to a list of strings
 
-        if kwargs.get('scan_coords') == True:
-            return elements_string, counts, theta, x_um, y_um, nx, ny, dx_cm, dy_cm
+        if kwargs.get('scan_coords') == True and kwargs.get('US_IC') == True:
+            scalers_names_h5 = h5['xrfmap/scalers/name']
+            scalers_h5 = h5['xrfmap/scalers/val']
+
+            scalers_names = scalers_names_h5[()]
+            scalers = scalers_h5[()]
+
+            us_ic_index = np.ndarray.item(scalers_names == 'sclr1_ch2')
+            us_ic = scalers[:, :, us_ic_index]
+
+            return elements_string, counts, us_ic, theta, x_um, y_um, nx, ny, dx_cm, dy_cm
 
         else:
             return elements_string, counts, theta, nx, ny, dx_cm, dy_cm
