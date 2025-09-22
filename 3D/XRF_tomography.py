@@ -52,33 +52,33 @@ fl = {"K": np.array([xlib.KA1_LINE, xlib.KA2_LINE, xlib.KA3_LINE, xlib.KB1_LINE,
 def reconstruct_jXRFT_tomography(
         # ______________________________________
         # |Raw data and experimental parameters|________________________________
-        sample_size_n, sample_height_n, sample_size_cm, probe_energy=None,
+        sample_size_n, sample_height_n, sample_size_cm, probe_energy = None,
         # Set sample_size_n (sample_height_n) to the number of pixels along the direction 
         # perpendicular (parallel) to # the rotational axis of the sample;
         # sample_size_cm is the size of the sample size (in unit cm) along the direction 
         # perpendicular to the rotational axis of the  sample
-        probe_intensity=None,
+        probe_intensity = None,
         probe_att = True,
         # Set the value of incident probe fluence for simulation data
         # Not required for exp. data unless the calibration data is missing. In that case,
         # Set the value to some estimated probe intensity
         
-        manual_det_coord=True, 
+        manual_det_coord = True, 
         # True when using a exp. data; 
         # False when using a simulation data; 
         # For a simulation data, auto-distribute detecting points on the ciucualr sening area
         # given det_dia_cm and det_ds_spacing_cm;
-        set_det_coord_cm=None,
+        set_det_coord_cm = None,
         # Set to None for simulation data;
         # For exp. data, a np array with dimension (# of detecing points, 3) 
         # 3 for (z, x, y) coordinates, probe propagate along +y axis; sample rotates about +z axis;
         # The sign of x determines which side the detector locates relative to the sample;
 
-        det_on_which_side="negative", # TODO
+        det_on_which_side = "negative", # TODO
         # Choose from 'positive' or 'negative' depending on the side that the detector locates 
         # relative the sample;
     
-        manual_det_area=True,
+        manual_det_area = True,
         # True when using a exp. data;
         # False when using a simulation data;
         # If set to True, the program caculated the signal collecting solid angle of XRF using det_area_cm2;
@@ -87,48 +87,48 @@ def reconstruct_jXRFT_tomography(
         # For exp. data, the factor of signal collecting solid angle is included in probe_intensity
         # which is calculated from the calibration data;
         
-        det_area_cm2=None,
+        det_area_cm2 = None,
         # For exp. data only. Set the value of the total sensing area;
         # For simulation data, set to None (program calculates sensing area with given det_dia_cm)
     
-        det_dia_cm=None, 
+        det_dia_cm = None, 
         # For simulation data only. Diameter of the sensor assuming a circular sensing area.
         # Only used when manual_det_area is False. 
         # Need to use the same diameter setting as it's used to generating a simulation data  
-        det_ds_spacing_cm=None,
+        det_ds_spacing_cm = None,
         # For simulation data only. used to distribute detecting points on the XRF detecting plane.
     
-        det_from_sample_cm=None,
+        det_from_sample_cm = None,
         # For simulation data only.
         # For exp. data, the distance between the detector and the sample is given in set_det_coord_cm
     
         # __________________________________
         # |Probe Intensity calibration data|____________________________________    
-        use_std_calibation=False, std_path=None, f_std=None, std_element_lines_roi=None, density_std_elements=None, fitting_method=None,
+        use_std_calibation = False, std_path = None, f_std = None, std_element_lines_roi = None, density_std_elements = None, fitting_method = None,
         # Set use_std_calibration to True if the calibration measurement exist otherwise set to False.
         # density_std_elements unit in g/cm^2
         # Set fitting method to  'XRF_fits' , 'XRF_roi' or 'XRF_roi_plus'
     
         # ___________________________
         # |Reconstruction parameters|___________________________________________
-        n_epochs=50, save_every_n_epochs=10, minibatch_size=None,
-        f_recon_parameters="recon_parameters.txt", dev=None,
-        selfAb=False, cont_from_check_point=False, use_saved_initial_guess=False, 
-        ini_kind='const', init_const=0.5, ini_rand_amp=0.1,
+        n_epochs = 50, save_every_n_epochs = 10, minibatch_size = None,
+        f_recon_parameters = "recon_parameters.txt", dev = None,
+        selfAb = False, cont_from_check_point = False, use_saved_initial_guess = False, 
+        ini_kind = 'const', init_const = 0.5, ini_rand_amp = 0.1,
         # Set ini_kind to 'const', 'rand' or 'randn'
     
-        recon_path='./', f_initial_guess=None, f_recon_grid=None, data_path=None, f_XRF_data=None, f_XRT_data=None,
+        recon_path='./', f_initial_guess = None, f_recon_grid = None, data_path = None, f_XRF_data = None, f_XRT_data = None,
         # f_recon_grid is the name of the file that saves the most recent reconstructed result 
-        scaler_counts_us_ic_dataset_idx=None,
+        scaler_counts_us_ic_dataset_idx = None,
         # the index of us_ic in the dataset MAPS/scaler_names
-        scaler_counts_ds_ic_dataset_idx=None,
+        scaler_counts_ds_ic_dataset_idx = None,
         # the index of ds_ic in the dataset MAPS/scaler_names
-        XRT_ratio_dataset_idx=None,
+        XRT_ratio_dataset_idx = None,
         # the index of abs_ic in the dataset MAPS/scaler_names
-        theta_ls_dataset='exchange/theta', channel_names='exchange/elements',
-        this_aN_dic=None, element_lines_roi=None, n_line_group_each_element=None,
-        b1=None, b2=None, lr=None,
-        P_folder=None, f_P=None, fl_K=fl["K"], fl_L=fl["L"], fl_M=fl["M"], **kwargs,):
+        theta_ls_dataset = 'exchange/theta', channel_names = 'exchange/elements',
+        this_aN_dic = None, element_lines_roi = None, n_line_group_each_element = None,
+        b1 = None, b2 = None, lr = None,
+        P_folder = None, f_P = None, fl_K = fl["K"], fl_L = fl["L"], fl_M = fl["M"], **kwargs,):
     
     comm = MPI.COMM_WORLD
     n_ranks = comm.Get_size()
@@ -141,8 +141,8 @@ def reconstruct_jXRFT_tomography(
     n_voxel = sample_height_n * sample_size_n**2 #dev
     
     #### create the file handle for experimental data; y1: channel data, y2: scalers data ####
-    y1_true_handle = h5py.File(os.path.join(data_path, f_XRF_data), 'r')
-    y2_true_handle = h5py.File(os.path.join(data_path, f_XRT_data), 'r')  
+    y1_true_handle = h5py.File(os.path.join(data_path, f_XRF_data), 'r') # XRF data
+    y2_true_handle = h5py.File(os.path.join(data_path, f_XRT_data), 'r') # XRT data
     ####----------------------------------------------------------------------------------####
     
     #### Calculate the number of elements in the reconstructed object, list the atomic numbers ####
@@ -167,7 +167,7 @@ def reconstruct_jXRFT_tomography(
     
     #### Calculate the MAC of probe ####
     # probe_attCS_ls = tc.as_tensor(xlib_np.CS_Total(aN_ls, probe_energy).flatten()).to(dev) # TODO
-    probe_attCS_ls = tc.as_tensor(xlib_np.CS_Total_Kissel(aN_ls, probe_energy).flatten()).to(dev) # TODO
+    probe_attCS_ls = tc.as_tensor(xlib_np.CS_Total_Kissel(aN_ls, probe_energy).flatten()).to(dev)
     ####----------------------------####
     
     #### Load all object angles ####
@@ -181,10 +181,11 @@ def reconstruct_jXRFT_tomography(
     #### original dim = (n_lines_roi, n_theta, sample_height_n, sample_size_n)
     y1_true = tc.from_numpy(y1_true_handle['exchange/data'][element_lines_roi_idx]).view(len(element_lines_roi_idx), n_theta, sample_height_n * sample_size_n).to(dev)
 #     #### pick the probe photon counts after the ion chamber from the scalers data as the transmission data
-#     y2_true = tc.from_numpy(y2_true_handle['exchange/data'][scaler_counts_ds_ic_dataset_idx]).view(n_theta, sample_height_n * sample_size_n).to(dev)
+    # y2_true = tc.from_numpy(y2_true_handle['exchange/data'][scaler_counts_ds_ic_dataset_idx]).view(n_theta, sample_height_n * sample_size_n).to(dev)
     
     ## Use this y2_true if using the attenuating expoenent in the XRT loss calculation
     y2_true = tc.from_numpy(y2_true_handle['exchange/data'][XRT_ratio_dataset_idx]).view(n_theta, sample_height_n * sample_size_n).to(dev)
+
     y2_true = -tc.log(y2_true) # TODO
     
     #### pick the probe photon counts calibrated for all optics and detectors

@@ -2,29 +2,29 @@ import numpy as np, h5py, h5_util
 
 from matplotlib import pyplot as plt
 
-mda_array = ['0116', '0117', '0118', '0119', '0120', '0121', '0122', '0123', '0124', '0125', '0126']
+# mda_array = ['0116', '0117', '0118', '0119', '0120', '0121', '0122', '0123', '0124', '0125', '0126']
 # mda_array = ['0124', '0125', '0126']
 
-for mda, MDA in enumerate(mda_array):
-    try:
-        h5 = h5py.File(f'/raid/users/roter/Jacobsen/img.dat/2xfm_{MDA}.mda.h5')
+# for mda, MDA in enumerate(mda_array):
+#     try:
+#         h5 = h5py.File(f'/raid/users/roter/Jacobsen/img.dat/2xfm_{MDA}.mda.h5')
 
-        extra_pv_names = h5['MAPS/Scan/Extra_PVs/Names'][()]
-        extra_pv_values = h5['MAPS/Scan/Extra_PVs/Values'][()]
+#         extra_pv_names = h5['MAPS/Scan/Extra_PVs/Names'][()]
+#         extra_pv_values = h5['MAPS/Scan/Extra_PVs/Values'][()]
         
-        scalers_names = h5['MAPS/Scalers/Names'][()]
-        scalers_values = h5['MAPS/Scalers/Values'][()]
+#         scalers_names = h5['MAPS/Scalers/Names'][()]
+#         scalers_values = h5['MAPS/Scalers/Values'][()]
 
-        z_idx = np.ndarray.item(np.where(extra_pv_names == b'2xfm:m26.VAL')[0])
-        us_ic_idx = np.ndarray.item(np.where(scalers_names == b'US_IC')[0])
+#         z_idx = np.ndarray.item(np.where(extra_pv_names == b'2xfm:m26.VAL')[0])
+#         us_ic_idx = np.ndarray.item(np.where(scalers_names == b'US_IC')[0])
 
-        z = extra_pv_values[z_idx]
-        us_ic = scalers_values[us_ic_idx].astype(float)
+#         z = extra_pv_values[z_idx]
+#         us_ic = scalers_values[us_ic_idx].astype(float)
 
-        print(f'MDA {MDA}: z = {z}; US_IC Total = {us_ic.sum()}')
+#         print(f'MDA {MDA}: z = {z}; US_IC Total = {us_ic.sum()}')
 
-    except:
-        print('None')
+#     except:
+#         print('None')
 
 # sid = 235324
 # sid_end = 235675
@@ -162,3 +162,12 @@ for mda, MDA in enumerate(mda_array):
 # output_filename = '/home/bwr0835/hxn_aggregate_xrf.h5'
 
 # h5_util.create_aggregate_xrf_h5(filename_array, output_filename, synchrotron = "nsls-ii")
+
+def func(a, b, **kwargs):
+    if kwargs.get('subtract') == True:
+        print(a - b)
+    
+    else:
+        print(a + b)
+
+func(1, 2, subtract = True)

@@ -1,6 +1,6 @@
 import numpy as np, h5py, os, sys
 
-def extract_h5_xrf_data(file_path, synchrotron):
+def extract_h5_xrf_data(file_path, synchrotron, **kwargs):
     h5 = h5py.File(file_path, 'r')
     
     if synchrotron == "Advanced Photon Source (APS)" or synchrotron == "APS" or synchrotron == "aps" or synchrotron == "Advanced Photon Source" or synchrotron == "advanced photon source" or synchrotron == "advanced photon source (aps)":
@@ -74,11 +74,11 @@ def extract_h5_xrf_data(file_path, synchrotron):
         axis_coords = axis_coords_h5[()]
         theta = 1e-3*theta_h5[()] # Convert from mdeg to deg
 
-        x = axis_coords[0]
-        y = axis_coords[1]
+        x_um = axis_coords[0]
+        y_um = axis_coords[1]
 
-        nx = np.shape(x)[1]
-        ny = np.shape(y)[0]
+        nx = np.shape(x_um)[1]
+        ny = np.shape(y_um)[0]
 
         elements_entries_to_ignore = [b'compton',
                                       b'elastic',
@@ -98,12 +98,16 @@ def extract_h5_xrf_data(file_path, synchrotron):
         counts = np.delete(counts, idx_to_delete, axis = 0)
         elements = np.delete(elements, idx_to_delete, axis = 0)
         
-        dx_cm = 1e-4*(np.abs(x[0][-1] - x[0][0])/(nx - 1)) # Convert from µm to cm
-        dy_cm = 1e-4*(np.abs(y[-1][0] - y[0][0])/(ny - 1)) # Convert from µm to cm
+        dx_cm = 1e-4*(np.abs(x_um[0][-1] - x_um[0][0])/(nx - 1)) # Convert from µm to cm
+        dy_cm = 1e-4*(np.abs(y_um[-1][0] - y_um[0][0])/(ny - 1)) # Convert from µm to cm
             
         elements_string = [element.decode() for element in elements] # Convert the elements array from a list of bytes to a list of strings
 
-        return elements_string, counts, theta, nx, ny, dx_cm, dy_cm
+        if kwargs.get('scan_coords') == True:
+            return elements_string, counts, theta, x_um, y_um, nx, ny, dx_cm, dy_cm
+
+        else:
+            return elements_string, counts, theta, nx, ny, dx_cm, dy_cm
 
 def extract_h5_xrt_data(file_path, synchrotron):
     h5 = h5py.File(file_path, 'r')
@@ -151,7 +155,7 @@ def extract_h5_xrt_data(file_path, synchrotron):
 
         return elements, cts_combined, theta, nx, ny, dx_cm, dy_cm
 
-def create_aggregate_xrf_h5(file_path_array, output_h5_file, synchrotron, solid_angle = False):
+def create_aggregate_xrf_h5(file_path_array, output_h5_file, synchrotron):
     n_theta = len(file_path_array)
 
     theta_array = np.zeros(n_theta) 
