@@ -2,6 +2,8 @@ import numpy as np, h5py, h5_util as util, sys
 
 from matplotlib import pyplot as plt, patches as pat
 
+plt.rcParams["figure.autolayout"] = True
+
 coarse_scan_filename = '/raid/users/roter/Jacobsen-nslsii/data/xrf/scan2D_235675.h5'
 fine_scan_filename = '/raid/users/roter/Jacobsen-nslsii/data/xrf/scan2D_235676.h5'
 
