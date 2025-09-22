@@ -51,8 +51,8 @@ print(f'{x3_coarse_idx}, {y3_coarse_idx}')
 
 fig, axs = plt.subplots(1, 2)
 
-pixel_width = x1_coarse_idx[1] - x0_coarse_idx[1]
-pixel_height = y1_coarse_idx[0] - y0_coarse_idx[0]
+pixel_width = x1_coarse_idx - x0_coarse_idx
+pixel_height = y1_coarse_idx - y0_coarse_idx
 
 # pixel_width = x1_fine - x0_fine
 # pixel_height = y1_fine - y0_fine
