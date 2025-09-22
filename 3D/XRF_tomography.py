@@ -128,7 +128,7 @@ def reconstruct_jXRFT_tomography(
         theta_ls_dataset = 'exchange/theta', channel_names = 'exchange/elements',
         this_aN_dic = None, element_lines_roi = None, n_line_group_each_element = None,
         b1 = None, b2 = None, lr = None,
-        P_folder = None, f_P = None, fl_K = fl["K"], fl_L = fl["L"], fl_M = fl["M"], **kwargs,):
+        P_folder = None, f_P = None, fl_K = fl["K"], fl_L = fl["L"], fl_M = fl["M"], **kwargs):
     
     comm = MPI.COMM_WORLD
     n_ranks = comm.Get_size()

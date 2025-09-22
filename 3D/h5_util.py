@@ -110,7 +110,7 @@ def extract_h5_xrf_data(file_path, synchrotron, **kwargs):
             scalers_names = scalers_names_h5[()]
             scalers = scalers_h5[()]
 
-            us_ic_index = np.ndarray.item(np.where(scalers_names == b'sclr1_ch2')[0])
+            us_ic_index = np.ndarray.item(np.where(scalers_names == b'sclr_4')[0])
             us_ic = scalers[:, :, us_ic_index]
 
             return elements_string, counts, us_ic, theta, x_um, y_um, nx, ny, dx_cm, dy_cm
