@@ -1,4 +1,4 @@
-import numpy as np, h5py, h5_util
+import numpy as np, h5py, h5_util, xraylib_np as xrl
 
 from matplotlib import pyplot as plt
 
@@ -163,11 +163,11 @@ from matplotlib import pyplot as plt
 
 # h5_util.create_aggregate_xrf_h5(filename_array, output_filename, synchrotron = "nsls-ii")
 
-def func(a, b, **kwargs):
-    if kwargs.get('subtract') == True:
-        print(a - b)
+# def func(a, b, **kwargs):
+#     if kwargs.get('subtract') == True:
+#         print(a - b)
     
-    else:
-        print(a + b)
+#     else:
+#         print(a + b)
 
-func(1, 2, subtract = True)
+# func(1, 2, subtract = True)

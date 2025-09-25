@@ -19,7 +19,6 @@ fl = {"K": np.array([xlib.KA1_LINE, xlib.KA2_LINE, xlib.KA3_LINE, xlib.KB1_LINE,
      }
 
 def calibrate_incident_probe_intensity(std_path, f_std, fitting_method, std_element_lines_roi, density_std_elements, probe_energy):
-    
     XRF_pcs_sum = np.zeros((std_element_lines_roi.shape[0]))
 
     for i, element_line in enumerate(std_element_lines_roi):
