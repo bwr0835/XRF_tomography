@@ -49,7 +49,7 @@ print(f'{x3_coarse_idx}, {y3_coarse_idx}')
 
 # sys.exit()
 
-# fig, axs = plt.subplots(1, 2)
+fig, axs = plt.subplots(1, 2)
 
 pixel_width = x1_coarse_idx - x0_coarse_idx
 pixel_height = y3_coarse_idx - y1_coarse_idx
@@ -57,21 +57,21 @@ pixel_height = y3_coarse_idx - y1_coarse_idx
 # pixel_width = x1_fine - x0_fine
 # pixel_height = y1_fine - y0_fine
 
-print(np.max(fe_fine/us_ic_fine))
+# print(np.max(fe_fine/us_ic_fine))
 
-plt.imshow(fe_fine)
+# plt.imshow(fe_fine)
 
-# axs[0].imshow(fe_coarse/us_ic_coarse)
-# axs[1].imshow(fe_fine/us_ic_fine)
+axs[0].imshow(fe_coarse/us_ic_coarse)
+axs[1].imshow(fe_fine/us_ic_fine)
 
-# rect = pat.Rectangle((x0_coarse_idx - 0.5, y1_coarse_idx - 0.5), pixel_width, pixel_height, edgecolor = 'white', facecolor = 'none')
+rect = pat.Rectangle((x0_coarse_idx - 0.5, y1_coarse_idx - 0.5), pixel_width, pixel_height, edgecolor = 'white', facecolor = 'none')
 
-# axs[0].add_patch(rect)
-plt.colorbar()
+axs[0].add_patch(rect)
+# plt.colorbar()
 
-# for axes in fig.axes:
-#     axes.axis('off')
+for axes in fig.axes:
+    axes.axis('off')
 
-# fig.tight_layout()
+fig.tight_layout()
 
 plt.show()
