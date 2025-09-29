@@ -337,7 +337,7 @@ def create_aggregate_xrt_h5(file_path_array, output_h5_file, synchrotron, **kwar
 
     for theta_idx, file_path in enumerate(file_path_array):
         if synchrotron.lower() == 'nsls-ii':
-            elements_new, counts, theta, nx_new, ny_new, _, _ = extract_h5_xrt_data(file_path_array, synchrotron, **kwargs)
+            elements_new, counts, theta, nx_new, ny_new, _, _ = extract_h5_xrt_data(file_path, synchrotron, **kwargs)
             
         else:
             elements_new, counts, theta, nx_new, ny_new, _, _ = extract_h5_xrt_data(file_path, synchrotron)
