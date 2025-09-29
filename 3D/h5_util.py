@@ -216,6 +216,9 @@ def extract_h5_xrt_data(file_path, synchrotron, **kwargs):
         nx = kwargs.get('nx')
         ny = kwargs.get('ny')
 
+        print(nx)
+        print(ny)
+
         cts_stxm = diffract_map_intensity.sum(axis = (2, 1)) # Sum over axis = 2, then sum over axis = 1
         cts_stxm = cts_stxm.reshape((ny, nx))
 
