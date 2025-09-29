@@ -132,7 +132,7 @@ def extract_h5_xrf_data(file_path, synchrotron, **kwargs):
 
                 sys.exit()
 
-            us_ic = scalers[:, :, us_ic_index]
+            us_ic = scalers[us_ic_index]
 
             # return elements_string, counts, us_ic, theta, x_um, y_um, nx, ny, dx_cm, dy_cm
             return elements_string, counts, us_ic, theta, nx, ny, dx_cm, dy_cm
