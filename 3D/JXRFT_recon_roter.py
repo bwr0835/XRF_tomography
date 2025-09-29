@@ -116,6 +116,8 @@ params_124_124_32_cabead = {
 
 params_2_ide_samp = {'f_recon_parameters': 'recon_parameters.txt', # Text file name for list of reconstruction parameters
                      'dev': dev,
+                     'synchrotron_enabled': True, # EXPERIMENTAL ONLY
+                     'synchrotron': 'aps', # EXPERIMENTAL ONLY
                      'use_std_calibation': True, # Whether to use mass calibration standard during reconstruction
                      'probe_intensity': None, # ONLY FOR SIMULATIONS OR LACK OF CALIBRATION DATA
                      'std_path': './data/Cabead/axo_std', # File path for mass calibration standard
@@ -157,9 +159,9 @@ params_2_ide_samp = {'f_recon_parameters': 'recon_parameters.txt', # Text file n
                      'n_line_group_each_element': np.array([1, 1, 1, 1, 1, 1]),
                      'sample_size_n': 124, # Set to number of pixels along width of projection images when rotation axis is up-down TODO
                      'sample_height_n': 32, # Set to number of pixels along height of projection images when rotation axis is up-down (e.g. # of slices) TODO
-                     'sample_size_cm': 0.0248, # Size of sample_size_n (in cm) along direction perpendicular to sample axis of rotation
+                     'sample_size_cm': 5e-5, # Size of sample_size_n (in cm) along direction perpendicular to sample axis of rotation
                      'probe_energy': np.array([13.0]), # Excitation energy (For 2-ID-E, we used 13 keV; for the HXN at BNL, we used 9.7 keV)
-                     'n_epochs': 200, # Number of epochs (updates to)
+                     'n_epochs': 200, # Number of epochs
                      'save_every_n_epochs': 5,
                      'minibatch_size': 124,
                      'b1': 1.0e4, # Regularization prefactor of XRT cost term

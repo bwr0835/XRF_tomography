@@ -71,7 +71,7 @@ class PPM(nn.Module):
         if self.selfAb == True:
             voxel_idx_offset = self.p * self.n_voxel_minibatch        
             
-            # clamp the index after substrcting the offset, so that all 0 indicies remains 0 (becomes negative if without clamping, and cause errors)
+            # clamp the index after subtracting the offset, so that all 0 indices remains 0 (becomes negative if without clamping, and cause errors)
             att_exponent = tc.stack([self.lac[:,:, tc.clamp((self.P_minibatch[m,0] - voxel_idx_offset), 0, self.n_voxel_minibatch).to(dtype=tc.long),\
                                               self.P_minibatch[m,1].to(dtype=tc.long)]\
                                     * self.P_minibatch[m,2].repeat(self.n_element, self.n_lines, 1) for m in range(self.n_det)])
@@ -110,7 +110,7 @@ class PPM(nn.Module):
         concentration_map_minibatch_rot = tc.reshape(concentration_map_minibatch_rot, (self.n_element, self.minibatch_size, self.sample_size_n))
         
         ## Calculate the attenuation of the probe
-        # Calculate the expoenent of attenuation of each voxel in the batch. (The atteuation before the probe enters each voxel.)
+        # Calculate the exponent of attenuation of each voxel in the batch. (The atteuation before the probe enters each voxel.)
         att_exponent_acc_map = tc.zeros((self.minibatch_size, self.sample_size_n+1), device=self.dev)
         
         fl_map_tot_flat_theta = tc.zeros((self.n_lines, self.n_voxel_minibatch), device=self.dev)

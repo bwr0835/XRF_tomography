@@ -221,7 +221,7 @@ def MakeFLlinesDictionary(this_aN_dic, probe_energy,
                           group_lines = True):
 
     """
-    Based on the given probe_energy, ouptut all the possible fluorescence line(s) into the output dictionary.
+    Based on the given probe_energy, output all the possible fluorescence line(s) into the output dictionary.
     The output dictionary has 4 items: 
     (1) energy of all possible fluorescence lines
     (2) the intensity of the fluorescence signals if the density of the emitting element is 1 g.cm^{-3}

@@ -437,7 +437,7 @@ def reconstruct_jXRFT_tomography(
                 
                 del lac
 
-            stdout_options = {'root':0, 'output_folder': recon_path, 'save_stdout': True, 'print_terminal': False}
+            stdout_options = {'root': 0, 'output_folder': recon_path, 'save_stdout': True, 'print_terminal': False}
             per_epoch_time = time.perf_counter() - t0_epoch
             
             print_flush_root(rank, val=per_epoch_time, output_file=f'per_epoch_time_mb_size_{minibatch_size}.csv', **stdout_options)
@@ -489,7 +489,7 @@ def reconstruct_jXRFT_tomography(
 #                 dxchange.write_tiff(X_cpu, os.path.join(recon_path, f_recon_grid)+"_"+str(epoch), dtype='float32', overwrite=True)  
                 
 
-        ## It's important to close the hdf5 file hadle in the end of the reconstruction.
+        ## It's important to close the hdf5 file handle in the end of the reconstruction.
         P_handle.close()
         y1_true_handle.close()
         y2_true_handle.close()
