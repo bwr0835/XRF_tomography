@@ -252,7 +252,7 @@ def create_aggregate_xrf_h5(file_path_array, output_h5_file, synchrotron, **kwar
         
         else:
             if kwargs.get('us_ic_enabled') == True:
-                elements_new, counts, us_ic, theta, nx_new, ny_new, _, _, = extract_h5_xrf_data(file_path, synchrotron, us_ic_enabled = kwargs.get('us_ic_enabled'))
+                elements_new, counts, us_ic, theta, nx_new, ny_new, _, _, = extract_h5_xrf_data(file_path, synchrotron, us_ic_enabled = True)
             
             else:
                 elements_new, counts, theta, nx_new, ny_new, _, _, = extract_h5_xrf_data(file_path, synchrotron)
@@ -260,9 +260,7 @@ def create_aggregate_xrf_h5(file_path_array, output_h5_file, synchrotron, **kwar
         assert nx == nx_new and ny == ny_new, f"Dimension mismatch in {file_path}." # Check that the dimensions of the new data match the dimensions of the first data set
         assert np.array_equal(elements, elements_new), f"Element mismatch in {file_path}." # Check that the elements are the same
         
-        if synchrotron.lower() == 'nsls-ii' and kwargs.get('us_ic') is not None:
-            print('OK')
-            
+        if synchrotron.lower() == 'nsls-ii' and kwargs.get('us_ic_enabled') == True:
             us_ic_array[theta_idx] = us_ic
 
         counts_array[:, theta_idx, :, :] = counts
@@ -312,7 +310,7 @@ def create_aggregate_xrf_h5(file_path_array, output_h5_file, synchrotron, **kwar
             exchange.attrs['raw_spectrum_fitting_software'] = 'PyMCA'
             exchange.attrs['raw_spectrum_fitting_method'] = 'NNLS'
     
-    f.close()
+        f.close()
 
     if synchrotron.lower() == 'nsls-ii' and kwargs.get('us_ic_enabled') == True:
         if np.any(us_ic_array):
