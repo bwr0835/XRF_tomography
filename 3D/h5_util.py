@@ -387,7 +387,7 @@ def create_aggregate_xrt_h5(file_path_array, output_h5_file, synchrotron, **kwar
             exchange['data'].attrs['us_ic_scaler_name'] = 'sclr1_ch4'
             exchange['data'].attrs['xrt_signal_name'] = 'stxm'
 
-def extract_h5_aggregate_xrf_data(file_path):
+def extract_h5_aggregate_xrf_data(file_path, **kwargs):
     h5 = h5py.File(file_path, 'r')
     
     counts_h5 = h5['exchange/data']
@@ -407,10 +407,13 @@ def extract_h5_aggregate_xrf_data(file_path):
 
     elements_string = [element.decode() for element in elements]
     filename_array = [filename.decode() for filename in filenames]
+    
+    if kwargs.get('filename_array') == True:
+        return elements_string, counts, theta, raw_spectrum_fitting_method.decode(), dataset_type.decode(), filename_array
+    
+    return elements_string, counts, theta, raw_spectrum_fitting_method.decode(), dataset_type.decode()
 
-    return elements_string, counts, theta, raw_spectrum_fitting_method.decode(), dataset_type.decode(), filename_array
-
-def extract_h5_aggregate_xrt_data(file_path):
+def extract_h5_aggregate_xrt_data(file_path, **kwargs):
     h5 = h5py.File(file_path, 'r')
     
     counts_h5 = h5['exchange/data']
@@ -431,4 +434,7 @@ def extract_h5_aggregate_xrt_data(file_path):
     elements_string = [element.decode() for element in elements]
     filename_array = [filename.decode() for filename in filenames]
 
-    return elements_string, counts, theta, us_ic_scaler_name.decode(), dataset_type.decode(), filename_array
+    if kwargs.get('filename_array') == True:
+        return elements_string, counts, theta, us_ic_scaler_name.decode(), dataset_type.decode(), filename_array
+    
+    return elements_string, counts, theta, us_ic_scaler_name.decode(), dataset_type.decode()
