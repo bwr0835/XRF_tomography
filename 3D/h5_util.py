@@ -213,11 +213,8 @@ def extract_h5_xrt_data(file_path, synchrotron, **kwargs):
 
             sys.exit()
 
-        nx = kwargs.get('nx')
-        ny = kwargs.get('ny')
-
-        print(nx)
-        print(ny)
+        nx = kwargs.get('nx_xrf')
+        ny = kwargs.get('ny_xrf')
 
         cts_stxm = diffract_map_intensity.sum(axis = (2, 1)) # Sum over axis = 2, then sum over axis = 1
         cts_stxm = cts_stxm.reshape((ny, nx))
@@ -320,17 +317,15 @@ def create_aggregate_xrt_h5(file_path_array, output_h5_file, synchrotron, **kwar
     theta_array = np.zeros(n_theta) 
 
     if synchrotron.lower() == 'nsls-ii':
-        nx = kwargs.get('nx')
-        ny = kwargs.get('ny')
         us_ic = kwargs.get('us_ic')
 
-        if nx is None \
-            or ny is None \
-            or us_ic is None:
-                print('Error: nx, ny, and/or us_ic not provided. Exiting program...')
+        if us_ic is None:
+            print('Error: \'us_ic\' not provided. Exiting program...')
 
-                sys.exit()
+            sys.exit()
         
+        kwargs['ny_xrf'], kwargs['nx_xrf'] = us_ic[0].shape
+
         elements, counts, theta, nx, ny, _, _ = extract_h5_xrt_data(file_path_array[0], synchrotron, **kwargs)
     
     else:
@@ -345,7 +340,7 @@ def create_aggregate_xrt_h5(file_path_array, output_h5_file, synchrotron, **kwar
         
         assert nx == nx_new and ny == ny_new, f"Dimension mismatch in {file_path}." # Check that the dimensions of the new data match the dimensions of the first data set
         assert np.array_equal(elements, elements_new), f"Element mismatch in {file_path}." # Check that the elements are the same
-        
+
         counts_array[:, theta_idx, :, :] = counts
         theta_array[theta_idx] = theta
         file_path_array[theta_idx] = os.path.basename(file_path)
