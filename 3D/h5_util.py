@@ -290,7 +290,7 @@ def create_aggregate_xrf_h5(file_path_array, output_h5_file, synchrotron, **kwar
         file_path_array_sorted = [file_path_array[theta_idx] for theta_idx in range(n_theta)]
     
     with h5py.File(output_h5_file, 'w') as f:
-        f.create_dataset('filename', data = file_path_array_sorted)
+        f.create_dataset('filenames', data = file_path_array_sorted)
 
         exchange = f.create_group('exchange')
 
@@ -298,15 +298,15 @@ def create_aggregate_xrf_h5(file_path_array, output_h5_file, synchrotron, **kwar
         exchange.create_dataset('elements', data = elements_new)
         exchange.create_dataset('theta', data = theta_array_sorted)
         
-        exchange['dataset_type'] = 'xrf'
+        exchange['data'].attrs['dataset_type'] = 'xrf'
         
         if synchrotron.lower() == 'aps':
-            exchange['raw_spectrum_fitting_software'] = 'MAPS'
-            exchange['raw_spectrum_fitting_method'] = 'NNLS'
+            exchange.attrs['raw_spectrum_fitting_software'] = 'MAPS'
+            exchange.attrs['raw_spectrum_fitting_method'] = 'NNLS'
         
         elif synchrotron.lower() == 'nsls-ii':
-            exchange['raw_spectrum_fitting_software'] = 'PyMCA'
-            exchange['raw_spectrum_fitting_method'] = 'NNLS'
+            exchange.attrs['raw_spectrum_fitting_software'] = 'PyMCA'
+            exchange.attrs['raw_spectrum_fitting_method'] = 'NNLS'
 
     if synchrotron.lower() == 'nsls-ii' and kwargs.get('us_ic') == True:
         return us_ic_array_sorted, nx, ny
