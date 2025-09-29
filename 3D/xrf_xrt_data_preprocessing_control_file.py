@@ -12,14 +12,14 @@ def preprocess_xrf_xrt_data(synchrotron,
                             mass_calibration_dir,
                             mass_calibration_filepath,
                             mass_calibration_elements,
-                            areal_mass_density_mass_calibration_elements,
+                            areal_mass_density_mass_calibration_elements_g_cm2,
                             iterative_reproj_enabled):
         
     if create_aggregate_xrf_xrt_files_enabled:
         root = tk.Tk()
 
-        xrf_file_array = fd.askopenfilenames(parent = root, title = "Choose XRF files to aggregate.", filetypes = [('HDF5 files', '*.h5*')])
-        xrt_file_array = fd.askopenfilenames(parent = root, title = "Choose XRT files to aggregate.", filetypes = [('HDF5 files', '*.h5*')])
+        xrf_file_array = fd.askopenfilenames(parent = root, title = "Choose XRF files to aggregate.", filetypes = [('HDF5 files', '*.h5')])
+        xrt_file_array = fd.askopenfilenames(parent = root, title = "Choose XRT files to aggregate.", filetypes = [('HDF5 files', '*.h5')])
 
         if xrf_file_array == '' or xrt_file_array == '':
             print('Error: XRF and/or XRT filename array empty. Exiting program...')
