@@ -250,7 +250,7 @@ def create_aggregate_xrf_h5(file_path_array, output_h5_file, synchrotron, **kwar
         
         else:
             if kwargs.get('us_ic_enabled') == True:
-                elements_new, counts, us_ic, theta, nx_new, ny_new, _, _, = extract_h5_xrf_data(file_path, synchrotron, us_ic_enabled = True)
+                elements_new, counts, us_ic, theta, nx_new, ny_new, _, _, = extract_h5_xrf_data(file_path, synchrotron, us_ic_enabled = kwargs.get('us_ic_enabled'))
             
             else:
                 elements_new, counts, theta, nx_new, ny_new, _, _, = extract_h5_xrf_data(file_path, synchrotron)
@@ -284,7 +284,7 @@ def create_aggregate_xrf_h5(file_path_array, output_h5_file, synchrotron, **kwar
         theta_array_sorted = theta_array
         counts_array_sorted = counts_array
 
-        if kwargs.get('us_ic') is not None:
+        if kwargs.get('us_ic_enabled') == True:
             us_ic_array_sorted = us_ic_array[theta_array_sorted]
 
         file_path_array_sorted = [file_path_array[theta_idx] for theta_idx in range(n_theta)]
@@ -308,7 +308,7 @@ def create_aggregate_xrf_h5(file_path_array, output_h5_file, synchrotron, **kwar
             exchange.attrs['raw_spectrum_fitting_software'] = 'PyMCA'
             exchange.attrs['raw_spectrum_fitting_method'] = 'NNLS'
 
-    if synchrotron.lower() == 'nsls-ii' and kwargs.get('us_ic') is not None:
+    if synchrotron.lower() == 'nsls-ii' and kwargs.get('us_ic_enabled') == True:
         return us_ic_array_sorted, nx, ny
 
 def create_aggregate_xrt_h5(file_path_array, output_h5_file, synchrotron, **kwargs):
