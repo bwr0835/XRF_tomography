@@ -337,10 +337,10 @@ def create_aggregate_xrt_h5(file_path_array, output_h5_file, synchrotron, **kwar
 
     for theta_idx, file_path in enumerate(file_path_array):
         if synchrotron.lower() == 'nsls-ii':
-            elements_new, counts, theta, nx_new, ny_new, _, _ = extract_h5_xrt_data(file_path, synchrotron)
-        
+            elements_new, counts, theta, nx_new, ny_new, _, _ = extract_h5_xrt_data(file_path_array, synchrotron, **kwargs)
+            
         else:
-            elements_new, counts, theta, nx_new, ny_new, _, _ = extract_h5_xrt_data(file_path_array[0], synchrotron, **kwargs)
+            elements_new, counts, theta, nx_new, ny_new, _, _ = extract_h5_xrt_data(file_path, synchrotron)
         
         assert nx == nx_new and ny == ny_new, f"Dimension mismatch in {file_path}." # Check that the dimensions of the new data match the dimensions of the first data set
         assert np.array_equal(elements, elements_new), f"Element mismatch in {file_path}." # Check that the elements are the same
