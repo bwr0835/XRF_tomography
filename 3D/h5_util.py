@@ -241,7 +241,7 @@ def create_aggregate_xrf_h5(file_path_array, output_h5_file, synchrotron, **kwar
     
     counts_array = np.zeros((n_elements, n_theta, ny, nx))
 
-    if synchrotron.lower() == 'nsls-ii' and kwargs.get('US_IC' == True):
+    if synchrotron.lower() == 'nsls-ii' and kwargs.get('us_ic' == True):
         us_ic_array = np.zeros((n_theta, ny, nx))
 
     for theta_idx, file_path in enumerate(file_path_array):
@@ -250,7 +250,7 @@ def create_aggregate_xrf_h5(file_path_array, output_h5_file, synchrotron, **kwar
         
         else:
             if kwargs.get('us_ic') == True:
-                elements_new, counts, us_ic, theta, nx_new, ny_new, _, _, = extract_h5_xrf_data(file_path, synchrotron, US_IC = True)
+                elements_new, counts, us_ic, theta, nx_new, ny_new, _, _, = extract_h5_xrf_data(file_path, synchrotron, us_ic = True)
             
             else:
                 elements_new, counts, theta, nx_new, ny_new, _, _, = extract_h5_xrf_data(file_path, synchrotron)
