@@ -66,7 +66,7 @@ def preprocess_xrf_xrt_data(synchrotron,
                           '/raid/users/roter/Jacobsen/img.dat/2xfm_0115.mda.h5',
                           '/raid/users/roter/Jacobsen/img.dat/2xfm_0116.mda.h5']
         
-        xrt_file_array = xrf_file_array
+        xrt_file_array = xrf_file_array.copy()
         # root = tk.Tk()
 
         # xrf_file_array = fd.askopenfilenames(parent = root, title = "Choose XRF files to aggregate.", filetypes = [('HDF5 files', '*.h5')])
