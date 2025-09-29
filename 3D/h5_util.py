@@ -259,7 +259,7 @@ def create_aggregate_xrf_h5(file_path_array, output_h5_file, synchrotron, **kwar
         assert np.array_equal(elements, elements_new), f"Element mismatch in {file_path}." # Check that the elements are the same
         
         if synchrotron.lower() == 'nsls-ii' and kwargs.get('us_ic') == True:
-            us_ic_array[theta_idx] == us_ic
+            us_ic_array[theta_idx] = us_ic
 
         counts_array[:, theta_idx, :, :] = counts
         theta_array[theta_idx] = theta
