@@ -241,10 +241,8 @@ def create_aggregate_xrf_h5(file_path_array, output_h5_file, synchrotron, **kwar
     
     counts_array = np.zeros((n_elements, n_theta, ny, nx))
 
-    if synchrotron.lower() == 'nsls-ii' and kwargs.get('us_ic') is not None:
+    if synchrotron.lower() == 'nsls-ii' and kwargs.get('us_ic_enabled') == True:
         us_ic_array = np.zeros((n_theta, ny, nx))
-
-        print('Yes')
 
     for theta_idx, file_path in enumerate(file_path_array):
         if synchrotron.lower() != 'nsls-ii':
