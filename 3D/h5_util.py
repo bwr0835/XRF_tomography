@@ -261,6 +261,9 @@ def create_aggregate_xrf_h5(file_path_array, output_h5_file, synchrotron, **kwar
         if synchrotron.lower() == 'nsls-ii' and kwargs.get('us_ic') is not None:
             us_ic_array[theta_idx] = us_ic
 
+            if us_ic_array[theta_idx].any() and theta_idx % 20 == 0:
+                print(us_ic_array[theta_idx])
+
         counts_array[:, theta_idx, :, :] = counts
         theta_array[theta_idx] = theta
         file_path_array[theta_idx] = os.path.basename(file_path)
