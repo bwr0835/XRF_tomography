@@ -312,6 +312,8 @@ def create_aggregate_xrf_h5(file_path_array, output_h5_file, synchrotron, **kwar
         elif synchrotron.lower() == 'nsls-ii':
             exchange.attrs['raw_spectrum_fitting_software'] = 'PyMCA'
             exchange.attrs['raw_spectrum_fitting_method'] = 'NNLS'
+    
+    f.close()
 
     if synchrotron.lower() == 'nsls-ii' and kwargs.get('us_ic_enabled') == True:
         if np.any(us_ic_array):
