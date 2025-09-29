@@ -5,8 +5,6 @@ from xrf_xrt_data_preprocessing_control_file import preprocess_xrf_xrt_data
 preprocessing_inputs = {'synchrotron': 'aps',
                         'synchrotron_beamline': '2_ide',
                         'create_aggregate_xrf_xrt_files_enabled': True,
-                        'xrf_aggregate_filepath': None,
-                        'xrt_aggregate_filepath': None,
                         'mass_calibration_enabled': False,
                         'mass_calibration_dir': None,
                         'mass_calibration_filepath': None,
