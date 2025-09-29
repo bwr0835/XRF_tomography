@@ -309,6 +309,11 @@ def create_aggregate_xrf_h5(file_path_array, output_h5_file, synchrotron, **kwar
             exchange.attrs['raw_spectrum_fitting_method'] = 'NNLS'
 
     if synchrotron.lower() == 'nsls-ii' and kwargs.get('us_ic_enabled') == True:
+        if np.any(us_ic_array):
+            print(us_ic_array_sorted)
+
+        sys.exit()
+        
         return us_ic_array_sorted, nx, ny
 
 def create_aggregate_xrt_h5(file_path_array, output_h5_file, synchrotron, **kwargs):
