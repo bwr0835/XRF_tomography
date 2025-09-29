@@ -274,7 +274,7 @@ def create_aggregate_xrf_h5(file_path_array, output_h5_file, synchrotron, **kwar
         file_path_array_sorted = [file_path_array[theta_idx] for theta_idx in theta_idx_sorted]
     
     else:
-        # This assumes all angles are in order over 360° (scan from -90° to 90°, flip sample, scan from -90° to 90°) AND -90° is included in BOTH sample orientations
+        # The following assumes all angles are in order over 360° (scan from -90° to 90°, flip sample, scan from -90° to 90°) AND -90° is included in BOTH sample orientations
         
         second_neg_90_deg_idx = (np.where(theta_array == -90)[0])[-1]
 
@@ -285,7 +285,7 @@ def create_aggregate_xrf_h5(file_path_array, output_h5_file, synchrotron, **kwar
         counts_array_sorted = counts_array
 
         if kwargs.get('us_ic_enabled') == True:
-            us_ic_array_sorted = us_ic_array[theta_array_sorted]
+            us_ic_array_sorted = us_ic_array
 
         file_path_array_sorted = [file_path_array[theta_idx] for theta_idx in range(n_theta)]
     
