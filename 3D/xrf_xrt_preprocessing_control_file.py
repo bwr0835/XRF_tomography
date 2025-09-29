@@ -296,9 +296,7 @@ def preprocess_xrf_xrt_data(synchrotron,
 
             h5u.create_aggregate_xrt_h5(xrt_file_array, 
                                         output_xrt_filepath, 
-                                        synchrotron, 
-                                        nx = nx, 
-                                        ny = ny, 
+                                        synchrotron,
                                         us_ic = us_ic)
         
         else:

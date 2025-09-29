@@ -314,7 +314,7 @@ def create_aggregate_xrf_h5(file_path_array, output_h5_file, synchrotron, **kwar
 
     if synchrotron.lower() == 'nsls-ii' and kwargs.get('us_ic_enabled') == True:
         # if np.any(us_ic_array):
-        #     print(us_ic_array_sorted)
+            # print(us_ic_array_sorted)
 
         # sys.exit()
         
