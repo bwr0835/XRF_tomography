@@ -5,14 +5,15 @@ from tkinter import filedialog as fd
 def preprocess_xrf_xrt_data(synchrotron,
                             synchrotron_beamline,
                             create_aggregate_xrf_xrt_files_enabled,
+                            pre_existing_alignment_norm_mass_calibration_file_enabled,
+                            pre_existing_alignment_norm_mass_calibration_file_path,
+                            norm_enabled,
                             mass_calibration_enabled,
                             mass_calibration_dir,
                             mass_calibration_filepath,
                             mass_calibration_elements,
                             areal_mass_density_mass_calibration_elements,
-                            pre_existing_alignment_norm_mass_cal_file,
-                            iterative_reproj_enabled,
-                            norm_enabled):
+                            iterative_reproj_enabled):
         
     if create_aggregate_xrf_xrt_files_enabled:
         root = tk.Tk()
