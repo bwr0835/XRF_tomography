@@ -14,7 +14,7 @@ preprocessing_inputs = {'synchrotron': 'aps',
                         'mass_calibration_elements': np.array([['Ca', 'K'],
                                                                ['Fe', 'K'],
                                                                ['Cu', 'K']]),
-                        'areal_mass_density_calibration_elements': np.array([1.931, 0.504, 0.284])*1e-6,
+                        'areal_mass_density_mass_calibration_elements': np.array([1.931, 0.504, 0.284])*1e-6,
                         'iterative_reproj_enabled': True}
 
 if __name__ == '__main__':
