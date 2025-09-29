@@ -134,7 +134,7 @@ def extract_h5_xrf_data(file_path, synchrotron, **kwargs):
 
             us_ic = scalers[:, :, us_ic_index]
 
-            print(us_ic)
+            # print(us_ic)
 
             # return elements_string, counts, us_ic, theta, x_um, y_um, nx, ny, dx_cm, dy_cm
             return elements_string, counts, us_ic, theta, nx, ny, dx_cm, dy_cm
@@ -263,7 +263,7 @@ def create_aggregate_xrf_h5(file_path_array, output_h5_file, synchrotron, **kwar
         if synchrotron.lower() == 'nsls-ii' and kwargs.get('us_ic') is not None:
             us_ic_array[theta_idx] = us_ic
 
-            if us_ic_array[theta_idx].any():
+            if us_ic_array[theta_idx].any() and theta_idx == 0:
                 print(us_ic_array[theta_idx])
 
         counts_array[:, theta_idx, :, :] = counts
