@@ -1,6 +1,6 @@
 import numpy as np
 
-from xrf_xrt_data_preprocessing_control_file import preprocess_xrt_xrf_data
+from xrf_xrt_data_preprocessing_control_file import preprocess_xrf_xrt_data
 
 preprocessing_inputs = {'synchrotron': 'aps',
                         'synchrotron_beamline': '2_ide',
@@ -18,4 +18,4 @@ preprocessing_inputs = {'synchrotron': 'aps',
                         'norm_enabled': True}
 
 if __name__ == '__main__':
-    preprocess_xrt_xrf_data(**preprocessing_inputs)
+    preprocess_xrf_xrt_data(**preprocessing_inputs)
