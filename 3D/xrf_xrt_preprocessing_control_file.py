@@ -290,7 +290,7 @@ def preprocess_xrf_xrt_data(synchrotron,
             us_ic, nx, ny = h5u.create_aggregate_xrf_h5(xrf_file_array, 
                                                               output_xrf_filepath, 
                                                               synchrotron, 
-                                                              us_ic = True) # us_ic_array only returned since that data is not present in NSLS-II ptychography files
+                                                              us_ic_enabled = True) # us_ic_array only returned since that data is not present in NSLS-II ptychography files
 
             print('Creating aggregate XRT data file...')
 
