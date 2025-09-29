@@ -335,8 +335,10 @@ def create_aggregate_xrt_h5(file_path_array, output_h5_file, synchrotron, **kwar
     
     counts_array = np.zeros((n_elements, n_theta, ny, nx))
 
-    for theta_idx, file_path in enumerate(file_path_array):
+    for theta_idx, file_path in enumerate(file_path_array):     
         if synchrotron.lower() == 'nsls-ii':
+            print(f'HDF file {theta_idx + 1}/{len(file_path_array)} extracted')
+            
             elements_new, counts, theta, nx_new, ny_new, _, _ = extract_h5_xrt_data(file_path, synchrotron, **kwargs)
             
         else:
@@ -367,6 +369,8 @@ def create_aggregate_xrt_h5(file_path_array, output_h5_file, synchrotron, **kwar
 
         theta_array_sorted = theta_array
         counts_array_sorted = counts_array
+
+        counts_array_sorted[1] = us_ic
 
         file_path_array_sorted = [file_path_array[theta_idx] for theta_idx in range(n_theta)]
 
