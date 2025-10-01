@@ -343,6 +343,8 @@ def create_aggregate_xrt_h5(file_path_array, output_h5_file, synchrotron, **kwar
 
             sys.exit()
         
+        print(us_ic.shape)
+
         kwargs['ny'], kwargs['nx'] = us_ic[0].shape
 
         elements, counts, theta, nx, ny, _, _ = extract_h5_xrt_data(file_path_array[0], synchrotron, **kwargs)
