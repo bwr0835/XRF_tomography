@@ -254,7 +254,11 @@ def create_aggregate_xrf_h5(file_path_array, output_h5_file, synchrotron, **kwar
         us_ic_array = np.zeros((n_theta, ny, nx))
 
     for theta_idx, file_path in enumerate(file_path_array):
-        print(f'\rHDF file {theta_idx + 1}/{len(file_path_array)} extracted', end = '', flush = True)
+        if theta_idx != len(file_path_array) - 1:
+            print(f'\rHDF file {theta_idx + 1}/{len(file_path_array)} extracted', end = '', flush = True)
+        
+        else:
+            print(f'\rHDF file {theta_idx + 1}/{len(file_path_array)} extracted', flush = True)
         
         if synchrotron != 'nsls-ii':
             elements_new, counts, theta, nx_new, ny_new, _, _ = extract_h5_xrf_data(file_path, synchrotron)
@@ -353,8 +357,12 @@ def create_aggregate_xrt_h5(file_path_array, output_h5_file, synchrotron, **kwar
     
     counts_array = np.zeros((n_elements, n_theta, ny, nx))
 
-    for theta_idx, file_path in enumerate(file_path_array):     
-        print(f'\rHDF file {theta_idx + 1}/{len(file_path_array)} extracted', end = '', flush = True)
+    for theta_idx, file_path in enumerate(file_path_array):
+        if theta_idx != len(file_path_array) - 1:
+            print(f'\rHDF file {theta_idx + 1}/{len(file_path_array)} extracted', end = '', flush = True)
+        
+        else:
+            print(f'\rHDF file {theta_idx + 1}/{len(file_path_array)} extracted', flush = True)
         
         if synchrotron == 'nsls-ii':
             elements_new, counts, theta, nx_new, ny_new, _, _ = extract_h5_xrt_data(file_path, synchrotron, **kwargs)
