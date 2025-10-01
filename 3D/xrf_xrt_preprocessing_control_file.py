@@ -23,7 +23,7 @@ def preprocess_xrf_xrt_data(synchrotron,
                             mass_calib_filepath,
                             mass_calib_elements,
                             areal_mass_dens_mass_calib_elements_g_cm2,
-                            iterative_reproj_enabled,
+                            iter_reproj_enabled,
                             n_iter_iter_reproj,
                             return_aux_data):
 
