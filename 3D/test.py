@@ -162,27 +162,3 @@ from matplotlib import pyplot as plt
 # output_filename = '/home/bwr0835/hxn_aggregate_xrf.h5'
 
 # h5_util.create_aggregate_xrf_h5(filename_array, output_filename, synchrotron = "nsls-ii")
-
-# def func(a, b, **kwargs):
-#     if kwargs.get('subtract') == True:
-#         print(a - b)
-    
-#     else:
-#         print(a + b)
-
-
-# h5 = h5py.File('/Users/bwr0835/Downloads/scan_235546.h5')
-
-# diffract_map = h5['diffamp'][()]
-
-# diffract_map_intensity = diffract_map**2
-
-# cts_stxm = (diffract_map_intensity.sum(axis = (2, 1)))
-
-# cts_stxm = cts_stxm.reshape((160, 260))
-
-# # cts_stxm /= np.max(cts_stxm) # TODO
-
-# plt.imshow(cts_stxm)
-# plt.colorbar()
-# plt.show()

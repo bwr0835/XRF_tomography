@@ -1,9 +1,13 @@
-import numpy as np, h5py, os, sys
+import numpy as np, \
+       pandas as pd, \
+       h5py, \
+       os, \
+       sys
 
 def extract_h5_xrf_data(file_path, synchrotron, **kwargs):
     h5 = h5py.File(file_path, 'r')
     
-    if synchrotron.lower() == 'aps':
+    if synchrotron == 'aps':
         try:
             if "MAPS/XRF_Analyzed/NNLS" in h5.keys():
                 counts_h5 = h5['MAPS/XRF_Analyzed/NNLS/Counts_Per_Sec']
@@ -19,17 +23,19 @@ def extract_h5_xrf_data(file_path, synchrotron, **kwargs):
             extra_pvs_names = extra_pvs_h5['Names'][()]
             extra_pvs_values = extra_pvs_h5['Values'][()]
 
-            theta_idx = np.where(extra_pvs_names == b'2xfm:m58.VAL')[0]
-            theta = float(extra_pvs_values[theta_idx][0].decode()) # Get the value of theta and decode it to a float (from a byte)
+            nx_conv = ny_h5[()] # Width and height are reversed in the actual HDF5 data structure
+            ny_conv = nx_h5[()] # Width and height are reversed in the actual HDF5 data structure
+
+            h5.close()
 
         except:
             print('Error: Incompatible HDF5 file structure. Exiting program...')
 
             sys.exit()    
 
-        nx_conv = ny_h5[()] # Width and height are reversed in the actual HDF5 data structure
-        ny_conv = nx_h5[()] # Width and height are reversed in the actual HDF5 data structure
-
+        theta_idx = np.where(extra_pvs_names == b'2xfm:m58.VAL')[0]
+        theta = float(extra_pvs_values[theta_idx][0].decode()) # Get the value of theta and decode it to a float (from a byte)
+       
         nx = len(nx_conv)
         ny = len(ny_conv) - 2 # MAPS tacks on two extra values for whatever reason
                 
@@ -70,12 +76,19 @@ def extract_h5_xrf_data(file_path, synchrotron, **kwargs):
 
         return elements_string, counts_new, theta, nx, ny, dx_cm, dy_cm
         
-    elif synchrotron.lower() == 'nsls-ii':
+    elif synchrotron == 'nsls-ii':
         try:
             counts_h5 = h5['xrfmap/detsum/xrf_fit']
             elements_h5 = h5['xrfmap/detsum/xrf_fit_name']
             axis_coords_h5 = h5['xrfmap/positions/pos']
             theta_h5 = h5['xrfmap/scan_metadata'].attrs['param_theta'] # Metadata stored as key-value pairs (attributes) (similar to a Python dictionary)
+
+            if kwargs.get('us_ic_enabled') == True:
+                scalers_names_h5 = h5['xrfmap/scalers/name']
+                scalers_h5 = h5['xrfmap/scalers/val']
+
+                scalers_names = scalers_names_h5[()]
+                scalers = scalers_h5[()]
 
         except:
             print('Error: Incompatible HDF5 file structure. Exiting program...')
@@ -86,6 +99,8 @@ def extract_h5_xrf_data(file_path, synchrotron, **kwargs):
         counts = counts_h5[()]
         axis_coords = axis_coords_h5[()]
         theta = 1e-3*theta_h5[()] # Convert from mdeg to deg
+
+        h5.close()
 
         x_um = axis_coords[0]
         y_um = axis_coords[1]
@@ -116,22 +131,10 @@ def extract_h5_xrf_data(file_path, synchrotron, **kwargs):
             
         elements_string = [element.decode() for element in elements] # Convert the elements array from a list of bytes to a list of strings
 
-        # if kwargs.get('scan_coords') == True and kwargs.get('us_ic') == True:
+        # if kwargs.get('scan_coords') == True and kwargs.get('us_ic_enabled') == True:
         if kwargs.get('us_ic_enabled') == True:
-            try:
-                scalers_names_h5 = h5['xrfmap/scalers/name']
-                scalers_h5 = h5['xrfmap/scalers/val']
-
-                scalers_names = scalers_names_h5[()]
-                scalers = scalers_h5[()]
-
-                us_ic_index = np.ndarray.item(np.where(scalers_names == b'sclr1_ch4')[0]) # Ion chamber upstream of zone plate, but downstream of X-ray beam slits
+            us_ic_index = np.ndarray.item(np.where(scalers_names == b'sclr1_ch4')[0]) # Ion chamber upstream of zone plate, but downstream of X-ray beam slits
             
-            except:
-                print('Error: Incompatible HDF5 file structure. Exiting program...')
-
-                sys.exit()
-
             us_ic = scalers[:, :, us_ic_index]
 
             # print(us_ic)
@@ -165,6 +168,8 @@ def extract_h5_xrt_data(file_path, synchrotron, **kwargs):
         nx_conv = ny_h5[()] # Width and height are reversed in the actual HDF5 data structure
         ny_conv = nx_h5[()] # Width and height are reversed in the actual HDF5 data structure
         
+        h5.close()
+
         # elements = ['empty', 'us_ic', 'ds_ic', 'abs_ic']
         elements = ['empty', 'us_ic', 'xrt_sig', 'empty']
         n_elements = len(elements)
@@ -202,13 +207,15 @@ def extract_h5_xrt_data(file_path, synchrotron, **kwargs):
 
         return elements, cts_combined, theta, nx, ny, dx_cm, dy_cm
     
-    elif synchrotron.lower() == 'nsls-ii':
+    elif synchrotron == 'nsls-ii':
         # STXM calculations adapted from X. Huang, Brookhaven National Laboratory
         try:
             diffract_map_intensity = h5['diffamp'][()]
             theta = h5['angle'][()]
 
             dx_cm, dy_cm = h5['dr_x'][()], h5['dr_y'][()] # These are supposed to be different than for XRF due to ptychography requiring overlapping positions
+
+            h5.close()
 
         except:
             print('Error: Incompatible HDF5 file structure. Exiting program...')
@@ -243,11 +250,13 @@ def create_aggregate_xrf_h5(file_path_array, output_h5_file, synchrotron, **kwar
     
     counts_array = np.zeros((n_elements, n_theta, ny, nx))
 
-    if synchrotron.lower() == 'nsls-ii' and kwargs.get('us_ic_enabled') == True:
+    if synchrotron == 'nsls-ii' and kwargs.get('us_ic_enabled') == True:
         us_ic_array = np.zeros((n_theta, ny, nx))
 
     for theta_idx, file_path in enumerate(file_path_array):
-        if synchrotron.lower() != 'nsls-ii':
+        print(f'\rHDF file {theta_idx + 1}/{len(file_path_array)} extracted', end = '', flush = True)
+        
+        if synchrotron != 'nsls-ii':
             elements_new, counts, theta, nx_new, ny_new, _, _ = extract_h5_xrf_data(file_path, synchrotron)
         
         else:
@@ -260,14 +269,14 @@ def create_aggregate_xrf_h5(file_path_array, output_h5_file, synchrotron, **kwar
         assert nx == nx_new and ny == ny_new, f"Dimension mismatch in {file_path}." # Check that the dimensions of the new data match the dimensions of the first data set
         assert np.array_equal(elements, elements_new), f"Element mismatch in {file_path}." # Check that the elements are the same
         
-        if synchrotron.lower() == 'nsls-ii' and kwargs.get('us_ic_enabled') == True:
+        if synchrotron == 'nsls-ii' and kwargs.get('us_ic_enabled') == True:
             us_ic_array[theta_idx] = us_ic
 
         counts_array[:, theta_idx, :, :] = counts
         theta_array[theta_idx] = theta
         file_path_array[theta_idx] = os.path.basename(file_path)
     
-    if synchrotron.lower() != 'nsls-ii':
+    if synchrotron == 'aps':
         theta_idx_sorted = np.argsort(theta_array) # Get indices for angles for sorting them in ascending order
     
         theta_array_sorted = theta_array[theta_idx_sorted]
@@ -275,7 +284,7 @@ def create_aggregate_xrf_h5(file_path_array, output_h5_file, synchrotron, **kwar
 
         file_path_array_sorted = [file_path_array[theta_idx] for theta_idx in theta_idx_sorted]
     
-    else:
+    elif synchrotron == 'nsls-ii':
         # The following assumes all angles are in order over 360° (scan from -90° to 90°, flip sample, scan from -90° to 90°) AND -90° is included in BOTH sample orientations
         
         second_neg_90_deg_idx = (np.where(theta_array == -90)[0])[-1]
@@ -302,17 +311,15 @@ def create_aggregate_xrf_h5(file_path_array, output_h5_file, synchrotron, **kwar
         
         exchange['data'].attrs['dataset_type'] = 'xrf'
         
-        if synchrotron.lower() == 'aps':
+        if synchrotron == 'aps':
             exchange.attrs['raw_spectrum_fitting_software'] = 'MAPS'
             exchange.attrs['raw_spectrum_fitting_method'] = 'NNLS'
         
-        elif synchrotron.lower() == 'nsls-ii':
+        elif synchrotron == 'nsls-ii':
             exchange.attrs['raw_spectrum_fitting_software'] = 'PyMCA'
             exchange.attrs['raw_spectrum_fitting_method'] = 'NNLS'
-    
-        f.close()
 
-    if synchrotron.lower() == 'nsls-ii' and kwargs.get('us_ic_enabled') == True:
+    if synchrotron == 'nsls-ii' and kwargs.get('us_ic_enabled') == True:
         # if np.any(us_ic_array):
             # print(us_ic_array_sorted)
 
@@ -325,7 +332,10 @@ def create_aggregate_xrt_h5(file_path_array, output_h5_file, synchrotron, **kwar
 
     theta_array = np.zeros(n_theta) 
 
-    if synchrotron.lower() == 'nsls-ii':
+    if synchrotron == 'aps':
+        elements, counts, theta, nx, ny, _, _ = extract_h5_xrt_data(file_path_array[0], synchrotron) # Invoke the first time for getting the number of elements and the number of pixels
+    
+    elif synchrotron == 'nsls-ii':
         us_ic = kwargs.get('us_ic')
 
         if us_ic is None:
@@ -336,18 +346,15 @@ def create_aggregate_xrt_h5(file_path_array, output_h5_file, synchrotron, **kwar
         kwargs['ny'], kwargs['nx'] = us_ic[0].shape
 
         elements, counts, theta, nx, ny, _, _ = extract_h5_xrt_data(file_path_array[0], synchrotron, **kwargs)
-    
-    else:
-        elements, counts, theta, nx, ny, _, _ = extract_h5_xrt_data(file_path_array[0], synchrotron) # Invoke the first time for getting the number of elements and the number of pixels
-    
+
     n_elements = len(elements)
     
     counts_array = np.zeros((n_elements, n_theta, ny, nx))
 
     for theta_idx, file_path in enumerate(file_path_array):     
-        if synchrotron.lower() == 'nsls-ii':
-            print(f'HDF file {theta_idx + 1}/{len(file_path_array)} extracted')
-            
+        print(f'\rHDF file {theta_idx + 1}/{len(file_path_array)} extracted', end = '', flush = True)
+        
+        if synchrotron == 'nsls-ii':
             elements_new, counts, theta, nx_new, ny_new, _, _ = extract_h5_xrt_data(file_path, synchrotron, **kwargs)
             
         else:
@@ -360,7 +367,7 @@ def create_aggregate_xrt_h5(file_path_array, output_h5_file, synchrotron, **kwar
         theta_array[theta_idx] = theta
         file_path_array[theta_idx] = os.path.basename(file_path)
     
-    if synchrotron.lower() != 'nsls-ii':
+    if synchrotron == 'aps':
         theta_idx_sorted = np.argsort(theta_array) # Get indices for angles for sorting them in ascending order
     
         theta_array_sorted = theta_array[theta_idx_sorted]
@@ -368,7 +375,7 @@ def create_aggregate_xrt_h5(file_path_array, output_h5_file, synchrotron, **kwar
 
         file_path_array_sorted = [file_path_array[theta_idx] for theta_idx in theta_idx_sorted]
     
-    else:
+    elif synchrotron == 'nsls-ii':
         # This assumes all angles are in order over 360° (scan from -90° to 90°, flip sample, scan from -90° to 90°) AND -90° is included in BOTH sample orientations
         
         second_neg_90_deg_idx = (np.where(theta_array == -90)[0])[-1]
@@ -394,24 +401,36 @@ def create_aggregate_xrt_h5(file_path_array, output_h5_file, synchrotron, **kwar
 
         exchange['data'].attrs['dataset_type'] = 'xrt'
 
-        if synchrotron.lower() == 'aps':
+        if synchrotron == 'aps':
             exchange['data'].attrs['us_ic_scaler_name'] = 'US_IC'
             exchange['data'].attrs['xrt_signal_name'] = 'DS_IC'
         
-        elif synchrotron.lower() == 'nsls-ii':
+        elif synchrotron == 'nsls-ii':
             exchange['data'].attrs['us_ic_scaler_name'] = 'sclr1_ch4'
             exchange['data'].attrs['xrt_signal_name'] = 'stxm'
 
 def extract_h5_aggregate_xrf_data(file_path, **kwargs):
-    h5 = h5py.File(file_path, 'r')
+    try:
+        h5 = h5py.File(file_path, 'r')
     
-    counts_h5 = h5['exchange/data']
-    theta_h5 = h5['exchange/theta']
-    elements_h5 = h5['exchange/elements']
-    filenames_h5 = h5['filenames']
+    except:
+        print('Error: File does not exist. Exiting program...')
+
+        sys.exit()
     
-    dataset_type_h5 = counts_h5.attrs['dataset_type']
-    raw_spectrum_fitting_method_h5 = counts_h5.attrs['raw_spectrum_fitting_method']
+    try:
+        counts_h5 = h5['exchange/data']
+        theta_h5 = h5['exchange/theta']
+        elements_h5 = h5['exchange/elements']
+        filenames_h5 = h5['filenames']
+    
+        dataset_type_h5 = counts_h5.attrs['dataset_type']
+        raw_spectrum_fitting_method_h5 = counts_h5.attrs['raw_spectrum_fitting_method']
+    
+    except:
+        print('Error: Incompatible HDF5 file structure. Exiting program...')
+
+        sys.exit()
 
     counts = counts_h5[()]
     theta = theta_h5[()]
@@ -419,6 +438,8 @@ def extract_h5_aggregate_xrf_data(file_path, **kwargs):
     dataset_type = dataset_type_h5[()]
     raw_spectrum_fitting_method = raw_spectrum_fitting_method_h5[()]
     filenames = filenames_h5[()]
+
+    h5.close()
 
     elements_string = [element.decode() for element in elements]
     filename_array = [filename.decode() for filename in filenames]
@@ -429,15 +450,29 @@ def extract_h5_aggregate_xrf_data(file_path, **kwargs):
     return elements_string, counts, theta, raw_spectrum_fitting_method.decode(), dataset_type.decode()
 
 def extract_h5_aggregate_xrt_data(file_path, **kwargs):
-    h5 = h5py.File(file_path, 'r')
-    
-    counts_h5 = h5['exchange/data']
-    theta_h5 = h5['exchange/theta']
-    elements_h5 = h5['exchange/elements']
-    filenames_h5 = h5['filenames']
 
-    dataset_type_h5 = counts_h5.attrs['dataset_type']
-    us_ic_scaler_name_h5 = counts_h5.attrs['us_ic_scaler_name']
+
+    try:
+        h5 = h5py.File(file_path, 'r')
+    
+    except:
+        print('Error: File does not exist. Exiting program...')
+
+        sys.exit()
+    
+    try:
+        counts_h5 = h5['exchange/data']
+        theta_h5 = h5['exchange/theta']
+        elements_h5 = h5['exchange/elements']
+        filenames_h5 = h5['filenames']
+
+        dataset_type_h5 = counts_h5.attrs['dataset_type']
+        us_ic_scaler_name_h5 = counts_h5.attrs['us_ic_scaler_name']
+    
+    except:
+        print('Error: Incompatible HDF file structure. Exiting program...')
+
+        sys.exit()
 
     counts = counts_h5[()]
     theta = theta_h5[()]
@@ -446,6 +481,8 @@ def extract_h5_aggregate_xrt_data(file_path, **kwargs):
     dataset_type = dataset_type_h5[()]
     filenames = filenames_h5[()]
 
+    h5.close()
+
     elements_string = [element.decode() for element in elements]
     filename_array = [filename.decode() for filename in filenames]
 
@@ -453,3 +490,36 @@ def extract_h5_aggregate_xrt_data(file_path, **kwargs):
         return elements_string, counts, theta, us_ic_scaler_name.decode(), dataset_type.decode(), filename_array
     
     return elements_string, counts, theta, us_ic_scaler_name.decode(), dataset_type.decode()
+
+def extract_norm_mass_calibration_net_shift_data(file_path, theta_array):
+    try:
+        norm_mass_calibration_net_shift_data = pd.read_csv(file_path)
+    
+    except:
+        print('Error: File does not exist or incorrect file extension. Exiting program...')
+
+        sys.exit()
+    
+    try:
+        thetas = norm_mass_calibration_net_shift_data['theta'].to_numpy().astype(float)
+    
+    except:
+        print('Error: Incorrect CSV file structure. Exiting program...')
+
+        sys.exit()
+
+    if not np.array_equal(thetas, theta_array):
+        print('Error: Inconsistent projection angles and/or number of projection angles relative to input aggregate HDF files. Exiting program...')
+
+        sys.exit()
+
+    norm_array = norm_mass_calibration_net_shift_data['norm_factor'].to_numpy().astype(float)
+    net_x_shifts = norm_mass_calibration_net_shift_data['net_x_shift'].to_numpy().astype(float)
+    net_y_shifts = norm_mass_calibration_net_shift_data['net_y_shift'].to_numpy().astype(float)
+    I0_norm = norm_mass_calibration_net_shift_data['I0_norm'].to_numpy()[0].astype(float)
+    I0_calibrated = norm_mass_calibration_net_shift_data['I0_calibrated'].to_numpy()[0].astype(float)
+
+    return norm_array, net_x_shifts, net_y_shifts, I0_norm, I0_calibrated
+
+
+    
