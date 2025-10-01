@@ -325,7 +325,7 @@ def create_aggregate_xrf_h5(file_path_array, output_h5_file, synchrotron, **kwar
 
         # sys.exit()
         
-        return us_ic_array_sorted, nx, ny
+        return us_ic_array_sorted
 
 def create_aggregate_xrt_h5(file_path_array, output_h5_file, synchrotron, **kwargs):
     n_theta = len(file_path_array)
