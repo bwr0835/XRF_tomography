@@ -5,6 +5,8 @@ from xrf_xrt_preprocessing_control_file import preprocess_xrf_xrt_data
 preprocessing_inputs = {'synchrotron': 'nsls-ii',
                         'synchrotron_beamline': 'hxn',
                         'create_aggregate_xrf_xrt_files_enabled': False,
+                        'aggregate_xrf_file_path': None,
+                        'aggregate_xrt_file_path': None,
                         'pre_existing_align_norm_mass_calib_file_enabled': False,
                         'pre_existing_align_norm_mass_calib_file_path': None,
                         'norm_enabled': True,
