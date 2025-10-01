@@ -19,8 +19,7 @@ def preprocess_xrf_xrt_data(synchrotron,
                             norm_method,
                             I0_cts_per_s,
                             t_dwell_s,
-                            mass_calibration_enabled,
-                            mass_calib_dir,
+                            mass_calib_enabled,
                             mass_calib_filepath,
                             mass_calib_elements,
                             areal_mass_dens_mass_calib_elements_g_cm2,
@@ -453,6 +452,6 @@ def preprocess_xrf_xrt_data(synchrotron,
                 
                 opt_dens = -np.log10(counts_xrt*t_dwell_s/I0_cts_per_s)
 
-        if mass_calibration_enabled:
+        if mass_calib_enabled:
             if synchrotron == 'aps':
                 pass
