@@ -1,4 +1,4 @@
-import numpy as np, h5_util, os, sys
+import numpy as np, file_util as futil, os, sys
 
 from matplotlib import pyplot as plt
 from numpy import fft
@@ -291,17 +291,23 @@ def edge_gauss_filter(image, sigma, alpha, nx, ny):
     
     return (image + dc_value)
 
-file_path_xrt = '/Users/bwr0835/Documents/2_ide_aggregate_xrt.h5'
-file_path_xrf = '/Users/bwr0835/Documents/2_ide_aggregate_xrf.h5'
-# file_path_xrf = '/Users/bwr0835/Documents/hxn_aggregate_xrf.h5'
+# file_path_xrt = '/Users/bwr0835/Documents/2_ide_aggregate_xrt.h5'
+# file_path_xrf = '/Users/bwr0835/Documents/2_ide_aggregate_xrf.h5'
+file_path_xrt = '/Users/bwr0835/Documents/hxn_aggregate_xrf.h5'
+file_path_xrf = '/Users/bwr0835/Documents/hxn_aggregate_xrf.h5'
 
 output_dir = '/Users/bwr0835/Documents'
 
-elements_xrt, counts_xrt, _, _, _ = h5_util.extract_h5_aggregate_xrt_data(file_path_xrt)
-elements_xrf, counts_xrf, theta_xrf, _ = h5_util.extract_h5_aggregate_xrf_data(file_path_xrf)
+print('XRF')
 
-ref_element_xrt = 'ds_ic'
-ref_element_xrf = 'Fe'
+elements_xrf, counts_xrf, theta_xrf, _, _ = futil.extract_h5_aggregate_xrf_data(file_path_xrt)
+
+print('XRT')
+
+elements_xrt, counts_xrt, _, _, _ = futil.extract_h5_aggregate_xrt_data(file_path_xrt)
+
+ref_element_xrt = 'xrt_sig'
+ref_element_xrf = 'Ni_K'
 # ref_element_xrf_array = ['Ni_K', 'Cu_K', 'Zn_K', 'Ce_L']
 
 # ref_element_idx_array = np.zeros(len(ref_element_xrf_array), dtype = int)
@@ -347,28 +353,28 @@ if (n_slices % 2) or (n_columns % 2):
 ref_element_idx_xrt = elements_xrt.index(ref_element_xrt)
 ref_element_idx_xrf = elements_xrf.index(ref_element_xrf)
 
-vmin = counts_xrf.min()
-vmax = counts_xrf.max()
+# vmin = counts_xrf.min()
+# vmax = counts_xrf.max()
 
 cts = counts_xrt[ref_element_idx_xrt]
 counts = counts_xrf[ref_element_idx_xrf]
 
-# cts_copy = cts.copy()
-# counts_copy = counts.copy()
+cts_copy = cts.copy()
+counts_copy = counts.copy()
 
-# I0_avg = np.mean(cts_copy)
+I0_avg = np.mean(cts_copy)
 
-# opt_dens_copy = -np.log(cts_copy/I0_avg)
+opt_dens_copy = -np.log(cts_copy/I0_avg)
 
 counts_xrt_norm, counts_xrf_norm, counts_xrt_mask_global_avg, convolution_mag_array = joint_fluct_norm(cts, counts)
 
 opt_dens = -np.log(counts_xrt_norm/counts_xrt_mask_global_avg)
 
-# vmin_xrt = cts_copy.min()
-# vmax_xrt = cts_copy.max()
+vmin_xrt = cts_copy.min()
+vmax_xrt = cts_copy.max()
 
-# vmin_xrf = counts_copy.min()
-# vmax_xrf = counts_copy.max()
+vmin_xrf = counts_copy.min()
+vmax_xrf = counts_copy.max()
 
 vmin_xrt_norm = counts_xrt_norm.min()
 vmax_xrt_norm = counts_xrt_norm.max()
@@ -376,46 +382,46 @@ vmax_xrt_norm = counts_xrt_norm.max()
 vmin_xrf_norm = counts_xrf_norm.min()
 vmax_xrf_norm = counts_xrf_norm.max()
 
-# vmin_conv = convolution_mag_array.min()
-# vmax_conv = convolution_mag_array.max()
+vmin_conv = convolution_mag_array.min()
+vmax_conv = convolution_mag_array.max()
 
-# vmin_od = opt_dens_copy.min()
-# vmax_od = opt_dens_copy.max()
+vmin_od = opt_dens_copy.min()
+vmax_od = opt_dens_copy.max()
 
 vmin_od_norm = opt_dens.min()
 vmax_od_norm = opt_dens.max()
 
-# fig1, axs1 = plt.subplots(3, 2)
-# fig2, axs2 = plt.subplots(2, 2)
-# fig3, axs3 = plt.subplots(3, 2)
+fig1, axs1 = plt.subplots(3, 2)
+fig2, axs2 = plt.subplots(2, 2)
+fig3, axs3 = plt.subplots(3, 2)
 # fig4, axs4 = plt.subplots()
 # fig5, axs5 = plt.subplots(2, 2) # BNL XRF DATA
-fig6, axs6 = plt.subplots(3, 1) # Normalized XRT, OD, XRF only
+# fig6, axs6 = plt.subplots(3, 1) # Normalized XRT, OD, XRF only
 
-# im_fig_array = [fig1, fig2, fig3]
+im_fig_array = [fig1, fig2, fig3]
 
-# threshold = np.percentile(convolution_mag_array[0], 80)
+threshold = np.percentile(convolution_mag_array[0], 80)
 
-# conv_mask = np.where(convolution_mag_array[0] >= threshold, convolution_mag_array[0], 0)
+conv_mask = np.where(convolution_mag_array[0] >= threshold, convolution_mag_array[0], 0)
 
-# im1_1 = axs1[0, 0].imshow(convolution_mag_array[0], vmin = vmin_conv, vmax = vmax_conv)
-# im1_2 = axs1[0, 1].imshow(conv_mask, vmin = vmin_conv, vmax = vmax_conv)
-# im1_3 = axs1[1, 0].imshow(cts_copy[0], vmin = vmin_xrt, vmax = vmax_xrt)
-# im1_4 = axs1[1, 1].imshow(counts_xrt_norm[0], vmin = vmin_xrt_norm, vmax = vmax_xrt_norm)
-# im1_5 = axs1[2, 0].imshow(opt_dens_copy[0], vmin = vmin_od, vmax = vmax_od)
-# im1_6 = axs1[2, 1].imshow(opt_dens[0], vmin = vmin_od_norm, vmax = vmax_od_norm)
+im1_1 = axs1[0, 0].imshow(convolution_mag_array[0], vmin = vmin_conv, vmax = vmax_conv)
+im1_2 = axs1[0, 1].imshow(conv_mask, vmin = vmin_conv, vmax = vmax_conv)
+im1_3 = axs1[1, 0].imshow(cts_copy[0], vmin = vmin_xrt, vmax = vmax_xrt)
+im1_4 = axs1[1, 1].imshow(counts_xrt_norm[0], vmin = vmin_xrt_norm, vmax = vmax_xrt_norm)
+im1_5 = axs1[2, 0].imshow(opt_dens_copy[0], vmin = vmin_od, vmax = vmax_od)
+im1_6 = axs1[2, 1].imshow(opt_dens[0], vmin = vmin_od_norm, vmax = vmax_od_norm)
 
-# im2_1 = axs2[0, 0].imshow(convolution_mag_array[0], vmin = vmin_conv, vmax = vmax_conv)
-# im2_2 = axs2[0, 1].imshow(conv_mask, vmin = vmin_conv, vmax = vmax_conv)
-# im2_3 = axs2[1, 0].imshow(counts_copy[0], vmin = vmin_xrf, vmax = vmax_xrf)
-# im2_4 = axs2[1, 1].imshow(counts_xrf_norm[0], vmin = vmin_xrf_norm, vmax = vmax_xrf_norm)
+im2_1 = axs2[0, 0].imshow(convolution_mag_array[0], vmin = vmin_conv, vmax = vmax_conv)
+im2_2 = axs2[0, 1].imshow(conv_mask, vmin = vmin_conv, vmax = vmax_conv)
+im2_3 = axs2[1, 0].imshow(counts_copy[0], vmin = vmin_xrf, vmax = vmax_xrf)
+im2_4 = axs2[1, 1].imshow(counts_xrf_norm[0], vmin = vmin_xrf_norm, vmax = vmax_xrf_norm)
 
-# im3_1 = axs3[0, 0].imshow(cts_copy[0], vmin = vmin_xrt, vmax = vmax_xrt)
-# im3_2 = axs3[0, 1].imshow(counts_xrt_norm[0], vmin = vmin_xrt_norm, vmax = vmax_xrt_norm)
-# im3_3 = axs3[1, 0].imshow(opt_dens_copy[0], vmin = vmin_od, vmax = vmax_od)
-# im3_4 = axs3[1, 1].imshow(opt_dens[0], vmin = vmin_od_norm, vmax = vmax_od_norm)
-# im3_5 = axs3[2, 0].imshow(counts_copy[0], vmin = vmin_xrf, vmax = vmax_xrf)
-# im3_6 = axs3[2, 1].imshow(counts_xrf_norm[0], vmin = vmin_xrf_norm, vmax = vmax_xrf_norm)
+im3_1 = axs3[0, 0].imshow(cts_copy[0], vmin = vmin_xrt, vmax = vmax_xrt)
+im3_2 = axs3[0, 1].imshow(counts_xrt_norm[0], vmin = vmin_xrt_norm, vmax = vmax_xrt_norm)
+im3_3 = axs3[1, 0].imshow(opt_dens_copy[0], vmin = vmin_od, vmax = vmax_od)
+im3_4 = axs3[1, 1].imshow(opt_dens[0], vmin = vmin_od_norm, vmax = vmax_od_norm)
+im3_5 = axs3[2, 0].imshow(counts_copy[0], vmin = vmin_xrf, vmax = vmax_xrf)
+im3_6 = axs3[2, 1].imshow(counts_xrf_norm[0], vmin = vmin_xrf_norm, vmax = vmax_xrf_norm)
 
 # im5_1 = axs5[0, 0].imshow(counts_xrf[ref_element_idx_array[0], 0], vmin = vmin, vmax = vmax)
 # im5_2 = axs5[0, 1].imshow(counts_xrf[ref_element_idx_array[1], 0], vmin = vmin, vmax = vmax)
@@ -429,24 +435,24 @@ fig6, axs6 = plt.subplots(3, 1) # Normalized XRT, OD, XRF only
 # im5_3 = axs5[1, 0].imshow(counts_xrf[ref_element_idx_array[2], neg_84_idx], vmin = vmin, vmax = vmax)
 # im5_4 = axs5[1, 1].imshow(counts_xrf[ref_element_idx_array[3], neg_84_idx], vmin = vmin, vmax = vmax)
 
-im6_1 = axs6[0].imshow(counts_xrt_norm[0], vmin = vmin_xrt_norm, vmax = vmax_xrt_norm)
-im6_2 = axs6[1].imshow(opt_dens[0], vmin = vmin_od_norm, vmax = vmax_od_norm)
-im6_3 = axs6[2].imshow(counts_xrf_norm[0], vmin = vmin_xrf_norm, vmax = vmax_xrf_norm)
+# im6_1 = axs6[0].imshow(counts_xrt_norm[0], vmin = vmin_xrt_norm, vmax = vmax_xrt_norm)
+# im6_2 = axs6[1].imshow(opt_dens[0], vmin = vmin_od_norm, vmax = vmax_od_norm)
+# im6_3 = axs6[2].imshow(counts_xrf_norm[0], vmin = vmin_xrf_norm, vmax = vmax_xrf_norm)
 
-axs6[0].set_title(r'XRT')
-axs6[1].set_title(r'Opt. Dens.')
-axs6[2].set_title(r'XRF')
+# axs6[0].set_title(r'XRT')
+# axs6[1].set_title(r'Opt. Dens.')
+# axs6[2].set_title(r'XRF')
 
-# text_1 = axs1[0, 0].text(0.02, 0.02, r'$\theta = {0}$\textdegree'.format(theta_xrf[0]), transform = axs1[0, 0].transAxes, color = 'white')
-# text_2 = axs2[0, 0].text(0.02, 0.02, r'$\theta = {0}$\textdegree'.format(theta_xrf[0]), transform = axs2[0, 0].transAxes, color = 'white')
-# text_3 = axs3[0, 0].text(0.02, 0.02, r'$\theta = {0}$\textdegree'.format(theta_xrf[0]), transform = axs3[2, 0].transAxes, color = 'white')
+text_1 = axs1[0, 0].text(0.02, 0.02, r'$\theta = {0}$\textdegree'.format(theta_xrf[0]), transform = axs1[0, 0].transAxes, color = 'white')
+text_2 = axs2[0, 0].text(0.02, 0.02, r'$\theta = {0}$\textdegree'.format(theta_xrf[0]), transform = axs2[0, 0].transAxes, color = 'white')
+text_3 = axs3[0, 0].text(0.02, 0.02, r'$\theta = {0}$\textdegree'.format(theta_xrf[0]), transform = axs3[2, 0].transAxes, color = 'white')
 # text_5 = axs5[0, 0].text(0.02, 0.02, r'$\theta = {0}$\textdegree'.format(theta_xrf[0]), transform = axs5[0, 0].transAxes, color = 'white')
-text_6 = axs6[2].text(0.02, 0.02, r'$\theta = {0}$\textdegree'.format(theta_xrf[0]), transform = axs6[2].transAxes, color = 'white')
+# text_6 = axs6[2].text(0.02, 0.02, r'$\theta = {0}$\textdegree'.format(theta_xrf[0]), transform = axs6[2].transAxes, color = 'white')
 
 # plt.show()
 
 # theta_frames5 = []
-theta_frames6 = []
+# theta_frames6 = []
 
 # idx = 0
 
@@ -459,9 +465,9 @@ theta_frames6 = []
 
 # fig5.suptitle(r'HXN XRF')
 
-for axs in fig6.axes:
-    axs.axis('off')
-    axs.axvline(x = n_columns//2, color = 'red', linewidth = 2)
+# for axs in fig6.axes:
+#     axs.axis('off')
+#     axs.axvline(x = n_columns//2, color = 'red', linewidth = 2)
 
 # for theta_idx in range(n_theta):
 #     im5_1.set_data(counts_xrf[ref_element_idx_array[0], theta_idx])
@@ -507,86 +513,86 @@ for axs in fig6.axes:
 # axs4.set_ylim(y_min, y_max)
 # axs4.legend(frameon = False, fontsize = 14)
 
-# for fig_idx in im_fig_array:
-#     for axs in fig_idx.axes:
-#         axs.axis('off')
-#         axs.axvline(x = 300, color = 'red', linewidth = 2)
+for fig_idx in im_fig_array:
+    for axs in fig_idx.axes:
+        axs.axis('off')
+        axs.axvline(x = 300, color = 'red', linewidth = 2)
 
-# axs1[0, 0].set_title(r'XRT Conv. $\rightarrow$', fontsize = 14)
-# axs1[1, 0].set_title(r'Raw XRT data $\rightarrow$', fontsize = 14)
-# axs1[2, 0].set_title(r'Raw OD data $\rightarrow$', fontsize = 14)
+axs1[0, 0].set_title(r'XRT Conv. $\rightarrow$', fontsize = 14)
+axs1[1, 0].set_title(r'Raw XRT data $\rightarrow$', fontsize = 14)
+axs1[2, 0].set_title(r'Raw OD data $\rightarrow$', fontsize = 14)
 
-# axs2[0, 0].set_title(r'XRT Conv. $\rightarrow$', fontsize = 14)
-# axs2[1, 0].set_title(r'Raw XRF data $\rightarrow$', fontsize = 14)
+axs2[0, 0].set_title(r'XRT Conv. $\rightarrow$', fontsize = 14)
+axs2[1, 0].set_title(r'Raw XRF data $\rightarrow$', fontsize = 14)
 
-# axs3[0, 0].set_title(r'Raw XRT data $\rightarrow$', fontsize = 14)
-# axs3[1, 0].set_title(r'Raw OD data $\rightarrow$', fontsize = 14)
-# axs3[2, 0].set_title(r'Raw XRF data $\rightarrow$', fontsize = 14)
+axs3[0, 0].set_title(r'Raw XRT data $\rightarrow$', fontsize = 14)
+axs3[1, 0].set_title(r'Raw OD data $\rightarrow$', fontsize = 14)
+axs3[2, 0].set_title(r'Raw XRF data $\rightarrow$', fontsize = 14)
 
-# theta_frames1 = []
-# theta_frames2 = []
-# theta_frames3 = []
+theta_frames1 = []
+theta_frames2 = []
+theta_frames3 = []
 
-fig6.tight_layout()
+# fig6.tight_layout()
 
 for theta_idx in range(n_theta):
-#     threshold = np.percentile(convolution_mag_array[theta_idx], 80)
+    threshold = np.percentile(convolution_mag_array[theta_idx], 80)
         
-#     conv_mask = np.where(convolution_mag_array[theta_idx] >= threshold, convolution_mag_array[theta_idx], 0)
+    conv_mask = np.where(convolution_mag_array[theta_idx] >= threshold, convolution_mag_array[theta_idx], 0)
 
-#     im1_1.set_data(convolution_mag_array[theta_idx])
-#     im1_2.set_data(conv_mask)
-#     im1_3.set_data(cts_copy[theta_idx])
-#     im1_4.set_data(counts_xrt_norm[theta_idx])
-#     im1_5.set_data(opt_dens_copy[theta_idx])
-#     im1_6.set_data(opt_dens[theta_idx])
+    im1_1.set_data(convolution_mag_array[theta_idx])
+    im1_2.set_data(conv_mask)
+    im1_3.set_data(cts_copy[theta_idx])
+    im1_4.set_data(counts_xrt_norm[theta_idx])
+    im1_5.set_data(opt_dens_copy[theta_idx])
+    im1_6.set_data(opt_dens[theta_idx])
 
-#     im2_1.set_data(convolution_mag_array[theta_idx])
-#     im2_2.set_data(conv_mask)
-#     im2_3.set_data(counts_copy[theta_idx])
-#     im2_4.set_data(counts_xrf_norm[theta_idx])
+    im2_1.set_data(convolution_mag_array[theta_idx])
+    im2_2.set_data(conv_mask)
+    im2_3.set_data(counts_copy[theta_idx])
+    im2_4.set_data(counts_xrf_norm[theta_idx])
 
-#     im3_1.set_data(cts_copy[theta_idx])
-#     im3_2.set_data(counts_xrt_norm[theta_idx])
-#     im3_3.set_data(opt_dens_copy[theta_idx])
-#     im3_4.set_data(opt_dens[theta_idx])
-#     im3_5.set_data(counts_copy[theta_idx])
-#     im3_6.set_data(counts_xrf_norm[theta_idx])
+    im3_1.set_data(cts_copy[theta_idx])
+    im3_2.set_data(counts_xrt_norm[theta_idx])
+    im3_3.set_data(opt_dens_copy[theta_idx])
+    im3_4.set_data(opt_dens[theta_idx])
+    im3_5.set_data(counts_copy[theta_idx])
+    im3_6.set_data(counts_xrf_norm[theta_idx])
 
-    im6_1.set_data(counts_xrt_norm[theta_idx])
-    im6_2.set_data(opt_dens[theta_idx])
-    im6_3.set_data(counts_xrf_norm[theta_idx])
+    # im6_1.set_data(counts_xrt_norm[theta_idx])
+    # im6_2.set_data(opt_dens[theta_idx])
+    # im6_3.set_data(counts_xrf_norm[theta_idx])
 
-#     text_1.set_text(r'$\theta = {0}$\textdegree'.format(theta_xrf[theta_idx]))
-#     text_2.set_text(r'$\theta = {0}$\textdegree'.format(theta_xrf[theta_idx]))
-#     text_3.set_text(r'$\theta = {0}$\textdegree'.format(theta_xrf[theta_idx]))
-    text_6.set_text(r'$\theta = {0}$\textdegree'.format(theta_xrf[theta_idx]))
+    text_1.set_text(r'$\theta = {0}$\textdegree'.format(theta_xrf[theta_idx]))
+    text_2.set_text(r'$\theta = {0}$\textdegree'.format(theta_xrf[theta_idx]))
+    text_3.set_text(r'$\theta = {0}$\textdegree'.format(theta_xrf[theta_idx]))
+    # text_6.set_text(r'$\theta = {0}$\textdegree'.format(theta_xrf[theta_idx]))
 
-#     fig1.canvas.draw() # Rasterize and store Matplotlib figure contents in special buffer
-#     fig2.canvas.draw()
-#     fig3.canvas.draw()
-    fig6.canvas.draw()
+    fig1.canvas.draw() # Rasterize and store Matplotlib figure contents in special buffer
+    fig2.canvas.draw()
+    fig3.canvas.draw()
+    # fig6.canvas.draw()
 
-#     frame1 = np.array(fig1.canvas.renderer.buffer_rgba())[:, :, :3] # Rasterize the contents in the stored buffer, access 
-#     frame2 = np.array(fig2.canvas.renderer.buffer_rgba())[:, :, :3]
-#     frame3 = np.array(fig3.canvas.renderer.buffer_rgba())[:, :, :3]
-    frame6 = np.array(fig6.canvas.renderer.buffer_rgba())[:, :, :3]
+    frame1 = np.array(fig1.canvas.renderer.buffer_rgba())[:, :, :3] # Rasterize the contents in the stored buffer, access 
+    frame2 = np.array(fig2.canvas.renderer.buffer_rgba())[:, :, :3]
+    frame3 = np.array(fig3.canvas.renderer.buffer_rgba())[:, :, :3]
+    # frame6 = np.array(fig6.canvas.renderer.buffer_rgba())[:, :, :3]
 
-#     theta_frames1.append(frame1)
-#     theta_frames2.append(frame2)
-#     theta_frames3.append(frame3)
-    theta_frames6.append(frame6)
+    theta_frames1.append(frame1)
+    theta_frames2.append(frame2)
+    theta_frames3.append(frame3)
+    # theta_frames6.append(frame6)
 
-# plt.close(fig1)
-# plt.close(fig2)
-# plt.close(fig3)
+plt.close(fig1)
+plt.close(fig2)
+plt.close(fig3)
 # plt.close(fig5)
-plt.close(fig6)
+# plt.close(fig6)
 
-# iio2.mimsave(os.path.join(output_dir, 'xrt_norm.gif'), theta_frames1, fps = fps)
-# iio2.mimsave(os.path.join(output_dir, 'xrf_norm.gif'), theta_frames2, fps = fps)
-# iio2.mimsave(os.path.join(output_dir, 'xrt_xrf_norm.gif'), theta_frames3, fps = fps)
+iio2.mimsave(os.path.join(output_dir, 'xrt_norm.gif'), theta_frames1, fps = fps)
+iio2.mimsave(os.path.join(output_dir, 'xrf_norm.gif'), theta_frames2, fps = fps)
+iio2.mimsave(os.path.join(output_dir, 'xrt_xrf_norm.gif'), theta_frames3, fps = fps)
 # iio2.mimsave(os.path.join(output_dir, 'init_hxn_xrf.gif'), theta_frames5, fps = fps)
-iio2.mimsave(os.path.join(output_dir, '2_ide_init_xrt_opt_dens_xrf.gif'), theta_frames6, fps = fps)
+# iio2.mimsave(os.path.join(output_dir, '2_ide_init_xrt_opt_dens_xrf.gif'), theta_frames6, fps = fps)
 
 # plt.show()
