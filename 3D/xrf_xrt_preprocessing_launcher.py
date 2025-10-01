@@ -18,7 +18,7 @@ preprocessing_inputs = {'synchrotron': 'nsls-ii',
                                                          ['Cu', 'K']]),
                         'areal_mass_dens_mass_calib_elements_g_cm2': np.array([1.931, 0.504, 0.284])*1e-6,
                         'iter_reproj_enabled': True,
-                        'n_iterative_reproj': 10,
+                        'n_iter_iter_reproj': 10,
                         'return_aux_data': True}
 
 if __name__ == '__main__':

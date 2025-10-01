@@ -397,7 +397,7 @@ def preprocess_xrf_xrt_data(synchrotron,
             
             opt_dens = -np.log(counts_xrt/I0_cts)
             
-            if iterative_reproj_enabled:
+            if iter_reproj_enabled:
                 if return_aux_data:
                     aligned_proj_final_xrt, \
                     aligned_proj_final_opt_dens, \
