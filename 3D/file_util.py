@@ -553,7 +553,12 @@ def create_h5_aligned_aggregate_xrf_xrt(elements_xrf,
     return
 
 def extract_csv_preprocessing_input_params(file_path):
-    input_params_csv = pd.read_csv(file_path, delimiter = ':', header = None, names = ['input_param', 'value'])
+    input_params_csv = pd.read_csv(file_path, 
+                                   delimiter = ':', 
+                                   header = None, 
+                                   names = ['input_param', 'value'],
+                                   dtype = str,
+                                   keep_default_na = False)
 
     input_params = input_params_csv['input_param']
     values = input_params_csv['value'].str.strip().replace('', None) # Extract values while setting non-existent values to None
