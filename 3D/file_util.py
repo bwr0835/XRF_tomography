@@ -559,6 +559,8 @@ def extract_csv_preprocessing_input_params(file_path):
     values = input_params_csv['value'].str.strip().replace('', None) # Extract values while setting non-existent values to None
     
     for idx, val in enumerate(values): # Convert strings supposed to be numberic to floats or ints
+        print(val)
+        
         if val.lower() == 'true' or val.lower() == 'false':
             values[idx] = (val == 'true') # Convert 'true' and 'false' strings to corresponding Boolean values
         
