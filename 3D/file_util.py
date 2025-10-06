@@ -558,16 +558,19 @@ def extract_csv_preprocessing_input_params(file_path):
     input_params = input_params_csv['input_param']
     values = input_params_csv['value'].str.strip().replace('', None) # Extract values while setting non-existent values to None
     
-    for idx, val in enumerate(values): # Convert strings supposed to be numberic to floats or ints
-        try:
-            values[idx] = int(val)
+    # for idx, val in enumerate(values): # Convert strings supposed to be numberic to floats or ints
+    #     if val.lower() == 'true' or val.lower() == 'false':
+    #         values[idx] = 
         
-        except:
-            try:
-                values[idx] = float(val)
+    #     try:
+    #         values[idx] = int(val)
+        
+    #     except:
+    #         try:
+    #             values[idx] = float(val)
             
-            except:
-                continue
+    #         except:
+    #             continue
     
     input_param_dict = dict(zip(input_params, values))
 
