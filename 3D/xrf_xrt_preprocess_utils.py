@@ -23,9 +23,7 @@ def pad_col_row(array, dataset_type):
 
     n_elements, n_theta, n_slices, n_columns = array.shape
     
-    # Create a new array with the expected final shape
-    new_shape = (n_elements, n_theta, n_slices + 1, n_columns + 1)
-    result_array = np.zeros(new_shape)
+    padded_array = np.zeros((n_elements, n_theta, n_slices + 1, n_columns + 1))
 
     if dataset_type == 'xrt':
         for element_idx in range(n_elements):
@@ -34,15 +32,11 @@ def pad_col_row(array, dataset_type):
 
                 padded_row = array_avg*np.ones(n_columns)
                 
-                # Add row first
                 temp_array = np.vstack((array[element_idx, theta_idx], padded_row))
 
-                # After adding row, the shape is now (n_slices + 1, n_columns)
-                # Get the current shape after row addition
-                current_shape = temp_array.shape
-                padded_column = array_avg*np.ones((current_shape[0], 1))
+                padded_column = array_avg*np.ones((temp_array.shape[0], 1))
 
-                result_array[element_idx, theta_idx] = np.hstack((temp_array, padded_column))
+                padded_array[element_idx, theta_idx] = np.hstack((temp_array, padded_column))
     
     elif dataset_type == 'xrf':
         for element_idx in range(n_elements):
@@ -51,22 +45,18 @@ def pad_col_row(array, dataset_type):
 
                 padded_row = array_avg*np.zeros(n_columns)
                 
-                # Add row first
                 temp_array = np.vstack((array[element_idx, theta_idx], padded_row))
 
-                # After adding row, the shape is now (n_slices + 1, n_columns)
-                # Get the current shape after row addition
-                current_shape = temp_array.shape
-                padded_column = array_avg*np.zeros((current_shape[0], 1))
+                padded_column = array_avg*np.zeros((temp_array.shape[0], 1))
 
-                result_array[element_idx, theta_idx] = np.hstack((temp_array, padded_column))
+                padded_array[element_idx, theta_idx] = np.hstack((temp_array, padded_column))
 
     else:
         print('Error: Invalid dataset type. Exiting program...')
 
         sys.exit()
 
-    return result_array
+    return padded_array
 
 def pad_col(array, dataset_type):
     if dataset_type == '' or array.ndim != 4:
@@ -256,7 +246,12 @@ def edge_gauss_filter(image, sigma, alpha, nx, ny):
     
     return (image + dc_value)
 
-def joint_fluct_norm(xrt_array, xrf_array, sigma_1 = 5, alpha = 10, sigma_2 = 10, return_conv_mag_array = False):
+def joint_fluct_norm(xrt_array,
+                     xrf_array,
+                     sigma_1 = 5,
+                     alpha = 10,
+                     sigma_2 = 10,
+                     return_conv_mag_array = False):
     if xrt_array.ndim != 3 and xrf_array != 3:
         print('Error: Number of XRT and/or XRF array dimesions ≠ 4. Exiting program...')
 

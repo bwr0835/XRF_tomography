@@ -191,7 +191,7 @@ def reconstruct_jXRFT_tomography(
     #### pick the probe photon counts calibrated for all optics and detectors
     if use_std_calibation:
         probe_cts = calibrate_incident_probe_intensity(std_path, f_std, fitting_method, std_element_lines_roi, density_std_elements, probe_energy)
-    
+        # TODO Remove since we can extract incident flux from normalization of incident flux fluctuations or photodiode or XRT measurements
     else:
         probe_cts = probe_intensity
 

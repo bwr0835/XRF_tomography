@@ -293,14 +293,14 @@ def edge_gauss_filter(image, sigma, alpha, nx, ny):
 
 # file_path_xrt = '/Users/bwr0835/Documents/2_ide_aggregate_xrt.h5'
 # file_path_xrf = '/Users/bwr0835/Documents/2_ide_aggregate_xrf.h5'
-file_path_xrt = '/Users/bwr0835/Documents/hxn_aggregate_xrf.h5'
+file_path_xrt = '/Users/bwr0835/Documents/hxn_aggregate_xrt.h5'
 file_path_xrf = '/Users/bwr0835/Documents/hxn_aggregate_xrf.h5'
 
 output_dir = '/Users/bwr0835/Documents'
 
 print('XRF')
 
-elements_xrf, counts_xrf, theta_xrf, _, _ = futil.extract_h5_aggregate_xrf_data(file_path_xrt)
+elements_xrf, counts_xrf, theta_xrf, _, _ = futil.extract_h5_aggregate_xrf_data(file_path_xrf)
 
 print('XRT')
 

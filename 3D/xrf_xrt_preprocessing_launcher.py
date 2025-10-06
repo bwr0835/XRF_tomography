@@ -1,27 +1,40 @@
-import numpy as np
+import os, sys, file_util as futil
 
 from xrf_xrt_preprocessing_control_file import preprocess_xrf_xrt_data
 
-preprocessing_inputs = {'synchrotron': 'nsls-ii',
-                        'synchrotron_beamline': 'hxn',
-                        'create_aggregate_xrf_xrt_files_enabled': True,
+preprocessing_inputs = {'synchrotron': None,
+                        'synchrotron_beamline': None,
+                        'create_aggregate_xrf_xrt_files_enabled': None,
                         'aggregate_xrf_file_path': None,
                         'aggregate_xrt_file_path': None,
-                        'pre_existing_align_norm_mass_calib_file_enabled': False,
-                        'pre_existing_align_norm_mass_calib_file_path': None,
-                        'norm_enabled': True,
-                        'norm_method': 'incident_intensity_masking',
+                        'pre_existing_align_norm_file_enabled': None,
+                        'pre_existing_align_norm_file_path': None,
+                        'norm_enabled': None,
+                        'norm_method': None,
                         'I0_cts_per_s': None,
                         't_dwell_s': None,
-                        'mass_calib_enabled': False,
-                        'mass_calib_filepath': None,
-                        'mass_calib_elements': np.array([['Ca', 'K'],
-                                                         ['Fe', 'K'],
-                                                         ['Cu', 'K']]),
-                        'areal_mass_dens_mass_calib_elements_g_cm2': np.array([1.931, 0.504, 0.284])*1e-6,
-                        'iter_reproj_enabled': True,
-                        'n_iter_iter_reproj': 10,
-                        'return_aux_data': True}
+                        'n_iter_iter_reproj': None,
+                        'return_aux_data': None,
+                        'output_dir_path': None}
 
 if __name__ == '__main__':
+    if len(sys.argv) == 1:
+        print('Error: Input file argument required. Exiting program...')
+
+        sys.exit()
+    
+    if len(sys.argv) > 2:
+        print('Error: More than one input argument detected. Exiting program...')
+
+        sys.exit()
+    
+    input_param_file_path = sys.argv[1]
+
+    if not os.path.isfile(input_param_file_path):
+        print('Error: File does not exist. Exiting program...')
+
+        sys.exit()
+
+    preprocessing_inputs = futil.extract_csv_preprocessing_input_params(input_param_file_path)
+
     preprocess_xrf_xrt_data(**preprocessing_inputs)

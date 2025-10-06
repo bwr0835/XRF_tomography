@@ -228,8 +228,6 @@ def extract_h5_xrt_data(file_path, synchrotron, **kwargs):
         cts_stxm = diffract_map_intensity.sum(axis = (2, 1)) # Sum over axis = 2, then sum over axis = 1
         cts_stxm = cts_stxm.reshape((ny, nx))
 
-        # cts_stxm /= np.max(cts_stxm) # TODO
-# ----------------------------------------------------------------------------------------------
         elements = ['empty', 'us_ic', 'xrt_sig', 'empty']
         n_elements = len(elements)
         
@@ -323,13 +321,10 @@ def create_aggregate_xrf_h5(file_path_array, output_h5_file, synchrotron, **kwar
             exchange.attrs['raw_spectrum_fitting_software'] = 'PyMCA'
             exchange.attrs['raw_spectrum_fitting_method'] = 'NNLS'
 
-    if synchrotron == 'nsls-ii' and kwargs.get('us_ic_enabled') == True:
-        # if np.any(us_ic_array):
-            # print(us_ic_array_sorted)
-
-        # sys.exit()
-        
+    if synchrotron == 'nsls-ii' and kwargs.get('us_ic_enabled') == True:   
         return us_ic_array_sorted
+    
+    return
 
 def create_aggregate_xrt_h5(file_path_array, output_h5_file, synchrotron, **kwargs):
     n_theta = len(file_path_array)
@@ -432,10 +427,14 @@ def extract_h5_aggregate_xrf_data(file_path, **kwargs):
         counts_h5 = h5['exchange/data']
         theta_h5 = h5['exchange/theta']
         elements_h5 = h5['exchange/elements']
-        filenames_h5 = h5['filenames']
-    
-        dataset_type_h5 = counts_h5.attrs['dataset_type']
-        raw_spectrum_fitting_method_h5 = counts_h5.attrs['raw_spectrum_fitting_method']
+
+        if kwargs.get('filename_array') == True:
+            filenames_h5 = h5['filenames']
+
+            filenames = filenames_h5[()]
+
+        dataset_type = counts_h5.attrs['dataset_type']
+        raw_spectrum_fitting_method = h5['exchange'].attrs['raw_spectrum_fitting_method']
     
     except:
         print('Error: Incompatible HDF5 file structure. Exiting program...')
@@ -445,23 +444,19 @@ def extract_h5_aggregate_xrf_data(file_path, **kwargs):
     counts = counts_h5[()]
     theta = theta_h5[()]
     elements = elements_h5[()]
-    dataset_type = dataset_type_h5[()]
-    raw_spectrum_fitting_method = raw_spectrum_fitting_method_h5[()]
-    filenames = filenames_h5[()]
-
+        
     h5.close()
 
     elements_string = [element.decode() for element in elements]
-    filename_array = [filename.decode() for filename in filenames]
     
     if kwargs.get('filename_array') == True:
-        return elements_string, counts, theta, raw_spectrum_fitting_method.decode(), dataset_type.decode(), filename_array
+        filename_array = [filename.decode() for filename in filenames]
+
+        return elements_string, counts, theta, raw_spectrum_fitting_method, dataset_type, filename_array
     
-    return elements_string, counts, theta, raw_spectrum_fitting_method.decode(), dataset_type.decode()
+    return elements_string, counts, theta, raw_spectrum_fitting_method, dataset_type
 
 def extract_h5_aggregate_xrt_data(file_path, **kwargs):
-
-
     try:
         h5 = h5py.File(file_path, 'r')
     
@@ -474,10 +469,14 @@ def extract_h5_aggregate_xrt_data(file_path, **kwargs):
         counts_h5 = h5['exchange/data']
         theta_h5 = h5['exchange/theta']
         elements_h5 = h5['exchange/elements']
-        filenames_h5 = h5['filenames']
 
-        dataset_type_h5 = counts_h5.attrs['dataset_type']
-        us_ic_scaler_name_h5 = counts_h5.attrs['us_ic_scaler_name']
+        if kwargs.get('filename_array') == True:
+            filenames_h5 = h5['filenames']
+
+            filenames = filenames_h5[()]
+
+        dataset_type = counts_h5.attrs['dataset_type']
+        us_ic_scaler_name = counts_h5.attrs['us_ic_scaler_name']
     
     except:
         print('Error: Incompatible HDF file structure. Exiting program...')
@@ -487,19 +486,17 @@ def extract_h5_aggregate_xrt_data(file_path, **kwargs):
     counts = counts_h5[()]
     theta = theta_h5[()]
     elements = elements_h5[()]
-    us_ic_scaler_name = us_ic_scaler_name_h5[()]
-    dataset_type = dataset_type_h5[()]
-    filenames = filenames_h5[()]
-
+    
     h5.close()
 
     elements_string = [element.decode() for element in elements]
-    filename_array = [filename.decode() for filename in filenames]
 
     if kwargs.get('filename_array') == True:
-        return elements_string, counts, theta, us_ic_scaler_name.decode(), dataset_type.decode(), filename_array
+        filename_array = [filename.decode() for filename in filenames]
+
+        return elements_string, counts, theta, us_ic_scaler_name, dataset_type, filename_array
     
-    return elements_string, counts, theta, us_ic_scaler_name.decode(), dataset_type.decode()
+    return elements_string, counts, theta, us_ic_scaler_name, dataset_type
 
 def extract_norm_mass_calibration_net_shift_data(file_path, theta_array):
     try:
@@ -527,9 +524,84 @@ def extract_norm_mass_calibration_net_shift_data(file_path, theta_array):
     net_x_shifts = norm_mass_calibration_net_shift_data['net_x_shift'].to_numpy().astype(float)
     net_y_shifts = norm_mass_calibration_net_shift_data['net_y_shift'].to_numpy().astype(float)
     I0_norm = norm_mass_calibration_net_shift_data['I0_norm'].to_numpy()[0].astype(float)
-    I0_calibrated = norm_mass_calibration_net_shift_data['I0_calibrated'].to_numpy()[0].astype(float)
 
-    return norm_array, net_x_shifts, net_y_shifts, I0_norm, I0_calibrated
+    return norm_array, net_x_shifts, net_y_shifts, I0_norm
 
+def create_h5_aligned_aggregate_xrf_xrt(elements_xrf, 
+                                        elements_xrt,
+                                        xrf_array, 
+                                        xrt_array, 
+                                        theta_array, 
+                                        output_dir_path, 
+                                        output_subdir_name):
 
+    elements_xrt[3] = 'opt_dens'
     
+    os.makedirs(os.path.join(output_dir_path, output_subdir_name), exist_ok = True)
+    
+    output_file_path = os.path.join(output_dir_path, output_subdir_name, 'aligned_aggregate_xrf_xrt.h5')
+
+    with h5py.File(output_file_path, 'w') as f:
+        exchange = f.create_group('exchange')
+
+        exchange.create_dataset('element_xrf', data = elements_xrf)
+        exchange.create_dataset('element_xrt', data = elements_xrt)
+        exchange.create_dataset('data_xrf', data = xrf_array)
+        exchange.create_dataset('data_xrt', data = xrt_array)
+        exchange.create_dataset('theta', data = theta_array)
+    
+    return
+
+def extract_csv_preprocessing_input_params(file_path):
+    input_params_csv = pd.read_csv(file_path, delimiter = ':', header = None, names = ['input_param: value'])
+
+    input_params = input_params_csv['input_param']
+    values = input_params_csv['value'].str.strip().replace('', None) # Extract values while setting non-existent values to None
+    
+    for idx, val in enumerate(values): # Convert strings supposed to be numberic to floats or ints
+        try:
+            values[idx] = int(val)
+        
+        except:
+            try:
+                values[idx] = float(val)
+            
+            except:
+                continue
+    
+    input_param_dict = dict(zip(input_params, values))
+
+    for key, val in input_param_dict.items():
+        print(f'{key}: {val} (dtype = {type(val).__name__})')
+
+    sys.exit()
+    # return input_param_dict
+
+def create_aux_opt_dens_data_npy(dir_path,
+                                 aligned_exp_proj_array,
+                                 recon_array,
+                                 synth_proj_array,
+                                 pcc_2d_array,
+                                 dx_array,
+                                 dy_array,
+                                 net_x_shifts_pcc_array,
+                                 net_y_shifts_pcc_array):
+    
+    subdir_path = os.path.join(dir_path, 'aux_data')
+
+    os.makedirs(subdir_path, exist_ok = True)
+
+    np.save(os.path.join(subdir_path, 'aligned_exp_proj_iter_array.npy'), aligned_exp_proj_array)
+    np.save(os.path.join(subdir_path, 'recon_iter_array.npy'), recon_array)
+    np.save(os.path.join(subdir_path, 'synth_proj_iter_array.npy'), synth_proj_array)
+    np.save(os.path.join(subdir_path, 'pcc_2d_iter_array.npy'), pcc_2d_array)
+    np.save(os.path.join(subdir_path, 'dx_iter_array.npy'), dx_array)
+    np.save(os.path.join(subdir_path, 'dy_iter_array.npy'), dy_array)
+    np.save(os.path.join(subdir_path, 'net_x_shifts_pcc_iter_array.npy'), net_x_shifts_pcc_array)
+    np.save(os.path.join(subdir_path, 'net_y_shifts_pcc_iter_array.npy'), net_y_shifts_pcc_array)
+
+    return
+
+def create_intermed_aggregate_xrf_xrt_h5(file_path,
+                                         f):
+    pass

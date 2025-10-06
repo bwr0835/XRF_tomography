@@ -42,14 +42,14 @@ def find_theta_combos(theta_array_deg, dtheta):
 
     return valid_theta_idx_pairs
 
-def phase_xcorr(recon_proj, exp_proj, upsample_factor, return_pccc_2d = False):
+def phase_xcorr(recon_proj, exp_proj, upsample_factor, return_pcc_2d = False):
     n_columns = recon_proj.shape[1]
     n_slices = recon_proj.shape[0]
 
     recon_proj_filtered = ppu.edge_gauss_filter(recon_proj, sigma = 5, alpha = 10, nx = n_columns, ny = n_slices)
     exp_proj_filtered = ppu.edge_gauss_filter(exp_proj, sigma = 5, alpha = 10, nx = n_columns, ny = n_slices)
     
-    if return_pccc_2d:
+    if return_pcc_2d:
         recon_proj_fft = fft.fft2(recon_proj_filtered)
         orig_proj_fft = fft.fft2(exp_proj_filtered)
         
@@ -322,7 +322,7 @@ def iter_reproj(xrt_proj_img_array,
                 dy, dx = phase_xcorr(synth_proj[theta_idx], aligned_proj[theta_idx], upsample_factor = 100)
             
             else:
-                dy, dx, pcc_2d = phase_xcorr(synth_proj[theta_idx], aligned_proj[theta_idx], upsample_factor = 100, return_pccc_2d = True)
+                dy, dx, pcc_2d = phase_xcorr(synth_proj[theta_idx], aligned_proj[theta_idx], upsample_factor = 100, return_pcc_2d = True)
 
                 pcc_2d_array.append(pcc_2d)
 

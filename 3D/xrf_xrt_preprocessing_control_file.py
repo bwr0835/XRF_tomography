@@ -13,19 +13,15 @@ def preprocess_xrf_xrt_data(synchrotron,
                             create_aggregate_xrf_xrt_files_enabled,
                             aggregate_xrf_file_path,
                             aggregate_xrt_file_path,
-                            pre_existing_align_norm_mass_calib_file_enabled,
-                            pre_existing_align_norm_mass_calib_file_path,
+                            pre_existing_align_norm_file_enabled,
+                            pre_existing_align_norm_file_path,
                             norm_enabled,
                             norm_method,
                             I0_cts_per_s,
                             t_dwell_s,
-                            mass_calib_enabled,
-                            mass_calib_filepath,
-                            mass_calib_elements,
-                            areal_mass_dens_mass_calib_elements_g_cm2,
-                            iter_reproj_enabled,
                             n_iter_iter_reproj,
-                            return_aux_data):
+                            return_aux_data,
+                            output_dir_path):
 
     available_synchrotrons = ['aps', 'nsls-ii']
     
@@ -369,17 +365,21 @@ def preprocess_xrf_xrt_data(synchrotron,
 
                 n_columns += 1
 
-        if pre_existing_align_norm_mass_calib_file_enabled:
+        counts_xrt_sig_idx = elements_xrt.index('xrt_sig')
+        counts_xrt_sig = counts_xrt[counts_xrt_sig_idx]
+
+        if pre_existing_align_norm_file_enabled:
             norm_array, \
             net_x_shift_array, \
             net_y_shift_array, \
-            I0_norm_cts, \
-            I0_calibrated_cts = futil.extract_norm_mass_calibration_net_shift_data(pre_existing_align_norm_mass_calib_file_path, theta)
+            I0_norm_cts = futil.extract_norm_mass_calibration_net_shift_data(pre_existing_align_norm_file_path, theta)
+
+            pre_existing_align_norm_dir_path = os.path.dirname(pre_existing_align_norm_file_path)
 
             print('Applying pre-existing per-projection normalizations to XRF, XRT arrays...')
 
             counts_xrf *= norm_array
-            counts_xrt *= norm_array
+            counts_xrt_sig *= norm_array
 
             print('Calculating optical densities...')
 
@@ -394,43 +394,69 @@ def preprocess_xrf_xrt_data(synchrotron,
             
             else:
                 I0_cts = I0_norm_cts
-            
-            opt_dens = -np.log(counts_xrt/I0_cts)
-            
-            if iter_reproj_enabled:
-                if return_aux_data:
-                    aligned_proj_final_xrt, \
-                    aligned_proj_final_opt_dens, \
-                    aligned_proj_final_xrf, \
-                    net_x_shifts_pcc_final, \
-                    net_y_shifts_pcc_final, \
-                    aligned_exp_proj_array, \
-                    synth_proj_array, \
-                    pcc_2d_array, \
-                    recon_array, \
-                    net_x_shifts_pcc_new, \
-                    net_y_shifts_pcc_new, \
-                    dx_array_new, \
-                    dy_array_new = irprj(counts_xrt,
-                                         opt_dens,
-                                         counts_xrf,
-                                         theta,
-                                         I0_cts,
-                                         n_iter_iter_reproj,
-                                         return_aux_data = True)
 
-                else:
-                    aligned_proj_final_xrt, \
-                    aligned_proj_final_opt_dens, \
-                    aligned_proj_final_xrf, \
-                    net_x_shifts_pcc_final, \
-                    net_y_shifts_pcc_final = irprj(counts_xrt,
-                                                   opt_dens,
-                                                   counts_xrf,
-                                                   theta,
-                                                   I0_cts,
-                                                   n_iter_iter_reproj)
+            opt_dens = -np.log(counts_xrt_sig/I0_cts)
 
+            if return_aux_data:
+                aligned_proj_final_xrt_sig, \
+                aligned_proj_final_opt_dens, \
+                aligned_proj_final_xrf, \
+                net_x_shifts_pcc_final, \
+                net_y_shifts_pcc_final, \
+                aligned_exp_proj_array, \
+                synth_proj_array, \
+                pcc_2d_array, \
+                recon_array, \
+                net_x_shifts_pcc_array, \
+                net_y_shifts_pcc_array, \
+                dx_pcc_array, \
+                dy_pcc_array = irprj(counts_xrt_sig,
+                                    opt_dens,
+                                    counts_xrf,
+                                    theta,
+                                    I0_cts,
+                                    n_iter_iter_reproj,
+                                    return_aux_data = True)
+                    
+                print('Writing the following auxiliary, per-iteration data to NumPy (.npy) files (NOTE: Python is needed to view these!):')
+                print('     -Experimental optical density projection data')
+                print('     -Reconstructed optical density data')
+                print('     -Reprojected optical density data')
+                print('     -2D phase cross-correlation data')
+                print('     -Incremental x shifts')
+                print('     -Incremental y shifts')
+                print('     -Net x shifts')
+                print('     -Net y shifts')
+
+                futil.create_aux_opt_dens_data_npy(output_dir_path,
+                                                   aligned_exp_proj_array,
+                                                   recon_array,
+                                                   synth_proj_array,
+                                                   pcc_2d_array,
+                                                   dx_pcc_array,
+                                                   dy_pcc_array,
+                                                   net_x_shifts_pcc_array,
+                                                   net_y_shifts_pcc_array)                              
+                    
+            else:
+                aligned_proj_final_xrt_sig, \
+                aligned_proj_final_opt_dens, \
+                aligned_proj_final_xrf, \
+                net_x_shifts_pcc_final, \
+                net_y_shifts_pcc_final = irprj(counts_xrt_sig,
+                                               opt_dens,
+                                               counts_xrf,
+                                               theta,
+                                               I0_cts,
+                                               n_iter_iter_reproj)
+            
+            print('Writing final aligned XRF, XRT, and optical density projection data to HDF5 file...')
+            
+            futil.create_h5_intermed_aggregate_xrf_xrt(aligned_proj_final_xrf, 
+                                                       aligned_proj_final_xrt_sig, 
+                                                       aligned_proj_final_opt_dens, 
+                                                       theta)
+                
         else:
             if norm_enabled:
                 if norm_method == 'per_proj_mask':
@@ -451,7 +477,3 @@ def preprocess_xrf_xrt_data(synchrotron,
                     sys.exit()
                 
                 opt_dens = -np.log10(counts_xrt*t_dwell_s/I0_cts_per_s)
-
-        if mass_calib_enabled:
-            if synchrotron == 'aps':
-                pass
