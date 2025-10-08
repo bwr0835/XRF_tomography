@@ -1,11 +1,53 @@
+from numpy.core.defchararray import endswith
 import numpy as np, \
        pandas as pd, \
+       tkinter as tk, \
        csv, \
        h5py, \
        os, \
        sys
 
+from tkinter import filedialog as fd
+
+def extract_h5_xrf_xrt_data_file_lists_tk(synchrotron):
+    root = tk.Tk()
+    
+    root.withdraw()
+    
+    if synchrotron == 'aps':
+        xrf_file_array = fd.askopenfilenames(parent = root, title = "Choose XRF files to aggregate.", filetypes = [('HDF5 files', '*.h5')])
+
+        if xrt_file_array == '':
+            print('Error: XRF/XRT filename array empty. Exiting program...')
+
+            sys.exit()
+        
+        xrt_file_array = xrf_file_array.copy()
+
+    else:
+        xrf_file_array = fd.askopenfilenames(parent = root, title = "Choose XRF files to aggregate.", filetypes = [('HDF5 files', '*.h5')])
+        xrt_file_array = fd.askopenfilenames(parent = root, title = "Choose XRT files to aggregate.", filetypes = [('HDF5 files', '*.h5')])
+
+        if xrf_file_array == '' or xrt_file_array == '':
+            print('Error: XRF and/or XRT filename array empty. Exiting program...')
+            
+        sys.exit()
+
+    root.destroy()
+
+    return xrf_file_array, xrt_file_array
+
 def extract_h5_xrf_data(file_path, synchrotron, **kwargs):
+    if not os.path.isfile(file_path):
+        print('Error: HDF5 file path does not exist. Exiting program...')
+
+        sys.exit()
+
+    if not file_path.endswith('.h5'):
+        print('Error: File must be HDF5. Exiting program...')
+
+        sys.exit()
+    
     h5 = h5py.File(file_path, 'r')
     
     if synchrotron == 'aps':
@@ -147,6 +189,16 @@ def extract_h5_xrf_data(file_path, synchrotron, **kwargs):
             return elements_string, counts, theta, nx, ny, dx_cm, dy_cm
 
 def extract_h5_xrt_data(file_path, synchrotron, **kwargs):
+    if not os.path.isfile(file_path):
+        print('Error: HDF5 file path does not exist. Exiting program...')
+
+        sys.exit()
+
+    if not file_path.endswith('.h5'):
+        print('Error: File must be HDF5. Exiting program...')
+
+        sys.exit()
+    
     h5 = h5py.File(file_path, 'r')
 
     if synchrotron == 'aps':
@@ -416,13 +468,17 @@ def create_aggregate_xrt_h5(file_path_array, output_h5_file, synchrotron, **kwar
             exchange['data'].attrs['xrt_signal_name'] = 'stxm'
 
 def extract_h5_aggregate_xrf_data(file_path, **kwargs):
-    try:
-        h5 = h5py.File(file_path, 'r')
-    
-    except:
-        print('Error: File does not exist. Exiting program...')
+    if not os.path.isfile(file_path):
+        print('Error: HDF5 file path does not exist. Exiting program...')
 
         sys.exit()
+
+    if not file_path.endswith('.h5'):
+        print('Error: File must be HDF5. Exiting program...')
+
+        sys.exit()
+    
+    h5 = h5py.File(file_path, 'r')
     
     try:
         counts_h5 = h5['exchange/data']
@@ -458,13 +514,17 @@ def extract_h5_aggregate_xrf_data(file_path, **kwargs):
     return elements_string, counts, theta, raw_spectrum_fitting_method, dataset_type
 
 def extract_h5_aggregate_xrt_data(file_path, **kwargs):
-    try:
-        h5 = h5py.File(file_path, 'r')
-    
-    except:
-        print('Error: File does not exist. Exiting program...')
+    if not os.path.isfile(file_path):
+        print('Error: HDF5 file path does not exist. Exiting program...')
 
         sys.exit()
+
+    if not file_path.endswith('.h5'):
+        print('Error: File must be HDF5. Exiting program...')
+
+        sys.exit()
+    
+    h5 = h5py.File(file_path, 'r')
     
     try:
         counts_h5 = h5['exchange/data']
@@ -500,13 +560,17 @@ def extract_h5_aggregate_xrt_data(file_path, **kwargs):
     return elements_string, counts, theta, us_ic_scaler_name, dataset_type
 
 def extract_csv_norm_net_shift_data(file_path, theta_array):
-    try:
-        norm_mass_calibration_net_shift_data = pd.read_csv(file_path)
-    
-    except:
-        print('Error: File does not exist or incorrect file extension. Exiting program...')
+    if not os.path.isfile(file_path):
+        print('Error: CSV file path does not exist. Exiting program...')
 
         sys.exit()
+
+    if not file_path.endswith('.csv'):
+        print('Error: File must be CSV. Exiting program...')
+
+        sys.exit()
+
+    norm_mass_calibration_net_shift_data = pd.read_csv(file_path)
     
     try:
         thetas = norm_mass_calibration_net_shift_data['theta'].to_numpy().astype(float)
@@ -562,7 +626,17 @@ def create_h5_aligned_aggregate_xrf_xrt(elements_xrf,
     return
 
 def extract_csv_preprocessing_input_params(file_path):
-    input_params_csv = pd.read_csv(file_path, 
+    if not os.path.isfile(file_path):
+        print('Error: CSV file path does not exist. Exiting program...')
+
+        sys.exit()
+
+    if not file_path.endswith('.csv'):
+        print('Error: CSV file required for preprocessing input parameters. Exiting program...')
+
+        sys.exit()
+
+    input_params_csv = pd.read_csv(file_path,
                                    delimiter = ':', 
                                    header = None, 
                                    names = ['input_param', 'value'],
@@ -599,6 +673,35 @@ def extract_csv_preprocessing_input_params(file_path):
     
     input_param_dict = dict(zip(input_params, values)) # zip() creates tuples; dict() converts the tuples to a dictionary
 
+    available_synchrotrons = ['aps', 'nsls-ii']
+    
+    if input_param_dict['synchrotron'] is None or input_param_dict['synchrotron_beamline'] is None:
+        print('Error: Synchrotron and/or synchrotron beamline fields empty. Exiting program...')
+
+        sys.exit()
+    
+    synchrotron = input_param_dict['synchrotron'].lower()
+
+    if synchrotron not in available_synchrotrons:
+        print('Error: Synchrotron unavailable. Exiting program...')
+
+        sys.exit()
+    
+    bool_params_partial = ['create_aggregate_xrf_xrt_files_enabled',
+                           'pre_existing_aggregate_xrf_xrt_file_lists_enabled', 
+                           'pre_existing_align_norm_file_enabled',
+                           'norm_enabled',
+                           'realignment_enabled']
+
+    if not any(isinstance(val, bool) for val in input_param_dict[bool_params_partial]):
+        print('Error: \'create_aggregate_xrf_xrt_files_enabled\', \
+                      \'pre_existing_aggregate_xrf_xrt_file_lists_enabled\', \
+                      \'pre_existing_align_norm_file_enabled\', \
+                      \'norm_enabled\', \
+                      and \'realignment_enabled\' must be set to True or False. Exiting program...')
+
+        sys.exit()
+
     return input_param_dict
 
 def create_csv_file_list(file_path_array,
@@ -624,11 +727,48 @@ def create_csv_file_list(file_path_array,
     
     return
 
-def extract_csv_file_list(file_path):
-    with open(file_path, newline = '') as f:
-        filename_array = [filename.strip() for filename in f]
+def extract_csv_xrf_xrt_data_file_lists(file_path_1, file_path_2 = None, **kwargs):
+    if not os.path.isfile(file_path_1):
+        print('Error: CSV file path does not exist. Exiting program...')
+
+        sys.exit()
     
-    return filename_array
+    with open(file_path_1, newline = '') as f:
+        filename_array_1 = [fn for fn in (filename.strip() for filename in f) \
+                            if (os.path.isfile(fn) and fn.endswith('.h5'))] # Nested for loop
+
+        if len(filename_array_1) == 0:
+            print('Error: No .h5 files in first file array. Exiting program...')
+
+            sys.exit()
+    
+    if kwargs.get('synchrotron') is None:
+        print('Error: Synchrotron keyword argument required. Exiting program...')
+
+        sys.exit()
+
+    if kwargs.get('synchrotron') == 'aps':        
+        filename_array_2 = filename_array_1.copy()
+    
+    else:
+        if file_path_2 is None:
+            print('Error: Second CSV file path required. Exiting program...')
+
+            sys.exit()
+        
+        if not os.path.isfile(file_path_2):
+            print('Error: CSV file path does not exist')
+
+        with open(file_path_2, newline = '') as f:
+            filename_array_2 = [fn for fn in (filename.strip() for filename in f) \
+                                if (os.path.isfile(fn) and fn.endswith('.h5'))]
+
+            if len(filename_array_2) == 0:
+                print('Error: No .h5 files in second file array. Exiting program...')
+
+                sys.exit()
+    
+    return filename_array_1, filename_array_2
 
 def create_aux_conv_mag_data_npy(dir_path, array):
     subdir_path = os.path.join(dir_path, 'aux_data')

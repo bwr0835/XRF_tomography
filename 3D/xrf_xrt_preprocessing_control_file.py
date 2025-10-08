@@ -1,11 +1,9 @@
 import numpy as np, \
-       tkinter as tk, \
        file_util as futil, \
        xrf_xrt_preprocess_utils as ppu, \
        sys, \
        os
 
-from tkinter import filedialog as fd
 from realignment_final import iter_reproj as irprj
 
 def preprocess_xrf_xrt_data(synchrotron,
@@ -19,7 +17,7 @@ def preprocess_xrf_xrt_data(synchrotron,
                             pre_existing_align_norm_file_enabled,
                             pre_existing_align_norm_file_path,
                             norm_enabled,
-                            data_percentile,
+                            xrt_data_percentile,
                             return_aux_data,
                             I0_cts_per_s,
                             t_dwell_s,
@@ -27,58 +25,20 @@ def preprocess_xrf_xrt_data(synchrotron,
                             n_iter_iter_reproj,
                             aligned_data_output_dir_path):
 
-    available_synchrotrons = ['aps', 'nsls-ii']
-    
-    if synchrotron is None or synchrotron_beamline is None:
-        print('Error: Synchrotron and/or synchrotron beamline fields empty. Exiting program...')
-
-        sys.exit()
-    
-    synchrotron = synchrotron.lower()
-
-    if synchrotron not in available_synchrotrons:
-        print('Error: Synchrotron unavailable. Exiting program...')
-
-        sys.exit()
-    
-    bool_params = [create_aggregate_xrf_xrt_files_enabled,
-                   pre_existing_aggregate_xrf_xrt_file_lists_enabled, 
-                   pre_existing_align_norm_file_enabled,
-                   realignment_enabled]
-
-    if not any(isinstance(val, bool) for val in bool_params):
-        print('Error: \'create_aggregate_xrf_xrt_files_enabled\', \
-                      \'pre_existing_aggregate_xrf_xrt_file_lists_enabled\', \
-                      \'pre_existing_align_norm_file_enabled\', \
-                      and \'realignment_enabled\' must be set to True or False. Exiting program...')
-
-        sys.exit()
-    
-    if not create_aggregate_xrf_xrt_files_enabled and not isinstance(norm_enabled, bool):
-        print('Error: \'norm_enabled\' must be set to True or False. Exiting program...')
-
-        sys.exit()
-
     if create_aggregate_xrf_xrt_files_enabled:
         if pre_existing_aggregate_xrf_xrt_file_lists_enabled:
+            print('Extracting pre-existing XRF, XRT HDF5 file lists...')
+            
             if synchrotron == 'aps':
-                xrf_file_array = futil.extract_csv_file_list(aggregate_xrf_csv_file_path)
-                xrt_file_array = xrf_file_array.copy()
+                xrf_file_array, xrt_file_array = futil.extract_csv_xrf_xrt_data_file_lists(aggregate_xrf_csv_file_path, synchrotron = synchrotron)
             
             else:
-                xrf_file_array = futil.extract_csv_file_list(aggregate_xrf_csv_file_path)
-                xrt_file_array = futil.extract_csv_file_list(aggregate_xrt_csv_file_path)
-        
-        else:   
-            root = tk.Tk()
+                xrf_file_array, xrt_file_array = futil.extract_csv_xrf_xrt_data_file_lists(aggregate_xrf_csv_file_path, aggregate_xrt_csv_file_path, synchrotron = synchrotron)
+               
+        else:
+            print('Opening file dialog window for opening XRF, XRT HDF5 file extraction...')
 
-            xrf_file_array = fd.askopenfilenames(parent = root, title = "Choose XRF files to aggregate.", filetypes = [('HDF5 files', '*.h5')])
-            xrt_file_array = fd.askopenfilenames(parent = root, title = "Choose XRT files to aggregate.", filetypes = [('HDF5 files', '*.h5')])
-
-        if xrf_file_array == '' or xrt_file_array == '':
-            print('Error: XRF and/or XRT filename array empty. Exiting program...')
-            
-            sys.exit()
+            xrf_file_array, xrt_file_array = futil.extract_h5_xrf_xrt_data_file_lists_tk(synchrotron)
 
         xrf_array_dir = os.path.dirname(xrf_file_array[0])
         xrt_array_dir = os.path.dirname(xrt_file_array[0])
@@ -112,7 +72,9 @@ def preprocess_xrf_xrt_data(synchrotron,
                                           synchrotron,
                                           us_ic = us_ic)
 
-        print('Creating XRF file list CSV file...')
+        print('Creating aggregate XRF, XRT file list CSV files...')
+
+        futil.create
 
         sys.exit()
 
@@ -157,6 +119,8 @@ def preprocess_xrf_xrt_data(synchrotron,
         counts_xrt_sig = counts_xrt[counts_xrt_sig_idx]
 
         if pre_existing_align_norm_file_enabled:
+            print('Extracting pre-existing normalizations, net x pixel shifts, net y pixel shifts, and incident intensity...')
+            
             norm_array, \
             net_x_shift_array, \
             net_y_shift_array, \
@@ -173,22 +137,17 @@ def preprocess_xrf_xrt_data(synchrotron,
             
             if norm_enabled:
                 print('Normalizing XRF, XRT data via per-projection XRT masks...')
-                
-                if data_percentile is not None or data_percentile < 0 or data_percentile > 100:
-                    print('Error: \'data_percentile\' must be between 0 and 100. Exiting program...')
-
-                    sys.exit()
 
                 if return_aux_data:
                     counts_xrt_norm, counts_xrf_norm, norm_array, I0_cts, conv_mag_array = ppu.joint_fluct_norm(counts_xrt,
                                                                                                                 counts_xrf, 
-                                                                                                                data_percentile, 
+                                                                                                                xrt_data_percentile, 
                                                                                                                 return_conv_mag_array = True)
 
                 else:
-                    counts_xrt_norm, counts_xrf_norm, norm_array, I0_cts = ppu.joint_fluct_norm(counts_xrt, 
+                    counts_xrt_norm, counts_xrf_norm, norm_array, I0_cts = ppu.joint_fluct_norm(counts_xrt,
                                                                                                 counts_xrf,
-                                                                                                data_percentile)
+                                                                                                xrt_data_percentile)
 
             else:
                 if I0_cts_per_s is None or I0_cts_per_s < 0 or t_dwell_s is None or t_dwell_s < 0:
@@ -206,6 +165,10 @@ def preprocess_xrf_xrt_data(synchrotron,
         print('Calculating optical densities...')
         
         opt_dens = -np.log(counts_xrt_norm/I0_cts)
+
+    xrt_od_xrf_realignment_subdir_path = os.path.join(aligned_data_output_dir_path, 'xrt_od_xrf_realignment')
+
+    os.makedirs(xrt_od_xrf_realignment_subdir_path, exist_ok = True)
 
     if realignment_enabled:
         if return_aux_data:
@@ -233,7 +196,7 @@ def preprocess_xrf_xrt_data(synchrotron,
 
             print('Writing convolution magnitude array to NumPy (.npy) file')
             
-            futil.create_aux_conv_mag_data_npy(aligned_data_output_dir_path, conv_mag_array)
+            futil.create_aux_conv_mag_data_npy(xrt_od_xrf_realignment_subdir_path, conv_mag_array)
 
             print('Writing the following auxiliary, per-iteration data to NumPy (.npy) files (NOTE: Python is needed to view these!):')
             print('     -Experimental optical density projection data')
@@ -245,7 +208,7 @@ def preprocess_xrf_xrt_data(synchrotron,
             print('     -Net x shifts')
             print('     -Net y shifts')
 
-            futil.create_aux_opt_dens_data_npy(aligned_data_output_dir_path,
+            futil.create_aux_opt_dens_data_npy(xrt_od_xrf_realignment_subdir_path,
                                                aligned_exp_proj_array,
                                                recon_array,
                                                synth_proj_array,
@@ -269,7 +232,7 @@ def preprocess_xrf_xrt_data(synchrotron,
             
             print('Writing final aligned XRF, XRT, and optical density projection data to HDF5 file...')
             
-            futil.create_h5_aligned_aggregate_xrf_xrt(aligned_data_output_dir_path,
+            futil.create_h5_aligned_aggregate_xrf_xrt(xrt_od_xrf_realignment_subdir_path,
                                                       elements_xrf,
                                                       aligned_proj_final_xrf, 
                                                       aligned_proj_final_xrt_sig,
@@ -278,7 +241,7 @@ def preprocess_xrf_xrt_data(synchrotron,
             
             print('Writing per-projection normalization, final net x and y shifts, and incident intensity to CSV file...')
 
-            futil.create_csv_norm_net_shift_data(aligned_data_output_dir_path,
+            futil.create_csv_norm_net_shift_data(xrt_od_xrf_realignment_subdir_path,
                                                  theta,
                                                  norm_array,
                                                  net_x_shifts_pcc_final,
@@ -291,11 +254,11 @@ def preprocess_xrf_xrt_data(synchrotron,
         if return_aux_data:
             print('Writing per-projection convolution magnitudes to NumPy (.npy) file...')
 
-            futil.create_aux_conv_mag_data_npy(aligned_data_output_dir_path, conv_mag_array)
+            futil.create_aux_conv_mag_data_npy(xrt_od_xrf_realignment_subdir_path, conv_mag_array)
         
         print('Writing normalized XRF, XRT, and optical density projection data to HDF5 file...')
 
-        futil.create_h5_aligned_aggregate_xrf_xrt(aligned_data_output_dir_path,
+        futil.create_h5_aligned_aggregate_xrf_xrt(xrt_od_xrf_realignment_subdir_path,
                                                   elements_xrf,
                                                   counts_xrf_norm, 
                                                   counts_xrt_norm,
@@ -304,7 +267,7 @@ def preprocess_xrf_xrt_data(synchrotron,
 
         print('Writing per-projection normalization, final net x and y shifts, and incident intensity to CSV file...')
 
-        futil.create_csv_norm_net_shift_data(aligned_data_output_dir_path,
+        futil.create_csv_norm_net_shift_data(xrt_od_xrf_realignment_subdir_path,
                                              theta,
                                              norm_array,
                                              net_x_shift_array,

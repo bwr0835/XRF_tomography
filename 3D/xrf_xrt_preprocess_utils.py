@@ -248,17 +248,22 @@ def edge_gauss_filter(image, sigma, alpha, nx, ny):
 
 def joint_fluct_norm(xrt_array,
                      xrf_array,
-                     data_percentile,
+                     xrt_data_percentile,
                      sigma_1 = 5,
                      alpha = 10,
                      sigma_2 = 10,
                      return_conv_mag_array = False):
-    
+
     if xrt_array.ndim != 3 and xrf_array != 3:
         print('Error: Number of XRT and/or XRF array dimesions ≠ 4. Exiting program...')
 
         sys.exit()
 
+    if xrt_data_percentile is None or xrt_data_percentile < 0 or xrt_data_percentile > 100:
+        print('Error: \'data_percentile\' must be between 0 and 100. Exiting program...')
+
+        sys.exit() 
+    
     n_theta, n_slices, n_columns = xrt_array.shape
 
     convolution_mag_array = np.zeros((n_theta, n_slices, n_columns))
@@ -270,7 +275,7 @@ def joint_fluct_norm(xrt_array,
 
         convolution_mag = ndi.gaussian_filter(xrt_vignetted, sigma = sigma_2) # Blur the entire image using Gaussian filter/convolution
 
-        threshold = np.percentile(convolution_mag, data_percentile) # EX: Take top 20% of data (data_percentile = 80)
+        threshold = np.percentile(convolution_mag, xrt_data_percentile) # EX: Take top 20% of data (data_percentile = 80)
 
         mask = convolution_mag >= threshold
 
