@@ -3,8 +3,6 @@ import torch as tc
 import os
 import dxchange
 
-
-
 def initialize_guess_3d(dev, ini_kind, n_element, sample_size_n, sample_height_n,
                         recon_path, f_recon_grid, f_initial_guess, init_const=0.5, ini_rand_amp=0.1):
     if ini_kind == "rand":

@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-
 AN = {"H": 1,
       "He": 2,
       "Li": 3,

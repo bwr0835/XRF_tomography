@@ -1,15 +1,17 @@
 synchrotron: aps
 synchrotron_beamline: 2_ide
 create_aggregate_xrf_xrt_files_enabled: True
-aggregate_xrf_file_path:
-aggregate_xrt_file_path:
+pre_existing_aggregate_xrf_xrt_file_lists_enabled: True
+aggregate_xrf_csv_file_path:
+aggregate_xrf_csv_file_path:
+aggregate_xrf_h5_file_path:
+aggregate_xrt_h5_file_path:
 pre_existing_align_norm_file_enabled: False
 pre_existing_align_norm_file_path:
 norm_enabled: True
-norm_method: per_proj_mask
+return_aux_data: True
 I0_cts_per_s:
 t_dwell_s:
+iter_reproj_enabled: False
 n_iter_iter_reproj: 10
-return_aux_data: True
-output_dir_path:
-
+aligned_data_output_dir_path:

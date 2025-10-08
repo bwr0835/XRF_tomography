@@ -1,5 +1,6 @@
 import numpy as np, \
        pandas as pd, \
+       csv, \
        h5py, \
        os, \
        sys
@@ -498,7 +499,7 @@ def extract_h5_aggregate_xrt_data(file_path, **kwargs):
     
     return elements_string, counts, theta, us_ic_scaler_name, dataset_type
 
-def extract_norm_mass_calibration_net_shift_data(file_path, theta_array):
+def extract_csv_norm_net_shift_data(file_path, theta_array):
     try:
         norm_mass_calibration_net_shift_data = pd.read_csv(file_path)
     
@@ -521,21 +522,29 @@ def extract_norm_mass_calibration_net_shift_data(file_path, theta_array):
         sys.exit()
 
     norm_array = norm_mass_calibration_net_shift_data['norm_factor'].to_numpy().astype(float)
-    net_x_shifts = norm_mass_calibration_net_shift_data['net_x_shift'].to_numpy().astype(float)
-    net_y_shifts = norm_mass_calibration_net_shift_data['net_y_shift'].to_numpy().astype(float)
-    I0_norm = norm_mass_calibration_net_shift_data['I0_norm'].to_numpy()[0].astype(float)
+    net_x_shifts = norm_mass_calibration_net_shift_data['net_x_pixel_shift'].to_numpy().astype(float)
+    net_y_shifts = norm_mass_calibration_net_shift_data['net_y_pixel_shift'].to_numpy().astype(float)
+    I0 = norm_mass_calibration_net_shift_data['I0_cts'].to_numpy()[0].astype(float)
 
-    return norm_array, net_x_shifts, net_y_shifts, I0_norm
+    return norm_array, net_x_shifts, net_y_shifts, I0
 
-def create_h5_aligned_aggregate_xrf_xrt(elements_xrf, 
-                                        elements_xrt,
+def create_h5_aligned_aggregate_xrf_xrt(elements_xrf,
                                         xrf_array, 
-                                        xrt_array, 
+                                        xrt_array,
+                                        opt_dens_array, 
                                         theta_array, 
-                                        output_dir_path, 
-                                        output_subdir_name):
+                                        output_dir_path):
 
-    elements_xrt[3] = 'opt_dens'
+    elements_xrt = ['xrt_sig', 'opt_dens']
+
+    n_theta, n_slices, n_columns = xrt_array.shape
+
+    xrt_array_new = np.zeros((len(elements_xrt), n_theta, n_slices, n_columns))
+
+    xrt_array_new[0] = xrt_array
+    xrt_array_new[1] = opt_dens_array
+
+    output_subdir_name = 'aligned_data'
     
     os.makedirs(os.path.join(output_dir_path, output_subdir_name), exist_ok = True)
     
@@ -547,7 +556,7 @@ def create_h5_aligned_aggregate_xrf_xrt(elements_xrf,
         exchange.create_dataset('element_xrf', data = elements_xrf)
         exchange.create_dataset('element_xrt', data = elements_xrt)
         exchange.create_dataset('data_xrf', data = xrf_array)
-        exchange.create_dataset('data_xrt', data = xrt_array)
+        exchange.create_dataset('data_xrt', data = xrt_array_new)
         exchange.create_dataset('theta', data = theta_array)
     
     return
@@ -560,15 +569,21 @@ def extract_csv_preprocessing_input_params(file_path):
                                    dtype = str,
                                    keep_default_na = False)
 
-    input_params = input_params_csv['input_param']
-    values = input_params_csv['value'].str.strip().replace('', 'None') # Extract values while setting non-existent values to None
+    try:
+        input_params = input_params_csv['input_param']
+        values = input_params_csv['value'].str.strip().replace('', 'None') # Extract values while setting non-existent values to None
     
-    for idx, val in enumerate(values): # Convert strings supposed to be numberic to floats or ints
+    except:
+        print('Error: Unable to read in CSV file. Exiting program...')
+
+        sys.exit()
+    
+    for idx, val in enumerate(values): # Convert strings supposed to be numberic or Boolean to floats, ints, or bools
         print(val)
         
         if val.lower() == 'true' or val.lower() == 'false':
             values[idx] = (val == 'true') # Convert 'true' and 'false' strings to corresponding Boolean values
-        
+
         if val.lower() == 'none':
             values[idx] = None
 
@@ -582,13 +597,47 @@ def extract_csv_preprocessing_input_params(file_path):
             except:
                 continue
     
-    input_param_dict = dict(zip(input_params, values))
+    input_param_dict = dict(zip(input_params, values)) # zip() creates tuples; dict() converts the tuples to a dictionary
 
-    for key, val in input_param_dict.items():
-        print(f'{key}: {val} (dtype = {type(val).__name__})')
+    return input_param_dict
 
-    sys.exit()
-    # return input_param_dict
+def create_csv_file_list(file_path_array,
+                         input_dir_path, 
+                         output_dir_path,
+                         synchrotron, 
+                         synchrotron_beamline, 
+                         dataset_type):
+    
+    file_path_array_full = [os.path.join(input_dir_path, file_path) for file_path in file_path_array]
+    
+    if synchrotron == 'aps':
+        with open(os.path.join(output_dir_path, f'{synchrotron_beamline}_xrf_xrt_file_list.csv'), 'w', newline = '') as f:
+            writer = csv.writer(f)
+
+            writer.writerows(file_path_array_full)
+    
+    else:
+        with open(os.path.join(output_dir_path, f'{synchrotron_beamline}_{dataset_type}_file_list.csv'), 'w', newline = '') as f:
+            writer = csv.writer(f)
+
+            writer.writerows(file_path_array_full)
+    
+    return
+
+def extract_csv_file_list(file_path):
+    with open(file_path, newline = '') as f:
+        filename_array = [filename.strip() for filename in f]
+    
+    return filename_array
+
+def create_aux_conv_mag_data_npy(dir_path, array):
+    subdir_path = os.path.join(dir_path, 'aux_data')
+
+    os.makedirs(subdir_path, exist_ok = True)
+
+    np.save(os.path.join(subdir_path, 'conv_mag_array.npy'), array)
+
+    return
 
 def create_aux_opt_dens_data_npy(dir_path,
                                  aligned_exp_proj_array,
@@ -615,6 +664,23 @@ def create_aux_opt_dens_data_npy(dir_path,
 
     return
 
-def create_intermed_aggregate_xrf_xrt_h5(file_path,
-                                         f):
-    pass
+def create_csv_norm_net_shift_data(dir_path,
+                                   theta_array,
+                                   norm_array,
+                                   net_x_shifts,
+                                   net_y_shifts,
+                                   I0):
+
+    file_path = os.path.join(dir_path, 'norm_net_shift_data.csv')
+
+    df = pd.DataFrame({'theta_deg': theta_array,
+                       'norm_factor': norm_array,
+                       'net_x_pixel_shift': net_x_shifts,
+                       'net_y_pixel_shift': net_y_shifts,
+                       'I0_cts': I0})
+
+    df.loc[1:, 'I0_cts'] = '' # To make sure no errors arise from not having unequal column lengths
+
+    df.to_csv(file_path, index = False)
+
+    return

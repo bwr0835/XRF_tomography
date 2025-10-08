@@ -5,14 +5,9 @@ import numpy as np, \
 
 from skimage import transform as xform, registration as reg
 from scipy import ndimage as ndi, fft
-from matplotlib import pyplot as plt
 from itertools import combinations as combos
 
 # TODO Align other elements while keeping padding (good practice)
-
-plt.rcParams['text.usetex'] = True
-plt.rcParams['font.family'] = 'serif'
-plt.rcParams['text.latex.preamble'] = r'\usepackage{times}'
 
 def round_correct(num, ndec): # CORRECTLY round a number (num) to chosen number of decimal places (ndec)
     if ndec == 0:
@@ -135,8 +130,8 @@ def iter_reproj(xrt_proj_img_array,
                 theta_array,
                 I0,
                 n_iterations,
-                init_x_shift = None, 
-                init_y_shift = None,
+                init_x_shift, 
+                init_y_shift,
                 eps = 0.3,
                 return_aux_data = False):
     
@@ -148,11 +143,13 @@ def iter_reproj(xrt_proj_img_array,
     Inputs
     ------
     
-    theta_array: Array of projection angles (array-like; dtype: float)
-    
-    xrt_proj_img_array: 3D XRT tomography data (elements, projection angles, slices, scan positions) (array-like; dtype: float)
+    xrt_proj_img_array: 3D XRT tomography data (projection angles, slices, scan positions) (array-like; dtype: float)
 
-    opt_dens_proj_img_array: 3D optical density data derived from xrt_proj_img_array (projection angles, slices, scan positions)
+    opt_dens_proj_img_array: 3D optical density data derived from xrt_proj_img_array (projection angles, slices, scan positions) (array-like, dtype: float)
+
+    xrf_proj_img_array: 4D XRF data (elements, projection_angles, slices, scan positions) (array-like; dtype: float)
+
+    theta_array: Array of projection angles (array-like; dtype: float)
     
     n_iterations: Maximum number of iterative reprojection iterations (dtype: int)
     
@@ -207,18 +204,6 @@ def iter_reproj(xrt_proj_img_array,
         recon_array = []
     
     n_iter_converge = 3
-
-    if init_x_shift is None:
-        init_x_shift = np.zeros(n_theta)
-        
-    if init_y_shift is None:
-        init_y_shift = np.zeros(n_theta)
-    
-    if np.isscalar(init_x_shift):
-        init_x_shift *= np.ones(n_theta)
-        
-    if np.isscalar(init_y_shift):
-        init_y_shift *= np.ones(n_theta)
     
     aligned_proj = opt_dens_proj_img_array.copy()
 

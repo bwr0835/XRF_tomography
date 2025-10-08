@@ -2,21 +2,6 @@ import os, sys, file_util as futil
 
 from xrf_xrt_preprocessing_control_file import preprocess_xrf_xrt_data
 
-preprocessing_inputs = {'synchrotron': None,
-                        'synchrotron_beamline': None,
-                        'create_aggregate_xrf_xrt_files_enabled': None,
-                        'aggregate_xrf_file_path': None,
-                        'aggregate_xrt_file_path': None,
-                        'pre_existing_align_norm_file_enabled': None,
-                        'pre_existing_align_norm_file_path': None,
-                        'norm_enabled': None,
-                        'norm_method': None,
-                        'I0_cts_per_s': None,
-                        't_dwell_s': None,
-                        'n_iter_iter_reproj': None,
-                        'return_aux_data': None,
-                        'output_dir_path': None}
-
 if __name__ == '__main__':
     if len(sys.argv) == 1:
         print('Error: Input file argument required. Exiting program...')
