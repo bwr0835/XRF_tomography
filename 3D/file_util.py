@@ -665,6 +665,8 @@ def extract_csv_preprocessing_input_params(file_path):
                    'norm_enabled',
                    'realignment_enabled']
     
+    print(input_params)
+
     all_params_ordered = pd.Series(['synchrotron',
                                     'synchrotron_beamline',
                                     'create_aggregate_xrf_xrt_files_enabled',
@@ -690,7 +692,7 @@ def extract_csv_preprocessing_input_params(file_path):
 
     if input_params.equals(all_params_ordered):
         print('Error: At least one parameter missing or at least one parameter too many.')
-        print('\nThe following input parameters are required\n:')
+        print('\nThe following input parameters are required:\n')
         print(*(["'{}'".format(s) for s in all_params_ordered]), sep = '\n')
         print('\nEnding program...')
 
