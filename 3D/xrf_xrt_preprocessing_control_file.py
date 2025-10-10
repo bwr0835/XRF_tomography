@@ -4,7 +4,7 @@ import numpy as np, \
        sys, \
        os
 
-from realignment_final import iter_reproj as irprj
+from realignment_final import realign_proj as rap
 
 def preprocess_xrf_xrt_data(synchrotron,
                             synchrotron_beamline,
@@ -205,20 +205,20 @@ def preprocess_xrf_xrt_data(synchrotron,
             net_x_shifts_pcc_array, \
             net_y_shifts_pcc_array, \
             dx_pcc_array, \
-            dy_pcc_array = irprj(synchrotron,
-                                 counts_xrt_norm,
-                                 opt_dens,
-                                 counts_xrf_norm,
-                                 theta,
-                                 I0_cts,
-                                 n_iter_iter_reproj,
-                                 net_x_shift_array,
-                                 net_y_shift_array,
-                                 sigma,
-                                 alpha,
-                                 upsample_factor,
-                                 eps,
-                                 return_aux_data = True)
+            dy_pcc_array = rap(synchrotron,
+                               counts_xrt_norm,
+                               opt_dens,
+                               counts_xrf_norm,
+                               theta,
+                               I0_cts,
+                               n_iter_iter_reproj,
+                               net_x_shift_array,
+                               net_y_shift_array,
+                               sigma,
+                               alpha,
+                               upsample_factor,
+                               eps,
+                               return_aux_data = True)
 
             print('Writing convolution magnitude array to NumPy (.npy) file')
             
@@ -249,19 +249,19 @@ def preprocess_xrf_xrt_data(synchrotron,
             aligned_proj_final_opt_dens, \
             aligned_proj_final_xrf, \
             net_x_shifts_pcc_final, \
-            net_y_shifts_pcc_final = irprj(synchrotron,
-                                           counts_xrt_norm,
-                                           opt_dens,
-                                           counts_xrf_norm,
-                                           theta,
-                                           I0_cts,
-                                           n_iter_iter_reproj,
-                                           net_x_shift_array,
-                                           net_y_shift_array,
-                                           sigma,
-                                           alpha,
-                                           upsample_factor,
-                                           eps)
+            net_y_shifts_pcc_final = rap(synchrotron,
+                                         counts_xrt_norm,
+                                         opt_dens,
+                                         counts_xrf_norm,
+                                         theta,
+                                         I0_cts,
+                                         n_iter_iter_reproj,
+                                         net_x_shift_array,
+                                         net_y_shift_array,
+                                         sigma,
+                                         alpha,
+                                         upsample_factor,
+                                         eps)
             
             print('Writing final aligned XRF, XRT, and optical density projection data to HDF5 file...')
             
