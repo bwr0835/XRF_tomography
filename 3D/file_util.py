@@ -1,4 +1,3 @@
-from numpy.core.defchararray import endswith
 import numpy as np, \
        pandas as pd, \
        tkinter as tk, \
@@ -652,6 +651,51 @@ def extract_csv_preprocessing_input_params(file_path):
 
         sys.exit()
     
+    numeric_params = ['xrt_data_percentile',
+                      'I0_cts_per_s',
+                      't_dwell_s',
+                      'sigma',
+                      'alpha',
+                      'upsample_factor',
+                      'eps']
+    
+    bool_params = ['create_aggregate_xrf_xrt_files_enabled',
+                   'pre_existing_aggregate_xrf_xrt_file_lists_enabled', 
+                   'pre_existing_align_norm_file_enabled',
+                   'norm_enabled',
+                   'realignment_enabled']
+    
+    all_params_ordered = ['synchrotron',
+                          'synchrotron_beamline',
+                          'create_aggregate_xrf_xrt_files_enabled',
+                          'pre_existing_aggregate_xrf_xrt_file_lists_enabled',
+                          'aggregate_xrf_csv_file_path',
+                          'aggregate_xrt_csv_file_path',
+                          'aggregate_xrf_h5_file_path',
+                          'aggregate_xrt_h5_file_path',
+                          'pre_existing_align_norm_file_enabled',
+                          'pre_existing_align_norm_file_path',
+                          'norm_enabled',
+                          'xrt_data_percentile',
+                          'return_aux_data',
+                          'I0_cts_per_s',
+                          't_dwell_s',
+                          'realignment_enabled',
+                          'n_iter_iter_reproj',
+                          'sigma',
+                          'alpha',
+                          'upsample_factor',
+                          'eps',
+                          'aligned_data_output_dir_path']
+
+    if input_params != all_params_ordered:
+        print('Error: At least one parameter missing or at least one parameter too many.')
+        print('\nThe following input parameters are required\n:')
+        print(*(["'{}'".format(s) for s in all_params_ordered]), sep = '\n')
+        print('\nEnding program...')
+
+        sys.exit()
+
     for idx, val in enumerate(values): # Convert strings supposed to be numberic or Boolean to floats, ints, or bools
         print(val)
         
@@ -686,41 +730,43 @@ def extract_csv_preprocessing_input_params(file_path):
         print('Error: Synchrotron unavailable. Exiting program...')
 
         sys.exit()
-    
-    bool_params_partial = ['create_aggregate_xrf_xrt_files_enabled',
-                           'pre_existing_aggregate_xrf_xrt_file_lists_enabled', 
-                           'pre_existing_align_norm_file_enabled',
-                           'norm_enabled',
-                           'realignment_enabled']
 
-    if not any(isinstance(val, bool) for val in input_param_dict[bool_params_partial]):
-        print('Error: \'create_aggregate_xrf_xrt_files_enabled\', \
+    if not all(isinstance(input_param_dict[param], bool) for param in bool_params):
+        print('Error: Input parameters \'create_aggregate_xrf_xrt_files_enabled\', \
                       \'pre_existing_aggregate_xrf_xrt_file_lists_enabled\', \
                       \'pre_existing_align_norm_file_enabled\', \
                       \'norm_enabled\', \
-                      and \'realignment_enabled\' must be set to True or False. Exiting program...')
+                      and \'realignment_enabled\' must all be set to True or False. Exiting program...')
 
         sys.exit()
+
+    for param in numeric_params:
+        if isinstance(input_param_dict.get(param), str):
+            print(f'Error: Expected a number for input parameter \'{param}\'. Exiting program...')
 
     return input_param_dict
 
 def create_csv_file_list(file_path_array,
-                         input_dir_path, 
-                         output_dir_path,
+                         dir_path, 
                          synchrotron, 
                          synchrotron_beamline, 
-                         dataset_type):
+                         dataset_type = None):
     
-    file_path_array_full = [os.path.join(input_dir_path, file_path) for file_path in file_path_array]
+    file_path_array_full = [os.path.join(dir_path, file_path) for file_path in file_path_array]
     
     if synchrotron == 'aps':
-        with open(os.path.join(output_dir_path, f'{synchrotron_beamline}_xrf_xrt_file_list.csv'), 'w', newline = '') as f:
+        with open(os.path.join(dir_path, f'{synchrotron_beamline}_xrf_xrt_file_list.csv'), 'w', newline = '') as f:
             writer = csv.writer(f)
 
             writer.writerows(file_path_array_full)
     
     else:
-        with open(os.path.join(output_dir_path, f'{synchrotron_beamline}_{dataset_type}_file_list.csv'), 'w', newline = '') as f:
+        if dataset_type is None:
+            print('Error: Dataset type required. Exiting program...')
+
+            sys.exit()
+            
+        with open(os.path.join(dir_path, f'{synchrotron_beamline}_{dataset_type}_file_list.csv'), 'w', newline = '') as f:
             writer = csv.writer(f)
 
             writer.writerows(file_path_array_full)
@@ -824,3 +870,4 @@ def create_csv_norm_net_shift_data(dir_path,
     df.to_csv(file_path, index = False)
 
     return
+    

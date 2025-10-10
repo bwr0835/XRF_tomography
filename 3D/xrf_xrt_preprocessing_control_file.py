@@ -23,6 +23,10 @@ def preprocess_xrf_xrt_data(synchrotron,
                             t_dwell_s,
                             realignment_enabled,
                             n_iter_iter_reproj,
+                            sigma,
+                            alpha,
+                            upsample_factor,
+                            eps,
                             aligned_data_output_dir_path):
 
     if create_aggregate_xrf_xrt_files_enabled:
@@ -50,8 +54,8 @@ def preprocess_xrf_xrt_data(synchrotron,
 
         if synchrotron == 'aps':
             futil.create_aggregate_xrf_h5(xrf_file_array, 
-                                        output_xrf_filepath, 
-                                        synchrotron)
+                                          output_xrf_filepath, 
+                                          synchrotron)
 
             print('Creating aggregate XRT data file...')
 
@@ -67,14 +71,31 @@ def preprocess_xrf_xrt_data(synchrotron,
 
             print('Creating aggregate XRT data file...')
 
-            futil.create_aggregate_xrt_h5(xrt_file_array, 
+            futil.create_aggregate_xrt_h5(xrt_file_array,
                                           output_xrt_filepath, 
                                           synchrotron,
                                           us_ic = us_ic)
 
         print('Creating aggregate XRF, XRT file list CSV files...')
 
-        futil.create
+        if synchrotron == 'aps':
+            futil.create_csv_file_list(xrf_file_array,
+                                       xrf_array_dir, 
+                                       synchrotron, 
+                                       synchrotron_beamline)
+
+        else:
+            futil.create_csv_file_list(xrf_file_array,
+                                       xrf_array_dir, 
+                                       synchrotron, 
+                                       synchrotron_beamline,
+                                       'xrf')
+
+            futil.create_csv_file_list(xrf_file_array,
+                                       xrf_array_dir, 
+                                       synchrotron, 
+                                       synchrotron_beamline,
+                                       'xrt')
 
         sys.exit()
 
@@ -184,7 +205,8 @@ def preprocess_xrf_xrt_data(synchrotron,
             net_x_shifts_pcc_array, \
             net_y_shifts_pcc_array, \
             dx_pcc_array, \
-            dy_pcc_array = irprj(counts_xrt_norm,
+            dy_pcc_array = irprj(synchrotron,
+                                 counts_xrt_norm,
                                  opt_dens,
                                  counts_xrf_norm,
                                  theta,
@@ -192,6 +214,10 @@ def preprocess_xrf_xrt_data(synchrotron,
                                  n_iter_iter_reproj,
                                  net_x_shift_array,
                                  net_y_shift_array,
+                                 sigma,
+                                 alpha,
+                                 upsample_factor,
+                                 eps,
                                  return_aux_data = True)
 
             print('Writing convolution magnitude array to NumPy (.npy) file')
@@ -223,12 +249,19 @@ def preprocess_xrf_xrt_data(synchrotron,
             aligned_proj_final_opt_dens, \
             aligned_proj_final_xrf, \
             net_x_shifts_pcc_final, \
-            net_y_shifts_pcc_final = irprj(counts_xrt_norm,
+            net_y_shifts_pcc_final = irprj(synchrotron,
+                                           counts_xrt_norm,
                                            opt_dens,
                                            counts_xrf_norm,
                                            theta,
                                            I0_cts,
-                                           n_iter_iter_reproj)
+                                           n_iter_iter_reproj,
+                                           net_x_shift_array,
+                                           net_y_shift_array,
+                                           sigma,
+                                           alpha,
+                                           upsample_factor,
+                                           eps)
             
             print('Writing final aligned XRF, XRT, and optical density projection data to HDF5 file...')
             

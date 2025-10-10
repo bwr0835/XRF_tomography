@@ -7,8 +7,6 @@ from skimage import transform as xform, registration as reg
 from scipy import ndimage as ndi, fft
 from itertools import combinations as combos
 
-# TODO Align other elements while keeping padding (good practice)
-
 def round_correct(num, ndec): # CORRECTLY round a number (num) to chosen number of decimal places (ndec)
     if ndec == 0:
         return int(num + 0.5)
@@ -37,12 +35,18 @@ def find_theta_combos(theta_array_deg, dtheta):
 
     return valid_theta_idx_pairs
 
-def phase_xcorr(recon_proj, exp_proj, upsample_factor, return_pcc_2d = False):
+def phase_xcorr(recon_proj,
+                exp_proj, 
+                sigma, 
+                alpha, 
+                upsample_factor, 
+                return_pcc_2d = False):
+    
     n_columns = recon_proj.shape[1]
     n_slices = recon_proj.shape[0]
 
-    recon_proj_filtered = ppu.edge_gauss_filter(recon_proj, sigma = 5, alpha = 10, nx = n_columns, ny = n_slices)
-    exp_proj_filtered = ppu.edge_gauss_filter(exp_proj, sigma = 5, alpha = 10, nx = n_columns, ny = n_slices)
+    recon_proj_filtered = ppu.edge_gauss_filter(recon_proj, sigma, alpha, nx = n_columns, ny = n_slices)
+    exp_proj_filtered = ppu.edge_gauss_filter(exp_proj, sigma, alpha, nx = n_columns, ny = n_slices)
     
     if return_pcc_2d:
         recon_proj_fft = fft.fft2(recon_proj_filtered)
@@ -87,8 +91,7 @@ def rot_center(theta_sum):
     # Get real, imaginary components of the first AC spatial frequency for axis perpendicular to rotation axis.
     # Nt is the spatial period (there are Nt columns per row); Nz is the (fundamental) spatial frequency (thus, the first AC frequency)
 
-    real = T[Nz].real
-    imag = T[Nz].imag
+    real, imag = T[Nz].real, T[Nz].imag
 
     # Get phase of thetasum and return center of rotation.
     
@@ -124,25 +127,33 @@ def rot_center_avg(proj_img_array, theta_pair_array, theta_array):
 
     return center_rotation_avg, geom_center, offset
 
-def iter_reproj(xrt_proj_img_array,
-                opt_dens_proj_img_array,
-                xrf_proj_img_array,
-                theta_array,
-                I0,
-                n_iterations,
-                init_x_shift, 
-                init_y_shift,
-                eps = 0.3,
-                return_aux_data = False):
-    
+def realign_proj(synchrotron,
+                 xrt_proj_img_array,
+                 opt_dens_proj_img_array,
+                 xrf_proj_img_array,
+                 theta_array,
+                 I0,
+                 n_iterations,
+                 init_x_shift, 
+                 init_y_shift,
+                 sigma,
+                 alpha,
+                 upsample_factor,
+                 eps,
+                 return_aux_data = False):
+
     '''
 
-    iter_reproj: Perform iterative reprojection for joint realignment of XRF, XRT tomography datasets
+    realign_proj: Perform phase symmetry and iterative reprojection on experimental optical density (OD) projection images 
+    to correct for center of rotation (COR) error, jitter (per-projection translations), respectively, 
+    in x-ray transmission, OD, and x-ray fluorescnece projection images
 
     ------
     Inputs
     ------
     
+    synchrotron: Name of synchrotron light source (dtype: str)
+
     xrt_proj_img_array: 3D XRT tomography data (projection angles, slices, scan positions) (array-like; dtype: float)
 
     opt_dens_proj_img_array: 3D optical density data derived from xrt_proj_img_array (projection angles, slices, scan positions) (array-like, dtype: float)
@@ -159,8 +170,7 @@ def iter_reproj(xrt_proj_img_array,
     
     eps: Desired differential shift for convergence criterion (dtype: float)
 
-    return_aux_data: Flag for returning per-iteration auxiliary data (default: False)
-
+    return_aux_data: Flag for returning per-iteration auxiliary data (dtype: bool; default: False)
 
     -------
     Outputs
@@ -179,6 +189,23 @@ def iter_reproj(xrt_proj_img_array,
     net_y_shifts_pcc_new: Array of net y shifts with dimensions (n_iterations, n_theta) (array-like; dtype: float) (Note: n_iterations can be smaller the more quickly iter_reproj() converges)
 
     '''
+    
+    if sigma < 0 or alpha < 0:
+        print('Error: \'sigma\' and \'alpha\' must be positive numbers. Exiting program...')
+
+    if sigma is None:
+        print('Warning: Positive \'sigma\' not detected. Setting \'sigma\' to 5 pixels...')
+        
+        sigma = 5
+    
+    if alpha is None:
+        print('Warning: Positive, \'alpha\' not detected. Setting \'alpha\' to 10 pixels...')
+        
+        alpha = 10
+
+    if eps is None:
+        print('Warning: Nonzero, positive \'eps\' not detected. Setting \'eps\' to 0.3 pixels...')
+    
 
     n_elements_xrf = xrf_proj_img_array.shape[0]
     n_theta, n_slices, n_columns = xrt_proj_img_array.shape
@@ -241,8 +268,8 @@ def iter_reproj(xrt_proj_img_array,
     print(f'Center of rotation error: {round_correct(offset_init, ndec = 3)}')
     print(f'Applying initial center of rotation correction: {round_correct(-offset_init, ndec = 3)}')
 
-    for theta_idx in range(n_theta):
-        aligned_proj[theta_idx] = ndi.shift(opt_dens_proj_img_array[theta_idx], shift = (0, -offset_init))
+    # for theta_idx in range(n_theta):
+        # aligned_proj[theta_idx] = ndi.shift(opt_dens_proj_img_array[theta_idx], shift = (0, -offset_init))
 
     center_of_rotation_avg, _, _ = rot_center_avg(aligned_proj, theta_idx_pairs, theta_array)
 
@@ -304,10 +331,10 @@ def iter_reproj(xrt_proj_img_array,
         
         for theta_idx in range(n_theta):
             if not return_aux_data:
-                dy, dx = phase_xcorr(synth_proj[theta_idx], aligned_proj[theta_idx], upsample_factor = 100)
+                dy, dx = phase_xcorr(synth_proj[theta_idx], aligned_proj[theta_idx], sigma, alpha, upsample_factor)
             
             else:
-                dy, dx, pcc_2d = phase_xcorr(synth_proj[theta_idx], aligned_proj[theta_idx], upsample_factor = 100, return_pcc_2d = True)
+                dy, dx, pcc_2d = phase_xcorr(synth_proj[theta_idx], aligned_proj[theta_idx], upsample_factor, return_pcc_2d = True)
 
                 pcc_2d_array.append(pcc_2d)
 
@@ -348,14 +375,14 @@ def iter_reproj(xrt_proj_img_array,
                 net_y_shifts_pcc_new = net_y_shifts_pcc[:len(iterations)]
 
                 print(f'Number of iterations taken: {len(iterations)}')
-                print('Shifting all elements in XRT aggregate projection array by current net shifts...')
+                print('Shifting all elements in XRT, optical density aggregate projection arrays by current net shifts...')
 
                 for theta_idx in range(n_theta):
                     net_x_shift = net_x_shifts_pcc_new[i]
                     net_y_shift = net_y_shifts_pcc_new[i]
 
-                    aligned_proj_total_xrt[theta_idx] = ndi.shift(opt_dens_proj_img_array[theta_idx], shift = (net_y_shift, net_x_shift), cval = I0)
-                    aligned_proj_total_opt_dens[theta_idx] = ndi.shift(xrt_proj_img_array[theta_idx], shift = (net_y_shift, net_x_shift))
+                    aligned_proj_total_xrt[theta_idx] = ndi.shift(xrt_proj_img_array[theta_idx], shift = (net_y_shift, net_x_shift), cval = I0)
+                    aligned_proj_total_opt_dens[theta_idx] = ndi.shift(opt_dens_proj_img_array[theta_idx], shift = (net_y_shift, net_x_shift))
                     
                 print('Shifting all elements in XRF aggregate projection array by current net shifts...')
 
@@ -423,140 +450,3 @@ def iter_reproj(xrt_proj_img_array,
            aligned_proj_total_xrf, \
            net_x_shifts_pcc_new[-1], \
            net_y_shifts_pcc_new[-1]
-
-# file_path_xrf = '/home/bwr0835/2_ide_aggregate_xrf.h5'
-# file_path_xrt = '/home/bwr0835/2_ide_aggregate_xrt.h5'
-
-# output_dir_path_base = '/home/bwr0835'
-
-# # output_file_name_base = 'gridrec_5_iter_vacek_cor_and_shift_correction_padding_-22_deg_158_deg'
-# # output_file_name_base = 'xrt_mlem_1_iter_no_shift_no_log_tomopy_default_cor_w_padding_07_03_2025'
-# # output_file_name_base = 'xrt_mlem_1_iter_manual_shift_-20_no_log_tomopy_default_cor_w_padding_07_09_2025'
-# output_file_name_base = 'xrt_gridrec_6_iter_dynamic_ps_cor_correction_log_w_padding_gridrec_cor_299_5_aug_04_2025'
-# # output_file_name_base = 'xrt_gridrec_1_iter_no_shift_no_log_tomopy_default_cor_w_padding_07_03_2025'
-
-# if output_file_name_base == '':
-#     print('No output base file name chosen. Ending program...')
-
-#     sys.exit()
-
-# # create_aggregate_xrf_h5(file_path_array, file_path_xrf, synchrotron = 'aps')
-
-# try:
-#     elements_xrt, counts_xrt, theta_xrt, dataset_type_xrt, filenames = util.extract_h5_aggregate_xrt_data(file_path_xrt)
-
-# except:
-#     print('Cannot open XRT HDF5 file')
-    
-#     sys.exit()
-
-# try:
-#     elements_xrf, counts_xrf, _, dataset_type_xrf = util.extract_h5_aggregate_xrt_data(file_path_xrf)
-
-# except:
-#     print('Cannot open XRF HDF5 file')
-
-#     sys.exit()
-
-# phi_inc = 8.67768e5
-# t_dwell_s = 0.01 
-
-# counts_inc = phi_inc*t_dwell_s
-
-# desired_element = 'ds_ic'
-# desired_element_idx = elements_xrt.index(desired_element)
-
-# nonzero_mask = counts_xrt[desired_element_idx] > 0
-
-# counts_xrt[desired_element_idx][nonzero_mask] = -np.log(counts_xrt[desired_element_idx][nonzero_mask]/counts_inc)
-
-# n_theta, n_slices, n_columns = counts_xrt.shape
-
-# init_x_shift = 0
-
-# n_desired_iter = 6 # For the reprojection scheme, NOT for reconstruction by itself
-
-# algorithm = 'gridrec'
-
-# if (n_slices % 2) or (n_columns % 2): # Padding for odd-integer detector positions and/or slices
-#     if (n_slices % 2) and (n_columns % 2):
-#         xrt_proj_img_array = pad_col_row(counts_xrt)
-#         xrf_proj_img_array = pad_col_row(counts_xrf)
-            
-#         n_slices += 1
-#         n_columns += 1
-        
-#     elif n_slices % 2:
-#         xrt_proj_img_array = pad_row(counts_xrt)
-#         xrf_proj_img_array = pad_row(counts_xrf)
-
-#         n_slices += 1
-
-#     else:
-
-#         xrt_proj_img_array = pad_col(counts_xrt)
-#         xrf_proj_img_array = pad_col(counts_xrf)
-
-#         n_columns += 1
-
-# orig_proj_ref, \
-# aligned_proj_total_xrt, \
-# aligned_proj_total_opt_dens, \
-# aligned_proj_total_xrf, \
-# aligned_exp_proj_array, \
-# synth_proj_array, \
-# recon_array, \
-# net_x_shifts, \
-# net_y_shifts, \
-# dx_array, \
-# dy_array = iter_reproj(desired_element, 
-#                        elements_xrt,
-#                        theta_xrt,
-#                        counts_inc, 
-#                        counts_xrt, 
-#                        counts_xrf,
-#                        algorithm, 
-#                        n_desired_iter)
-
-# print('Saving XRT aux files...')
-
-# full_output_dir_path = os.path.join(output_dir_path_base, 'iter_reproj', output_file_name_base)
-
-# os.makedirs(full_output_dir_path, exist_ok = True)
-
-# np.save(os.path.join(full_output_dir_path, 'theta_array.npy'), theta_xrt)
-# np.save(os.path.join(full_output_dir_path, 'aligned_proj_all_elements.npy'), aligned_proj_total_xrt)
-# np.save(os.path.join(full_output_dir_path, 'aligned_proj_array_iter_' + desired_element + '.npy'), aligned_exp_proj_array)
-# np.save(os.path.join(full_output_dir_path, 'synth_proj_array_iter_' + desired_element + '.npy'), synth_proj_array)
-# np.save(os.path.join(full_output_dir_path, 'recon_array_iter_' + desired_element + '.npy'), recon_array)
-# np.save(os.path.join(full_output_dir_path, 'net_x_shifts_' + desired_element + '.npy'), net_x_shifts)
-# np.save(os.path.join(full_output_dir_path, 'net_y_shifts_' + desired_element + '.npy'), net_y_shifts)
-# np.save(os.path.join(full_output_dir_path, 'orig_exp_proj_' + desired_element + '.npy'), orig_proj_ref)
-
-# print('Exporting aligned XR and optical density data to HDF5 file...')
-
-# with h5py.File(os.path.join(output_dir_path_base, '2_ide_aggregate_xrt_aligned.h5'), 'w') as f:
-#     exchange = f.create_group('exchange')
-#     file_info = f.create_group('corresponding_file_info')
-
-#     exchange.create_dataset('data', data = aligned_proj_total_xrt, compression = 'gzip', compression_opts = 6)
-#     exchange.create_dataset('elements', data = elements_xrt)
-#     exchange.create_dataset('theta', data = theta_xrt)
-        
-#     file_info.create_dataset('filenames', data = filenames)
-#     file_info.create_dataset('dataset_type', data = 'xrt')
-
-# print('Exporting aligned XRF data to HDF5 file...')
-
-# with h5py.File(os.path.join(output_dir_path_base, '2_ide_aggregate_xrf_aligned.h5'), 'w') as f:
-#     exchange = f.create_group('exchange')
-#     file_info = f.create_group('corresponding_file_info')
-
-#     exchange.create_dataset('data', data = aligned_proj_total_xrf, compression = 'gzip', compression_opts = 6)
-#     exchange.create_dataset('elements', data = elements_xrf)
-#     exchange.create_dataset('theta', data = theta_xrt)
-        
-#     file_info.create_dataset('filenames', data = filenames)
-#     file_info.create_dataset('dataset_type', data = 'xrf')
-
-# print('Done')
