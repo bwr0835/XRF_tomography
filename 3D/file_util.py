@@ -641,7 +641,7 @@ def extract_csv_preprocessing_input_params(file_path):
                                    names = ['input_param', 'value'],
                                    dtype = str,
                                    keep_default_na = False,
-                                   index_col = False)
+                                   index = False)
 
     try:
         input_params = input_params_csv['input_param']
