@@ -688,7 +688,7 @@ def extract_csv_preprocessing_input_params(file_path):
                                     'eps',
                                     'aligned_data_output_dir_path'])
 
-    if input_params != all_params_ordered:
+    if input_params.equals(all_params_ordered):
         print('Error: At least one parameter missing or at least one parameter too many.')
         print('\nThe following input parameters are required\n:')
         print(*(["'{}'".format(s) for s in all_params_ordered]), sep = '\n')
