@@ -665,7 +665,8 @@ def extract_csv_preprocessing_input_params(file_path):
                    'norm_enabled',
                    'realignment_enabled']
     
-    print(input_params)
+    # print(input_params)
+    
 
     all_params_ordered = pd.Series(['synchrotron',
                                     'synchrotron_beamline',
@@ -689,6 +690,8 @@ def extract_csv_preprocessing_input_params(file_path):
                                     'upsample_factor',
                                     'eps',
                                     'aligned_data_output_dir_path'])
+
+    print(all_params_ordered)
 
     if input_params.equals(all_params_ordered):
         print('Error: At least one parameter missing or at least one parameter too many.')
