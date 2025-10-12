@@ -70,10 +70,6 @@ def extract_h5_xrf_data(file_path, synchrotron, **kwargs):
 
             h5.close()
 
-        except KeyboardInterrupt:
-            print('Test')
-            sys.exit()
-
         except:
             print('Error: Incompatible HDF5 file structure. Exiting program...')
 
