@@ -160,13 +160,13 @@ def preprocess_xrf_xrt_data(synchrotron,
                 print('Normalizing XRF, XRT data via per-projection XRT masks...')
 
                 if return_aux_data:
-                    counts_xrt_norm, counts_xrf_norm, norm_array, I0_cts, conv_mag_array = ppu.joint_fluct_norm(counts_xrt,
+                    counts_xrt_norm, counts_xrf_norm, norm_array, I0_cts, conv_mag_array = ppu.joint_fluct_norm(counts_xrt_sig,
                                                                                                                 counts_xrf, 
                                                                                                                 xrt_data_percentile, 
                                                                                                                 return_conv_mag_array = True)
 
                 else:
-                    counts_xrt_norm, counts_xrf_norm, norm_array, I0_cts = ppu.joint_fluct_norm(counts_xrt,
+                    counts_xrt_norm, counts_xrf_norm, norm_array, I0_cts = ppu.joint_fluct_norm(counts_xrt_sig,
                                                                                                 counts_xrf,
                                                                                                 xrt_data_percentile)
 
