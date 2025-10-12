@@ -730,13 +730,18 @@ def extract_csv_preprocessing_input_params(file_path):
         print('Error: Synchrotron unavailable. Exiting program...')
 
         sys.exit()
+    
+    for param in all_params_ordered:
+        print(f'{input_param_dict[param]}: {type(input_param_dict[param]).__name__}')
 
     if not all(isinstance(input_param_dict[param], bool) for param in bool_params):
-        print('Error: Input parameters \'create_aggregate_xrf_xrt_files_enabled\', \
-                      \'pre_existing_aggregate_xrf_xrt_file_lists_enabled\', \
-                      \'pre_existing_align_norm_file_enabled\', \
-                      \'norm_enabled\', \
-                      and \'realignment_enabled\' must all be set to True or False. Exiting program...')
+        print('Error: The following input parameters must all be set to True or False:\n', \
+              '     \'create_aggregate_xrf_xrt_files_enabled\'\n', \
+              '     \'pre_existing_aggregate_xrf_xrt_file_lists_enabled\'\n', \
+              '     \'pre_existing_align_norm_file_enabled\'\n', \
+              '     \'norm_enabled\'\n', \
+              '     \'realignment_enabled\'\n\n', \
+              'Exiting program...')
 
         sys.exit()
 
@@ -744,8 +749,8 @@ def extract_csv_preprocessing_input_params(file_path):
         if isinstance(input_param_dict.get(param), str):
             print(f'Error: Expected a number for input parameter \'{param}\'. Exiting program...')
 
-    # for param in all_params_ordered:
-    #     print(f'{input_param_dict[param]}: {type(input_param_dict[param]).__name__}')
+    for param in all_params_ordered:
+        print(f'{input_param_dict[param]}: {type(input_param_dict[param]).__name__}')
 
     return input_param_dict
 
