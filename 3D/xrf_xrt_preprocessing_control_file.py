@@ -29,6 +29,8 @@ def preprocess_xrf_xrt_data(synchrotron,
                             eps,
                             aligned_data_output_dir_path):
 
+    print('OK')
+
     if create_aggregate_xrf_xrt_files_enabled:
         if pre_existing_aggregate_xrf_xrt_file_lists_enabled:
             print('Extracting pre-existing XRF, XRT HDF5 file lists...')
@@ -101,7 +103,7 @@ def preprocess_xrf_xrt_data(synchrotron,
 
     else:
         if not os.path.dirname(aligned_data_output_dir_path):
-            print('Error: Output directory does not exist. Exiting program...')
+            print('Error: Unable to locate output file directory. Exiting program...')
 
             sys.exit()
 
