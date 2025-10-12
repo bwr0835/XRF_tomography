@@ -744,7 +744,7 @@ def extract_csv_preprocessing_input_params(file_path):
             print(f'Error: Expected a number for input parameter \'{param}\'. Exiting program...')
 
     for param in all_params_ordered:
-        print(f'{input_param_dict[param]}: {input_param_dict[param].dtype}')
+        print(f'{input_param_dict[param]}: {type(input_param_dict[param]).__name__}')
 
     return input_param_dict
 
