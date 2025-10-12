@@ -717,7 +717,7 @@ def extract_csv_preprocessing_input_params(file_path):
                 continue
     
     for val in values:
-        print(val.dtype)
+        print(type(val))
 
     input_param_dict = dict(zip(input_params, values)) # zip() creates tuples; dict() converts the tuples to a dictionary
 
