@@ -60,7 +60,7 @@ def phase_xcorr(recon_proj,
 
     y_shift, x_shift = shift[0], shift[1]
 
-    if pcc_2d:
+    if return_pcc_2d:
         return y_shift, x_shift, pcc_2d
     
     return y_shift, x_shift
