@@ -779,9 +779,6 @@ def extract_csv_preprocessing_input_params(file_path):
         print('Error: Synchrotron unavailable. Exiting program...')
 
         sys.exit()
-    
-    for param in all_params_ordered:
-        print(f'{input_param_dict[param]}: {type(input_param_dict[param]).__name__}')
 
     if not all(isinstance(input_param_dict[param], bool) for param in bool_params):
         print('Error: The following input parameters must all be set to True or False:\n', \
