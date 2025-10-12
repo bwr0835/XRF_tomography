@@ -740,8 +740,8 @@ def extract_csv_preprocessing_input_params(file_path):
               '     \'pre_existing_aggregate_xrf_xrt_file_lists_enabled\'\n', \
               '     \'pre_existing_align_norm_file_enabled\'\n', \
               '     \'norm_enabled\'\n', \
-              '     \'realignment_enabled\'\n\n\r', \
-              'Exiting program...')
+              '     \'realignment_enabled\'\n\n', \
+              '\rExiting program...')
 
         sys.exit()
 
