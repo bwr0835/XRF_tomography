@@ -699,7 +699,6 @@ def extract_csv_preprocessing_input_params(file_path):
         sys.exit()
 
     for idx, val in enumerate(values): # Convert strings supposed to be numberic or Boolean to floats, ints, or bools
-        print(val)
         
         if val.lower() == 'true' or val.lower() == 'false':
             values[idx] = (val == 'true') # Convert 'true' and 'false' strings to corresponding Boolean values
@@ -717,6 +716,9 @@ def extract_csv_preprocessing_input_params(file_path):
             except:
                 continue
     
+    for val in values:
+        print(val.dtype)
+
     input_param_dict = dict(zip(input_params, values)) # zip() creates tuples; dict() converts the tuples to a dictionary
 
     available_synchrotrons = ['aps', 'nsls-ii']
