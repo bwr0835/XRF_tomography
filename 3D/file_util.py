@@ -688,6 +688,7 @@ def extract_csv_preprocessing_input_params(file_path):
                                     'eps',
                                     'aligned_data_output_dir_path'])
 
+    available_synchrotrons = ['aps', 'nsls-ii']
     # print(all_params_ordered)
 
     if not input_params.equals(all_params_ordered):
@@ -699,7 +700,6 @@ def extract_csv_preprocessing_input_params(file_path):
         sys.exit()
 
     for idx, val in enumerate(values): # Convert strings supposed to be numberic or Boolean to floats, ints, or bools
-        
         if val.lower() == 'true' or val.lower() == 'false':
             values[idx] = (val == 'true') # Convert 'true' and 'false' strings to corresponding Boolean values
 
@@ -715,13 +715,8 @@ def extract_csv_preprocessing_input_params(file_path):
             
             except:
                 continue
-    
-    for val in values:
-        print(type(val))
 
     input_param_dict = dict(zip(input_params, values)) # zip() creates tuples; dict() converts the tuples to a dictionary
-
-    available_synchrotrons = ['aps', 'nsls-ii']
     
     if input_param_dict['synchrotron'] is None or input_param_dict['synchrotron_beamline'] is None:
         print('Error: Synchrotron and/or synchrotron beamline fields empty. Exiting program...')
@@ -747,6 +742,9 @@ def extract_csv_preprocessing_input_params(file_path):
     for param in numeric_params:
         if isinstance(input_param_dict.get(param), str):
             print(f'Error: Expected a number for input parameter \'{param}\'. Exiting program...')
+
+    for param in all_params_ordered:
+        print(f'{input_param_dict[param]}: {input_param_dict[param].dtype}')
 
     return input_param_dict
 
