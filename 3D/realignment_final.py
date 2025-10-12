@@ -189,7 +189,7 @@ def realign_proj(synchrotron,
     net_y_shifts_pcc_new: Array of net y shifts with dimensions (n_iterations, n_theta) (array-like; dtype: float) (Note: n_iterations can be smaller the more quickly iter_reproj() converges)
 
     '''
-    
+
     if sigma < 0 or alpha < 0:
         print('Error: \'sigma\' and \'alpha\' must be positive numbers. Exiting program...')
 
@@ -331,10 +331,19 @@ def realign_proj(synchrotron,
         
         for theta_idx in range(n_theta):
             if not return_aux_data:
-                dy, dx = phase_xcorr(synth_proj[theta_idx], aligned_proj[theta_idx], sigma, alpha, upsample_factor)
+                dy, dx = phase_xcorr(synth_proj[theta_idx], 
+                                     aligned_proj[theta_idx], 
+                                     sigma, 
+                                     alpha, 
+                                     upsample_factor)
             
             else:
-                dy, dx, pcc_2d = phase_xcorr(synth_proj[theta_idx], aligned_proj[theta_idx], upsample_factor, return_pcc_2d = True)
+                dy, dx, pcc_2d = phase_xcorr(synth_proj[theta_idx], 
+                                             aligned_proj[theta_idx], 
+                                             sigma, 
+                                             alpha, 
+                                             upsample_factor, 
+                                             return_pcc_2d = True)
 
                 pcc_2d_array.append(pcc_2d)
 
