@@ -15,7 +15,7 @@ I0_cts_per_s:
 t_dwell_s:
 realignment_enabled: True
 n_iter_iter_reproj: 6
-sigma: 5
+sigma: 15
 alpha: 10
 upsample_factor: 100
 eps: 0.3
