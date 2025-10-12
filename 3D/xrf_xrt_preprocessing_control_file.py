@@ -29,9 +29,6 @@ def preprocess_xrf_xrt_data(synchrotron,
                             eps,
                             aligned_data_output_dir_path):
 
-    print(create_aggregate_xrf_xrt_files_enabled)
-    print(pre_existing_aggregate_xrf_xrt_file_lists_enabled)
-
     if create_aggregate_xrf_xrt_files_enabled:
         if pre_existing_aggregate_xrf_xrt_file_lists_enabled:
             print('Extracting pre-existing XRF, XRT HDF5 file lists...')
