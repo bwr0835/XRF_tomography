@@ -254,7 +254,7 @@ def joint_fluct_norm(xrt_array,
                      sigma_2 = 10,
                      return_conv_mag_array = False):
 
-    if xrt_array.ndim != 3 and xrf_array != 3:
+    if xrt_array.ndim != 3 and xrf_array.ndim != 3:
         print('Error: Number of XRT and/or XRF array dimesions ≠ 4. Exiting program...')
 
         sys.exit()
