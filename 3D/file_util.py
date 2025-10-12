@@ -70,6 +70,11 @@ def extract_h5_xrf_data(file_path, synchrotron, **kwargs):
 
             h5.close()
 
+        except KeyboardInterrupt:
+            print('\n\nKeyboardInterrupt occurred. Exiting program...')
+            
+            sys.exit()
+
         except:
             print('Error: Incompatible HDF5 file structure. Exiting program...')
 
@@ -212,6 +217,11 @@ def extract_h5_xrt_data(file_path, synchrotron, **kwargs):
             extra_pvs_names = extra_pvs_h5['Names'][()]
             extra_pvs_values = extra_pvs_h5['Values'][()]
         
+        except KeyboardInterrupt:
+            print('\n\nKeyboardInterrupt occurred. Exiting program...')
+            
+            sys.exit()
+
         except:
             print('Error: Incompatible HDF5 file structure. Exiting program...')
 
@@ -235,6 +245,11 @@ def extract_h5_xrt_data(file_path, synchrotron, **kwargs):
             # abs_ic_idx = np.where(scaler_names == b'abs_ic')[0][0]
             theta_idx = np.where(extra_pvs_names == b'2xfm:m58.VAL')[0]
         
+        except KeyboardInterrupt:
+            print('\n\nKeyboardInterrupt occurred. Exiting program...')
+            
+            sys.exit()
+
         except:
             print('Error: Incompatible HDF5 file structure. Exiting program...')
 
@@ -268,6 +283,11 @@ def extract_h5_xrt_data(file_path, synchrotron, **kwargs):
             dx_cm, dy_cm = h5['dr_x'][()], h5['dr_y'][()] # These are supposed to be different than for XRF due to ptychography requiring overlapping positions
 
             h5.close()
+
+        except KeyboardInterrupt:
+            print('\n\nKeyboardInterrupt occurred. Exiting program...')
+            
+            sys.exit()
 
         except:
             print('Error: Incompatible HDF5 file structure. Exiting program...')
@@ -492,6 +512,11 @@ def extract_h5_aggregate_xrf_data(file_path, **kwargs):
         dataset_type = counts_h5.attrs['dataset_type']
         raw_spectrum_fitting_method = h5['exchange'].attrs['raw_spectrum_fitting_method']
     
+    except KeyboardInterrupt:
+        print('\n\nKeyboardInterrupt occurred. Exiting program...')
+            
+        sys.exit()
+
     except:
         print('Error: Incompatible HDF5 file structure. Exiting program...')
 
@@ -538,6 +563,11 @@ def extract_h5_aggregate_xrt_data(file_path, **kwargs):
         dataset_type = counts_h5.attrs['dataset_type']
         us_ic_scaler_name = counts_h5.attrs['us_ic_scaler_name']
     
+    except KeyboardInterrupt:
+        print('\n\nKeyboardInterrupt occurred. Exiting program...')
+            
+        sys.exit()
+
     except:
         print('Error: Incompatible HDF file structure. Exiting program...')
 
@@ -574,6 +604,11 @@ def extract_csv_norm_net_shift_data(file_path, theta_array):
     try:
         thetas = norm_mass_calibration_net_shift_data['theta'].to_numpy().astype(float)
     
+    except KeyboardInterrupt:
+        print('\n\nKeyboardInterrupt occurred. Exiting program...')
+            
+        sys.exit()
+
     except:
         print('Error: Incorrect CSV file structure. Exiting program...')
 
@@ -646,6 +681,11 @@ def extract_csv_preprocessing_input_params(file_path):
         input_params = input_params_csv['input_param']
         values = input_params_csv['value'].str.strip().replace('', 'None') # Extract values while setting non-existent values to None
     
+    except KeyboardInterrupt:
+        print('\n\nKeyboardInterrupt occurred. Exiting program...')
+            
+        sys.exit()
+
     except:
         print('Error: Unable to read in CSV file. Exiting program...')
 
@@ -709,10 +749,20 @@ def extract_csv_preprocessing_input_params(file_path):
         try:
             values[idx] = int(val)
         
+        except KeyboardInterrupt:
+            print('\n\nKeyboardInterrupt occurred. Exiting program...')
+            
+            sys.exit()
+
         except:
             try:
                 values[idx] = float(val)
             
+            except KeyboardInterrupt:
+                print('\n\nKeyboardInterrupt occurred. Exiting program...')
+            
+                sys.exit()
+
             except:
                 continue
 

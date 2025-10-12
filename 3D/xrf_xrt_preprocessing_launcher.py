@@ -24,10 +24,4 @@ if __name__ == '__main__':
 
     preprocessing_inputs = futil.extract_csv_preprocessing_input_params(input_param_file_path)
 
-    try:
-        preprocess_xrf_xrt_data(**preprocessing_inputs)
-    
-    except KeyboardInterrupt:
-            print('\n\nKeyboardInterrupt occurred. Exiting program...')
-            
-            sys.exit()
+    preprocess_xrf_xrt_data(**preprocessing_inputs)
