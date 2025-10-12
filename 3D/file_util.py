@@ -38,7 +38,7 @@ def extract_h5_xrf_xrt_data_file_lists_tk(synchrotron):
 
 def extract_h5_xrf_data(file_path, synchrotron, **kwargs):
     if not os.path.isfile(file_path):
-        print('Error: HDF5 file path does not exist. Exiting program...')
+        print('Error: HDF5 file path cannot be found. Exiting program...')
 
         sys.exit()
 
@@ -189,7 +189,7 @@ def extract_h5_xrf_data(file_path, synchrotron, **kwargs):
 
 def extract_h5_xrt_data(file_path, synchrotron, **kwargs):
     if not os.path.isfile(file_path):
-        print('Error: HDF5 file path does not exist. Exiting program...')
+        print('Error: HDF5 file path cannot be found. Exiting program...')
 
         sys.exit()
 
@@ -468,12 +468,12 @@ def create_aggregate_xrt_h5(file_path_array, output_h5_file, synchrotron, **kwar
 
 def extract_h5_aggregate_xrf_data(file_path, **kwargs):
     if not os.path.isfile(file_path):
-        print('Error: HDF5 file path does not exist. Exiting program...')
+        print('Error: HDF5 file path cannot be found. Exiting program...')
 
         sys.exit()
 
     if not file_path.endswith('.h5'):
-        print('Error: File must be HDF5. Exiting program...')
+        print('Error: File extension must be \'.h5\'. Exiting program...')
 
         sys.exit()
     
@@ -514,7 +514,7 @@ def extract_h5_aggregate_xrf_data(file_path, **kwargs):
 
 def extract_h5_aggregate_xrt_data(file_path, **kwargs):
     if not os.path.isfile(file_path):
-        print('Error: HDF5 file path does not exist. Exiting program...')
+        print('Error: HDF5 file path cannot be found. Exiting program...')
 
         sys.exit()
 
@@ -560,7 +560,7 @@ def extract_h5_aggregate_xrt_data(file_path, **kwargs):
 
 def extract_csv_norm_net_shift_data(file_path, theta_array):
     if not os.path.isfile(file_path):
-        print('Error: CSV file path does not exist. Exiting program...')
+        print('Error: CSV file path cannot be found. Exiting program...')
 
         sys.exit()
 
@@ -626,7 +626,7 @@ def create_h5_aligned_aggregate_xrf_xrt(elements_xrf,
 
 def extract_csv_preprocessing_input_params(file_path):
     if not os.path.isfile(file_path):
-        print('Error: CSV file path does not exist. Exiting program...')
+        print('Error: CSV file path cannot be found. Exiting program...')
 
         sys.exit()
 
@@ -699,7 +699,7 @@ def extract_csv_preprocessing_input_params(file_path):
         sys.exit()
 
     for idx, val in enumerate(values): # Convert strings supposed to be numberic or Boolean to floats, ints, or bools
-        print(val)
+        # print(val)
         
         if val.lower() == 'true' or val.lower() == 'false':
             values[idx] = (val == 'true') # Convert 'true' and 'false' strings to corresponding Boolean values
@@ -777,7 +777,7 @@ def create_csv_file_list(file_path_array,
 
 def extract_csv_xrf_xrt_data_file_lists(file_path_1, file_path_2 = None, **kwargs):
     if not os.path.isfile(file_path_1):
-        print('Error: CSV file path does not exist. Exiting program...')
+        print('Error: CSV file path cannot be found. Exiting program...')
 
         sys.exit()
     
@@ -805,7 +805,7 @@ def extract_csv_xrf_xrt_data_file_lists(file_path_1, file_path_2 = None, **kwarg
             sys.exit()
         
         if not os.path.isfile(file_path_2):
-            print('Error: CSV file path does not exist')
+            print('Error: CSV file path cannot be found')
 
         with open(file_path_2, newline = '') as f:
             filename_array_2 = [fn for fn in (filename.strip() for filename in f) \
