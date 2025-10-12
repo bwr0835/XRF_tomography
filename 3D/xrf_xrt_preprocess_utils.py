@@ -282,7 +282,7 @@ def joint_fluct_norm(xrt_array,
         xrt_mask_avg = xrt_array[theta_idx, mask].mean()
 
         xrt_array[theta_idx] /= xrt_mask_avg # First part of I0' = I0(<I_theta,mask,avg>/I_theta,mask,avg)
-        xrf_array[theta_idx] /= xrt_mask_avg
+        xrf_array[:, theta_idx] /= xrt_mask_avg
 
         xrt_mask_avg_sum += xrt_mask_avg
 
