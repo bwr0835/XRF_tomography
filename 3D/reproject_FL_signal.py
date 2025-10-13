@@ -55,13 +55,13 @@ params_3d_test_sample8_64_64_64 = {'dev': "cpu",
                                      'sample_size_n': 64, 
                                      'sample_height_n': 64,
                                      'sample_size_cm': 0.01,                                    
-                                     'probe_energy': np.array([20.0]),                                       
+                                     'probe_energy_keV': np.array([20.0]),                                       
                                      'minibatch_size': 64,                                    
                                      'manual_det_coord': False,
                                      'set_det_coord_cm': None,
                                      'det_on_which_side': "positive",
                                      'manual_det_area': False,
-                                     'set_det_area_cm2': None,
+                                     'set_det_area_eff_cm2': None,
                                      'det_size_cm': 0.9, # The estimated diameter of the sensor
                                      'det_from_sample_cm': 1.6, # The estimated spacing between the sample and the detector                           
                                      'det_ds_spacing_cm': 0.4, # Set this value to the value of det_size_cm divided by a number

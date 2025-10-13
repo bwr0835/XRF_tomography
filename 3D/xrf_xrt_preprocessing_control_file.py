@@ -106,7 +106,12 @@ def preprocess_xrf_xrt_data(synchrotron,
             sys.exit()
 
         elements_xrf, counts_xrf, theta, _, dataset_type = futil.extract_h5_aggregate_xrf_data(aggregate_xrf_h5_file_path)
-        elements_xrt, counts_xrt, _, _, dataset_type = futil.extract_h5_aggregate_xrt_data(aggregate_xrt_h5_file_path)
+        elements_xrt, counts_xrt, theta_xrt, _, dataset_type = futil.extract_h5_aggregate_xrt_data(aggregate_xrt_h5_file_path)
+
+        if not np.array_equal(theta, theta_xrt):
+            print('Error: Inconsistent number of XRF, XRT projection angles. Exiting program...')
+
+            sys.exit()
 
         _, n_theta, n_slices, n_columns = counts_xrf.shape
 

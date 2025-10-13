@@ -5,39 +5,40 @@ Created on Fri Nov 20 15:58:57 2020
 
 @author: panpanhuang
 """
-import os
-import shutil
-import sys
-import datetime
-import numpy as np
-import h5py
-from mpi4py import MPI
-import xraylib as xlib
-import xraylib_np as xlib_np
+import numpy as np, \
+       torch as tc, \
+       xraylib as xlib, \
+       xraylib_np as xlib_np, \
+       os, \
+       shutil, \
+       sys, \
+       datetime, \
+       time, \
+       matplotlib, \
+       h5py, \
+       dxchange, \
+       warnings
 
-import torch as tc
-tc.set_default_tensor_type(tc.FloatTensor)
-import torch.nn as nn
+from util import rotate, \
+                 MakeFLlinesDictionary_manual, \
+                 intersecting_length_fl_detectorlet_3d_mpi_write_h5_3_manual, \
+                 find_lines_roi_idx_from_dataset
+from mpi4py import MPI
+from torch import nn
 from tqdm import tqdm
-import time
-from util import rotate, MakeFLlinesDictionary_manual, intersecting_length_fl_detectorlet_3d_mpi_write_h5_3_manual, find_lines_roi_idx_from_dataset
 from standard_calibration import calibrate_incident_probe_intensity
 from array_ops import initialize_guess_3d
 from forward_model import PPM
 from misc import print_flush_root, print_flush_all
+from matplotlib import pyplot as plt, ticker as mtick, gridspec
+from mpl_toolkits.axes_grid1 import make_axes_locatable
 
-import matplotlib.pyplot as plt
-import matplotlib 
+tc.set_default_tensor_type(tc.FloatTensor)
+
 matplotlib.rcParams['pdf.fonttype'] = 'truetype'
 fontProperties = {'family': 'sans-serif', 'sans-serif': ['Helvetica'], 'weight': 'normal', 'size': 12}
 plt.rc('font', **fontProperties)
-from matplotlib import gridspec
-from mpl_toolkits.axes_grid1 import make_axes_locatable
-import matplotlib.ticker as mtick
 
-import dxchange
-
-import warnings
 warnings.filterwarnings("ignore")
 
 fl = {"K": np.array([xlib.KA1_LINE, xlib.KA2_LINE, xlib.KA3_LINE, xlib.KB1_LINE, xlib.KB2_LINE,
@@ -48,11 +49,10 @@ fl = {"K": np.array([xlib.KA1_LINE, xlib.KA2_LINE, xlib.KA3_LINE, xlib.KB1_LINE,
       "M": np.array([xlib.MA1_LINE, xlib.MA2_LINE, xlib.MB_LINE])               
      }
 
-    
 def reconstruct_jXRFT_tomography(
         # ______________________________________
         # |Raw data and experimental parameters|________________________________
-        sample_size_n, sample_height_n, sample_size_cm, probe_energy = None,
+        sample_size_n, sample_height_n, sample_size_cm, probe_energy_keV = None,
         # Set sample_size_n (sample_height_n) to the number of pixels along the direction 
         # perpendicular (parallel) to # the rotational axis of the sample;
         # sample_size_cm is the size of the sample size (in unit cm) along the direction 
@@ -81,13 +81,13 @@ def reconstruct_jXRFT_tomography(
         manual_det_area = True,
         # True when using a exp. data;
         # False when using a simulation data;
-        # If set to True, the program caculated the signal collecting solid angle of XRF using det_area_cm2;
+        # If set to True, the program caculated the signal collecting solid angle of XRF using det_area_eff_cm2;
         # If set to False, the program uses provided det_dia_cm and det_from_sample_cm;
         #### Note ####
         # For exp. data, the factor of signal collecting solid angle is included in probe_intensity
         # which is calculated from the calibration data;
         
-        det_area_cm2 = None,
+        det_area_eff_cm2 = None,
         # For exp. data only. Set the value of the total sensing area;
         # For simulation data, set to None (program calculates sensing area with given det_dia_cm)
     
@@ -111,24 +111,38 @@ def reconstruct_jXRFT_tomography(
     
         # ___________________________
         # |Reconstruction parameters|___________________________________________
-        n_epochs = 50, save_every_n_epochs = 10, minibatch_size = None,
+        n_epochs = 50, 
+        save_every_n_epochs = 10, 
+        minibatch_size = None,
         f_recon_parameters = "recon_parameters.txt", dev = None,
-        selfAb = False, cont_from_check_point = False, use_saved_initial_guess = False, 
-        ini_kind = 'const', init_const = 0.5, ini_rand_amp = 0.1,
-        # Set ini_kind to 'const', 'rand' or 'randn'
-    
-        recon_path='./', f_initial_guess = None, f_recon_grid = None, data_path = None, f_XRF_data = None, f_XRT_data = None,
-        # f_recon_grid is the name of the file that saves the most recent reconstructed result 
+        selfAb = False, 
+        cont_from_check_point = False, 
+        use_saved_initial_guess = False, 
+        ini_kind = 'const',  # Set ini_kind to 'const', 'rand' or 'randn'
+        init_const = 0.5, 
+        ini_rand_amp = 0.1,
+        recon_path='./', 
+        f_initial_guess = None, 
+        f_recon_grid = None,  # Name of the file that saves the most recent reconstructed result 
+        data_path = None, 
+        f_XRF_data = None, 
+        f_XRT_data = None,
         scaler_counts_us_ic_dataset_idx = None,
-        # the index of us_ic in the dataset MAPS/scaler_names
-        scaler_counts_ds_ic_dataset_idx = None,
-        # the index of ds_ic in the dataset MAPS/scaler_names
-        XRT_ratio_dataset_idx = None,
-        # the index of abs_ic in the dataset MAPS/scaler_names
-        theta_ls_dataset = 'exchange/theta', channel_names = 'exchange/elements',
-        this_aN_dic = None, element_lines_roi = None, n_line_group_each_element = None,
-        b1 = None, b2 = None, lr = None,
-        P_folder = None, f_P = None, fl_K = fl["K"], fl_L = fl["L"], fl_M = fl["M"], **kwargs):
+        scaler_counts_ds_ic_dataset_idx = None,  # the index of us_ic in the dataset MAPS/scaler_names
+        XRT_ratio_dataset_idx = None, # the index of ds_ic in the dataset MAPS/scaler_names
+        theta_ls_dataset = 'exchange/theta', channel_names = 'exchange/elements',  # the index of abs_ic in the dataset MAPS/scaler_names
+        this_aN_dic = None, 
+        element_lines_roi = None, 
+        n_line_group_each_element = None,
+        b1 = None, 
+        b2 = None, 
+        lr = None,
+        P_folder = None, 
+        f_P = None, 
+        fl_K = fl["K"], 
+        fl_L = fl["L"], 
+        fl_M = fl["M"],
+         **kwargs):
     
     comm = MPI.COMM_WORLD
     n_ranks = comm.Get_size()
@@ -152,7 +166,7 @@ def reconstruct_jXRFT_tomography(
     
     #### Make the lookup table of the fluorescence lines of interests ####
     fl_all_lines_dic = MakeFLlinesDictionary_manual(element_lines_roi,                           
-                                                    n_line_group_each_element, probe_energy, 
+                                                    n_line_group_each_element, probe_energy_keV, 
                                                     sample_size_n, sample_size_cm,
                                                     fl_line_groups = np.array(["K", "L", "M"]), fl_K = fl_K, fl_L = fl_L, fl_M = fl_M) #cpu
     
@@ -166,8 +180,8 @@ def reconstruct_jXRFT_tomography(
     ####--------------------------------------------------------------####
     
     #### Calculate the MAC of probe ####
-    # probe_attCS_ls = tc.as_tensor(xlib_np.CS_Total(aN_ls, probe_energy).flatten()).to(dev) # TODO
-    probe_attCS_ls = tc.as_tensor(xlib_np.CS_Total_Kissel(aN_ls, probe_energy).flatten()).to(dev)
+    # probe_attCS_ls = tc.as_tensor(xlib_np.CS_Total(aN_ls, probe_energy_keV).flatten()).to(dev) # TODO
+    probe_attCS_ls = tc.as_tensor(xlib_np.CS_Total_Kissel(aN_ls, probe_energy_keV).flatten()).to(dev)
     ####----------------------------####
     
     #### Load all object angles ####
@@ -190,7 +204,7 @@ def reconstruct_jXRFT_tomography(
     
     #### pick the probe photon counts calibrated for all optics and detectors
     if use_std_calibation:
-        probe_cts = calibrate_incident_probe_intensity(std_path, f_std, fitting_method, std_element_lines_roi, density_std_elements, probe_energy)
+        probe_cts = calibrate_incident_probe_intensity(std_path, f_std, fitting_method, std_element_lines_roi, density_std_elements, probe_energy_keV)
         # TODO Remove since we can extract incident flux from normalization of incident flux fluctuations or photodiode or XRT measurements
     else:
         probe_cts = probe_intensity
@@ -200,7 +214,7 @@ def reconstruct_jXRFT_tomography(
     
     
     if manual_det_area == True:
-        det_solid_angle_ratio = det_area_cm2 / (4 * np.pi * det_from_sample_cm**2)
+        det_solid_angle_ratio = det_area_eff_cm2 / (4 * np.pi * det_from_sample_cm**2)
         # det_solid_angle_ratio = 1.0
         signal_attenuation_factor = 1.0
     
@@ -302,7 +316,7 @@ def reconstruct_jXRFT_tomography(
                 recon_params.write("sample_size_n = %d\n" %sample_size_n)
                 recon_params.write("sample_height_n = %d\n" %sample_height_n)
                 recon_params.write("sample_size_cm = %.2f\n" %sample_size_cm)
-                recon_params.write("probe_energy_keV = %.2f\n" %probe_energy[0])
+                recon_params.write("probe_energy_keV = %.2f\n" %probe_energy_keV[0])
                 recon_params.write("incident_probe_cts = %.2e\n" %probe_cts)
                 
                 if not manual_det_area:
@@ -330,9 +344,9 @@ def reconstruct_jXRFT_tomography(
             theta_ls_rand = comm.bcast(theta_ls_rand, root=0).to(dev)         
             comm.Barrier() 
             
-            stdout_options = {'root':0, 'output_folder': recon_path, 'save_stdout': True, 'print_terminal': True}
+            stdout_options = {'root': 0, 'output_folder': recon_path, 'save_stdout': True, 'print_terminal': True}
             timestr = str(datetime.datetime.today())     
-            print_flush_root(rank, val=f"epoch: {epoch}, time: {timestr}", output_file='', **stdout_options)
+            print_flush_root(rank, val = f"epoch: {epoch}, time: {timestr}", output_file = '', **stdout_options)
  
             for idx, theta in enumerate(theta_ls_rand):
                 this_theta_idx = rand_idx[idx] 
@@ -381,7 +395,7 @@ def reconstruct_jXRFT_tomography(
                     model = PPM(dev, selfAb, lac, X, p, n_element, n_lines, FL_line_attCS_ls,
                                  detected_fl_unit_concentration, n_line_group_each_element,
                                  sample_height_n, minibatch_size, sample_size_n, sample_size_cm,
-                                 probe_energy, probe_cts, probe_att, probe_attCS_ls,
+                                 probe_energy_keV, probe_cts, probe_att, probe_attCS_ls,
                                  theta, signal_attenuation_factor,
                                  n_det, P_minibatch, det_dia_cm, det_from_sample_cm, det_solid_angle_ratio)
                     
@@ -536,7 +550,7 @@ def reconstruct_jXRFT_tomography(
             X = None
                    
         if rank == 0:
-            XRF_loss_whole_obj =  tc.from_numpy(np.load(os.path.join(recon_path, 'XRF_loss_signal.npy')).astype(np.float32))
+            XRF_loss_whole_obj = tc.from_numpy(np.load(os.path.join(recon_path, 'XRF_loss_signal.npy')).astype(np.float32))
             XRT_loss_whole_obj = tc.from_numpy(np.load(os.path.join(recon_path, 'XRT_loss_signal.npy')).astype(np.float32))
             loss_whole_obj = tc.from_numpy(np.load(os.path.join(recon_path, 'loss_signal.npy')).astype(np.float32))
             
@@ -573,7 +587,7 @@ def reconstruct_jXRFT_tomography(
                 recon_params.write("sample_size_n = %d\n" %sample_size_n)
                 recon_params.write("sample_height_n = %d\n" %sample_height_n)
                 recon_params.write("sample_size_cm = %.2f\n" %sample_size_cm)
-                recon_params.write("probe_energy_keV = %.2f\n" %probe_energy[0])
+                recon_params.write("probe_energy_keV = %.2f\n" %probe_energy_keV[0])
                 recon_params.write("incident_probe_cts = %.2e\n" %probe_cts)             
                 
                 if not manual_det_area:
@@ -646,7 +660,7 @@ def reconstruct_jXRFT_tomography(
                     model = PPM(dev, selfAb, lac, X, p, n_element, n_lines, FL_line_attCS_ls,
                                  detected_fl_unit_concentration, n_line_group_each_element,
                                  sample_height_n, minibatch_size, sample_size_n, sample_size_cm,
-                                 probe_energy, probe_cts, probe_att, probe_attCS_ls,
+                                 probe_energy_keV, probe_cts, probe_att, probe_attCS_ls,
                                  theta, signal_attenuation_factor,
                                  n_det, P_minibatch, det_dia_cm, det_from_sample_cm, det_solid_angle_ratio)
 

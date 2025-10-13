@@ -1,6 +1,7 @@
 import numpy as np, sys
 
 from scipy import ndimage as ndi
+from itertools import combinations as combos
 
 def round_correct(num, ndec):
     if ndec == 0:
@@ -254,7 +255,7 @@ def joint_fluct_norm(xrt_array,
                      sigma_2 = 10,
                      return_conv_mag_array = False):
 
-    if xrt_array.ndim != 3 and xrf_array.ndim != 4:
+    if xrt_array.ndim != 3 or xrf_array.ndim != 4:
         print('Error: Number of XRT dimensions ≠ 3 and/or number of XRF array dimesions ≠ 4. Exiting program...')
 
         sys.exit()
@@ -299,3 +300,18 @@ def joint_fluct_norm(xrt_array,
         return xrt_array, xrf_array, norm_array, global_xrt_mask_avg, np.array(convolution_mag_array)
     
     return xrt_array, xrf_array, norm_array, global_xrt_mask_avg
+
+def find_theta_combos(theta_array_deg, dtheta = 0):
+    '''
+    
+    Make sure angles are in degrees!
+
+    '''
+
+    theta_array_idx_pairs = list(combos(np.arange(len(theta_array_deg)), 2)) # Generate a list of all pairs of theta_array indices
+
+    valid_theta_idx_pairs = [(theta_idx_1, theta_idx_2) for theta_idx_1, theta_idx_2 in theta_array_idx_pairs 
+                             if (180 - dtheta <= np.abs(theta_array_deg[theta_idx_1] - theta_array_deg[theta_idx_2]) <= 180 + dtheta)]
+                            # Compound inequality syntax is acceptable in Python in certain cases
+
+    return valid_theta_idx_pairs

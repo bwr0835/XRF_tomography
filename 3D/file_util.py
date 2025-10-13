@@ -1,6 +1,7 @@
 import numpy as np, \
        pandas as pd, \
        tkinter as tk, \
+       xrf_xrt_input_param_names as ipn, \
        csv, \
        h5py, \
        os, \
@@ -670,14 +671,14 @@ def extract_csv_preprocessing_input_params(file_path):
 
         sys.exit()
 
-    input_params_csv = pd.read_csv(file_path,
-                                   delimiter = ':', 
-                                   header = None, 
-                                   names = ['input_param', 'value'],
-                                   dtype = str,
-                                   keep_default_na = False)
-
     try:
+        input_params_csv = pd.read_csv(file_path,
+                                       delimiter = ':', 
+                                       header = None, 
+                                       names = ['input_param', 'value'],
+                                       dtype = str,
+                                       keep_default_na = False)
+
         input_params = input_params_csv['input_param']
         values = input_params_csv['value'].str.strip().replace('', 'None') # Extract values while setting non-existent values to None
     
@@ -691,44 +692,11 @@ def extract_csv_preprocessing_input_params(file_path):
 
         sys.exit()
     
-    numeric_params = ['xrt_data_percentile',
-                      'I0_cts_per_s',
-                      't_dwell_s',
-                      'sigma',
-                      'alpha',
-                      'upsample_factor',
-                      'eps']
-    
-    bool_params = ['create_aggregate_xrf_xrt_files_enabled',
-                   'pre_existing_aggregate_xrf_xrt_file_lists_enabled', 
-                   'pre_existing_align_norm_file_enabled',
-                   'norm_enabled',
-                   'realignment_enabled']
-    
-    all_params_ordered = pd.Series(['synchrotron',
-                                    'synchrotron_beamline',
-                                    'create_aggregate_xrf_xrt_files_enabled',
-                                    'pre_existing_aggregate_xrf_xrt_file_lists_enabled',
-                                    'aggregate_xrf_csv_file_path',
-                                    'aggregate_xrt_csv_file_path',
-                                    'aggregate_xrf_h5_file_path',
-                                    'aggregate_xrt_h5_file_path',
-                                    'pre_existing_align_norm_file_enabled',
-                                    'pre_existing_align_norm_file_path',
-                                    'norm_enabled',
-                                    'xrt_data_percentile',
-                                    'return_aux_data',
-                                    'I0_cts_per_s',
-                                    't_dwell_s',
-                                    'realignment_enabled',
-                                    'n_iter_iter_reproj',
-                                    'sigma',
-                                    'alpha',
-                                    'upsample_factor',
-                                    'eps',
-                                    'aligned_data_output_dir_path'])
+    available_synchrotrons = ipn.available_synchrotrons
+    numeric_params = ipn.preprocessing_numeric_params
+    bool_params = ipn.preprocessing_bool_params
+    all_params_ordered = pd.Series(ipn.preprocessing_params_ordered)
 
-    available_synchrotrons = ['aps', 'nsls-ii']
     # print(all_params_ordered)
 
     if not input_params.equals(all_params_ordered):
@@ -743,7 +711,7 @@ def extract_csv_preprocessing_input_params(file_path):
         if val.lower() == 'true' or val.lower() == 'false':
             values[idx] = (val.lower() == 'true')
         
-        if val.lower() == 'none':
+        elif val.lower() == 'none':
             values[idx] = None
 
         try:
@@ -924,4 +892,36 @@ def create_csv_norm_net_shift_data(dir_path,
     df.to_csv(file_path, index = False)
 
     return
+
+def extract_input_jxrft_recon(file_path):
+    if not os.path.isfile(file_path):
+        print('Error: Cannot locate input file path. Exiting program...')
+
+        sys.exit()
+    
+    if not file_path.endswith('.csv'):
+        print('Error: Reconstruction input parameter file must be CSV. Exiting program...')
+
+        sys.exit()
+        
+    try:
+        input_params_csv = pd.read_csv(file_path,
+                                       delimiter = ':', 
+                                       header = None, 
+                                       names = ['input_param', 'value'],
+                                       dtype = str,
+                                       keep_default_na = False)
+
+        input_params = input_params_csv['input_param']
+        values = input_params_csv['value'].str.strip().replace('', 'None') # Extract values while setting non-existent values to None
+
+    except KeyboardInterrupt:
+        print('\n\nKeyboardInterrupt occurred. Exiting program...')
+            
+        sys.exit()
+
+    except:
+        print('Error: Unable to read in reconstruction input parameter CSV file. Exiting program...')
+
+        sys.exit()
     

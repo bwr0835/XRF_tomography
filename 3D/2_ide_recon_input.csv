@@ -1,0 +1,41 @@
+synchrotron: aps
+synchrotron_beamline: 2_ide
+f_recon_parameters: 'recon_parameters.txt'
+probe_intensity:
+selfAb:
+cont_from_check_point:
+use_saved_initial_guess:
+ini_kind:
+init_const:
+ini_rand_amp:
+recon_path:
+f_initial_guess:
+f_recon_grid:
+data_path:
+f_XRF_data:
+f_XRT_data:
+this_aN_dic: {'Si': 14, 'Ti': 22, 'Cr': 24, 'Fe': 26, 'Ni': 28, 'Ba: 56'}
+element_lines_roi: np.array([['Si', 'K'], ['Ti', 'K'], ['Cr', 'K'], ['Fe', 'K'], ['Ni', 'K'], ['Ba', 'L']])
+n_line_group_each_element: np.array([1, 1, 1, 1, 1, 1])
+sample_size_n:
+sample_height_n:
+sample_size_cm:
+probe_energy_keV: np.array([13])
+n_epochs: 200
+save_every_n_epochs: 5
+minibatch_size:	124
+b1: 10000					
+b2:	1
+lr:	0.001
+manual_det_coord:
+set_det_x_coord_cm:
+set_det_y_coord_cm:
+set_det_z_coord_cm:
+det_on_which_side:
+det_from_sample_cm:
+det_ds_spacing_cm:
+manual_det_area:
+det_area_eff_cm2:
+det_dia_cm:
+P_folder:
+f_P:

@@ -33,7 +33,7 @@ def generate_reconstructed_FL_signal(dev, use_simulation_sample, simulation_prob
                                      this_theta_st_idx, this_theta_end_idx,
                                      data_path, f_XRT_data,
                                      this_aN_dic, element_lines_roi, n_line_group_each_element, 
-                                     sample_size_n, sample_height_n, sample_size_cm, probe_energy,
+                                     sample_size_n, sample_height_n, sample_size_cm, probe_energy_keV,
                                      minibatch_size,
                                      manual_det_coord, set_det_coord_cm, det_on_which_side,
                                      manual_det_area, set_det_area_cm2, det_size_cm, det_from_sample_cm,
@@ -57,7 +57,7 @@ def generate_reconstructed_FL_signal(dev, use_simulation_sample, simulation_prob
     
     #### Make the lookup table of the fluorescence lines of interests ####
     fl_all_lines_dic = MakeFLlinesDictionary_manual(element_lines_roi,                           
-                                                    n_line_group_each_element, probe_energy, 
+                                                    n_line_group_each_element, probe_energy_keV, 
                                                     sample_size_n, sample_size_cm,
                                                     fl_line_groups = np.array(["K", "L", "M"]), fl_K = fl_K, fl_L = fl_L, fl_M = fl_M) #cpu
     
@@ -73,7 +73,7 @@ def generate_reconstructed_FL_signal(dev, use_simulation_sample, simulation_prob
     ####--------------------------------------------------------------####
     
     #### Calculate the MAC of probe ####
-    probe_attCS_ls = tc.as_tensor(xlib_np.CS_Total(aN_ls, probe_energy).flatten()).to(dev)
+    probe_attCS_ls = tc.as_tensor(xlib_np.CS_Total(aN_ls, probe_energy_keV).flatten()).to(dev)
     # TODO: Should this use xlib_np.CS_Total_Kissel()?
     ####----------------------------####
     
@@ -94,7 +94,7 @@ def generate_reconstructed_FL_signal(dev, use_simulation_sample, simulation_prob
         theta_ls = tc.from_numpy(y2_true_handle['exchange/theta'][...] * np.pi / 180).float()  #unit: rad #cpu
         n_theta = len(theta_ls) 
         #### Calculate the incident photon counts from the calibration data
-        probe_cts = calibrate_incident_probe_intensity(std_path, f_std, fitting_method, std_element_lines_roi, density_std_elements, probe_energy) 
+        probe_cts = calibrate_incident_probe_intensity(std_path, f_std, fitting_method, std_element_lines_roi, density_std_elements, probe_energy_keV) 
     
     theta_idx_ls = np.arange(this_theta_st_idx, this_theta_end_idx, 1)
     this_theta_ls = theta_ls[this_theta_st_idx: this_theta_end_idx]
@@ -208,7 +208,7 @@ def generate_reconstructed_FL_signal(dev, use_simulation_sample, simulation_prob
             model = PPM(dev, selfAb, lac, X, p, n_element, n_lines, FL_line_attCS_ls,
                          detected_fl_unit_concentration, n_line_group_each_element,
                          sample_height_n, minibatch_size, sample_size_n, sample_size_cm,
-                         probe_energy, probe_cts, probe_att, probe_attCS_ls,
+                         probe_energy_keV, probe_cts, probe_att, probe_attCS_ls,
                          theta, signal_attenuation_factor,
                          n_det, P_minibatch, det_size_cm, det_from_sample_cm, det_solid_angle_ratio)
             

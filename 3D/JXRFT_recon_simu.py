@@ -75,7 +75,7 @@ params_3d_test_sample8_64_64_64 = {
                               'sample_size_n': 64, 
                               'sample_height_n': 64,
                               'sample_size_cm': 0.01,                                    
-                              'probe_energy': np.array([20.0]),                            
+                              'probe_energy_keV': np.array([20.0]),                            
                               'n_epochs': 300,
                               'save_every_n_epochs': 1,
                               'minibatch_size': 64,

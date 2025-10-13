@@ -14,7 +14,7 @@ class PPM(nn.Module):
     def __init__(self, dev, selfAb, lac, grid_concentration, p, n_element, n_lines, 
                  FL_line_attCS_ls, detected_fl_unit_concentration, n_line_group_each_element,
                  sample_height_n, minibatch_size, sample_size_n, sample_size_cm,          
-                 probe_energy, probe_cts, probe_att, probe_attCS_ls,
+                 probe_energy_keV, probe_cts, probe_att, probe_attCS_ls,
                  theta, signal_attenuation_factor,
                  n_det, P_minibatch, det_dia_cm, det_from_sample_cm, det_solid_angle_ratio):
         """
@@ -42,7 +42,7 @@ class PPM(nn.Module):
         self.n_voxel = self.sample_height_n * self.sample_size_n**2 
         
         self.xp = self.init_xp() # initialize the values of the minibatch      
-        self.probe_energy = probe_energy  
+        self.probe_energy_keV = probe_energy_keV  
         self.probe_cts = probe_cts
         self.probe_att = probe_att
         self.probe_attCS_ls =  probe_attCS_ls

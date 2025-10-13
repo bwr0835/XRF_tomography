@@ -1,17 +1,16 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+import numpy as np, \
+       torch as tc, \
+       xraylib as xlib, \
+       os, \
+       sys, \
+       warnings
 
-import os
-import sys
-import numpy as np
-import torch as tc
-import xraylib as xlib
 from XRF_tomography import reconstruct_jXRFT_tomography
 from mpi4py import MPI
 from misc import create_summary
-
-import warnings
 
 comm = MPI.COMM_WORLD
 n_ranks = comm.Get_size()
@@ -26,11 +25,16 @@ gpu_index = rank % 2
 # gpu_index = 1
 if tc.cuda.is_available():  
     dev = tc.device('cuda:{}'.format(gpu_index))
+    
     print("Process ", rank, "running on", dev)
+    
     sys.stdout.flush()
+
 else:  
     dev = "cpu"
+    
     print("Process", rank, "running on CPU")
+    
     sys.stdout.flush()
 
 
@@ -105,7 +109,7 @@ params_124_124_32_cabead = {
                               'det_from_sample_cm': None,
                               'det_ds_spacing_cm': None,
                               'manual_det_area': True,
-                              'det_area_cm2': 1.68,
+                              'det_area_eff_cm2': 1.68,
                               'det_dia_cm': None,
                               'P_folder': 'data/P_array/sample_124_124_32/Dis_1.69_manual_dpts_4',              
                               'f_P': 'Intersecting_Length_124_124_32',
@@ -160,7 +164,7 @@ params_2_ide_samp = {'f_recon_parameters': 'recon_parameters.txt', # Text file n
                      'sample_size_n': 124, # Set to number of pixels along width of projection images when rotation axis is up-down TODO
                      'sample_height_n': 32, # Set to number of pixels along height of projection images when rotation axis is up-down (e.g. # of slices) TODO
                      'sample_size_cm': 5e-5, # Size of sample_size_n (in cm) along direction perpendicular to sample axis of rotation
-                     'probe_energy': np.array([13.0]), # Excitation energy (For 2-ID-E, we used 13 keV; for the HXN at BNL, we used 9.7 keV)
+                     'probe_energy_keV': np.array([13.0]), # Excitation energy (For 2-ID-E, we used 13 keV; for the HXN at BNL, we used 9.7 keV)
                      'n_epochs': 200, # Number of epochs
                      'save_every_n_epochs': 5,
                      'minibatch_size': 124,
@@ -180,8 +184,8 @@ params_2_ide_samp = {'f_recon_parameters': 'recon_parameters.txt', # Text file n
                      'det_from_sample_cm': None, # SIMULATION ONLY
                      'det_ds_spacing_cm': None, # SIMULATION ONLY
                      'manual_det_area': True, # Experimental detector active area enable 
-                    #  'det_area_cm2': 1.68, # TOTAL experimental detector active area (cm^2)
-                     'det_area_cm2': 1.26,
+                    #  'det_area_eff_cm2': 1.68, # TOTAL experimental detector active area (cm^2)
+                     'det_area_eff_cm2': 1.26,
                      'det_dia_cm': None, # SIMULATION ONLY
                      'P_folder': 'data/P_array/sample_124_124_32/Dis_1.69_manual_dpts_3', #       
                      'f_P': 'Intersecting_Length_124_124_32',
@@ -192,6 +196,15 @@ params_2_ide_samp = {'f_recon_parameters': 'recon_parameters.txt', # Text file n
 params = params_2_ide_samp
 
 if __name__ == "__main__": 
+    if rank == 0:
+        if len(sys.argv) < 3 or len(sys.argv) > 4:
+            print('Error: Must have exactly two program inputs. Exiting program...')
+
+            sys.exit()
+        
+        recon_param_file_path = sys.argv[1]
+        
+    
     reconstruct_jXRFT_tomography(**params)
     
     if rank == 0:

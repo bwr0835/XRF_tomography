@@ -78,7 +78,7 @@ def rotate(arr, theta, dev):
 
 
 def attenuation_3d(src_path, theta_st, theta_end, n_theta, sample_height_n, sample_size_n,
-                sample_size_cm, this_aN_dic, probe_energy, dev):
+                sample_size_cm, this_aN_dic, probe_energy_keV, dev):
     """  
     Parameters
     ----------
@@ -107,7 +107,7 @@ def attenuation_3d(src_path, theta_st, theta_end, n_theta, sample_height_n, samp
         a dictionary of items with key = element symbol (string), and value = atomic number
         e.g. this_aN_dic = {"C":6, "O": 8}
         
-    probe_energy : ndarray
+    probe_energy_keV : ndarray
         This array is an array with only 1 element. The element is the keV energy of the incident beam.
         
     dev : string
@@ -128,8 +128,8 @@ def attenuation_3d(src_path, theta_st, theta_end, n_theta, sample_height_n, samp
     theta_ls = - tc.linspace(theta_st, theta_end, n_theta + 1)[:-1]
     grid_concentration = tc.tensor(np.load(src_path)).float().to(dev)
     aN_ls = np.array(list(this_aN_dic.values()))
-    # probe_attCS_ls = tc.tensor(xlib_np.CS_Total(aN_ls, probe_energy).flatten()).float().to(dev)
-    probe_attCS_ls = tc.tensor(xlib_np.CS_Total_Kissel(aN_ls, probe_energy).flatten()).float().to(dev)
+    # probe_attCS_ls = tc.tensor(xlib_np.CS_Total(aN_ls, probe_energy_keV).flatten()).float().to(dev)
+    probe_attCS_ls = tc.tensor(xlib_np.CS_Total_Kissel(aN_ls, probe_energy_keV).flatten()).float().to(dev)
     
     att_exponent_acc_map = tc.zeros((len(theta_ls), sample_height_n, sample_size_n, sample_size_n+1), device=dev)
     for i , theta in enumerate(theta_ls):
@@ -149,7 +149,7 @@ def attenuation_3d(src_path, theta_st, theta_end, n_theta, sample_height_n, samp
 
 
 def create_XRT_data_3d(src_path, theta_st, theta_end, n_theta, sample_height_n, sample_size_n,
-                         sample_size_cm, this_aN_dic, probe_energy, probe_cts, save_path, save_fname, theta_sep, Poisson_noise, dev):
+                         sample_size_cm, this_aN_dic, probe_energy_keV, probe_cts, save_path, save_fname, theta_sep, Poisson_noise, dev):
     """
     Parameters
     ----------
@@ -178,7 +178,7 @@ def create_XRT_data_3d(src_path, theta_st, theta_end, n_theta, sample_height_n, 
         a dictionary of items with key = element symbol (string), and value = atomic number
         e.g. this_aN_dic = {"C":6, "O": 8}
         
-    probe_energy : ndarray
+    probe_energy_keV : ndarray
         This array is an array with only 1 element. The element is the keV energy of the incident beam.
         
     probe_cts : float
@@ -194,7 +194,7 @@ def create_XRT_data_3d(src_path, theta_st, theta_end, n_theta, sample_height_n, 
         [note: sample_size may not be the same as the input argument because of padding]
     """   
     XRT_data = probe_cts * attenuation_3d(src_path, theta_st, theta_end, n_theta, sample_height_n, sample_size_n,
-                sample_size_cm, this_aN_dic, probe_energy, dev)[1]
+                sample_size_cm, this_aN_dic, probe_energy_keV, dev)[1]
     
     if Poisson_noise == True:
         random_noise_generator = default_rng()
@@ -215,7 +215,7 @@ def create_XRT_data_3d(src_path, theta_st, theta_end, n_theta, sample_height_n, 
     return XRT_data
 
 
-def MakeFLlinesDictionary(this_aN_dic, probe_energy,
+def MakeFLlinesDictionary(this_aN_dic, probe_energy_keV,
                           sample_size_n, sample_size_cm,
                           fl_line_groups = np.array(["K", "L", "M"]), fl_K = fl["K"], fl_L = fl["L"], fl_M = fl["M"],
                           group_lines = True):
@@ -235,9 +235,9 @@ def MakeFLlinesDictionary(this_aN_dic, probe_energy,
     FL_all_elements_dic = {"element_Line": [], "fl_energy": np.array([]), "detected_fl_unit_concentration": np.array([])}
     voxel_size = sample_size_cm/sample_size_n   
 
-    fl_cs_K = xlib_np.CS_FluorLine_Kissel_Cascade(aN_ls, fl_K, probe_energy)
-    fl_cs_L = xlib_np.CS_FluorLine_Kissel_Cascade(aN_ls, fl_L, probe_energy)
-    fl_cs_M = xlib_np.CS_FluorLine_Kissel_Cascade(aN_ls, fl_M, probe_energy)
+    fl_cs_K = xlib_np.CS_FluorLine_Kissel_Cascade(aN_ls, fl_K, probe_energy_keV)
+    fl_cs_L = xlib_np.CS_FluorLine_Kissel_Cascade(aN_ls, fl_L, probe_energy_keV)
+    fl_cs_M = xlib_np.CS_FluorLine_Kissel_Cascade(aN_ls, fl_M, probe_energy_keV)
 
     # Remove the extra dimension with only 1 element
     fl_cs_K = np.reshape(fl_cs_K, (fl_cs_K.shape[:-1]))
@@ -317,12 +317,12 @@ def find_lines_roi_idx_from_dataset(data_path, f_XRF_data, element_lines_roi, st
 
 
 def MakeFLlinesDictionary_manual(element_lines_roi,                           
-                                 n_line_group_each_element, probe_energy, 
+                                 n_line_group_each_element, probe_energy_keV, 
                                  sample_size_n, sample_size_cm,
                                  fl_line_groups = np.array(["K", "L", "M"]), fl_K = fl["K"], fl_L = fl["L"], fl_M = fl["M"]):
 
     """
-    Given the probe_energy and the fluorescence lines of interests, output a dictionary.
+    Given the probe_energy_keV and the fluorescence lines of interests, output a dictionary.
     The output dictionary has 4 items: 
     (1) energy of all possible fluorescence lines
     (2) the intensity of the fluorescence signals if the density of the emitting element is 1 g.cm^{-3}
@@ -340,7 +340,7 @@ def MakeFLlinesDictionary_manual(element_lines_roi,
 
     for i, element_line_roi in enumerate(element_lines_roi):
         fl_energy = xlib_np.LineEnergy(np.array([AN[element_line_roi[0]]]), fl[element_line_roi[1]]).flatten()
-        fl_cs = xlib_np.CS_FluorLine_Kissel_Cascade(np.array([AN[element_line_roi[0]]]), fl[element_line_roi[1]], probe_energy).flatten()
+        fl_cs = xlib_np.CS_FluorLine_Kissel_Cascade(np.array([AN[element_line_roi[0]]]), fl[element_line_roi[1]], probe_energy_keV).flatten()
 
         if np.sum(fl_cs) != 0:
             fl_energy_group = np.average(fl_energy, weights=fl_cs) 
@@ -356,7 +356,7 @@ def MakeFLlinesDictionary_manual(element_lines_roi,
     return FL_all_elements_dic
 
 
-def generate_fl_signal_from_each_voxel_3d(src_path, theta_st, theta_end, n_theta, sample_size_n, sample_height_n, sample_size_cm, this_aN_dic, probe_energy, dev):
+def generate_fl_signal_from_each_voxel_3d(src_path, theta_st, theta_end, n_theta, sample_size_n, sample_height_n, sample_size_cm, this_aN_dic, probe_energy_keV, dev):
     """
     This function calculates the ratio of fluoresence signal genenerated at each voxel at each object angle
     The rotational axis is along dim 0 of the grid
@@ -388,7 +388,7 @@ def generate_fl_signal_from_each_voxel_3d(src_path, theta_st, theta_end, n_theta
         a dictionary of items with key = element symbol (string), and value = atomic number
         e.g. this_aN_dic = {"C":6, "O": 8}
         
-    probe_energy : ndarray
+    probe_energy_keV : ndarray
         This array is an array with only 1 element. The element is the keV energy of the incident beam.
         
     dev : string
@@ -406,7 +406,7 @@ def generate_fl_signal_from_each_voxel_3d(src_path, theta_st, theta_end, n_theta
 
     grid_concentration = tc.tensor(np.load(src_path)).float().to(dev)
 
-    fl_all_lines_dic = MakeFLlinesDictionary(this_aN_dic, probe_energy,
+    fl_all_lines_dic = MakeFLlinesDictionary(this_aN_dic, probe_energy_keV,
                               sample_size_n.cpu().numpy(), sample_size_cm.cpu().numpy(),
                               fl_line_groups = np.array(["K", "L", "M"]), fl_K = fl["K"], fl_L = fl["L"], fl_M = fl["M"],
                               group_lines = True)
@@ -1571,9 +1571,9 @@ def intersecting_length_fl_detectorlet_3d(det_size_cm, det_from_sample_cm, det_d
 
 
 def self_absorption_att_ratio_single_theta_3d(src_path, n_det, P, det_size_cm, det_from_sample_cm, det_ds_spacing_cm, sample_size_n, sample_size_cm, sample_height_n, 
-                                             this_aN_dic, probe_energy, dev, theta):
+                                             this_aN_dic, probe_energy_keV, dev, theta):
     
-    fl_all_lines_dic = MakeFLlinesDictionary(this_aN_dic, probe_energy, sample_size_n.cpu().numpy(), sample_size_cm.cpu().numpy(),
+    fl_all_lines_dic = MakeFLlinesDictionary(this_aN_dic, probe_energy_keV, sample_size_n.cpu().numpy(), sample_size_cm.cpu().numpy(),
                           fl_line_groups = np.array(["K", "L", "M"]), fl_K = fl["K"], fl_L = fl["L"], fl_M = fl["M"], group_lines = True)
 
     n_voxel = sample_height_n * sample_size_n * sample_size_n
@@ -1610,7 +1610,7 @@ def self_absorption_att_ratio_single_theta_3d(src_path, n_det, P, det_size_cm, d
 
 
 def create_XRF_data_single_theta_3d(n_det, P, theta_st, theta_end, n_theta, src_path, det_size_cm, det_from_sample_cm, det_ds_spacing_cm, sample_size_n,
-                             sample_size_cm, sample_height_n, this_aN_dic, probe_cts, probe_energy, save_path, save_fname, Poisson_noise, dev, this_theta_idx):
+                             sample_size_cm, sample_height_n, this_aN_dic, probe_cts, probe_energy_keV, save_path, save_fname, Poisson_noise, dev, this_theta_idx):
     
     if not os.path.exists(save_path):
         os.makedirs(save_path)    
@@ -1618,9 +1618,9 @@ def create_XRF_data_single_theta_3d(n_det, P, theta_st, theta_end, n_theta, src_
     theta_ls = - tc.linspace(theta_st, theta_end, n_theta + 1)[:-1]
     theta = theta_ls[this_theta_idx]
     probe_before_attenuation_flat = probe_cts * tc.ones((sample_height_n * sample_size_n * sample_size_n), device=dev)
-    att_ratio_map_flat = attenuation_3d(src_path, theta_st, theta_end, n_theta, sample_height_n, sample_size_n, sample_size_cm, this_aN_dic, probe_energy, dev)[0][this_theta_idx]
+    att_ratio_map_flat = attenuation_3d(src_path, theta_st, theta_end, n_theta, sample_height_n, sample_size_n, sample_size_cm, this_aN_dic, probe_energy_keV, dev)[0][this_theta_idx]
     SA_att_ratio =  self_absorption_att_ratio_single_theta_3d(src_path, n_det, P, det_size_cm, det_from_sample_cm, det_ds_spacing_cm, sample_size_n, sample_size_cm, sample_height_n, 
-                                                             this_aN_dic, probe_energy, dev, theta)
+                                                             this_aN_dic, probe_energy_keV, dev, theta)
     
 
     
@@ -1628,7 +1628,7 @@ def create_XRF_data_single_theta_3d(n_det, P, theta_st, theta_end, n_theta, src_
     probe_after_attenuation_flat = probe_before_attenuation_flat * att_ratio_map_flat
     
     #(n_elemental_line, sample_height * sample_size * sample_size)
-    fl_ratio_map_tot = generate_fl_signal_from_each_voxel_3d(src_path, theta_st, theta_end, n_theta, sample_size_n, sample_height_n, sample_size_cm, this_aN_dic, probe_energy, dev)[this_theta_idx]
+    fl_ratio_map_tot = generate_fl_signal_from_each_voxel_3d(src_path, theta_st, theta_end, n_theta, sample_size_n, sample_height_n, sample_size_cm, this_aN_dic, probe_energy_keV, dev)[this_theta_idx]
 
     #calculate fluorescence after self-absorption. dimension: (n_line, n_voxel (FL source))
     fl_signal_SA = tc.unsqueeze(probe_after_attenuation_flat, dim=0) * fl_ratio_map_tot * SA_att_ratio         
@@ -1654,7 +1654,7 @@ def create_XRF_data_single_theta_3d(n_det, P, theta_st, theta_end, n_theta, src_
 
 
 def create_XRF_data_3d(n_ranks, rank, P_folder, f_P, theta_st, theta_end, n_theta, src_path, det_size_cm, det_from_sample_cm, det_ds_spacing_cm, sample_size_n,
-                             sample_size_cm, sample_height_n, this_aN_dic, probe_cts, probe_energy, save_path, save_fname, Poisson_noise, dev):
+                             sample_size_cm, sample_height_n, this_aN_dic, probe_cts, probe_energy_keV, save_path, save_fname, Poisson_noise, dev):
     
     P_save_path = os.path.join(P_folder, f_P)
     if not os.path.isfile(P_save_path + ".h5"):   
@@ -1669,5 +1669,5 @@ def create_XRF_data_3d(n_ranks, rank, P_folder, f_P, theta_st, theta_end, n_thet
         theta_ls = - tc.linspace(theta_st, theta_end, n_theta + 1)[:-1] 
         for this_theta_idx, theta in enumerate(tqdm(theta_ls)):
             create_XRF_data_single_theta_3d(n_det, P, theta_st, theta_end, n_theta, src_path, det_size_cm, det_from_sample_cm, det_ds_spacing_cm, sample_size_n,
-                                 sample_size_cm, sample_height_n, this_aN_dic, probe_cts, probe_energy, save_path, save_fname, Poisson_noise, dev, this_theta_idx)
+                                 sample_size_cm, sample_height_n, this_aN_dic, probe_cts, probe_energy_keV, save_path, save_fname, Poisson_noise, dev, this_theta_idx)
         P_handle.close()

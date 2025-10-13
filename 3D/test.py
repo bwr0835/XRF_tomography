@@ -1,4 +1,4 @@
-import numpy as np, h5py, h5_util, xraylib_np as xrl
+import numpy as np, h5py, file_util, xraylib_np as xrl
 
 from matplotlib import pyplot as plt
 
