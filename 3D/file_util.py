@@ -887,7 +887,7 @@ def create_csv_norm_net_shift_data(dir_path,
                        'net_y_pixel_shift': net_y_shifts,
                        'I0_cts': I0})
 
-    df.loc[1:, 'I0_cts'] = '' # To make sure no errors arise from not having unequal column lengths
+    df.loc[1:, 'I0_cts'] = np.nan # To make sure no errors arise from not having unequal column lengths
 
     df.to_csv(file_path, index = False)
 
