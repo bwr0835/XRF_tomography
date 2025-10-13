@@ -635,7 +635,7 @@ def create_h5_aligned_aggregate_xrf_xrt(elements_xrf,
                                         output_dir_path):
 
     elements_xrt = ['xrt_sig', 'opt_dens']
-
+    print(xrt_array.shape)
     n_theta, n_slices, n_columns = xrt_array.shape
 
     xrt_array_new = np.zeros((len(elements_xrt), n_theta, n_slices, n_columns))
