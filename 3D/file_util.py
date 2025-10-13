@@ -627,12 +627,12 @@ def extract_csv_norm_net_shift_data(file_path, theta_array):
 
     return norm_array, net_x_shifts, net_y_shifts, I0
 
-def create_h5_aligned_aggregate_xrf_xrt(elements_xrf,
+def create_h5_aligned_aggregate_xrf_xrt(dir_path,
+                                        elements_xrf,
                                         xrf_array, 
                                         xrt_array,
                                         opt_dens_array, 
-                                        theta_array, 
-                                        output_dir_path):
+                                        theta_array):
 
     elements_xrt = ['xrt_sig', 'opt_dens']
     print(xrt_array.shape)
@@ -645,9 +645,9 @@ def create_h5_aligned_aggregate_xrf_xrt(elements_xrf,
 
     output_subdir_name = 'aligned_data'
     
-    os.makedirs(os.path.join(output_dir_path, output_subdir_name), exist_ok = True)
+    os.makedirs(os.path.join(dir_path, output_subdir_name), exist_ok = True)
     
-    output_file_path = os.path.join(output_dir_path, output_subdir_name, 'aligned_aggregate_xrf_xrt.h5')
+    output_file_path = os.path.join(dir_path, output_subdir_name, 'aligned_aggregate_xrf_xrt.h5')
 
     with h5py.File(output_file_path, 'w') as f:
         exchange = f.create_group('exchange')
