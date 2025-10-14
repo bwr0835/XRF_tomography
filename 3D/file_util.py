@@ -1028,7 +1028,7 @@ def extract_h5_aggregate_xrf_xrt_data(file_path, synchrotron, **kwargs):
         elements_xrt = h5['exchange/elements_xrf'][()]
         xrf_data = h5['exchange/data_xrf'][()]
         xrt_data = h5['exchange/data_xrt'][()]
-        theta = h5['theta'][()]
+        theta = h5['exchange/theta'][()]
             
     opt_dens_idx = np.ndarray.item(np.where(elements_xrt == 'xrt_sig')[0])
 
