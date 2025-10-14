@@ -4,6 +4,7 @@ import numpy as np, \
        xrf_xrt_input_param_names as ipn, \
        csv, \
        h5py, \
+       ast, \
        os, \
        sys
 
@@ -635,7 +636,7 @@ def create_h5_aligned_aggregate_xrf_xrt(dir_path,
                                         theta_array):
 
     elements_xrt = ['xrt_sig', 'opt_dens']
-    print(xrt_array.shape)
+
     n_theta, n_slices, n_columns = xrt_array.shape
 
     xrt_array_new = np.zeros((len(elements_xrt), n_theta, n_slices, n_columns))
@@ -652,8 +653,8 @@ def create_h5_aligned_aggregate_xrf_xrt(dir_path,
     with h5py.File(output_file_path, 'w') as f:
         exchange = f.create_group('exchange')
 
-        exchange.create_dataset('element_xrf', data = elements_xrf)
-        exchange.create_dataset('element_xrt', data = elements_xrt)
+        exchange.create_dataset('elements_xrf', data = elements_xrf)
+        exchange.create_dataset('elements_xrt', data = elements_xrt)
         exchange.create_dataset('data_xrf', data = xrf_array)
         exchange.create_dataset('data_xrt', data = xrt_array_new)
         exchange.create_dataset('theta', data = theta_array)
@@ -762,6 +763,8 @@ def extract_csv_preprocessing_input_params(file_path):
     for param in numeric_params:
         if isinstance(input_param_dict.get(param), str):
             print(f'Error: Expected a number for input parameter \'{param}\'. Exiting program...')
+
+            sys.exit()
 
     # for param in all_params_ordered:
     #     print(f'{input_param_dict[param]}: {type(input_param_dict[param]).__name__}')
@@ -893,7 +896,7 @@ def create_csv_norm_net_shift_data(dir_path,
 
     return
 
-def extract_input_jxrft_recon(file_path):
+def extract_csv_input_jxrft_recon_params(file_path, fluor_lines, dev):
     if not os.path.isfile(file_path):
         print('Error: Cannot locate input file path. Exiting program...')
 
@@ -925,3 +928,117 @@ def extract_input_jxrft_recon(file_path):
 
         sys.exit()
     
+    all_params_ordered = pd.Series(ipn.preprocessing_params_ordered)
+
+    if not input_params.equals(all_params_ordered):
+        print('Error: At least one parameter missing or at least one parameter too many.')
+        print('\nThe following input parameters are required:\n')
+        print(*(["     -'{}'".format(s) for s in all_params_ordered]), sep = '\n')
+        print('\n\rEnding program...')
+
+    available_synchrotrons = ipn.available_synchrotrons
+    numeric_scalar_params = ipn.recon_numeric_scalar_params
+    numeric_array_params = ipn.recon_numeric_array_params
+    dict_params = ipn.recon_dict_params
+    bool_params = ipn.preprocessing_bool_params
+    
+    for idx, val in enumerate(values):
+        if val.lower() == 'none':
+            values[idx] = None
+
+        elif val.lower() == 'true' or val.lower() == 'false':
+            values[idx] = val.lower() == 'true'
+        
+        elif input_params[idx] in numeric_array_params:
+            try:
+                values[idx] = np.array(ast.literal_eval(val))
+            
+            except:
+                print('Error: At least one reconstruction input parameter value cannot be converted to a NumPy array. Exiting program...')
+
+                sys.exit()
+        
+        elif input_params[idx] in dict_params:
+            try:
+                values[idx] = ast.literal_eval(val)
+            
+            except:
+                print('Error: Cannot convert value of at least one parameter to dictionary. Exiting program...')
+
+                sys.exit()
+        
+        else:
+            try:
+                values[idx] = int(val)
+            
+            except:
+                try:
+                    values[idx] = float(val)
+                
+                except:
+                    continue
+    
+    input_param_dict = dict(zip(input_params, values))
+
+    if input_param_dict['synchrotron'] is None or input_param_dict['synchrotron_beamline'] is None:
+        print('Error: Synchrotron and/or synchrotron beamline fields empty. Exiting program...')
+
+        sys.exit()
+    
+    synchrotron = input_param_dict['synchrotron'].lower()
+
+    if synchrotron not in available_synchrotrons:
+        print('Error: Synchrotron unavailable. Exiting program...')
+
+        sys.exit()
+
+    if not all(isinstance(input_param_dict[param], bool) for param in bool_params):
+        print('Error: The following input parameters must all be set to True or False:')
+        print(*(["     -'{}'".format(param) for param in bool_params]), sep = '\n')
+        print('\n\rExiting program...')
+
+        sys.exit()
+
+    for param in numeric_scalar_params:
+        if isinstance(input_param_dict.get(param), str):
+            print(f'Error: Expected a number for input parameter \'{param}\'. Exiting program...')
+
+            sys.exit()
+
+    input_param_dict['dev'] = dev # Device (GPU, CPU, etc.)
+    input_param_dict['fl_K'] = fluor_lines['K']
+    input_param_dict['fl_L'] = fluor_lines['L']
+    input_param_dict['fl_M'] = fluor_lines['M']
+
+    return input_param_dict
+
+def extract_h5_aggregate_xrf_xrt(file_path, synchrotron, **kwargs):
+    if not os.path.isfile(file_path):
+        print('Error: Cannot locate aggregate XRF, XRT HDF5 file. Exiting program...')
+
+        sys.exit()
+    
+    if not file_path.endswith('.h5'):
+        print('Error: Aggregate XRF, XRT file extension must be \'.h5\'. Exiting program...')
+
+        sys.exit()
+    
+    with h5py.File(file_path, 'r') as h5:
+        elements_xrf = h5['exchange/elements_xrf'][()]
+        elements_xrt = h5['exchange/elements_xrf'][()]
+        xrf_data = h5['exchange/data_xrf'][()]
+        xrt_data = h5['exchange/data_xrt'][()]
+        theta = h5['theta'][()]
+            
+    opt_dens_idx = np.ndarray.item(np.where(elements_xrt == 'xrt_sig')[0])
+
+    opt_dens = xrt_data[opt_dens_idx]
+
+    n_theta, n_slices, n_columns = opt_dens.shape
+    
+    
+    element_lines_roi = kwargs.get('element_lines_roi')
+
+    print(type(elements_xrf).__name__)
+
+    return

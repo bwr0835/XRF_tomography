@@ -42,79 +42,65 @@ plt.rc('font', **fontProperties)
 warnings.filterwarnings("ignore")
 
 fl = {"K": np.array([xlib.KA1_LINE, xlib.KA2_LINE, xlib.KA3_LINE, xlib.KB1_LINE, xlib.KB2_LINE,
-                 xlib.KB3_LINE, xlib.KB4_LINE, xlib.KB5_LINE]),
+                     xlib.KB3_LINE, xlib.KB4_LINE, xlib.KB5_LINE]),
       "L": np.array([xlib.LA1_LINE, xlib.LA2_LINE, xlib.LB1_LINE, xlib.LB2_LINE, xlib.LB3_LINE,
-                 xlib.LB4_LINE, xlib.LB5_LINE, xlib.LB6_LINE, xlib.LB7_LINE, xlib.LB9_LINE,
-                 xlib.LB10_LINE, xlib.LB15_LINE, xlib.LB17_LINE]),              
+                     xlib.LB4_LINE, xlib.LB5_LINE, xlib.LB6_LINE, xlib.LB7_LINE, xlib.LB9_LINE,
+                     xlib.LB10_LINE, xlib.LB15_LINE, xlib.LB17_LINE]),              
       "M": np.array([xlib.MA1_LINE, xlib.MA2_LINE, xlib.MB_LINE])               
      }
 
 def reconstruct_jXRFT_tomography(
         # ______________________________________
         # |Raw data and experimental parameters|________________________________
-        sample_size_n, sample_height_n, sample_size_cm, probe_energy_keV = None,
-        # Set sample_size_n (sample_height_n) to the number of pixels along the direction 
-        # perpendicular (parallel) to # the rotational axis of the sample;
-        # sample_size_cm is the size of the sample size (in unit cm) along the direction 
-        # perpendicular to the rotational axis of the  sample
-        probe_intensity = None,
+        sample_size_n, # Set sample_size_n (sample_height_n) to the number of pixels along the direction
+                       # perpendicular (parallel) to # the rotational axis of the sample;
+        sample_height_n, 
+        sample_size_cm, # Size of the sample size (in unit cm) along the direction 
+                        # perpendicular to the rotational axis of the sample
+        probe_energy_keV = None,
+        probe_intensity = None, # Set the value of incident probe fluence for simulation data
+                                # Not required for exp. data unless the calibration data is missing. In that case,
+                                # Set the value to some estimated probe intensity
         probe_att = True,
-        # Set the value of incident probe fluence for simulation data
-        # Not required for exp. data unless the calibration data is missing. In that case,
-        # Set the value to some estimated probe intensity
-        
-        manual_det_coord = True, 
-        # True when using a exp. data; 
-        # False when using a simulation data; 
-        # For a simulation data, auto-distribute detecting points on the ciucualr sening area
-        # given det_dia_cm and det_ds_spacing_cm;
-        set_det_coord_cm = None,
-        # Set to None for simulation data;
-        # For exp. data, a np array with dimension (# of detecing points, 3) 
-        # 3 for (z, x, y) coordinates, probe propagate along +y axis; sample rotates about +z axis;
-        # The sign of x determines which side the detector locates relative to the sample;
-
-        det_on_which_side = "negative", # TODO
-        # Choose from 'positive' or 'negative' depending on the side that the detector locates 
-        # relative the sample;
-    
-        manual_det_area = True,
-        # True when using a exp. data;
-        # False when using a simulation data;
-        # If set to True, the program caculated the signal collecting solid angle of XRF using det_area_eff_cm2;
-        # If set to False, the program uses provided det_dia_cm and det_from_sample_cm;
-        #### Note ####
-        # For exp. data, the factor of signal collecting solid angle is included in probe_intensity
-        # which is calculated from the calibration data;
-        
-        det_area_eff_cm2 = None,
-        # For exp. data only. Set the value of the total sensing area;
-        # For simulation data, set to None (program calculates sensing area with given det_dia_cm)
-    
-        det_dia_cm = None, 
-        # For simulation data only. Diameter of the sensor assuming a circular sensing area.
-        # Only used when manual_det_area is False. 
-        # Need to use the same diameter setting as it's used to generating a simulation data  
-        det_ds_spacing_cm = None,
-        # For simulation data only. used to distribute detecting points on the XRF detecting plane.
-    
-        det_from_sample_cm = None,
-        # For simulation data only.
-        # For exp. data, the distance between the detector and the sample is given in set_det_coord_cm
-    
-        # __________________________________
+        manual_det_coord = True, # True when using a exp. data; 
+                                 # False when using a simulation data; 
+                                 # For simulation data, auto-distribute detecting points on a circular sensing area
+                                 # given det_dia_cm and det_ds_spacing_cm;
+        set_det_coord_cm = None, # Set to None for simulation data;
+                                 # For exp. data, a np array with dimension (# of detecing points, 3)
+                                 # 3 for (z, x, y) coordinates, probe propagate along +y axis; sample rotates about +z axis;
+                                 # The sign of x determines which side the detector locates relative to the sample;
+        det_on_which_side = 'negative', # Choose from 'positive' or 'negative' depending on the side that the detector locates 
+                                  # relative the sample; TODO
+        manual_det_area = True, # True when using a exp. data;
+                                # False when using a simulation data;
+                                # If set to True, the program caculated the signal collecting solid angle of XRF using 
+                                # det_area_eff_cm2;
+                                # If set to False, the program uses provided det_dia_cm and det_from_sample_cm;
+                                #### Note ####
+                                # For exp. data, the factor of signal collecting solid angle is included in probe_intensity
+                                # which is calculated from the calibration data;
+        det_area_eff_cm2 = None, # For exp. data only. Set the value of the total sensing area;
+                                 # For simulation data, set to None (program calculates sensing area with given det_dia_cm)
+        det_dia_cm = None,  # For simulation data only. Diameter of the sensor assuming a circular sensing area.
+                            # Only used when manual_det_area is False. 
+                            # Need to use the same diameter setting, as it's used to generate simulation data  
+        det_ds_spacing_cm = None, # For simulation data only. used to distribute detecting points on the XRF detecting plane.
+        det_from_sample_cm = None, # For simulation data only.
+                                   # For exp. data, the distance between the detector and the sample is given in set_det_coord_cm
         # |Probe Intensity calibration data|____________________________________    
-        use_std_calibation = False, std_path = None, f_std = None, std_element_lines_roi = None, density_std_elements = None, fitting_method = None,
-        # Set use_std_calibration to True if the calibration measurement exist otherwise set to False.
-        # density_std_elements unit in g/cm^2
-        # Set fitting method to  'XRF_fits' , 'XRF_roi' or 'XRF_roi_plus'
-    
-        # ___________________________
+        use_std_calibation = False, # Set use_std_calibration to True if the calibration measurement exist otherwise set to False.
+        std_path = None, # Density_std_elements unit in g/cm^2
+        f_std = None, 
+        std_element_lines_roi = None, 
+        density_std_elements = None, 
+        fitting_method = None, # Set fitting method to  'XRF_fits' , 'XRF_roi' or 'XRF_roi_plus'
         # |Reconstruction parameters|___________________________________________
         n_epochs = 50, 
         save_every_n_epochs = 10, 
         minibatch_size = None,
-        f_recon_parameters = "recon_parameters.txt", dev = None,
+        f_recon_parameters = "recon_parameters.txt", 
+        dev = None,
         selfAb = False, 
         cont_from_check_point = False, 
         use_saved_initial_guess = False, 
@@ -142,7 +128,7 @@ def reconstruct_jXRFT_tomography(
         fl_K = fl["K"], 
         fl_L = fl["L"], 
         fl_M = fl["M"],
-         **kwargs):
+        **kwargs):
     
     comm = MPI.COMM_WORLD
     n_ranks = comm.Get_size()
@@ -151,12 +137,15 @@ def reconstruct_jXRFT_tomography(
     loss_fn = nn.MSELoss()
     #TODO # loss_fn = nn.PoissonNLLLoss()
     dia_len_n = int(1.2 * (sample_height_n**2 + sample_size_n**2 + sample_size_n**2)**0.5) # dev
-    n_voxel_minibatch = minibatch_size * sample_size_n #dev
-    n_voxel = sample_height_n * sample_size_n**2 #dev
+    n_voxel_minibatch = minibatch_size*sample_size_n #dev
+    n_voxel = sample_height_n*sample_size_n**2 #dev
     
     #### create the file handle for experimental data; y1: channel data, y2: scalers data ####
-    y1_true_handle = h5py.File(os.path.join(data_path, f_XRF_data), 'r') # XRF data
-    y2_true_handle = h5py.File(os.path.join(data_path, f_XRT_data), 'r') # XRT data
+    
+    # y1_true_handle, y2_true_handle = 
+
+    # y1_true_handle = h5py.File(os.path.join(data_path, f_XRF_data), 'r') # XRF data
+    # y2_true_handle = h5py.File(os.path.join(data_path, f_XRT_data), 'r') # XRT data
     ####----------------------------------------------------------------------------------####
     
     #### Calculate the number of elements in the reconstructed object, list the atomic numbers ####
@@ -180,12 +169,12 @@ def reconstruct_jXRFT_tomography(
     ####--------------------------------------------------------------####
     
     #### Calculate the MAC of probe ####
-    # probe_attCS_ls = tc.as_tensor(xlib_np.CS_Total(aN_ls, probe_energy_keV).flatten()).to(dev) # TODO
+    # probe_attCS_ls = tc.as_tensor(xlib_np.CS_Total(aN_ls, probe_energy_keV).flatten()).to(dev)
     probe_attCS_ls = tc.as_tensor(xlib_np.CS_Total_Kissel(aN_ls, probe_energy_keV).flatten()).to(dev)
     ####----------------------------####
     
     #### Load all object angles ####
-    theta_ls = tc.from_numpy(y1_true_handle[theta_ls_dataset][...] * np.pi / 180).float()  #unit: rad #cpu
+    theta_ls = tc.from_numpy(y1_true_handle[theta_ls_dataset][...]*np.pi/180).float()  #unit: rad #cpu
     n_theta = len(theta_ls)  
     ####------------------------####
    
@@ -193,7 +182,7 @@ def reconstruct_jXRFT_tomography(
     
     #### pick only the element lines of interests from the channel data. flatten the data to strips
     #### original dim = (n_lines_roi, n_theta, sample_height_n, sample_size_n)
-    y1_true = tc.from_numpy(y1_true_handle['exchange/data'][element_lines_roi_idx]).view(len(element_lines_roi_idx), n_theta, sample_height_n * sample_size_n).to(dev)
+    y1_true = tc.from_numpy(y1_true_handle['exchange/data'][element_lines_roi_idx]).view(len(element_lines_roi_idx), n_theta, sample_height_n*sample_size_n).to(dev)
 #     #### pick the probe photon counts after the ion chamber from the scalers data as the transmission data
     # y2_true = tc.from_numpy(y2_true_handle['exchange/data'][scaler_counts_ds_ic_dataset_idx]).view(n_theta, sample_height_n * sample_size_n).to(dev)
     
@@ -210,12 +199,11 @@ def reconstruct_jXRFT_tomography(
         probe_cts = probe_intensity
 
     minibatch_ls_0 = tc.arange(n_ranks).to(dev) #dev
-    n_batch = (sample_height_n * sample_size_n) // (n_ranks * minibatch_size) #scalar
+    n_batch = (sample_height_n*sample_size_n)//(n_ranks*minibatch_size) #scalar
     
     
     if manual_det_area == True:
-        det_solid_angle_ratio = det_area_eff_cm2 / (4 * np.pi * det_from_sample_cm**2)
-        # det_solid_angle_ratio = 1.0
+        det_solid_angle_ratio = det_area_eff_cm2/(4*np.pi*det_from_sample_cm**2)
         signal_attenuation_factor = 1.0
     
     else:
@@ -265,14 +253,13 @@ def reconstruct_jXRFT_tomography(
     P_handle = h5py.File(P_save_path + ".h5", 'r')
 
     if cont_from_check_point == False: 
-        
         # load the saved_initial_guess to rank0 cpu
         if use_saved_initial_guess:
             if rank == 0:
                 with h5py.File(os.path.join(recon_path, f_initial_guess + '.h5'), "r") as s:
                     X = s["sample/densities"][...].astype(np.float32)
                     X = tc.from_numpy(X)
-                shutil.copy(os.path.join(recon_path, f_initial_guess +'.h5'), os.path.join(recon_path, f_recon_grid +'.h5'))
+                shutil.copy(os.path.join(recon_path, f_initial_guess + '.h5'), os.path.join(recon_path, f_recon_grid + '.h5'))
                 
             else:
                 X = None
@@ -284,13 +271,13 @@ def reconstruct_jXRFT_tomography(
                 ## Save the initial guess for future reference
                 with h5py.File(os.path.join(recon_path, f_initial_guess +'.h5'), 'w') as s:
                     sample = s.create_group("sample")
-                    sample_v = sample.create_dataset("densities", shape=(n_element, sample_height_n, sample_size_n, sample_size_n), dtype="f4")
-                    sample_e = sample.create_dataset("elements", shape=(n_element,), dtype='S5')
+                    sample_v = sample.create_dataset("densities", shape = (n_element, sample_height_n, sample_size_n, sample_size_n), dtype="f4")
+                    sample_e = sample.create_dataset("elements", shape = (n_element,), dtype = 'S5')
                     sample_v[...] = X
                     sample_e[...] = np.array(list(this_aN_dic.keys())).astype('S5')
  
                 ## Save the initial guess which will be used in reconstruction and will be updated to the current reconstructing result 
-                shutil.copy(os.path.join(recon_path, f_initial_guess +'.h5'), os.path.join(recon_path, f_recon_grid +'.h5'))
+                shutil.copy(os.path.join(recon_path, f_initial_guess + '.h5'), os.path.join(recon_path, f_recon_grid + '.h5'))
 
             else:
                 X = None
@@ -298,9 +285,9 @@ def reconstruct_jXRFT_tomography(
         comm.Barrier()
             
         if rank == 0:
-            XRF_loss_whole_obj = tc.zeros(n_epochs * n_theta)
-            XRT_loss_whole_obj = tc.zeros(n_epochs * n_theta)
-            loss_whole_obj = tc.zeros(n_epochs * n_theta)
+            XRF_loss_whole_obj = tc.zeros(n_epochs*n_theta)
+            XRT_loss_whole_obj = tc.zeros(n_epochs*n_theta)
+            loss_whole_obj = tc.zeros(n_epochs*n_theta)
             
             with open(os.path.join(recon_path, f_recon_parameters), "w") as recon_params:
                 recon_params.write("starting_epoch = 0\n")
@@ -340,8 +327,8 @@ def reconstruct_jXRFT_tomography(
                 theta_ls_rand = tc.ones(n_theta)
 
             comm.Barrier() 
-            rand_idx = comm.bcast(rand_idx, root=0).to(dev) 
-            theta_ls_rand = comm.bcast(theta_ls_rand, root=0).to(dev)         
+            rand_idx = comm.bcast(rand_idx, root = 0).to(dev) 
+            theta_ls_rand = comm.bcast(theta_ls_rand, root = 0).to(dev)         
             comm.Barrier() 
             
             stdout_options = {'root': 0, 'output_folder': recon_path, 'save_stdout': True, 'print_terminal': True}
@@ -360,7 +347,7 @@ def reconstruct_jXRFT_tomography(
                     
                 if selfAb == True:               
                     X_ap_rot = rotate(X, theta, dev) #dev
-                    lac = X_ap_rot.view(n_element, 1, 1, n_voxel) * FL_line_attCS_ls.view(n_element, n_lines, 1, 1) #dev
+                    lac = X_ap_rot.view(n_element, 1, 1, n_voxel)*FL_line_attCS_ls.view(n_element, n_lines, 1, 1) #dev
                     lac = lac.expand(-1, -1, n_voxel_minibatch, -1).float() #dev
                 
                 else:
@@ -376,8 +363,8 @@ def reconstruct_jXRFT_tomography(
                     p = minibatch_ls[rank]
                     
                     if selfAb == True:
-                        P_minibatch = tc.from_numpy(P_handle['P_array'][:,:, p * dia_len_n * minibatch_size * sample_size_n:\
-                                                                        (p+1) * dia_len_n * minibatch_size * sample_size_n]).to(dev)
+                        P_minibatch = tc.from_numpy(P_handle['P_array'][:, :, p*dia_len_n*minibatch_size*sample_size_n: \
+                                                                        (p + 1)*dia_len_n*minibatch_size*sample_size_n]).to(dev)
                         n_det = P_minibatch.shape[0] 
                     
                     else:
@@ -399,15 +386,15 @@ def reconstruct_jXRFT_tomography(
                                  theta, signal_attenuation_factor,
                                  n_det, P_minibatch, det_dia_cm, det_from_sample_cm, det_solid_angle_ratio)
                     
-                    optimizer = tc.optim.Adam(model.parameters(), lr=lr)              
+                    optimizer = tc.optim.Adam(model.parameters(), lr = lr)              
                                     
                     ## load true data, y1: XRF_data, y2: XRT data
                     #dev #Take all lines_roi, this_theta_idx, and strips in this minibatc
                     y1_hat, y2_hat = model()
                     
-                    XRF_loss = loss_fn(y1_hat, y1_true[:, this_theta_idx, minibatch_size * p : minibatch_size * (p+1)])
-                    XRT_loss = loss_fn(y2_hat, b2 * y2_true[this_theta_idx, minibatch_size * p : minibatch_size * (p+1)])
-                    loss = XRF_loss + b1 * XRT_loss
+                    XRF_loss = loss_fn(y1_hat, y1_true[:, this_theta_idx, minibatch_size*p:minibatch_size*(p + 1)])
+                    XRT_loss = loss_fn(y2_hat, b2*y2_true[this_theta_idx, minibatch_size*p:minibatch_size*(p + 1)])
+                    loss = XRF_loss + b1*XRT_loss
 
                     optimizer.zero_grad()
                     loss.backward()
@@ -419,17 +406,17 @@ def reconstruct_jXRFT_tomography(
                     comm.Barrier()
                        
                     XRF_loss = XRF_loss.detach().item()
-                    XRF_loss_sum = comm.reduce(XRF_loss, op=MPI.SUM, root=0)
+                    XRF_loss_sum = comm.reduce(XRF_loss, op = MPI.SUM, root = 0)
                     
                     XRT_loss = XRT_loss.detach().item() 
-                    XRT_loss_sum = comm.reduce(XRT_loss, op=MPI.SUM, root=0)                    
+                    XRT_loss_sum = comm.reduce(XRT_loss, op = MPI.SUM, root = 0)                    
                                        
                     loss = loss.detach().item()           
-                    loss_sum = comm.reduce(loss, op=MPI.SUM, root=0)
+                    loss_sum = comm.reduce(loss, op = MPI.SUM, root = 0)
                     comm.Barrier()                    
                     
-                    with h5py.File(os.path.join(recon_path, f_recon_grid +'.h5'), 'r+', driver='mpio', comm=comm) as s:
-                        s["sample/densities"][:, minibatch_size * p // sample_size_n : minibatch_size * (p + 1) // sample_size_n, :, :] = updated_minibatch.numpy()
+                    with h5py.File(os.path.join(recon_path, f_recon_grid +'.h5'), 'r+', driver = 'mpio', comm = comm) as s:
+                        s["sample/densities"][:, minibatch_size*p//sample_size_n:minibatch_size*(p + 1)//sample_size_n, :, :] = updated_minibatch.numpy()
                     
                     comm.Barrier()
                     
@@ -443,9 +430,9 @@ def reconstruct_jXRFT_tomography(
                     tc.cuda.empty_cache()
 
                 if rank == 0:
-                    loss_whole_obj[n_theta * epoch + idx] = tc.mean(total_loss_n_batch)
-                    XRF_loss_whole_obj[n_theta * epoch + idx] = tc.mean(XRF_loss_n_batch)
-                    XRT_loss_whole_obj[n_theta * epoch + idx] = tc.mean(XRT_loss_n_batch)
+                    loss_whole_obj[n_theta*epoch + idx] = tc.mean(total_loss_n_batch)
+                    XRF_loss_whole_obj[n_theta*epoch + idx] = tc.mean(XRF_loss_n_batch)
+                    XRT_loss_whole_obj[n_theta*epoch + idx] = tc.mean(XRT_loss_n_batch)
                     
                 comm.Barrier()                    
                 
@@ -454,29 +441,29 @@ def reconstruct_jXRFT_tomography(
             stdout_options = {'root': 0, 'output_folder': recon_path, 'save_stdout': True, 'print_terminal': False}
             per_epoch_time = time.perf_counter() - t0_epoch
             
-            print_flush_root(rank, val=per_epoch_time, output_file=f'per_epoch_time_mb_size_{minibatch_size}.csv', **stdout_options)
+            print_flush_root(rank, val = per_epoch_time, output_file = f'per_epoch_time_mb_size_{minibatch_size}.csv', **stdout_options)
             
             comm.Barrier()
  
             if rank == 0:
-                with h5py.File(os.path.join(recon_path, f_recon_grid +'.h5'), "r") as s:
+                with h5py.File(os.path.join(recon_path, f_recon_grid + '.h5'), "r") as s:
                     X_cpu = s["sample/densities"][...].astype(np.float32)
                 
             if rank == 0 and epoch != 0:
-                epsilon = np.mean((X_cpu - X_previous)**2) # TODO
+                epsilon = np.mean((X_cpu - X_previous)**2)
                 
-                print_flush_root(rank, val=epsilon, output_file=f'model_change_mse_epoch.csv', **stdout_options)
+                print_flush_root(rank, val = epsilon, output_file = f'model_change_mse_epoch.csv', **stdout_options)
                 
                 if epsilon < 1e-12:             
                     if rank == 0:
-                        with h5py.File(os.path.join(recon_path, f_recon_grid +"_"+str(epoch)+"_ending_condition" +'.h5'), "w") as s:
+                        with h5py.File(os.path.join(recon_path, f_recon_grid + "_" + str(epoch)+"_ending_condition" +'.h5'), "w") as s:
                             sample = s.create_group("sample")
-                            sample_v = sample.create_dataset("densities", shape=(n_element, sample_height_n, sample_size_n, sample_size_n), dtype="f4")
-                            sample_e = sample.create_dataset("elements", shape=(n_element,), dtype='S5')
+                            sample_v = sample.create_dataset("densities", shape = (n_element, sample_height_n, sample_size_n, sample_size_n), dtype="f4")
+                            sample_e = sample.create_dataset("elements", shape = (n_element,), dtype = 'S5')
                             s["sample/densities"][...] = X_cpu
                             s["sample/elements"][...] = np.array(list(this_aN_dic.keys())).astype('S5')
                         
-                        dxchange.write_tiff(X_cpu, os.path.join(recon_path, f_recon_grid)+"_"+str(epoch)+"_ending_condition", dtype='float32', overwrite=True)                     
+                        dxchange.write_tiff(X_cpu, os.path.join(recon_path, f_recon_grid) + "_" + str(epoch) + "_ending_condition", dtype = 'float32', overwrite = True)                     
                     
                     break
                 
@@ -493,11 +480,11 @@ def reconstruct_jXRFT_tomography(
             
             comm.Barrier()
             
-            if rank == 0 and ((epoch+1)%save_every_n_epochs == 0 and (epoch+1)//save_every_n_epochs !=0 or epoch+1 == n_epochs):
-                with h5py.File(os.path.join(checkpoint_path, f_recon_grid +"_"+str(epoch) +'.h5'), "w") as s:
+            if rank == 0 and ((epoch + 1) % save_every_n_epochs == 0 and (epoch + 1)//save_every_n_epochs != 0 or epoch + 1 == n_epochs):
+                with h5py.File(os.path.join(checkpoint_path, f_recon_grid + "_" + str(epoch) + '.h5'), "w") as s:
                     sample = s.create_group("sample")
-                    sample_v = sample.create_dataset("densities", shape=(n_element, sample_height_n, sample_size_n, sample_size_n), dtype="f4")
-                    sample_e = sample.create_dataset("elements", shape=(n_element,), dtype='S5')
+                    sample_v = sample.create_dataset("densities", shape = (n_element, sample_height_n, sample_size_n, sample_size_n), dtype = "f4")
+                    sample_e = sample.create_dataset("elements", shape = (n_element,), dtype = 'S5')
                     s["sample/densities"][...] = X_cpu
                     s["sample/elements"][...] = np.array(list(this_aN_dic.keys())).astype('S5')
 #                 dxchange.write_tiff(X_cpu, os.path.join(recon_path, f_recon_grid)+"_"+str(epoch), dtype='float32', overwrite=True)  
@@ -569,9 +556,9 @@ def reconstruct_jXRFT_tomography(
             with open(os.path.join(recon_path, f_recon_parameters), "a") as recon_params:
                 n_start_last = n_ending - 15 - len(element_lines_roi)
 
-                previsous_starting_epoch = int(params_list[n_start_last][params_list[n_start_last].find("=")+1:])
-                previous_n_epoch = int(params_list[n_start_last+1][params_list[n_start_last+1].find("=")+1:])
-                starting_epoch = previsous_starting_epoch + previous_n_epoch
+                previous_starting_epoch = int(params_list[n_start_last][(params_list[n_start_last].find("=") + 1):])
+                previous_n_epoch = int(params_list[n_start_last + 1][(params_list[n_start_last + 1].find("=") + 1):])
+                starting_epoch = previous_starting_epoch + previous_n_epoch
                 recon_params.write("\n")
                 recon_params.write("###########################################\n")
                 recon_params.write("starting_epoch = %d\n" %starting_epoch)
@@ -611,15 +598,15 @@ def reconstruct_jXRFT_tomography(
                 theta_ls_rand = tc.ones(n_theta)
 
             comm.Barrier() 
-            rand_idx = comm.bcast(rand_idx, root=0).to(dev) 
-            theta_ls_rand = comm.bcast(theta_ls_rand, root=0).to(dev)         
+            rand_idx = comm.bcast(rand_idx, root = 0).to(dev) 
+            theta_ls_rand = comm.bcast(theta_ls_rand, root = 0).to(dev)         
             comm.Barrier()     
              
             
-            stdout_options = {'root':0, 'output_folder': recon_path, 'save_stdout': True, 'print_terminal': True}
+            stdout_options = {'root': 0, 'output_folder': recon_path, 'save_stdout': True, 'print_terminal': True}
             timestr = str(datetime.datetime.today())
             
-            print_flush_root(rank, f"epoch: {epoch}, time: {timestr}", output_file='', **stdout_options)
+            print_flush_root(rank, f"epoch: {epoch}, time: {timestr}", output_file = '', **stdout_options)
             
             for idx, theta in enumerate(theta_ls_rand):
                 this_theta_idx = rand_idx[idx]
@@ -627,14 +614,14 @@ def reconstruct_jXRFT_tomography(
                 # The updated X read by all ranks only at each new obj. angle
                 # Because updating the remaining slices in the current obj. angle doesn't require the info of the previous updated slices.   
                 ## Calculate lac using the current X. lac (linear attenuation coefficient) has the dimension of [n_element, n_lines, n_voxel_minibatch, n_voxel]
-                with h5py.File(os.path.join(recon_path, f_recon_grid +'.h5'), "r") as s:
+                with h5py.File(os.path.join(recon_path, f_recon_grid + '.h5'), "r") as s:
                     X = s["sample/densities"][...].astype(np.float32)
                     X = tc.from_numpy(X).to(dev) #dev
                     
                 ## Calculate lac using the current X. lac (linear attenuation coefficient) has the dimension of [n_element, n_lines, n_voxel_minibatch, n_voxel]
                 if selfAb == True:
                     X_ap_rot = rotate(X, theta, dev) #dev
-                    lac = X_ap_rot.view(n_element, 1, 1, n_voxel) * FL_line_attCS_ls.view(n_element, n_lines, 1, 1) #dev
+                    lac = X_ap_rot.view(n_element, 1, 1, n_voxel)*FL_line_attCS_ls.view(n_element, n_lines, 1, 1) #dev
                     lac = lac.expand(-1, -1, n_voxel_minibatch, -1).float() #dev
                 
                 else:
@@ -646,11 +633,12 @@ def reconstruct_jXRFT_tomography(
                     total_loss_n_batch = tc.zeros(n_batch)
                 
                 for m in range(n_batch):
-                    minibatch_ls = n_ranks * m + minibatch_ls_0  #dev
+                    minibatch_ls = n_ranks*m + minibatch_ls_0  #dev
                     p = minibatch_ls[rank]
 
                     if selfAb == True:
-                        P_minibatch = tc.from_numpy(P_handle['P_array'][:,:, p * dia_len_n * minibatch_size * sample_size_n: (p+1) * dia_len_n * minibatch_size * sample_size_n]).to(dev)
+                        P_minibatch = tc.from_numpy(P_handle['P_array'][:, :, p*dia_len_n*minibatch_size*sample_size_n: \
+                                                                        (p + 1)*dia_len_n*minibatch_size*sample_size_n]).to(dev)
                         n_det = P_minibatch.shape[0] 
                     
                     else:
@@ -683,18 +671,18 @@ def reconstruct_jXRFT_tomography(
                     comm.Barrier()
                     
                     XRF_loss = XRF_loss.detach().item() 
-                    XRF_loss_sum = comm.reduce(XRF_loss, op=MPI.SUM, root=0)
+                    XRF_loss_sum = comm.reduce(XRF_loss, op = MPI.SUM, root = 0)
                     
                     XRT_loss = XRT_loss.detach().item() 
-                    XRT_loss_sum = comm.reduce(XRT_loss, op=MPI.SUM, root=0)                    
+                    XRT_loss_sum = comm.reduce(XRT_loss, op = MPI.SUM, root = 0)                    
                                        
                     loss = loss.detach().item()           
-                    loss_sum = comm.reduce(loss, op=MPI.SUM, root=0)
+                    loss_sum = comm.reduce(loss, op = MPI.SUM, root = 0)
                     
                     comm.Barrier()                  
                 
-                    with h5py.File(os.path.join(recon_path, f_recon_grid +'.h5'), 'r+', driver='mpio', comm=comm) as s:
-                        s["sample/densities"][:, minibatch_size * p // sample_size_n : minibatch_size * (p + 1) // sample_size_n, :, :] = updated_minibatch.numpy()
+                    with h5py.File(os.path.join(recon_path, f_recon_grid +'.h5'), 'r+', driver = 'mpio', comm = comm) as s:
+                        s["sample/densities"][:, minibatch_size*p//sample_size_n:minibatch_size*(p + 1)//sample_size_n, :, :] = updated_minibatch.numpy()
                         
                     if rank == 0:
                         XRF_loss_n_batch[m] = XRF_loss_sum/n_ranks
@@ -721,28 +709,28 @@ def reconstruct_jXRFT_tomography(
             stdout_options = {'root':0, 'output_folder': recon_path, 'save_stdout': True, 'print_terminal': False}
             per_epoch_time = time.perf_counter() - t0_epoch
             
-            print_flush_root(rank, val=per_epoch_time, output_file=f'per_epoch_time_mb_size_{minibatch_size}.csv', **stdout_options)
+            print_flush_root(rank, val = per_epoch_time, output_file = f'per_epoch_time_mb_size_{minibatch_size}.csv', **stdout_options)
             
             comm.Barrier()
 
             if rank == 0:
-                with h5py.File(os.path.join(recon_path, f_recon_grid +'.h5'), "r") as s:
+                with h5py.File(os.path.join(recon_path, f_recon_grid + '.h5'), "r") as s:
                     X_cpu = s["sample/densities"][...].astype(np.float32)
                     
-            if rank ==0 and epoch != 0:
+            if rank == 0 and epoch != 0:
                 epsilon = np.mean((X_cpu - X_previous)**2)
                 
                 print_flush_root(rank, val=epsilon, output_file=f'model_change_mse_epoch.csv', **stdout_options)
                 
-                if epsilon < 10**(-12):             
+                if epsilon < 1e-12:
                     if rank == 0:
-                        with h5py.File(os.path.join(recon_path, f_recon_grid +"_"+str(epoch)+"_ending_condition" +'.h5'), "w") as s:
+                        with h5py.File(os.path.join(recon_path, f_recon_grid + "_" + str(epoch) + "_ending_condition" + '.h5'), "w") as s:
                             sample = s.create_group("sample")
-                            sample_v = sample.create_dataset("densities", shape=(n_element, sample_height_n, sample_size_n, sample_size_n), dtype="f4")
-                            sample_e = sample.create_dataset("elements", shape=(n_element,), dtype='S5')
+                            sample_v = sample.create_dataset("densities", shape = (n_element, sample_height_n, sample_size_n, sample_size_n), dtype = "f4")
+                            sample_e = sample.create_dataset("elements", shape = (n_element,), dtype = 'S5')
                             s["sample/densities"][...] = X_cpu
                             s["sample/elements"][...] = np.array(list(this_aN_dic.keys())).astype('S5')
-                        dxchange.write_tiff(X_cpu, os.path.join(recon_path, f_recon_grid)+"_"+str(epoch)+"_ending_condition", dtype='float32', overwrite=True)                         
+                        dxchange.write_tiff(X_cpu, os.path.join(recon_path, f_recon_grid) + "_" + str(epoch) + "_ending_condition", dtype = 'float32', overwrite = True)                         
                     
                     break
                 
@@ -761,11 +749,11 @@ def reconstruct_jXRFT_tomography(
             
             checkpoint_path = os.path.join(recon_path, "checkpoint")
             
-            if rank == 0 and ((epoch+1)%save_every_n_epochs == 0 and (epoch+1)//save_every_n_epochs !=0 or epoch+1 == n_epochs):
-                with h5py.File(os.path.join(checkpoint_path, f_recon_grid +"_"+str(starting_epoch + epoch) +'.h5'), "w") as s:
+            if rank == 0 and ((epoch + 1) % save_every_n_epochs == 0 and (epoch + 1)//save_every_n_epochs != 0 or epoch + 1 == n_epochs):
+                with h5py.File(os.path.join(checkpoint_path, f_recon_grid + "_" + str(starting_epoch + epoch) + '.h5'), "w") as s:
                     sample = s.create_group("sample")
-                    sample_v = sample.create_dataset("densities", shape=(n_element, sample_height_n, sample_size_n, sample_size_n), dtype="f4")
-                    sample_e = sample.create_dataset("elements", shape=(n_element,), dtype='S5')
+                    sample_v = sample.create_dataset("densities", shape = (n_element, sample_height_n, sample_size_n, sample_size_n), dtype = "f4")
+                    sample_e = sample.create_dataset("elements", shape = (n_element,), dtype = 'S5')
                     s["sample/densities"][...] = X_cpu
                     s["sample/elements"][...] = np.array(list(this_aN_dic.keys())).astype('S5')
 #                 dxchange.write_tiff(X_cpu, os.path.join(recon_path, f_recon_grid)+"_"+str(epoch), dtype='float32', overwrite=True)     

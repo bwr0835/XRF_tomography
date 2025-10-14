@@ -299,16 +299,20 @@ def find_lines_roi_idx_from_dataset(data_path, f_XRF_data, element_lines_roi, st
     
     if std_sample:
         channel_names = XRF_data['MAPS/channel_names'][...]
+    
     else:
         channel_names = XRF_data['exchange/elements'][...]
         
     channel_names = np.array([str(channel_name, 'utf-8') for channel_name in channel_names])
     element_lines_roi_idx = np.zeros(len(element_lines_roi)).astype(np.int)
+    
     for i, element_line_roi in enumerate(element_lines_roi):
         if element_line_roi[1] == "K":
             channel_name_roi = element_line_roi[0]
+        
         else:
             channel_name_roi = element_line_roi[0] + "_" + element_line_roi[1]
+        
         element_line_idx = np.argwhere(channel_names == channel_name_roi)
         element_lines_roi_idx[i] = element_line_idx
         
@@ -317,9 +321,14 @@ def find_lines_roi_idx_from_dataset(data_path, f_XRF_data, element_lines_roi, st
 
 
 def MakeFLlinesDictionary_manual(element_lines_roi,                           
-                                 n_line_group_each_element, probe_energy_keV, 
-                                 sample_size_n, sample_size_cm,
-                                 fl_line_groups = np.array(["K", "L", "M"]), fl_K = fl["K"], fl_L = fl["L"], fl_M = fl["M"]):
+                                 n_line_group_each_element, 
+                                 probe_energy_keV, 
+                                 sample_size_n, 
+                                 sample_size_cm,
+                                 fl_line_groups = np.array(["K", "L", "M"]), 
+                                 fl_K = fl["K"], 
+                                 fl_L = fl["L"], 
+                                 fl_M = fl["M"]):
 
     """
     Given the probe_energy_keV and the fluorescence lines of interests, output a dictionary.
@@ -345,12 +354,13 @@ def MakeFLlinesDictionary_manual(element_lines_roi,
         if np.sum(fl_cs) != 0:
             fl_energy_group = np.average(fl_energy, weights=fl_cs) 
             fl_cs_group = np.sum(fl_cs)
+        
         else:
             fl_energy_group = 0.
             fl_cs_group = 0.
 
         FL_all_elements_dic["fl_energy"] = np.append(FL_all_elements_dic["fl_energy"], fl_energy_group)
-        fl_unit_con = fl_cs_group * voxel_size
+        fl_unit_con = fl_cs_group*voxel_size
         FL_all_elements_dic["detected_fl_unit_concentration"] = np.append(FL_all_elements_dic["detected_fl_unit_concentration"], fl_unit_con)   
         
     return FL_all_elements_dic

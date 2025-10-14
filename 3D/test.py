@@ -1,4 +1,4 @@
-import numpy as np, h5py, file_util, xraylib_np as xrl
+import numpy as np, h5py, file_util, xraylib_np as xrl, ast, pandas as pd
 
 from matplotlib import pyplot as plt
 
@@ -136,6 +136,7 @@ from matplotlib import pyplot as plt
 #              235667,
 #              235670,
 #              235673]
+
 
 # while sid < sid_end:
 #     filename = f'/raid/users/roter/Jacobsen-nslsii/data/xrf/scan2D_{sid}.h5'
