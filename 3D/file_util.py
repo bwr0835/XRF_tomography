@@ -1012,7 +1012,7 @@ def extract_csv_input_jxrft_recon_params(file_path, fluor_lines, dev):
 
     return input_param_dict
 
-def extract_h5_aggregate_xrf_xrt(file_path, synchrotron, **kwargs):
+def extract_h5_aggregate_xrf_xrt_data(file_path, synchrotron, **kwargs):
     if not os.path.isfile(file_path):
         print('Error: Cannot locate aggregate XRF, XRT HDF5 file. Exiting program...')
 
