@@ -1030,11 +1030,11 @@ def extract_h5_aggregate_xrf_xrt_data(file_path, synchrotron, **kwargs):
         xrt_data = h5['exchange/data_xrt'][()]
         theta = h5['exchange/theta'][()]
             
-    opt_dens_idx = np.ndarray.item(np.where(elements_xrt == 'xrt_sig')[0])
+    # opt_dens_idx = np.ndarray.item(np.where(elements_xrt == 'xrt_sig')[0])
 
-    opt_dens = xrt_data[opt_dens_idx]
+    # opt_dens = xrt_data[opt_dens_idx]
 
-    n_theta, n_slices, n_columns = opt_dens.shape
+    # n_theta, n_slices, n_columns = opt_dens.shape
     
     
     element_lines_roi = kwargs.get('element_lines_roi')
