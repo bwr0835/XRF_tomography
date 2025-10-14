@@ -1038,6 +1038,7 @@ def extract_h5_aggregate_xrf_xrt_data(file_path, synchrotron, **kwargs):
     
     
     element_lines_roi = kwargs.get('element_lines_roi')
+    print(elements_xrf)
 
     print(type(elements_xrf).__name__)
 
