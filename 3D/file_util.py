@@ -1025,7 +1025,7 @@ def extract_h5_aggregate_xrf_xrt_data(file_path, synchrotron, **kwargs):
     
     with h5py.File(file_path, 'r') as h5:
         elements_xrf = h5['exchange/elements_xrf'][()]
-        elements_xrt = h5['exchange/elements_xrf'][()]
+        elements_xrt = h5['exchange/elements_xrt'][()]
         xrf_data = h5['exchange/data_xrf'][()]
         xrt_data = h5['exchange/data_xrt'][()]
         theta = h5['exchange/theta'][()]
