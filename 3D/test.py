@@ -1,4 +1,4 @@
-import numpy as np, h5py, file_util as futil, xraylib as xrl, ast, pandas as pd
+import numpy as np, h5py, file_util as futil, pandas as pd
 
 from matplotlib import pyplot as plt
 
