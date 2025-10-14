@@ -1033,6 +1033,8 @@ def extract_h5_aggregate_xrf_xrt_data(file_path, synchrotron, **kwargs):
     elements_xrf_string = [element.decode() for element in elements_xrf]
     elements_xrt_string = [element.decode() for element in elements_xrt]
 
+    print(elements_xrt_string)
+
     opt_dens_idx = elements_xrt_string.index('opt_dens')
     print(opt_dens_idx)
 
