@@ -1012,7 +1012,7 @@ def extract_csv_input_jxrft_recon_params(file_path, fluor_lines, dev):
 
     return input_param_dict
 
-def extract_h5_aggregate_xrf_xrt_data(file_path, synchrotron, **kwargs):
+def extract_h5_aggregate_xrf_xrt_data(file_path, **kwargs):
     if not os.path.isfile(file_path):
         print('Error: Cannot locate aggregate XRF, XRT HDF5 file. Exiting program...')
 
@@ -1023,29 +1023,46 @@ def extract_h5_aggregate_xrf_xrt_data(file_path, synchrotron, **kwargs):
 
         sys.exit()
     
-    with h5py.File(file_path, 'r') as h5:
-        elements_xrf = h5['exchange/elements_xrf'][()]
-        elements_xrt = h5['exchange/elements_xrt'][()]
-        xrf_data = h5['exchange/data_xrf'][()]
-        xrt_data = h5['exchange/data_xrt'][()]
-        theta = h5['exchange/theta'][()]
+    try:
+        with h5py.File(file_path, 'r') as h5:
+            elements_xrf = h5['exchange/elements_xrf'][()]
+            elements_xrt = h5['exchange/elements_xrt'][()]
+            xrf_data = h5['exchange/data_xrf'][()]
+            xrt_data = h5['exchange/data_xrt'][()]
+            theta = h5['exchange/theta'][()]
     
-    elements_xrf_string = [element.decode() for element in elements_xrf]
-    elements_xrt_string = [element.decode() for element in elements_xrt]
+    except KeyboardInterrupt:
+        print('Keyboard interrupt. Exiting program...')
 
-    print(elements_xrt_string)
-
-    opt_dens_idx = elements_xrt_string.index('opt_dens')
-    print(opt_dens_idx)
-
-    opt_dens = xrt_data[opt_dens_idx]
-
-    n_theta, n_slices, n_columns = opt_dens.shape
+        sys.exit()
     
+    except:
+        print('Error: Incorrect HDF5 file structure. Exiting program...')
+
+        sys.exit()
     
     element_lines_roi = kwargs.get('element_lines_roi')
 
-    print(type(elements_xrf).__name__)
-    print(elements_xrf_string)
+    elements_xrf_string = [element.decode() for element in elements_xrf]
+    elements_xrt_string = [element.decode() for element in elements_xrt]
 
-    return
+    if element_lines_roi is not None:
+        try:
+            element_lines_roi_idx = np.array([elements_xrf_string.index(element) for element in element_lines_roi[0]])
+        
+        except KeyboardInterrupt:
+            print('Keyboard interrupt. Exiting program...')
+        
+        except:
+            print('Error: Unable to parse ')
+
+        xrf_data_roi = xrf_data[element_lines_roi_idx]
+    
+    else:
+        element_lines_roi_idx = np.arange(len(elements_xrf_string))
+        xrf_data_roi = xrf_data
+
+    opt_dens_idx = elements_xrt_string.index('opt_dens')
+    opt_dens = xrt_data[opt_dens_idx]
+
+    return element_lines_roi_idx, xrf_data_roi, opt_dens, theta

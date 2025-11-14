@@ -665,7 +665,7 @@ def intersecting_length_fl_detectorlet_3d_mpi_write_h5(n_ranks, rank, det_size_c
     j_offset = rank * n_layers_each_rank * sample_size_n**2
     
     stdout_options = {'root':0, 'output_folder': './', 'save_stdout': False, 'print_terminal': True}
-    for i,  det_pos in enumerate(det_pos_ls_flat):
+    for i, det_pos in enumerate(det_pos_ls_flat):
         timestr = str(datetime.datetime.today())     
         print_flush_root(rank, val=f"detecting point: {i}, time: {timestr}", output_file='', **stdout_options)
         for j, v in enumerate(voxel_pos_ls_flat_minibatch): 

@@ -6,7 +6,7 @@ probe_intensity: 730712.2086470381
 selfAb: True
 cont_from_check_point: False
 use_saved_initial_guess: False
-downsample_factor: [, ]
+downsample_factor: 
 upsample_factor:
 ini_kind: const
 init_const: 0
