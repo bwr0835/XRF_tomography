@@ -116,51 +116,31 @@ def realign_proj(synchrotron,
                  **kwargs):
 
     '''
-
     realign_proj: Perform phase symmetry and iterative reprojection on experimental optical density (OD) projection images 
     to correct for center of rotation (COR) error, jitter (per-projection translations), respectively, 
     in x-ray transmission, OD, and x-ray fluorescnece projection images
 
-    ------
     Inputs
     ------
-    
     synchrotron: Name of synchrotron light source (dtype: str)
-
     xrt_proj_img_array: 3D XRT tomography data (projection angles, slices, scan positions) (array-like; dtype: float)
-
     opt_dens_proj_img_array: 3D optical density data derived from xrt_proj_img_array (projection angles, slices, scan positions) (array-like, dtype: float)
-
     xrf_proj_img_array: 4D XRF data (elements, projection_angles, slices, scan positions) (array-like; dtype: float)
-
     theta_array: Array of projection angles (array-like; dtype: float)
-    
     n_iterations: Maximum number of iterative reprojection iterations (dtype: int)
-    
-    init_x_shift: Initial x-shifts for all projections (for helping speed up convergence) (array-like; dtype: float)
-    
+    init_x_shift: Initial x-shifts for all projections (for helping speed up convergence) (array-like; dtype: float)    
     init_y_shift: Initial y-shifts for all projections (for helping speed up convergence) (array-like; dtype: float)
-    
     eps: Desired differential shift for convergence criterion (dtype: float)
-
     return_aux_data: Flag for returning per-iteration auxiliary data (dtype: bool; default: False)
 
-    -------
     Outputs
-    -------
-    
+    ------- 
     aligned_proj_total: 4D XRF tomography data (XRT data will come later) corrected for per-projection jitter, center of rotation misalignment (array-like; dtype: float)
-
     aligned_exp_proj_array: 1D array of experimental 3D XRF tomography data arrays for each iteration for ref_element (array-like; dtype: float)
-
     synth_proj_array: 1D array of synthetic 3D XRF tomography data arrays for each iteration for ref_element (array-like; dtype: float)
-
     recon_array: 1D array of 3D reconstruction slices for each iteration for ref_element (array-like; dtype: float)
-
     net_x_shifts_pcc_new: Array of net x shifts with dimensions (n_iterations, n_theta) (array-like; dtype: float) (Note: n_iterations can be smaller the more quickly iter_reproj() converges)
-    
     net_y_shifts_pcc_new: Array of net y shifts with dimensions (n_iterations, n_theta) (array-like; dtype: float) (Note: n_iterations can be smaller the more quickly iter_reproj() converges)
-
     '''
 
     if sigma < 0 or alpha < 0:

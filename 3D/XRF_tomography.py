@@ -9,10 +9,9 @@ import numpy as np, \
        torch as tc, \
        xraylib as xlib, \
        xraylib_np as xlib_np, \
-       file_util as futil, \
+       xrf_xrt_jxrft_file_util as futil, \
        os, \
        shutil, \
-       sys, \
        datetime, \
        time, \
        matplotlib, \
@@ -20,10 +19,13 @@ import numpy as np, \
        dxchange, \
        warnings
 
-from util import rotate, \
+from util import downsample_proj_data, \
+                 upsample_recon_data, \
+                 rotate, \
                  MakeFLlinesDictionary_manual, \
                  intersecting_length_fl_detectorlet_3d_mpi_write_h5_3_manual, \
-                 find_lines_roi_idx_from_dataset
+                 find_lines_roi_idx_from_dataset, \
+                 upsample_recon_data
 from mpi4py import MPI
 from torch import nn
 from tqdm import tqdm
@@ -50,98 +52,283 @@ fl = {"K": np.array([xlib.KA1_LINE, xlib.KA2_LINE, xlib.KA3_LINE, xlib.KB1_LINE,
       "M": np.array([xlib.MA1_LINE, xlib.MA2_LINE, xlib.MB_LINE])               
      }
 
-def reconstruct_jXRFT_tomography(
-        synchrotron,
-        # ______________________________________
-        # |Raw data and experimental parameters|________________________________
-        sample_size_n, # Set sample_size_n (sample_height_n) to the number of pixels along the direction
-                       # perpendicular (parallel) to # the rotational axis of the sample;
-        sample_height_n, 
-        sample_size_cm, # Size of the sample size (in unit cm) along the direction 
-                        # perpendicular to the rotational axis of the sample
-        probe_energy_keV = None,
-        probe_intensity = None, # Set the value of incident probe intensity (in photons or photons/s) 
-                                # For simulations, set the value to some estimated probe intensity
-        probe_att = True,
-        manual_det_coord = True, # True when using a exp. data; 
-                                 # False when using a simulation data; 
-                                 # For simulation data, auto-distribute detecting points on a circular sensing area
-                                 # given det_dia_cm and det_ds_spacing_cm;
-        set_det_coord_cm = None, # Set to None for simulation data;
-                                 # For exp. data, a np array with dimension (# of detecing points, 3)
-                                 # 3 for (z, x, y) coordinates, probe propagate along +y axis; sample rotates about +z axis;
-                                 # The sign of x determines which side the detector locates relative to the sample;
-        det_on_which_side = 'negative', # Choose from 'positive' or 'negative' depending on the side that the detector locates 
-                                  # relative the sample; TODO
-        manual_det_area = True, # True when using a exp. data;
-                                # False when using a simulation data;
-                                # If set to True, the program caculated the signal collecting solid angle of XRF using 
-                                # det_area_eff_cm2;
-                                # If set to False, the program uses provided det_dia_cm and det_from_sample_cm;
-                                #### Note ####
-                                # For exp. data, the factor of signal collecting solid angle is included in probe_intensity
-                                # which is calculated from the calibration data;
-        det_area_eff_cm2 = None, # For exp. data only. Set the value of the total sensing area;
-                                 # For simulation data, set to None (program calculates sensing area with given det_dia_cm)
-        det_dia_cm = None,  # For simulation data only. Diameter of the sensor assuming a circular sensing area.
-                            # Only used when manual_det_area is False. 
-                            # Need to use the same diameter setting, as it's used to generate simulation data  
-        det_ds_spacing_cm = None, # For simulation data only. used to distribute detecting points on the XRF detecting plane.
-        det_from_sample_cm = None, # For simulation data only.
-                                   # For exp. data, the distance between the detector and the sample is given in set_det_coord_cm
-        # |Probe Intensity calibration data|____________________________________    
-        use_std_calibation = False, # Set use_std_calibration to True if the calibration measurement exist otherwise set to False.
-        std_path = None, # Density_std_elements unit in g/cm^2
-        f_std = None, 
-        std_element_lines_roi = None, 
-        density_std_elements = None, 
-        fitting_method = None, # Set fitting method to  'XRF_fits' , 'XRF_roi' or 'XRF_roi_plus'
-        # |Reconstruction parameters|___________________________________________
-        n_epochs = 50, 
-        save_every_n_epochs = 10, 
-        minibatch_size = None,
-        f_recon_parameters = "recon_parameters.txt", 
-        dev = None,
-        selfAb = False, 
-        cont_from_check_point = False, 
-        use_saved_initial_guess = False, 
-        ini_kind = 'const',  # Set ini_kind to 'const', 'rand' or 'randn'
-        init_const = 0.5, 
-        ini_rand_amp = 0.1,
-        recon_path='./', 
-        f_initial_guess = None, 
-        f_recon_grid = None,  # Name of the file that saves the most recent reconstructed result 
-        # data_path = None, 
-        # f_XRF_data = None, 
-        f_XRF_XRT_data = None,
-        # f_XRT_data = None,
-        scaler_counts_us_ic_dataset_idx = None,
-        scaler_counts_ds_ic_dataset_idx = None,  # the index of us_ic in the dataset MAPS/scaler_names
-        XRT_ratio_dataset_idx = None, # the index of ds_ic in the dataset MAPS/scaler_names
-        theta_ls_dataset = 'exchange/theta', 
-        channel_names = 'exchange/elements',  # the index of abs_ic in the dataset MAPS/scaler_names
-        this_aN_dic = None, 
-        element_lines_roi = None, 
-        n_line_group_each_element = None,
-        b1 = None, 
-        b2 = None, 
-        lr = None,
-        P_folder = None, 
-        f_P = None, 
-        fl_K = fl["K"], 
-        fl_L = fl["L"], 
-        fl_M = fl["M"],
-        **kwargs):
+# def reconstruct_jXRFT_tomography(
+#         synchrotron,
+#         # ______________________________________
+#         # |Raw data and experimental parameters|________________________________
+#         sample_size_n, # Set sample_size_n (sample_height_n) to the number of pixels along the direction
+#                        # perpendicular (parallel) to # the rotational axis of the sample;
+#         sample_height_n, 
+#         sample_size_cm, # Size of the sample size (in unit cm) along the direction 
+#                         # perpendicular to the rotational axis of the sample
+#         probe_energy_keV = None,
+#         probe_intensity = None, # Set the value of incident probe intensity (in photons or photons/s) 
+#                                 # For simulations, set the value to some estimated probe intensity
+#         probe_att = True,
+#         manual_det_coord = True, # True when using a exp. data; 
+#                                  # False when using a simulation data; 
+#                                  # For simulation data, auto-distribute detecting points on a circular sensing area
+#                                  # given det_dia_cm and det_ds_spacing_cm;
+#         set_det_coord_cm = None, # Set to None for simulation data;
+#                                  # For exp. data, a np array with dimension (# of detecing points, 3)
+#                                  # 3 for (z, x, y) coordinates, probe propagate along +y axis; sample rotates about +z axis;
+#                                  # The sign of x determines which side the detector locates relative to the sample;
+#         det_on_which_side = 'negative', # Choose from 'positive' or 'negative' depending on the side that the detector locates 
+#                                   # relative the sample; TODO
+#         manual_det_area = True, # True when using a exp. data;
+#                                 # False when using a simulation data;
+#                                 # If set to True, the program caculated the signal collecting solid angle of XRF using 
+#                                 # det_area_eff_cm2;
+#                                 # If set to False, the program uses provided det_dia_cm and det_from_sample_cm;
+#                                 #### Note ####
+#                                 # For exp. data, the factor of signal collecting solid angle is included in probe_intensity
+#                                 # which is calculated from the calibration data;
+#         det_area_eff_cm2 = None, # For exp. data only. Set the value of the total sensing area;
+#                                  # For simulation data, set to None (program calculates sensing area with given det_dia_cm)
+#         det_dia_cm = None,  # For simulation data only. Diameter of the sensor assuming a circular sensing area.
+#                             # Only used when manual_det_area is False. 
+#                             # Need to use the same diameter setting, as it's used to generate simulation data  
+#         det_ds_spacing_cm = None, # For simulation data only. used to distribute detecting points on the XRF detecting plane.
+#         det_from_sample_cm = None, # For simulation data only.
+#                                    # For exp. data, the distance between the detector and the sample is given in set_det_coord_cm
+#         # |Probe Intensity calibration data|____________________________________    
+#         use_std_calibation = False, # Set use_std_calibration to True if the calibration measurement exist otherwise set to False.
+#         std_path = None, # Density_std_elements unit in g/cm^2
+#         f_std = None, 
+#         std_element_lines_roi = None, 
+#         density_std_elements = None, 
+#         fitting_method = None, # Set fitting method to  'XRF_fits' , 'XRF_roi' or 'XRF_roi_plus'
+#         # |Reconstruction parameters|___________________________________________
+#         n_epochs = 50, 
+#         save_every_n_epochs = 10, 
+#         minibatch_size = None,
+#         f_recon_parameters = "recon_parameters.txt", 
+#         dev = None,
+#         selfAb = False, 
+#         cont_from_check_point = False, 
+#         use_saved_initial_guess = False, 
+#         ini_kind = 'const',  # Set ini_kind to 'const', 'rand' or 'randn'
+#         init_const = 0.5, 
+#         ini_rand_amp = 0.1,
+#         recon_path='./', 
+#         f_initial_guess = None, 
+#         f_recon_grid = None,  # Name of the file that saves the most recent reconstructed result 
+#         # data_path = None, 
+#         # f_XRF_data = None, 
+#         f_XRF_XRT_data = None,
+#         # f_XRT_data = None,
+#         scaler_counts_us_ic_dataset_idx = None,
+#         scaler_counts_ds_ic_dataset_idx = None,  # the index of us_ic in the dataset MAPS/scaler_names
+#         XRT_ratio_dataset_idx = None, # the index of ds_ic in the dataset MAPS/scaler_names
+#         theta_ls_dataset = 'exchange/theta', 
+#         channel_names = 'exchange/elements',  # the index of abs_ic in the dataset MAPS/scaler_names
+#         this_aN_dic = None, 
+#         element_lines_roi = None, 
+#         n_line_group_each_element = None,
+#         b1 = None, 
+#         b2 = None, 
+#         lr = None,
+#         P_folder = None, 
+#         f_P = None, 
+#         fl_K = fl["K"], 
+#         fl_L = fl["L"], 
+#         fl_M = fl["M"],
+#         **kwargs):
     
+def reconstruct_jXRFT_tomography(synchrotron,
+                                 synchrotron_beamline,
+                                 sample_size_n,
+                                 sample_height_n, 
+                                 sample_size_cm,
+                                 probe_energy_keV = None,
+                                 probe_intensity = None,
+                                 probe_att = True,
+                                 manual_det_coord = True,
+                                 set_det_coord_cm = None,
+                                 det_on_which_side = 'negative',
+                                 manual_det_area = True,
+                                 det_area_eff_cm2 = None, 
+                                 det_dia_cm = None,
+                                 det_ds_spacing_cm = None,
+                                 det_from_sample_cm = None,
+                                 n_epochs = 50, 
+                                 save_every_n_epochs = 10, 
+                                 minibatch_size = None,
+                                 f_recon_parameters = "recon_parameters.txt", 
+                                 dev = None,
+                                 selfAb = True,
+                                 noise_model = None,
+                                 cont_from_check_point = False, 
+                                 use_saved_initial_guess = False, 
+                                 ini_kind = 'const',
+                                 init_const = 0.5, 
+                                 ini_rand_amp = 0.1,
+                                 recon_path = None, 
+                                 f_initial_guess = None, 
+                                 f_recon_grid = None,
+                                 f_XRF_XRT_data = None,
+                                 downsample_factor = 1,
+                                 upsample_factor = 1,
+                                 this_aN_dic = None, 
+                                 element_lines_roi = None, 
+                                 n_line_group_each_element = None,
+                                 b1 = None, 
+                                 b2 = None, 
+                                 lr = None,
+                                 P_folder = None, 
+                                 f_P = None, 
+                                 fl_K = fl["K"], 
+                                 fl_L = fl["L"], 
+                                 fl_M = fl["M"],
+                                 **kwargs):
+
+    '''
+    Perform joint iterative X-ray fluorescence (XRF) and X-ray transmission (XRT) reconstruction via automatic differentiation 
+    while correcting for incident probe/beam attenuation and XRF self-absorption [1].
+
+    Parameters
+    ----------
+    synchrotron : str
+        Name of synchrotron light source
+    synchrotron_beamline : str 
+        Name of synchrotron light source beamline
+    sample_size_n : int
+        Number of pixels along width of projection images when rotation axis is up-down (e.g. # of columns/scan positions)
+    sample_height_n: int 
+        Number of pixels along height of projection images when rotation axis is up-down (e.g. # of rows/slices)
+    sample_size_cm : float
+        Size of sample_n (in cm) along direction perpendicular to sample axis of rotation
+    probe_energy_keV : ndarray
+        Energy of incident probe/beam (in keV)
+    probe_intensity : float
+        Incident probe/beam intensity (in photons/s or photons)
+    probe_att : bool 
+        Flag for including incident probe/beam attenuation
+    manual_det_coord : bool 
+        Flag for setting detector coordinates manually (True for experimental data, False for simulated data)
+    set_det_coord_cm : ndarray or None 
+        Detector coordinates (cm)
+        Coordinate array structure: [[0, z_0, x_0, y_0], [1, z_1, x_1, y_1], ..., [N_det - 1, z_(N_det - 1), x_(N_det - 1), y_(N_det - 1)]]
+            z: Axis of rotation
+            x: Detection axis (sign of x dictates which side detector located on relative to sample)
+            y: Incident beam axis
+            N_det: Number of detection points
+        Set to None for simulated data (program calculates coordinates using det_dia_cm and det_from_sample_cm)
+    det_on_which_side : str
+        Which side of a sample the detector is on
+        Set to 'negative' or 'positive' (TODO!!!!!)
+    det_area_eff_cm2: float 
+        Effective detector area (cm^2)
+    det_dia_cm : float 
+        Detector diameter (cm) assuming a circular detection area
+            For simulated data only (or if manual_det_area = False)!
+            For simulated data, value must be the same as when generating such data
+    n_epochs : int
+        Number of epochs to execute function for
+    save_every_n_epochs : int
+        Save data for every n epochs only
+    minibatch_size : int
+        Size of randomly-selected subset of XRF, XRT data (TODO!!!!!)
+    f_recon_parameters : str
+        File name for writing out reconstruction parameters
+    dev : str or None
+        Device (for parallelization nature of the reconstruction algorithm)
+        If None, then only CPU involved in function execution
+    selfAb : bool
+        Flag for enabling self-absorption correction
+    noise_model : str
+        Noise model to use with cost function to be minimized
+        Set to 'gaussian' or 'poisson'
+    cont_from_check_point : bool
+        Flag for continuing reconstruction algorithm from (????) (TODO!!!!!)
+    use_saved_initial_guess : bool
+        Flag for using saved initial XRF, XRT guesses of object (unsure about this) (TODO!!!!!)
+    ini_kind : str
+        TODO!!!!!
+        Set to 'const' (default), 'rand', or 'randn'
+    init_const : float
+        TODO!!!!!
+    ini_rand_amp : float
+        TODO!!!!!
+    recon_path : str
+        Directory path for reconstructed data
+    f_initial_guess : str
+        File name for initial guess of reconstructed data
+    f_recon_grid : str
+        File name for most recent reconstructed result
+    f_XRF_XRT_data : str
+        File name for joint XRF, XRT data (currently supporting .h5 format only)
+    this_aN_dic : dict
+        Elements and atomic numbers Z of interest for XRF
+        Dictionary structure: {Element: Z, ...}
+        Example: {'Ca': 20, 'Fe', 26, 'Ba', 56}
+    element_lines_roi : ndarray
+        Elements of interest and subshells of interest
+        Array structure: np.array([[Element, subshell], ...])
+        Example: np.array([['Si', 'K], ['Ca', 'K'], ['Ca', 'L'], ['Fe', 'K'], ['Cu', 'K'], ['Cu', 'L'], ['Ba', 'L']])
+    n_line_group_each_element : ndarray
+        Number of subshells of interest for each element of interest (array-like; dtype: str)
+        Example using above element_lines_roi example: np.array([1, 2, 1, 2, 1])
+    b1 : float
+        Regularization prefactor of XRT cost term
+    b2 : float
+        Second prefactor inside XRT cost term [2]
+    lr : float
+        Learning rate
+    P_folder : str, optional (????) (TODO!!!!!)
+        Directory path for info on XRF-detectorlet intersecting lengths (TODO!!!!!)
+    f_P : str
+        File name for XRF-detectorlet intersecting lengths (TODO!!!!!)
+    fl_K : dict
+        K fluorescence lines
+        See XRF_tomography.py for example/default dictionary
+        See xraylib documentation for more information on XRF line macros [3]
+    fl_L : dict
+        L fluorescence lines
+        See XRF_tomography.py for default dictionary
+        See xraylib documentation for more information on XRF line macros [3]
+    fl_M : dict
+        M fluorescence lines
+        See XRF_tomography.py for default dictionary
+        See xraylib documentation for more information on XRF line macros [3]
+
+    Returns
+    -------
+    None
+
+    Outputs
+    -------
+
+
+    References
+    ----------
+    [1] P. Huang, “Toward Large-scale X-ray Microscopy for Ptychography and Fluorescence Tomography”, Ph.D. Thesis (Northwestern University, May 2022).
+
+    [2] Z. W. Di, S. Chen, Y. P. Hong, C. Jacobsen, S. Leyffer, and S. M. Wild, Opt. Express 25, 13107 (2017).
+    
+    [3] T. Schoonjans, A. Brunetti, B. Golosio, M. S. D. Rio, V. A. Solé, C. Ferrero, and L. Vincze, Spectrochim. Acta, Part B 66, 776 (2011).
+    '''
+
     comm = MPI.COMM_WORLD
     n_ranks = comm.Get_size()
     rank = comm.Get_rank()
     
-    loss_fn = nn.MSELoss()
-    #TODO # loss_fn = nn.PoissonNLLLoss()
+    if noise_model == 'gaussian':
+        loss_fn = nn.MSELoss()
+    
+    elif noise_model == 'poisson':
+        loss_fn = nn.PoissonNLLLoss()
+    
+    elif rank == 0:
+        msg = 'Error: Unable to extract noise model option. Exiting program...'
+
+        print_flush_root(rank, msg, save_stdout = False, print_terminal = True)
+
+        comm.Abort()
+    
     dia_len_n = int(1.2*(sample_height_n**2 + sample_size_n**2 + sample_size_n**2)**0.5) # dev
-    n_voxel_minibatch = minibatch_size*sample_size_n #dev
-    n_voxel = sample_height_n*sample_size_n**2 #dev
+    n_voxel_minibatch = minibatch_size*sample_size_n # dev
+    n_voxel = sample_height_n*sample_size_n**2 # dev
     
     #### create the file handle for experimental data; y1: channel data, y2: scalers data ####
     
@@ -152,10 +339,29 @@ def reconstruct_jXRFT_tomography(
     ####----------------------------------------------------------------------------------####
     
     elements_xrf, \
-    xrf_data_roi, \
-    opt_dens, \
+    xrf_data, \
+    opt_dens_data, \
     theta_tomo = futil.extract_h5_aggregate_xrf_xrt_data(f_XRF_XRT_data, element_lines_roi = element_lines_roi)
     
+    if downsample_factor > 1 and rank == 0:
+        msg = f'Downsampling XRF, optical density projection images by factor of {downsample_factor}'
+        
+        print_flush_root(rank, msg, save_stdout = False, print_terminal = True)
+
+        xrf_data_roi = downsample_proj_data(xrf_data, downsample_factor)
+        opt_dens = downsample_proj_data(opt_dens_data, downsample_factor)
+
+        sample_height_n /= downsample_factor
+        sample_size_n /= downsample_factor
+    
+    else:
+        xrf_data_roi = xrf_data
+        opt_dens = opt_dens_data
+    
+    dia_len_n = int(1.2*(sample_height_n**2 + sample_size_n**2 + sample_size_n**2)**0.5) # dev
+    n_voxel_minibatch = minibatch_size*sample_size_n # dev
+    n_voxel = sample_height_n*sample_size_n**2 # dev
+
     #### Calculate the number of elements in the reconstructed object, list the atomic numbers ####
     n_element = len(elements_xrf)
 
@@ -167,6 +373,14 @@ def reconstruct_jXRFT_tomography(
         
         elif synchrotron == 'nsls-ii':
             aN_ls[idx] = xlib_np.SymbolToAtomicNumber(element.split('_')[0])
+        
+        else:
+            if rank == 0:
+                msg = 'Error: Unable to extract at least one element symbol. Exiting program...'
+                
+                print_flush_root(rank, msg, save_stdout = False, print_terminal = True)
+
+            comm.Abort()
 
     # aN_ls = np.array(list(this_aN_dic.values()))
     ####--------------------------------------------------------------####
@@ -286,8 +500,25 @@ def reconstruct_jXRFT_tomography(
         if use_saved_initial_guess:
             if rank == 0:
                 with h5py.File(os.path.join(recon_path, f_initial_guess + '.h5'), "r") as s:
-                    X = s["sample/densities"][...].astype(np.float32)
-                    X = tc.from_numpy(X)
+                    X_init = s["sample/densities"][...].astype(np.float32)
+
+                if upsample_factor > 1:
+                    msg = f'Upsampling initial guess of reconstruction slices by factor of {upsample_factor}'
+        
+                    print_flush_root(rank, msg, save_stdout = False, print_terminal = True)
+                   
+                    X = upsample_recon_data(X_init, upsample_factor)
+
+                if (X.shape[0], X.shape[1]) != (y1_true.shape[2], y1_true.shape[3]): # If the number of slices and scan positions are not identical after
+                                                                                         # downsampling projection data and upsampling initial reconstruction data, throw error and terminate program
+                        
+                    msg = 'Error: Number of slices and scan positions do not match between upsampled initial reconstruction guess and downsampled projection data. Exiting program...'
+                        
+                    print_flush_root(rank, msg, save_stdout = False, print_terminal = True)
+
+                    comm.Abort()
+
+                X = tc.from_numpy(X_init)
                 
                 shutil.copy(os.path.join(recon_path, f_initial_guess + '.h5'), os.path.join(recon_path, f_recon_grid + '.h5'))
                 
@@ -323,7 +554,7 @@ def reconstruct_jXRFT_tomography(
                 recon_params.write("starting_epoch = 0\n")
                 recon_params.write("n_epochs = %d\n" %n_epochs)
                 recon_params.write("n_ranks = %d\n" %n_ranks)
-                recon_params.write("element_line:\n" + str(element_lines_roi)+"\n") 
+                recon_params.write("element_line:\n" + str(element_lines_roi) + "\n") 
                 recon_params.write("b1 = %.9f\n" %b1)
                 recon_params.write("b2 = %.9f\n" %b2)
                 recon_params.write("learning rate = %f\n" %lr)
@@ -410,11 +641,11 @@ def reconstruct_jXRFT_tomography(
                     
                     ## Load us_ic as the incoming probe count in this minibatch
                     model = PPM(dev, selfAb, lac, X, p, n_element, n_lines, FL_line_attCS_ls,
-                                 detected_fl_unit_concentration, n_line_group_each_element,
-                                 sample_height_n, minibatch_size, sample_size_n, sample_size_cm,
-                                 probe_energy_keV, probe_cts, probe_att, probe_attCS_ls,
-                                 theta, signal_attenuation_factor,
-                                 n_det, P_minibatch, det_dia_cm, det_from_sample_cm, det_solid_angle_ratio)
+                                detected_fl_unit_concentration, n_line_group_each_element,
+                                sample_height_n, minibatch_size, sample_size_n, sample_size_cm,
+                                probe_energy_keV, probe_cts, probe_att, probe_attCS_ls,
+                                theta, signal_attenuation_factor,
+                                n_det, P_minibatch, det_dia_cm, det_from_sample_cm, det_solid_angle_ratio)
                     
                     optimizer = tc.optim.Adam(model.parameters(), lr = lr)              
                                     
@@ -562,6 +793,13 @@ def reconstruct_jXRFT_tomography(
         if rank == 0:           
             with h5py.File(os.path.join(recon_path, f_recon_grid + ".h5"), "r") as s:
                 X = s["sample/densities"][...].astype(np.float32)
+
+                if upsample_factor > 1:
+                    X = upsample_recon_data(X_init, upsample_factor)
+                
+                else:
+                    X = X_init
+
                 X = tc.from_numpy(X)
             
         else:

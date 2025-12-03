@@ -1,6 +1,9 @@
 available_synchrotrons = ['aps',
                           'nsls-ii']
 
+available_noise_models = ['gaussian',
+                          'poisson']
+
 preprocessing_params_ordered = ['synchrotron',
                                 'synchrotron_beamline',
                                 'create_aggregate_xrf_xrt_files_enabled',
@@ -29,7 +32,6 @@ preprocessing_numeric_params = ['xrt_data_percentile',
                                 't_dwell_s',
                                 'sigma',
                                 'alpha',
-                                'upsample_factor',
                                 'eps']
 
 preprocessing_bool_params = ['create_aggregate_xrf_xrt_files_enabled',
@@ -79,6 +81,8 @@ recon_params_ordered = ['synchrotron',
                         'f_P']
 
 recon_numeric_scalar_params = ['probe_intensity',
+                               'downsample_factor',
+                               'upsample_factor',
                                'init_const',
                                'ini_rand_amp'
                                'sample_size_n',
@@ -101,3 +105,9 @@ recon_numeric_array_params = ['element_lines_roi',
                               'set_det_coord_cm']
 
 recon_dict_params = ['this_aN_dict']
+
+recon_bool_params = ['cont_from_check_point',
+                     'selfAb',
+                     'use_saved_initial_guess',
+                     'manual_det_coord',
+                     'manual_det_area']

@@ -1,16 +1,14 @@
 import numpy as np
 import torch as tc
-tc.set_default_tensor_type(tc.FloatTensor)
 import xraylib as xlib
 import xraylib_np as xlib_np
 import torch.nn as nn
+
 from util import rotate, MakeFLlinesDictionary_manual
 
-
-
+tc.set_default_tensor_type(tc.FloatTensor)
 
 class PPM(nn.Module):
- 
     def __init__(self, dev, selfAb, lac, grid_concentration, p, n_element, n_lines, 
                  FL_line_attCS_ls, detected_fl_unit_concentration, n_line_group_each_element,
                  sample_height_n, minibatch_size, sample_size_n, sample_size_cm,          

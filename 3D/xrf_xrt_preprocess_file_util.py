@@ -937,10 +937,11 @@ def extract_csv_input_jxrft_recon_params(file_path, fluor_lines, dev):
         print('\n\rEnding program...')
 
     available_synchrotrons = ipn.available_synchrotrons
+    available_noise_models = ipn.available_noise_models
     numeric_scalar_params = ipn.recon_numeric_scalar_params
     numeric_array_params = ipn.recon_numeric_array_params
     dict_params = ipn.recon_dict_params
-    bool_params = ipn.preprocessing_bool_params
+    bool_params = ipn.recon_bool_params
     
     for idx, val in enumerate(values):
         if val.lower() == 'none':
@@ -986,6 +987,12 @@ def extract_csv_input_jxrft_recon_params(file_path, fluor_lines, dev):
         sys.exit()
     
     synchrotron = input_param_dict['synchrotron'].lower()
+    noise_model = input_param_dict['noise_model'].lower()
+
+    if noise_model not in available_noise_models:
+        print('Error: Noise model unavailable. Exiting program...')
+
+        sys.exit()
 
     if synchrotron not in available_synchrotrons:
         print('Error: Synchrotron unavailable. Exiting program...')
@@ -1001,9 +1008,17 @@ def extract_csv_input_jxrft_recon_params(file_path, fluor_lines, dev):
 
     for param in numeric_scalar_params:
         if isinstance(input_param_dict.get(param), str):
-            print(f'Error: Expected a number for input parameter \'{param}\'. Exiting program...')
+            print(f'Error: Expected a number for input parameter \'{param}\', but got a string. Exiting program...')
 
             sys.exit()
+
+    input_param_dict['probe_energy_kev'] = np.array([input_param_dict['probe_energy_kev']])
+    
+    if input_param_dict.get('downsample_factor') is None:
+        input_param_dict['downsample_factor'] = 1
+    
+    if input_param_dict.get('upsample_factor') is None:
+        input_param_dict['upsample_factor'] = 1
 
     input_param_dict['dev'] = dev # Device (GPU, CPU, etc.)
     input_param_dict['fl_K'] = fluor_lines['K']

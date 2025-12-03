@@ -56,7 +56,7 @@ if __name__ == "__main__":
         recon_param_file_path = sys.argv[1]
 
         params = futil.extract_csv_input_jxrft_recon_params(recon_param_file_path, fl, dev)
-    
+
     reconstruct_jXRFT_tomography(**params)
     
     if rank == 0:

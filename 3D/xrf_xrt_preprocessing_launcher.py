@@ -1,4 +1,4 @@
-import os, sys, file_util as futil
+import os, sys, xrf_xrt_preprocess_file_util as futil
 
 from xrf_xrt_preprocessing_control_file import preprocess_xrf_xrt_data
 

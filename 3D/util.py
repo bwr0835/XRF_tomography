@@ -6,20 +6,23 @@ Created on Sat Nov  7 23:34:50 2020
 @author: panpanhuang
 """
 
+import datetime, \
+       h5py, \
+       numpy as np, \
+       xraylib as xlib, \
+       xraylib_np as xlib_np, \
+       torch as tc, \
+       torch.nn.functional as F, \
+       os, \
+       sys
+
 from mpi4py import MPI
-import datetime
 from numpy.random import default_rng
-import h5py
-import numpy as np
-import xraylib as xlib
-import xraylib_np as xlib_np
-import torch as tc
-import torch.nn.functional as F
-import os
-import sys
 from tqdm import tqdm
 from misc import print_flush_root
 from Atomic_number import AN
+from scipy import ndimage as ndi
+from skimage import measure as meas
 
 comm = MPI.COMM_WORLD
 n_ranks = comm.Get_size()
@@ -751,11 +754,10 @@ def intersecting_length_fl_detectorlet_3d_mpi_write_h5(n_ranks, rank, det_size_c
 ### Divide the sample into strips intersected with the probe for parallelization
 ####  and write the info of intersecting length to a .h5 file
 def intersecting_length_fl_detectorlet_3d_mpi_write_h5_2(n_ranks, minibatch_size, rank, det_size_cm, det_from_sample_cm, det_ds_spacing_cm, sample_size_n, sample_size_cm, sample_height_n, P_folder, f_P):
-    
- 
     if rank == 0:
         if not os.path.exists(P_folder):
             os.makedirs(P_folder)
+        
         with open(os.path.join(P_folder, 'P_array_parameters.txt'), "w") as P_params:
             P_params.write("det_size_cm = %f\n" %det_size_cm)
             P_params.write("det_from_sample_cm = %f\n" %det_from_sample_cm)
@@ -815,7 +817,7 @@ def intersecting_length_fl_detectorlet_3d_mpi_write_h5_2(n_ranks, minibatch_size
     n_det = len(det_pos_ls_flat)
     
     if rank == 0:
-        print(f"numbder of detecting points: {n_det}")
+        print(f"number of detecting points: {n_det}")
         sys.stdout.flush()
         
     ## define sample edges: 
@@ -1676,8 +1678,50 @@ def create_XRF_data_3d(n_ranks, rank, P_folder, f_P, theta_st, theta_end, n_thet
         P_handle = h5py.File(P_save_path + ".h5", 'r')
         P = tc.from_numpy(P_handle['P_array'][...])
         n_det = P.shape[0] 
-        theta_ls = - tc.linspace(theta_st, theta_end, n_theta + 1)[:-1] 
+        theta_ls = -tc.linspace(theta_st, theta_end, n_theta + 1)[:-1] 
         for this_theta_idx, theta in enumerate(tqdm(theta_ls)):
             create_XRF_data_single_theta_3d(n_det, P, theta_st, theta_end, n_theta, src_path, det_size_cm, det_from_sample_cm, det_ds_spacing_cm, sample_size_n,
                                  sample_size_cm, sample_height_n, this_aN_dic, probe_cts, probe_energy_keV, save_path, save_fname, Poisson_noise, dev, this_theta_idx)
         P_handle.close()
+
+def downsample_proj_data(array, downsample_factor, func = np.mean):
+    if array.ndim != 4:
+        print_flush_root(rank, 'Error: Input projection data must be exactly 4D. Exiting program...', save_stdout = False, print_terminal = True)
+
+        comm.Abort()
+    
+    _, _, n_slices, n_columns = array.shape
+
+    if not isinstance(downsample_factor, int) or downsample_factor <= 0:
+        print_flush_root(rank, 'Error: Downsampling factor must be a positive integer. Exiting program...', save_stdout = False, print_terminal = True)
+
+        comm.Abort()
+
+    if (n_slices//downsample_factor) % 2 or (n_columns//downsample_factor) % 2:
+        print('Warning: Odd number of rows/slices and/or columns/scan positions resulting from downsampling. Consider switching to even number of slices and/or scan positions being output.')
+
+    return meas.block_reduce(array, block_size = (1, 1, downsample_factor, downsample_factor), func = func) # 
+
+def upsample_recon_data(array, upsample_factor):
+    if array.ndim != 3:
+        print_flush_root(rank, 'Error: Input reconstructed image array must be exactly 3D. Exiting program...', save_stdout = False, print_terminal = True)
+
+        comm.Abort()
+    
+    _, n_rows, n_columns = array.shape
+
+    if n_rows != n_columns:
+        print_flush_root(rank, 'Error: Reconstruction slice arrays must be square. Exiting program...', save_stdout = False, print_terminal = True)
+
+        comm.Abort()
+    
+    if not isinstance(upsample_factor, int) or upsample_factor <= 0:
+        print_flush_root(rank, 'Error: Upsample factor must be a positive integer. Exiting program...', save_stdout = False, print_terminal = True)
+        
+        comm.Abort()
+
+    if (n_columns*upsample_factor) % 2:
+        print_flush_root(rank, 'Warning: Odd number of columns/scan positions resulting from upsampling. Consider switching to even number of scan positions being output.', save_stdout = False, print_terminal = True)
+
+    return ndi.zoom(array, zoom = (1, upsample_factor, upsample_factor), grid_mode = True) # For interpolation purposes, any pixels beyond input array bounds are set to zero (assuming XRF or optical density arrays used)
+                                                                                           # Cubic splin interpolation used (the default)                                                                                # grid_mode = True defines pixel gridding (for interpolation purposes) by pixel edges instead of centers
