@@ -316,3 +316,26 @@ def find_theta_combos(theta_array_deg, dtheta = 0):
 
     return valid_theta_idx_pairs
 
+def crop_array(xrf_array, opt_dens_array, edge_dict):
+    if xrf_array.ndim != 4 or opt_dens_array.ndim != 3:
+        print('Error: XRF and optical density arrays must be 4D and 3D, respectively. Exiting program...')
+
+        sys.exit()
+
+    _, n_slices, n_columns = opt_dens_array.shape
+        
+    for edge in edge_dict:
+        if edge == 'bottom' or edge == 'top' and edge_dict[edge] >= n_slices:
+            print('Error: Cannot exceed number of slices (rows) when cropping. Exiting program...')
+
+            sys.exit()
+                
+        if edge == 'left' or edge == 'right' and edge_dict[edge] >= n_columns:
+            print('Error: Cannot exceed number of scan positions (columns) when cropping. Exiting program...')
+
+            sys.exit()
+
+    cropped_xrf_array = xrf_array[:, :, edge_dict['top']:(n_slices - edge_dict['bottom']), edge_dict['left']:(n_columns - edge_dict['right'])]
+    cropped_opt_dens_array = opt_dens_array[:, edge_dict['top']:(n_slices - edge_dict['bottom']), edge_dict['left']:(n_columns - edge_dict['right'])]
+
+    return cropped_xrf_array, cropped_opt_dens_array

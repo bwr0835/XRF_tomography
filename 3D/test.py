@@ -165,3 +165,7 @@ from matplotlib import pyplot as plt
 # h5_util.create_aggregate_xrf_h5(filename_array, output_filename, synchrotron = "nsls-ii")
 
 # filename = '/home/bwr0835/2_ide_realigned_data_no_cor_correction/xrt_od_xrf_realignment/aligned_data/aligned_aggregate_xrf_xrt.h5'
+
+a = np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
+
+print(a[5:-1])

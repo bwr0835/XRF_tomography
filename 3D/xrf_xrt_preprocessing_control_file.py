@@ -113,7 +113,12 @@ def preprocess_xrf_xrt_data(synchrotron,
         elements_xrt, counts_xrt, theta_xrt, _, dataset_type = futil.extract_h5_aggregate_xrt_data(aggregate_xrt_h5_file_path)
 
         if not np.array_equal(theta, theta_xrt):
-            print('Error: Inconsistent number of XRF, XRT projection angles. Exiting program...')
+            print('Error: Inconsistent XRF, XRT projection angles. Exiting program...')
+
+            sys.exit()
+        
+        if counts_xrf.shape[2:] != counts_xrt.shape[2:]:
+            print('Error: Inconsistent number of XRF, XRT slices (rows) and/or scan positions (columns). Exiting program...')
 
             sys.exit()
 
@@ -197,24 +202,15 @@ def preprocess_xrf_xrt_data(synchrotron,
         opt_dens = -np.log(counts_xrt_norm/I0_cts)
 
     if init_edge_crop_enabled:
-        print('Cropping projection images...')
+        print('Creating auxilliary cropped XRF, optical density projection images...')
 
         if init_edge_pixel_lengths_to_crop is None:
             print("Error: Empty field for 'init_edge_pixel_lengths_to_crop'. Exiting program...")
 
             sys.exit()
+            
+        init_cropped_xrf_array, init_cropped_xrt_array = ppu.crop_array(counts_xrf_norm, opt_dens, edges_to_crop)
         
-        for key in init_edge_pixel_lengths_to_crop:
-            if key == 'bottom' or key == 'top' and init_edge_pixel_lengths_to_crop[key] >= n_slices:
-                print('Error: Cannot exceed number of rows (slices) when cropping. Exiting program...')
-
-                sys.exit()
-                
-            if key == 'left' or key == 'right' and init_edge_pixel_lengths_to_crop[key] >= n_columns:
-                print('Error: Cannot exceed number of columns (scan positions) when cropping. Exiting program...')
-
-                sys.exit()
-
 
     xrt_od_xrf_realignment_subdir_path = os.path.join(aligned_data_output_dir_path, 'xrt_od_xrf_realignment')
 
