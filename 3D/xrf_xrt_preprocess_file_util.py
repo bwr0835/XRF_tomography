@@ -693,12 +693,14 @@ def extract_csv_preprocessing_input_params(file_path):
 
         sys.exit()
     
-    available_synchrotrons = ipn.available_synchrotrons
     numeric_params = ipn.preprocessing_numeric_params
     bool_params = ipn.preprocessing_bool_params
+    list_params = ipn.preprocessing_list_params
+    dict_params = ipn.preprocessing_dict_params
     all_params_ordered = pd.Series(ipn.preprocessing_params_ordered)
 
-    # print(all_params_ordered)
+    available_synchrotrons = ipn.available_synchrotrons
+    edge_crop_dxns = ipn.edge_crop_dxns
 
     if not input_params.equals(all_params_ordered):
         print('Error: At least one parameter missing or at least one parameter too many.')
@@ -709,23 +711,23 @@ def extract_csv_preprocessing_input_params(file_path):
         sys.exit()
 
     for idx, val in enumerate(values): # Convert strings supposed to be numberic or Boolean to floats, ints, or bools
-        if val.lower() == 'true' or val.lower() == 'false':
+        if val.lower() == 'none':
+            values[idx] = None
+        
+        elif val.lower() == 'true' or val.lower() == 'false':
             values[idx] = (val.lower() == 'true')
         
-        elif val.lower() == 'none':
-            values[idx] = None
+        elif input_params[idx] in list_params:
+            values[idx] = values[idx].split(',')
 
-        try:
-            values[idx] = int(val)
-        
-        except KeyboardInterrupt:
-            print('\n\nKeyboardInterrupt occurred. Exiting program...')
-            
-            sys.exit()
+            for _idx, _str in enumerate(values[idx]):
+                _str = _str.strip().lower()
 
-        except:
+                values[idx][_idx] = _str
+
+        elif input_params[idx] in dict_params:
             try:
-                values[idx] = float(val)
+                values[idx] = ast.literal_eval(val)
             
             except KeyboardInterrupt:
                 print('\n\nKeyboardInterrupt occurred. Exiting program...')
@@ -733,21 +735,32 @@ def extract_csv_preprocessing_input_params(file_path):
                 sys.exit()
 
             except:
-                continue
+                print('Error: Cannot convert value of at least one parameter to dictionary. Exiting program...', flush = True)
+
+                sys.exit()
+                
+        else:
+            try:
+                values[idx] = int(val)
+        
+            except KeyboardInterrupt:
+                print('\n\nKeyboardInterrupt occurred. Exiting program...')
+            
+                sys.exit()
+
+            except:
+                try:
+                    values[idx] = float(val)
+            
+                except KeyboardInterrupt:
+                    print('\n\nKeyboardInterrupt occurred. Exiting program...')
+            
+                    sys.exit()
+
+                except:
+                    continue
 
     input_param_dict = dict(zip(input_params, values)) # zip() creates tuples; dict() converts the tuples to a dictionary
-    
-    if input_param_dict['synchrotron'] is None or input_param_dict['synchrotron_beamline'] is None:
-        print('Error: Synchrotron and/or synchrotron beamline fields empty. Exiting program...')
-
-        sys.exit()
-    
-    synchrotron = input_param_dict['synchrotron'].lower()
-
-    if synchrotron not in available_synchrotrons:
-        print('Error: Synchrotron unavailable. Exiting program...')
-
-        sys.exit()
 
     if not all(isinstance(input_param_dict[param], bool) for param in bool_params):
         print('Error: The following input parameters must all be set to True or False:\n', \
@@ -760,14 +773,44 @@ def extract_csv_preprocessing_input_params(file_path):
 
         sys.exit()
 
+    if input_param_dict['synchrotron'] is None or input_param_dict['synchrotron_beamline'] is None:
+        print('Error: Synchrotron and/or synchrotron beamline fields empty. Exiting program...')
+
+        sys.exit()
+
+    synchrotron = input_param_dict['synchrotron'].lower()
+
+    if synchrotron in available_synchrotrons:
+        input_param_dict['synchrotron'] = synchrotron
+    
+    else:
+        print('Error: Synchrotron unavailable. Exiting program...')
+
+        sys.exit()
+    
+    for param in dict_params:
+        if param == 'init_edge_pixel_lengths_to_crop' or param == 'final_edge_pixel_lengths_to_crop' and input_param_dict[param] is not None:
+            for key in input_param_dict[param]:
+                if key not in edge_crop_dxns:
+                    print(f"Error: Unable to identify at least one specified edge for '{param}'. Exiting program...")
+
+                    sys.exit()
+            
+                if not isinstance(input_param_dict[param][key], int):
+                    print(f"Error: All values in the input dictionary of '{param}' should be integers. Exiting program...")
+
+                    sys.exit()
+                
+                if input_param_dict[param][key] <= 0:
+                    print(f"Error: All values in the input dictionary of '{param}' should be positive integers. Exiting program...")
+
+                    sys.exit()
+
     for param in numeric_params:
-        if isinstance(input_param_dict.get(param), str):
+        if isinstance(input_param_dict[param], str):
             print(f'Error: Expected a number for input parameter \'{param}\'. Exiting program...')
 
             sys.exit()
-
-    # for param in all_params_ordered:
-    #     print(f'{input_param_dict[param]}: {type(input_param_dict[param]).__name__}')
 
     return input_param_dict
 
@@ -895,137 +938,6 @@ def create_csv_norm_net_shift_data(dir_path,
     df.to_csv(file_path, index = False)
 
     return
-
-def extract_csv_input_jxrft_recon_params(file_path, fluor_lines, dev):
-    if not os.path.isfile(file_path):
-        print('Error: Cannot locate input file path. Exiting program...')
-
-        sys.exit()
-    
-    if not file_path.endswith('.csv'):
-        print('Error: Reconstruction input parameter file must be CSV. Exiting program...')
-
-        sys.exit()
-        
-    try:
-        input_params_csv = pd.read_csv(file_path,
-                                       delimiter = ':', 
-                                       header = None, 
-                                       names = ['input_param', 'value'],
-                                       dtype = str,
-                                       keep_default_na = False)
-
-        input_params = input_params_csv['input_param']
-        values = input_params_csv['value'].str.strip().replace('', 'None') # Extract values while setting non-existent values to None
-
-    except KeyboardInterrupt:
-        print('\n\nKeyboardInterrupt occurred. Exiting program...')
-            
-        sys.exit()
-
-    except:
-        print('Error: Unable to read in reconstruction input parameter CSV file. Exiting program...')
-
-        sys.exit()
-    
-    all_params_ordered = pd.Series(ipn.preprocessing_params_ordered)
-
-    if not input_params.equals(all_params_ordered):
-        print('Error: At least one parameter missing or at least one parameter too many.')
-        print('\nThe following input parameters are required:\n')
-        print(*(["     -'{}'".format(s) for s in all_params_ordered]), sep = '\n')
-        print('\n\rEnding program...')
-
-    available_synchrotrons = ipn.available_synchrotrons
-    available_noise_models = ipn.available_noise_models
-    numeric_scalar_params = ipn.recon_numeric_scalar_params
-    numeric_array_params = ipn.recon_numeric_array_params
-    dict_params = ipn.recon_dict_params
-    bool_params = ipn.recon_bool_params
-    
-    for idx, val in enumerate(values):
-        if val.lower() == 'none':
-            values[idx] = None
-
-        elif val.lower() == 'true' or val.lower() == 'false':
-            values[idx] = val.lower() == 'true'
-        
-        elif input_params[idx] in numeric_array_params:
-            try:
-                values[idx] = np.array(ast.literal_eval(val))
-            
-            except:
-                print('Error: At least one reconstruction input parameter value cannot be converted to a NumPy array. Exiting program...')
-
-                sys.exit()
-        
-        elif input_params[idx] in dict_params:
-            try:
-                values[idx] = ast.literal_eval(val)
-            
-            except:
-                print('Error: Cannot convert value of at least one parameter to dictionary. Exiting program...')
-
-                sys.exit()
-        
-        else:
-            try:
-                values[idx] = int(val)
-            
-            except:
-                try:
-                    values[idx] = float(val)
-                
-                except:
-                    continue
-    
-    input_param_dict = dict(zip(input_params, values))
-
-    if input_param_dict['synchrotron'] is None or input_param_dict['synchrotron_beamline'] is None:
-        print('Error: Synchrotron and/or synchrotron beamline fields empty. Exiting program...')
-
-        sys.exit()
-    
-    synchrotron = input_param_dict['synchrotron'].lower()
-    noise_model = input_param_dict['noise_model'].lower()
-
-    if noise_model not in available_noise_models:
-        print('Error: Noise model unavailable. Exiting program...')
-
-        sys.exit()
-
-    if synchrotron not in available_synchrotrons:
-        print('Error: Synchrotron unavailable. Exiting program...')
-
-        sys.exit()
-
-    if not all(isinstance(input_param_dict[param], bool) for param in bool_params):
-        print('Error: The following input parameters must all be set to True or False:')
-        print(*(["     -'{}'".format(param) for param in bool_params]), sep = '\n')
-        print('\n\rExiting program...')
-
-        sys.exit()
-
-    for param in numeric_scalar_params:
-        if isinstance(input_param_dict.get(param), str):
-            print(f'Error: Expected a number for input parameter \'{param}\', but got a string. Exiting program...')
-
-            sys.exit()
-
-    input_param_dict['probe_energy_kev'] = np.array([input_param_dict['probe_energy_kev']])
-    
-    if input_param_dict.get('downsample_factor') is None:
-        input_param_dict['downsample_factor'] = 1
-    
-    if input_param_dict.get('upsample_factor') is None:
-        input_param_dict['upsample_factor'] = 1
-
-    input_param_dict['dev'] = dev # Device (GPU, CPU, etc.)
-    input_param_dict['fl_K'] = fluor_lines['K']
-    input_param_dict['fl_L'] = fluor_lines['L']
-    input_param_dict['fl_M'] = fluor_lines['M']
-
-    return input_param_dict
 
 def extract_h5_aggregate_xrf_xrt_data(file_path, **kwargs):
     if not os.path.isfile(file_path):

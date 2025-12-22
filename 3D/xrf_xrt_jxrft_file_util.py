@@ -7,7 +7,6 @@ import numpy as np, \
        os
 
 from mpi4py import MPI
-from misc import print_flush_root
 
 comm = MPI.COMM_WORLD
 n_ranks = comm.Get_size()
@@ -15,12 +14,12 @@ rank = comm.Get_rank()
 
 def extract_csv_input_jxrft_recon_params(file_path, fluor_lines, dev):
     if not os.path.isfile(file_path):
-        print_flush_root(rank, 'Error: Cannot locate input file path. Exiting program...', save_stdout = False, print_terminal = True)
+        print('Error: Cannot locate input file path. Exiting program...', flush = True)
 
         comm.Abort()
     
     if not file_path.endswith('.csv'):
-        print_flush_root(rank, 'Error: Reconstruction input parameter file must be CSV. Exiting program...', save_stdout = False, print_terminal = True)
+        print('Error: Reconstruction input parameter file must be CSV. Exiting program...', flush = True)
 
         comm.Abort()
         
@@ -36,25 +35,25 @@ def extract_csv_input_jxrft_recon_params(file_path, fluor_lines, dev):
         values = input_params_csv['value'].str.strip().replace('', 'None') # Extract values while setting non-existent values to None
 
     except KeyboardInterrupt:
-        print_flush_root(rank, '\n\nKeyboardInterrupt occurred. Exiting program...', save_stdout = False, print_terminal = True)
+        print('\n\nKeyboardInterrupt occurred. Exiting program...', flush = True)
             
         comm.Abort()
 
     except:
-        print_flush_root(rank, 'Error: Unable to read in reconstruction input parameter CSV file. Exiting program...', save_stdout = False, print_terminal = True)
+        print('Error: Unable to read in reconstruction input parameter CSV file. Exiting program...', flush = True)
 
         comm.Abort()
     
     all_params_ordered = pd.Series(ipn.preprocessing_params_ordered)
 
     if not input_params.equals(all_params_ordered):
-        print_flush_root(rank, 'Error: At least one parameter missing or at least one parameter too many.', save_stdout = False, print_terminal = True)
-        print_flush_root(rank, '\nThe following input parameters are required:\n', save_stdout = False, print_terminal = True)
+        print('Error: At least one parameter missing or at least one parameter too many.', flush = True)
+        print('\nThe following input parameters are required:\n', flush = True)
         
         for param in all_params_ordered:
-            print_flush_root(rank, f"     -'{param}'", save_stdout = False, print_terminal = True)
+            print(rank, f"     -'{param}'", flush = True)
             
-        print_flush_root(rank, '\n\rEnding program...', save_stdout = False, print_terminal = True)
+        print('\n\rEnding program...', flush = True)
 
     available_synchrotrons = ipn.available_synchrotrons
     available_noise_models = ipn.available_noise_models
@@ -75,7 +74,7 @@ def extract_csv_input_jxrft_recon_params(file_path, fluor_lines, dev):
                 values[idx] = np.array(ast.literal_eval(val))
             
             except:
-                print_flush_root(rank, 'Error: At least one reconstruction input parameter value cannot be converted to a NumPy array. Exiting program...', save_stdout = False, print_terminal = True)
+                print('Error: At least one reconstruction input parameter value cannot be converted to a NumPy array. Exiting program...', flush = True)
 
                 comm.Abort()
         
@@ -84,7 +83,7 @@ def extract_csv_input_jxrft_recon_params(file_path, fluor_lines, dev):
                 values[idx] = ast.literal_eval(val)
             
             except:
-                print_flush_root(rank, 'Error: Cannot convert value of at least one parameter to dictionary. Exiting program...', save_stdout = False, print_terminal = True)
+                print('Error: Cannot convert value of at least one parameter to dictionary. Exiting program...', flush = True)
 
                 comm.Abort()
         
@@ -102,7 +101,7 @@ def extract_csv_input_jxrft_recon_params(file_path, fluor_lines, dev):
     input_param_dict = dict(zip(input_params, values))
 
     if input_param_dict['synchrotron'] is None or input_param_dict['synchrotron_beamline'] is None:
-        print_flush_root(rank, 'Error: Synchrotron and/or synchrotron beamline fields empty. Exiting program...', save_stdout = False, print_terminal = True)
+        print('Error: Synchrotron and/or synchrotron beamline fields empty. Exiting program...', flush = True)
 
         comm.Abort()
     
@@ -110,28 +109,28 @@ def extract_csv_input_jxrft_recon_params(file_path, fluor_lines, dev):
     noise_model = input_param_dict['noise_model'].lower()
 
     if noise_model not in available_noise_models:
-        print_flush_root(rank, 'Error: Noise model unavailable. Exiting program...', save_stdout = False, print_terminal = True)
+        print('Error: Noise model unavailable. Exiting program...', flush = True)
 
         comm.Abort()
 
     if synchrotron not in available_synchrotrons:
-        print_flush_root(rank, 'Error: Synchrotron unavailable. Exiting program...', save_stdout = False, print_terminal = True)
+        print('Error: Synchrotron unavailable. Exiting program...', flush = True)
 
         comm.Abort()
 
     if not all(isinstance(input_param_dict[param], bool) for param in bool_params):
-        print_flush_root(rank, 'Error: The following input parameters must all be set to True or False:', save_stdout = False, print_terminal = True)
+        print('Error: The following input parameters must all be set to True or False:', flush = True)
         
         for param in bool_params:
-            print_flush_root(rank, f"     -'{param}'", save_stdout = False, print_terminal = True)
+            print(f"     -'{param}'", flush = True)
             
-        print_flush_root(rank, '\n\rExiting program...', save_stdout = False, print_terminal = True)
+        print('\n\rExiting program...', flush = True)
 
         comm.Abort()
 
     for param in numeric_scalar_params:
         if isinstance(input_param_dict.get(param), str):
-            print_flush_root(rank, f'Error: Expected a number for input parameter \'{param}\', but got a string. Exiting program...', save_stdout = False, print_terminal = True)
+            print(f'Error: Expected a number for input parameter \'{param}\', but got a string. Exiting program...', flush = True)
 
             comm.Abort()
 
@@ -151,14 +150,13 @@ def extract_csv_input_jxrft_recon_params(file_path, fluor_lines, dev):
     return input_param_dict
 
 def extract_h5_aggregate_xrf_xrt_data(file_path, **kwargs):
-
     if not os.path.isfile(file_path):
-        print_flush_root(rank, 'Error: Cannot locate aggregate XRF, XRT HDF5 file. Exiting program...', save_stdout = False, print_terminal = True)
+        print('Error: Cannot locate aggregate XRF, XRT HDF5 file. Exiting program...', flush = True)
 
         comm.Abort()
     
     if not file_path.endswith('.h5'):
-        print_flush_root(rank, 'Error: Aggregate XRF, XRT file extension must be \'.h5\'. Exiting program...', save_stdout = False, print_terminal = True)
+        print(rank, 'Error: Aggregate XRF, XRT file extension must be \'.h5\'. Exiting program...', flush = True)
 
         comm.Abort()
     
@@ -171,12 +169,12 @@ def extract_h5_aggregate_xrf_xrt_data(file_path, **kwargs):
             theta = h5['exchange/theta'][()]
     
     except KeyboardInterrupt:
-        print_flush_root(rank, 'Keyboard interrupt. Exiting program...', save_stdout = False, print_terminal = True)
+        print(rank, 'Keyboard interrupt. Exiting program...', flush = True)
 
         comm.Abort()
     
     except:
-        print_flush_root(rank, 'Error: Incorrect HDF5 file structure. Exiting program...', save_stdout = False, print_terminal = True)
+        print(rank, 'Error: Incorrect HDF5 file structure. Exiting program...', flush = True)
 
         comm.Abort()
     
@@ -190,12 +188,12 @@ def extract_h5_aggregate_xrf_xrt_data(file_path, **kwargs):
             element_lines_roi_idx = np.array([elements_xrf_string.index(element) for element in element_lines_roi[0]])
         
         except KeyboardInterrupt:
-            print_flush_root(rank, 'Keyboard interrupt. Exiting program...', save_stdout = False, print_terminal = True)
+            print(rank, 'Keyboard interrupt. Exiting program...', flush = True)
 
             comm.Abort()
         
         except:
-            print_flush_root(rank, 'Error: Unable to parse elements and/or line(s) of interest. Exiting program...', save_stdout = False, print_terminal = True)
+            print(rank, 'Error: Unable to parse elements and/or line(s) of interest. Exiting program...', flush = True)
 
             comm.Abort()
 

@@ -1,4 +1,4 @@
-import numpy as np, h5py, file_util as futil, pandas as pd
+import numpy as np, h5py, xrf_xrt_jxrft_file_util as futil, pandas as pd, xraylib_np as xrl_np, xraylib as xrl
 
 from matplotlib import pyplot as plt
 
@@ -164,6 +164,4 @@ from matplotlib import pyplot as plt
 
 # h5_util.create_aggregate_xrf_h5(filename_array, output_filename, synchrotron = "nsls-ii")
 
-filename = '/home/bwr0835/2_ide_realigned_data_no_cor_correction/xrt_od_xrf_realignment/aligned_data/aligned_aggregate_xrf_xrt.h5'
-
-futil.extract_h5_aggregate_xrf_xrt_data(filename, 'aps')
+# filename = '/home/bwr0835/2_ide_realigned_data_no_cor_correction/xrt_od_xrf_realignment/aligned_data/aligned_aggregate_xrf_xrt.h5'

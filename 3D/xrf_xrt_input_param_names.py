@@ -4,6 +4,11 @@ available_synchrotrons = ['aps',
 available_noise_models = ['gaussian',
                           'poisson']
 
+edge_crop_dxns = ['top',
+                  'bottom',
+                  'left',
+                  'right']
+
 preprocessing_params_ordered = ['synchrotron',
                                 'synchrotron_beamline',
                                 'create_aggregate_xrf_xrt_files_enabled',
@@ -25,6 +30,8 @@ preprocessing_params_ordered = ['synchrotron',
                                 'alpha',
                                 'upsample_factor',
                                 'eps',
+                                'final_edge_crop_enabled',
+                                'edges_to_crop',
                                 'aligned_data_output_dir_path']
 
 preprocessing_numeric_params = ['xrt_data_percentile',
@@ -34,11 +41,17 @@ preprocessing_numeric_params = ['xrt_data_percentile',
                                 'alpha',
                                 'eps']
 
+preprocessing_list_params = ['edges_to_crop']
+
 preprocessing_bool_params = ['create_aggregate_xrf_xrt_files_enabled',
                              'pre_existing_aggregate_xrf_xrt_file_lists_enabled', 
                              'pre_existing_align_norm_file_enabled',
                              'norm_enabled',
-                             'realignment_enabled']
+                             'realignment_enabled',
+                             'final_edge_crop_enabled']
+
+preprocessing_dict_params = ['init_edge_pixel_lengths_to_crop',
+                             'final_edge_pixel_lengths_to_crop']
 
 recon_params_ordered = ['synchrotron',
                         'synchrotron_beamline',

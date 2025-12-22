@@ -2,7 +2,6 @@ import numpy as np, sys
 
 from scipy import ndimage as ndi
 from itertools import combinations as combos
-from skimage import measure as meas
 
 def round_correct(num, ndec):
     if ndec == 0:
@@ -317,43 +316,3 @@ def find_theta_combos(theta_array_deg, dtheta = 0):
 
     return valid_theta_idx_pairs
 
-def downsample_proj_data(array, downsample_factor, func = np.mean):
-    if array.ndim != 4:
-        print('Error: Input projection data must be exactly 4D. Exiting program...')
-
-        sys.exit()
-    
-    _, _, n_slices, n_columns = array.shape
-
-    if not isinstance(downsample_factor, int) or downsample_factor <= 0:
-        print('Error: Downsampling factor must be a positive integer. Exiting program...')
-
-        sys.exit()
-
-    if (n_slices//downsample_factor) % 2 or (n_columns//downsample_factor) % 2:
-        print('Warning: Odd number of rows/slices and/or columns/scan positions resulting from downsampling. Consider switching to even number of slices and/or scan positions being output.')
-
-    return meas.block_reduce(array, block_size = (1, 1, downsample_factor, downsample_factor), func = func) # 
-
-def upsample_recon_data(array, upsample_factor):
-    if array.ndim != 3:
-        print('Error: Input reconstructed image array must be exactly 3D. Exiting program...')
-    
-    _, n_rows, n_columns = array.shape
-
-    if n_rows != n_columns:
-        print('Error: Reconstruction slice arrays must be square. Exiting program...')
-
-        sys.exit()
-    
-    if not isinstance(upsample_factor, int) or upsample_factor <= 0:
-        print('Error: Upsample factor must be a positive integer. Exiting program...')
-        
-        sys.exit()
-
-    if (n_columns*upsample_factor) % 2:
-        print('Warning: Odd number of columns/scan positions resulting from upsampling. Consider switching to even number of scan positions being output.')
-
-    return ndi.zoom(array, zoom = (1, upsample_factor, upsample_factor), grid_mode = True) # For interpolation purposes, any pixels beyond input array bounds are set to zero (assuming XRF or optical density arrays used)
-                                                                                           # Cubic splin interpolation used (the default)
-                                                                                           # grid_mode = True defines pixel gridding (for interpolation purposes) by pixel edges instead of centers

@@ -10,6 +10,7 @@ import numpy as np, \
        xraylib as xlib, \
        xraylib_np as xlib_np, \
        xrf_xrt_jxrft_file_util as futil, \
+       xrl_fluorline_macros, \
        os, \
        shutil, \
        datetime, \
@@ -44,13 +45,15 @@ plt.rc('font', **fontProperties)
 
 warnings.filterwarnings("ignore")
 
-fl = {"K": np.array([xlib.KA1_LINE, xlib.KA2_LINE, xlib.KA3_LINE, xlib.KB1_LINE, xlib.KB2_LINE,
-                     xlib.KB3_LINE, xlib.KB4_LINE, xlib.KB5_LINE]),
-      "L": np.array([xlib.LA1_LINE, xlib.LA2_LINE, xlib.LB1_LINE, xlib.LB2_LINE, xlib.LB3_LINE,
-                     xlib.LB4_LINE, xlib.LB5_LINE, xlib.LB6_LINE, xlib.LB7_LINE, xlib.LB9_LINE,
-                     xlib.LB10_LINE, xlib.LB15_LINE, xlib.LB17_LINE]),              
-      "M": np.array([xlib.MA1_LINE, xlib.MA2_LINE, xlib.MB_LINE])               
-     }
+# fl = {"K": np.array([xlib.KA1_LINE, xlib.KA2_LINE, xlib.KA3_LINE, xlib.KB1_LINE, xlib.KB2_LINE,
+#                      xlib.KB3_LINE, xlib.KB4_LINE, xlib.KB5_LINE]),
+#       "L": np.array([xlib.LA1_LINE, xlib.LA2_LINE, xlib.LB1_LINE, xlib.LB2_LINE, xlib.LB3_LINE,
+#                      xlib.LB4_LINE, xlib.LB5_LINE, xlib.LB6_LINE, xlib.LB7_LINE, xlib.LB9_LINE,
+#                      xlib.LB10_LINE, xlib.LB15_LINE, xlib.LB17_LINE]),              
+#       "M": np.array([xlib.MA1_LINE, xlib.MA2_LINE, xlib.MB_LINE])               
+#      }
+
+fl = xrl_fluorline_macros.fl
 
 # def reconstruct_jXRFT_tomography(
 #         synchrotron,
@@ -292,13 +295,6 @@ def reconstruct_jXRFT_tomography(synchrotron,
         See XRF_tomography.py for default dictionary
         See xraylib documentation for more information on XRF line macros [3]
 
-    Returns
-    -------
-    None
-
-    Outputs
-    -------
-
 
     References
     ----------
@@ -369,7 +365,11 @@ def reconstruct_jXRFT_tomography(synchrotron,
 
     for element, idx in enumerate(elements_xrf):
         if synchrotron == 'aps':
-            aN_ls[idx] = xlib_np.SymbolToAtomicNumber(element)
+            if '_' in element:
+                aN_ls[idx] = xlib_np.SymbolToAtomicNumber(element.split('_')[0])
+            
+            else:
+                aN_ls[idx] = xlib_np.SymbolToAtomicNumber(element)
         
         elif synchrotron == 'nsls-ii':
             aN_ls[idx] = xlib_np.SymbolToAtomicNumber(element.split('_')[0])

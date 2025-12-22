@@ -1,5 +1,5 @@
 import numpy as np, \
-       file_util as futil, \
+       xrf_xrt_preprocess_file_util as futil, \
        xrf_xrt_preprocess_utils as ppu, \
        sys, \
        os
@@ -21,12 +21,16 @@ def preprocess_xrf_xrt_data(synchrotron,
                             return_aux_data,
                             I0_cts_per_s,
                             t_dwell_s,
+                            init_edge_crop_enabled,
+                            init_edge_pixel_lengths_to_crop,
                             realignment_enabled,
                             n_iter_iter_reproj,
                             sigma,
                             alpha,
                             upsample_factor,
                             eps,
+                            final_edge_crop_enabled,
+                            edges_to_crop,
                             aligned_data_output_dir_path):
 
     if create_aggregate_xrf_xrt_files_enabled:
@@ -192,6 +196,26 @@ def preprocess_xrf_xrt_data(synchrotron,
         
         opt_dens = -np.log(counts_xrt_norm/I0_cts)
 
+    if init_edge_crop_enabled:
+        print('Cropping projection images...')
+
+        if init_edge_pixel_lengths_to_crop is None:
+            print("Error: Empty field for 'init_edge_pixel_lengths_to_crop'. Exiting program...")
+
+            sys.exit()
+        
+        for key in init_edge_pixel_lengths_to_crop:
+            if key == 'bottom' or key == 'top' and init_edge_pixel_lengths_to_crop[key] >= n_slices:
+                print('Error: Cannot exceed number of rows (slices) when cropping. Exiting program...')
+
+                sys.exit()
+                
+            if key == 'left' or key == 'right' and init_edge_pixel_lengths_to_crop[key] >= n_columns:
+                print('Error: Cannot exceed number of columns (scan positions) when cropping. Exiting program...')
+
+                sys.exit()
+
+
     xrt_od_xrf_realignment_subdir_path = os.path.join(aligned_data_output_dir_path, 'xrt_od_xrf_realignment')
 
     os.makedirs(xrt_od_xrf_realignment_subdir_path, exist_ok = True)
@@ -225,7 +249,7 @@ def preprocess_xrf_xrt_data(synchrotron,
                                eps,
                                return_aux_data = True)
 
-            print('Writing convolution magnitude array to NumPy (.npy) file')
+            print('Writing convolution magnitude array to NumPy (.npy) file (NOTE: Python is needed to view this!)...')
             
             futil.create_aux_conv_mag_data_npy(xrt_od_xrf_realignment_subdir_path, conv_mag_array)
 
@@ -268,25 +292,32 @@ def preprocess_xrf_xrt_data(synchrotron,
                                          upsample_factor,
                                          eps)
             
-            print('Writing final aligned XRF, XRT, and optical density projection data to HDF5 file...')
+        # if final_edge_crop_enabled:
+        #     if edges_to_crop is None:
+        #         print('Warning to edges specified to crop. Ignoring cropping...')
             
-            futil.create_h5_aligned_aggregate_xrf_xrt(xrt_od_xrf_realignment_subdir_path,
-                                                      elements_xrf,
-                                                      aligned_proj_final_xrf, 
-                                                      aligned_proj_final_xrt_sig,
-                                                      aligned_proj_final_opt_dens, 
-                                                      theta)
-            
-            print('Writing per-projection normalization, final net x and y shifts, and incident intensity to CSV file...')
+        #     else:
+                
 
-            futil.create_csv_norm_net_shift_data(xrt_od_xrf_realignment_subdir_path,
-                                                 theta,
-                                                 norm_array,
-                                                 net_x_shifts_pcc_final,
-                                                 net_y_shifts_pcc_final,
-                                                 I0_cts)
+        print('Writing final aligned XRF, XRT, and optical density projection data to HDF5 file...')
             
-            print('Done')
+        futil.create_h5_aligned_aggregate_xrf_xrt(xrt_od_xrf_realignment_subdir_path,
+                                                  elements_xrf,
+                                                  aligned_proj_final_xrf, 
+                                                  aligned_proj_final_xrt_sig,
+                                                  aligned_proj_final_opt_dens, 
+                                                  theta)
+            
+        print('Writing per-projection normalization, final net x and y shifts, and incident intensity to CSV file...')
+
+        futil.create_csv_norm_net_shift_data(xrt_od_xrf_realignment_subdir_path,
+                                             theta,
+                                             norm_array,
+                                             net_x_shifts_pcc_final,
+                                             net_y_shifts_pcc_final,
+                                             I0_cts)
+            
+        print('Done')
 
     else:
         if return_aux_data:
@@ -294,6 +325,10 @@ def preprocess_xrf_xrt_data(synchrotron,
 
             futil.create_aux_conv_mag_data_npy(xrt_od_xrf_realignment_subdir_path, conv_mag_array)
         
+        # if final_edge_crop_enabled:
+            # 
+
+
         print('Writing normalized XRF, XRT, and optical density projection data to HDF5 file...')
 
         futil.create_h5_aligned_aggregate_xrf_xrt(xrt_od_xrf_realignment_subdir_path,
