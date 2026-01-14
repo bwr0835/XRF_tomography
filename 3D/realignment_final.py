@@ -410,7 +410,7 @@ def realign_proj(xrt_proj_img_array,
         
         for slice_idx in range(n_slices):
             print(f'\rReprojecting slice {slice_idx + 1}/{n_slices}', end = '', flush = True)
-            
+
             sinogram = (xform.radon(recon[slice_idx].copy(), theta_array)).T
             # sinogram = radon_manual(recon[slice_idx].copy(), theta_array)
 
@@ -449,7 +449,12 @@ def realign_proj(xrt_proj_img_array,
                 net_y_shifts_pcc_new[i, theta_idx] = net_y_shifts_pcc_new[i - 1, theta_idx] + dy
             
             if (theta_idx % 7) == 0:
-                print(f'Current x-shift: {ppu.round_correct(dx, ndec = 3)} (theta = {ppu.round_correct(theta_array_new[theta_idx], ndec = 1)})')
+                if theta_idx == 0:
+                    print(f'\nCurrent x-shift: {ppu.round_correct(dx, ndec = 3)} (theta = {ppu.round_correct(theta_array_new[theta_idx], ndec = 1)})')
+                
+                else:
+                     print(f'Current x-shift: {ppu.round_correct(dx, ndec = 3)} (theta = {ppu.round_correct(theta_array_new[theta_idx], ndec = 1)})')
+                
                 print(f'Current y-shift: {ppu.round_correct(dy, ndec = 3)}')
 
         center_of_rotation_avg_synth, _, offset_synth = rot_center_avg(synth_proj, theta_idx_pairs_new, theta_array_new)
@@ -489,6 +494,8 @@ def realign_proj(xrt_proj_img_array,
                 print('Shifting all elements in cropped XRF aggregate projection array by current net shifts...')
 
                 for element_idx in range(n_elements_xrf):
+                    print(f'\rElement {element_idx + 1}/{n_elements_xrf}', end = '', flush = True)
+                    
                     for theta_idx in range(n_theta):
                         net_x_shift = net_x_shifts_pcc_new_1[i][theta_idx]
                         net_y_shift = net_y_shifts_pcc_new_1[i][theta_idx]
@@ -510,7 +517,7 @@ def realign_proj(xrt_proj_img_array,
                     aligned_proj_xrf_final = xrf_proj_img_array
 
                 if np.any(net_y_shifts): # Any nonzero y shifts
-                    print("Truncating cropped XRT, OD, XRF projection images in y so object is in every projection image's field of view...")
+                    print("\nTruncating cropped XRT, OD, XRF projection images in y so object is in every projection image's field of view...")
 
                     if edge_info is not None:
                         print("...and remapping cropped projection images back onto original counterparts...")
@@ -539,7 +546,7 @@ def realign_proj(xrt_proj_img_array,
 
                 else:
                     if edge_info is not None:
-                        print("Remapping cropped XRT, OD, XRF projection images back onto original counterparts...")
+                        print("\nRemapping cropped XRT, OD, XRF projection images back onto original counterparts...")
                         
                         start_slice = edge_info['top']
                         end_slice = n_slices - edge_info['bottom']
@@ -555,8 +562,6 @@ def realign_proj(xrt_proj_img_array,
                         aligned_proj_xrt_final = aligned_proj_total_xrt
                         aligned_proj_opt_dens_final = aligned_proj_total_opt_dens
                         aligned_proj_xrf_final = aligned_proj_total_xrf
-                
-                print('Done')
 
                 break
             
@@ -645,13 +650,9 @@ def realign_proj(xrt_proj_img_array,
                     aligned_proj_xrf_final[:, :, start_slice:end_slice, start_column:end_column] = aligned_proj_total_xrf[:, :, start_slice:end_slice]
                     
                 else:
-                    print('\n')
-                    
                     aligned_proj_xrt_final = aligned_proj_total_xrt
                     aligned_proj_opt_dens_final = aligned_proj_total_opt_dens
                     aligned_proj_xrf_final = aligned_proj_total_xrf
-
-            print('Done')
 
     if return_aux_data:
         aligned_exp_proj_array = np.array(aligned_exp_proj_array)
