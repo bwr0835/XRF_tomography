@@ -154,7 +154,7 @@ def realign_proj(xrt_proj_img_array,
         alpha = 10
 
     if upsample_factor is None:
-        print('Warning: \'upsample_factor\' not detected. Setting \`sample_factor\` to 100...')
+        print('Warning: \'upsample_factor\' not detected. Setting \'sample_factor\' to 100...')
 
         upsample_factor = 100
     
