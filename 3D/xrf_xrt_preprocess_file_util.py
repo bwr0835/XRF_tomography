@@ -706,10 +706,10 @@ def extract_csv_preprocessing_input_params(file_path):
             
         sys.exit()
 
-    # except:
-        # print('Error: Unable to read in CSV file. Exiting program...')
+    except:
+        print('Error: Unable to read in CSV file. Exiting program...')
 
-        # sys.exit()
+        sys.exit()
     
     numeric_params = ipn.preprocessing_numeric_params
     bool_params = ipn.preprocessing_bool_params
@@ -835,6 +835,8 @@ def extract_csv_preprocessing_input_params(file_path):
             print(f'Error: Expected a number for input parameter \'{param}\'. Exiting program...')
 
             sys.exit()
+
+    print(input_param_dict['init_edge_pixel_lengths_to_crop'])
 
     return input_param_dict
 
