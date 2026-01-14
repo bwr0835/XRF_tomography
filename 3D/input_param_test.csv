@@ -15,8 +15,8 @@ I0_cts_per_s:
 t_dwell_s:
 init_edge_crop_enabled: False
 init_edge_pixel_lengths_to_crop: 
-realignment_enabled: False
-n_iter_iter_reproj: 6
+realignment_enabled: True
+n_iter_iter_reproj: 1
 zero_idx_to_discard:
 sigma: 5
 alpha: 10
