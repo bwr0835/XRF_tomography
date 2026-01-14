@@ -361,6 +361,7 @@ def preprocess_xrf_xrt_data(synchrotron,
                                                   aligned_proj_final_xrt_sig_cropped,
                                                   aligned_proj_final_opt_dens_cropped,
                                                   theta_final,
+                                                  zero_idx_to_discard,
                                                   init_edge_pixel_lengths_to_crop,
                                                   final_edge_pixel_lengths_to_crop)
             
@@ -427,6 +428,7 @@ def preprocess_xrf_xrt_data(synchrotron,
                                                   final_xrt_sig_cropped,
                                                   final_opt_dens_cropped, 
                                                   theta_final,
+                                                  zero_idx_to_discard,
                                                   init_edge_pixel_lengths_to_crop,
                                                   final_edge_pixel_lengths_to_crop)
 
