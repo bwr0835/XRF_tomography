@@ -1,27 +1,27 @@
-synchrotron: aps
-synchrotron_beamline: 2_ide
+synchrotron = aps
+synchrotron_beamline = 2_ide
 create_aggregate_xrf_xrt_files_enabled: False
 pre_existing_aggregate_xrf_xrt_file_lists_enabled: False
-aggregate_xrf_csv_file_path: /home/bwr0835/XRF_tomography/3D/2_ide_xrf_file_list.csv
-aggregate_xrt_csv_file_path: 
-aggregate_xrf_h5_file_path: /raid/users/roter/Jacobsen/img.dat/2_ide_aggregate_xrf.h5
-aggregate_xrt_h5_file_path: /raid/users/roter/Jacobsen/img.dat/2_ide_aggregate_xrt.h5
+aggregate_xrf_csv_file_path = /home/bwr0835/XRF_tomography/3D/2_ide_xrf_file_list.csv
+aggregate_xrt_csv_file_path = 
+aggregate_xrf_h5_file_path = /raid/users/roter/Jacobsen/img.dat/2_ide_aggregate_xrf.h5
+aggregate_xrt_h5_file_path = /raid/users/roter/Jacobsen/img.dat/2_ide_aggregate_xrt.h5
 pre_existing_align_norm_file_enabled: False
-pre_existing_align_norm_file_path:
-norm_enabled: True
-xrt_data_percentile: 80
-return_aux_data: True
-I0_cts_per_s:
-t_dwell_s:
-init_edge_crop_enabled: True
-init_edge_pixel_lengths_to_crop: {'right': 10}
-realignment_enabled: True
-n_iter_iter_reproj: 1
+pre_existing_align_norm_file_path =
+norm_enabled = True
+xrt_data_percentile = 80
+return_aux_data = True
+I0_cts_per_s =
+t_dwell_s =
+init_edge_crop_enabled = True
+init_edge_pixel_lengths_to_crop = {'right': 10}
+realignment_enabled = True
+n_iter_iter_reproj = 1
 zero_idx_to_discard:
-sigma: 5
-alpha: 10
-upsample_factor: 100
-eps: 0.3
-final_edge_crop_enabled: False
-final_edge_pixel_lengths_to_crop:
-aligned_data_output_dir_path: /home/bwr0835/2_ide_realigned_data_no_cor_correction
+sigma = 5
+alpha = 10
+upsample_factor = 100
+eps = 0.3
+final_edge_crop_enabled = False
+final_edge_pixel_lengths_to_crop =
+aligned_data_output_dir_path = /home/bwr0835/2_ide_realigned_data_no_cor_correction

@@ -692,7 +692,7 @@ def extract_csv_preprocessing_input_params(file_path):
 
     try:
         input_params_csv = pd.read_csv(file_path,
-                                       delimiter = ':', 
+                                       delimiter = '=', 
                                        header = None, 
                                        names = ['input_param', 'value'],
                                        dtype = str,
