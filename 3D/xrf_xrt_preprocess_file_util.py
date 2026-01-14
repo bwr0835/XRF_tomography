@@ -706,10 +706,10 @@ def extract_csv_preprocessing_input_params(file_path):
             
         sys.exit()
 
-    except:
-        print('Error: Unable to read in CSV file. Exiting program...')
+    # except:
+        # print('Error: Unable to read in CSV file. Exiting program...')
 
-        sys.exit()
+        # sys.exit()
     
     numeric_params = ipn.preprocessing_numeric_params
     bool_params = ipn.preprocessing_bool_params
