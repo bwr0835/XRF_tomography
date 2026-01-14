@@ -17,10 +17,11 @@ init_edge_crop_enabled: False
 init_edge_pixel_lengths_to_crop: 
 realignment_enabled: False
 n_iter_iter_reproj: 6
+zero_idx_to_discard:
 sigma: 5
 alpha: 10
 upsample_factor: 100
 eps: 0.3
-final_edge_crop_enabled: False
-final_edge_pixel_lengths_to_crop: {'Top', 20; bottom, 40; left, 30; right, 40
+final_edge_crop_enabled:
+final_edge_pixel_lengths_to_crop:
 aligned_data_output_dir_path: /home/bwr0835/2_ide_realigned_data_no_cor_correction

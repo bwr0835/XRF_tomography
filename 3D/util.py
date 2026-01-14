@@ -218,9 +218,14 @@ def create_XRT_data_3d(src_path, theta_st, theta_end, n_theta, sample_height_n, 
     return XRT_data
 
 
-def MakeFLlinesDictionary(this_aN_dic, probe_energy_keV,
-                          sample_size_n, sample_size_cm,
-                          fl_line_groups = np.array(["K", "L", "M"]), fl_K = fl["K"], fl_L = fl["L"], fl_M = fl["M"],
+def MakeFLlinesDictionary(this_aN_dic, 
+                          probe_energy_keV,
+                          sample_size_n, 
+                          sample_size_cm,
+                          fl_line_groups = np.array(["K", "L", "M"]), 
+                          fl_K = fl["K"], 
+                          fl_L = fl["L"], 
+                          fl_M = fl["M"],
                           group_lines = True):
 
     """
@@ -257,10 +262,11 @@ def MakeFLlinesDictionary(this_aN_dic, probe_energy_keV,
         fl_energy_group = np.zeros((len(element_ls),n_line_group))
         fl_cs_group = np.zeros((len(element_ls),n_line_group))
         
-        for i, element_name in enumerate(element_ls): 
+        # TODO Ask Chris about whether to use mu' or tau' due to scattering exclusion
 
+        for i, element_name in enumerate(element_ls):
             if np.sum(fl_cs_K[i] != 0):
-                fl_energy_group[i,0] = np.average(fl_energy_K[i], weights=fl_cs_K[i]) 
+                fl_energy_group[i,0] = np.average(fl_energy_K[i], weights=fl_cs_K[i])
                 fl_cs_group[i,0] = np.sum(fl_cs_K[i])
             else:
                 fl_energy_group[i,0] = 0
@@ -282,6 +288,7 @@ def MakeFLlinesDictionary(this_aN_dic, probe_energy_keV,
 
             element_Line = fl_line_groups[fl_energy_group[i]!= 0]
             element_Line = [[element_name, element_Line[j]] for j in range(len(element_Line))]
+            
             for k in range(len(element_Line)):
                 FL_all_elements_dic["(element_name, Line)"].append(element_Line[k])     
 
@@ -327,11 +334,7 @@ def MakeFLlinesDictionary_manual(element_lines_roi,
                                  n_line_group_each_element, 
                                  probe_energy_keV, 
                                  sample_size_n, 
-                                 sample_size_cm,
-                                 fl_line_groups = np.array(["K", "L", "M"]), 
-                                 fl_K = fl["K"], 
-                                 fl_L = fl["L"], 
-                                 fl_M = fl["M"]):
+                                 sample_size_cm):
 
     """
     Given the probe_energy_keV and the fluorescence lines of interests, output a dictionary.
@@ -349,7 +352,7 @@ def MakeFLlinesDictionary_manual(element_lines_roi,
     FL_all_elements_dic["n_lines"] = len(element_lines_roi)
 
     voxel_size = sample_size_cm/sample_size_n   
-
+    # TODO Seemingly change summing all XRF production cross sections to just outputting the array and then summing up detector window-attenuated coefficients in forward_model.py
     for i, element_line_roi in enumerate(element_lines_roi):
         fl_energy = xlib_np.LineEnergy(np.array([AN[element_line_roi[0]]]), fl[element_line_roi[1]]).flatten()
         fl_cs = xlib_np.CS_FluorLine_Kissel_Cascade(np.array([AN[element_line_roi[0]]]), fl[element_line_roi[1]], probe_energy_keV).flatten()
@@ -389,7 +392,7 @@ def generate_fl_signal_from_each_voxel_3d(src_path, theta_st, theta_end, n_theta
         The number of sample angles
 
     sample_size_n: int scalar
-        sample size in number of pixles on the side along the probe propagation axis
+        sample size in number of pixels on the side along the probe propagation axis
         
     sample_height_n : integer
         The height of the sample along the rotational axis (in number of pixels)
@@ -1005,7 +1008,7 @@ def intersecting_length_fl_detectorlet_3d_mpi_write_h5_3(n_ranks, minibatch_size
     n_det = len(det_pos_ls_flat)
     
     if rank == 0:
-        print(f"numbder of detecting points: {n_det}")
+        print(f"number of detecting points: {n_det}")
         sys.stdout.flush()
         
     ## define sample edges: 
@@ -1595,7 +1598,7 @@ def self_absorption_att_ratio_single_theta_3d(src_path, n_det, P, det_size_cm, d
     grid_concentration = tc.from_numpy(np.load(src_path)).float().to(dev)
     n_element = len(this_aN_dic)
     
-    # generate an arrary of total attenuation cross section with the dimension: (n_element, n_elemental_lines)
+    # generate an array of total attenuation cross section with the dimension: (n_element, n_elemental_lines)
     # The component in the array represents the total attenuation cross section at some line energy in some element (with unitary concentration)
     
     # FL_line_attCS_ls = tc.as_tensor(xlib_np.CS_Total(aN_ls, fl_all_lines_dic["fl_energy"])).float().to(dev)

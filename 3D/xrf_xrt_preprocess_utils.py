@@ -316,26 +316,57 @@ def find_theta_combos(theta_array_deg, dtheta = 0):
 
     return valid_theta_idx_pairs
 
-def crop_array(xrf_array, opt_dens_array, edge_dict):
+def crop_array(xrf_array, xrt_array, opt_dens_array, edge_dict):
     if xrf_array.ndim != 4 or opt_dens_array.ndim != 3:
-        print('Error: XRF and optical density arrays must be 4D and 3D, respectively. Exiting program...')
+        print('Error: XRF, XRT, and optical density arrays must be 4D and 3D, respectively. Exiting program...')
 
         sys.exit()
 
     _, n_slices, n_columns = opt_dens_array.shape
-        
-    for edge in edge_dict:
-        if edge == 'bottom' or edge == 'top' and edge_dict[edge] >= n_slices:
-            print('Error: Cannot exceed number of slices (rows) when cropping. Exiting program...')
+    
+    if (edge_dict['bottom'] + edge_dict['top'] >= n_slices) or (edge_dict['left'] + edge_dict['right'] >= n_columns):
+        print('Error: Overlapping crops detected. Exiting program...')
 
-            sys.exit()
-                
-        if edge == 'left' or edge == 'right' and edge_dict[edge] >= n_columns:
-            print('Error: Cannot exceed number of scan positions (columns) when cropping. Exiting program...')
+        sys.exit()
+    
+    start_slice = edge_dict['top']
+    end_slice = n_slices - edge_dict['bottom']
 
-            sys.exit()
+    start_column = edge_dict['left']
+    end_column = n_columns - edge_dict['right']
 
-    cropped_xrf_array = xrf_array[:, :, edge_dict['top']:(n_slices - edge_dict['bottom']), edge_dict['left']:(n_columns - edge_dict['right'])]
-    cropped_opt_dens_array = opt_dens_array[:, edge_dict['top']:(n_slices - edge_dict['bottom']), edge_dict['left']:(n_columns - edge_dict['right'])]
+    cropped_xrf_array = xrf_array[:, :, start_slice:end_slice, start_column:end_column]
+    cropped_xrt_array = xrt_array[:, start_slice:end_slice, start_column:end_column]
+    cropped_opt_dens_array = opt_dens_array[:, start_slice:end_slice, start_column:end_column]
 
-    return cropped_xrf_array, cropped_opt_dens_array
+    return cropped_xrf_array, cropped_xrt_array, cropped_opt_dens_array
+
+def remove_zero_deg_proj_no_realignment(xrf_array, xrt_array, opt_dens_array, zero_idx_to_discard, theta_array):
+    if zero_idx_to_discard != 'first' or zero_idx_to_discard != 'second' or zero_idx_to_discard is None:
+        print('Error: \'zero_idx_to_discard\' must be \'first\' or \'second\'. Exiting program...')
+
+        sys.exit()
+
+    if np.count_nonzero(theta_array == 0) != 2:
+        print('Error: Must have two 0° angles. Exiting program...')
+
+        sys.exit()
+    
+    n_theta = len(theta_array)
+
+    first_zero_deg_idx, second_zero_deg_idx = np.where(theta_array == 0)[0]
+
+    theta_idx_array = np.arange(n_theta)
+
+    if zero_idx_to_discard == 'first':
+        mask = theta_idx_array != first_zero_deg_idx
+    
+    else:
+        mask = theta_idx_array != second_zero_deg_idx
+    
+    xrf_array_final = xrf_array[mask]
+    xrt_array_final = xrt_array[mask]
+    opt_dens_array_final = opt_dens_array[mask]
+    theta_array_final = theta_array[mask]
+
+    return xrf_array_final, xrt_array_final, opt_dens_array_final, theta_array_final

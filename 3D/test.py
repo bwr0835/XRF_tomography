@@ -1,4 +1,4 @@
-import numpy as np, h5py, xrf_xrt_jxrft_file_util as futil, pandas as pd, xraylib_np as xrl_np, xraylib as xrl
+import numpy as np, h5py, xrf_xrt_jxrft_file_util as futil, pandas as pd, xraylib_np as xrl_np, xraylib as xrl, pandas as pd
 
 from matplotlib import pyplot as plt
 
@@ -166,6 +166,17 @@ from matplotlib import pyplot as plt
 
 # filename = '/home/bwr0835/2_ide_realigned_data_no_cor_correction/xrt_od_xrf_realignment/aligned_data/aligned_aggregate_xrf_xrt.h5'
 
-a = np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
+# E = np.array([10., 11.])
+# print(xrl_np.CS_Total_Kissel(np.array([4]), E).squeeze())
 
-print(a[5:-1])
+el_roi = np.array([['Si', 'K'], ['Ti', 'K'], ['Cr', 'K'], ['Fe', 'K'], ['Ni', 'K'], ['Ba', 'L']], dtype = 'S5')
+
+print(el_roi)
+
+with h5py.File('/Users/bwr0835/Documents/test.h5', 'w') as f:
+    a = f.create_dataset('el_line', data = el_roi)
+
+with h5py.File('/Users/bwr0835/Documents/test.h5', 'r') as f:
+    a = f['el_line'].asstr()[()]
+
+print(a)

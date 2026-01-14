@@ -73,8 +73,9 @@ def generate_reconstructed_FL_signal(dev, use_simulation_sample, simulation_prob
     ####--------------------------------------------------------------####
     
     #### Calculate the MAC of probe ####
+    # probe_attCS_ls = tc.as_tensor(xlib_np.CS_Total(aN_ls, probe_energy_keV).flatten()).to(dev)
     probe_attCS_ls = tc.as_tensor(xlib_np.CS_Total(aN_ls, probe_energy_keV).flatten()).to(dev)
-    # TODO: Should this use xlib_np.CS_Total_Kissel()?
+
     ####----------------------------####
     
     

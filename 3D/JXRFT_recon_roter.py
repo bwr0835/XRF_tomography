@@ -24,20 +24,19 @@ warnings.filterwarnings("ignore")
 # stdout_options = {'output_folder': recon_path, 'save_stdout': False, 'print_terminal': True}
 gpu_index = rank % 2
 # gpu_index = 1
-if tc.cuda.is_available():  
+if tc.cuda.is_available():
     dev = tc.device('cuda:{}'.format(gpu_index))
     
     print("Process ", rank, "running on", dev)
     
     sys.stdout.flush()
 
-else:  
+else:
     dev = "cpu"
     
     print("Process", rank, "running on CPU")
     
     sys.stdout.flush()
-
 
 # fl = {"K": np.array([xlib.KA1_LINE, xlib.KA2_LINE, xlib.KA3_LINE, xlib.KB1_LINE, xlib.KB2_LINE,
 #                  xlib.KB3_LINE, xlib.KB4_LINE, xlib.KB5_LINE]),

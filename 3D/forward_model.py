@@ -9,12 +9,35 @@ from util import rotate, MakeFLlinesDictionary_manual
 tc.set_default_tensor_type(tc.FloatTensor)
 
 class PPM(nn.Module):
-    def __init__(self, dev, selfAb, lac, grid_concentration, p, n_element, n_lines, 
-                 FL_line_attCS_ls, detected_fl_unit_concentration, n_line_group_each_element,
-                 sample_height_n, minibatch_size, sample_size_n, sample_size_cm,          
-                 probe_energy_keV, probe_cts, probe_att, probe_attCS_ls,
-                 theta, signal_attenuation_factor,
-                 n_det, P_minibatch, det_dia_cm, det_from_sample_cm, det_solid_angle_ratio):
+    def __init__(self,
+                 dev, 
+                 selfAb, 
+                 lac, 
+                 grid_concentration, 
+                 p, 
+                 n_element, 
+                 n_lines, 
+                 FL_line_attCS_ls,
+                 FL_line_det_attCS_ls,
+                 detected_fl_unit_concentration, 
+                 n_line_group_each_element,
+                 sample_height_n, 
+                 minibatch_size, 
+                 sample_size_n, 
+                 sample_size_cm,          
+                 probe_energy_keV, 
+                 probe_cts, 
+                 probe_att, 
+                 probe_attCS_ls,
+                 theta, 
+                 signal_attenuation_factor,
+                 n_det, 
+                 P_minibatch, 
+                 det_dia_cm,
+                 det_from_sample_cm, 
+                 det_solid_angle_ratio,
+                 det_window_dens,
+                 det_window_thickness):
         """
         Initialize the attributes of PPM. 
         """
@@ -28,6 +51,7 @@ class PPM(nn.Module):
         self.n_lines = n_lines
 
         self.FL_line_attCS_ls = FL_line_attCS_ls.to(self.dev)
+        self.FL_line_det_attCS_ls = FL_line_det_attCS_ls.to(self.dev)
         self.detected_fl_unit_concentration = detected_fl_unit_concentration.to(self.dev)
         self.n_line_group_each_element = n_line_group_each_element.to(self.dev)
         
@@ -43,7 +67,7 @@ class PPM(nn.Module):
         self.probe_energy_keV = probe_energy_keV  
         self.probe_cts = probe_cts
         self.probe_att = probe_att
-        self.probe_attCS_ls =  probe_attCS_ls
+        self.probe_attCS_ls = probe_attCS_ls
         self.probe_before_attenuation_flat = self.init_probe()        
               
         self.theta = theta
@@ -55,7 +79,8 @@ class PPM(nn.Module):
         self.det_from_sample_cm = det_from_sample_cm
         self.SA_theta = self.init_SA_theta()
         self.det_solid_angle_ratio = det_solid_angle_ratio
-        
+        self.det_window_dens = det_window_dens
+        self.det_window_thickness = det_window_thickness
         
     def init_xp(self):
         """
@@ -114,13 +139,16 @@ class PPM(nn.Module):
         fl_map_tot_flat_theta = tc.zeros((self.n_lines, self.n_voxel_minibatch), device=self.dev)
         concentration_map_minibatch_rot_flat = concentration_map_minibatch_rot.view(self.n_element, self.n_voxel_minibatch)
         line_idx = 0
+
+        # TODO Include attenuation due to detector window
+
         for j in range(self.n_element):
             ## step 1: calculate the attenuation exponent at each voxel
             if self.probe_att == True:
                 lac_single = concentration_map_minibatch_rot[j] * self.probe_attCS_ls[j]
                 lac_acc = tc.cumsum(lac_single, axis=1) # dim = (minibatch_size, sample_size_n)
                 lac_acc = tc.cat((tc.zeros((self.minibatch_size, 1), device=self.dev), lac_acc), dim = 1) # dim = (minibatch_size, sample_size_n + 1)
-                att_exponent_acc = lac_acc * (self.sample_size_cm / self.sample_size_n)    
+                att_exponent_acc = lac_acc * (self.sample_size_cm/self.sample_size_n)    
                 att_exponent_acc_map += att_exponent_acc
             
             else:
@@ -128,18 +156,23 @@ class PPM(nn.Module):
             ## step 2: calculate the fluorescence signal generated at each voxel
             fl_unit = self.detected_fl_unit_concentration[line_idx:line_idx + self.n_line_group_each_element[j]]            
             ## FL signal over the current elemental lines for each voxel
-            fl_map = tc.stack([concentration_map_minibatch_rot_flat[j] * fl_unit_single_line for fl_unit_single_line in fl_unit])            
-            fl_map_tot_flat_theta[line_idx:line_idx + self.n_line_group_each_element[j],:] = fl_map            
+            fl_map = tc.stack([concentration_map_minibatch_rot_flat[j]*fl_unit_single_line for fl_unit_single_line in fl_unit])
+
+            fl_map_tot_flat_theta[line_idx:line_idx + self.n_line_group_each_element[j], :] = fl_map
             line_idx = line_idx + len(fl_unit)
             
         attenuation_map_theta_flat = tc.exp(-(att_exponent_acc_map[:,:-1])).view(self.n_voxel_minibatch)
 #         transmission_theta = tc.exp(-att_exponent_acc_map[:,-1])
         transmission_att_exponent_theta = att_exponent_acc_map[:,-1]
-             
+
+        # Calculate attenuation due to detector window and add new axis/dimension so that broadcasting rules are obeyed
+        # tensor.unsqueeze(dim = 1) = tensor[:, None]
+        det_window_attenuation = tc.exp(-self.FL_line_det_attCS_ls*self.det_window_dens*self.det_window_thickness).unsqueeze(dim = 1)
+
         #### 4: Create XRF, XRT data ####           
         probe_after_attenuation_theta = self.probe_before_attenuation_flat * attenuation_map_theta_flat 
         # fl_signal_SA_theta, dim = (n_lines, n_minibatch)
-        fl_signal_SA_theta = tc.unsqueeze(probe_after_attenuation_theta, dim=0) * fl_map_tot_flat_theta * self.SA_theta  
+        fl_signal_SA_theta = tc.unsqueeze(probe_after_attenuation_theta, dim=0) * fl_map_tot_flat_theta*self.SA_theta *self.FL_line_det_attCS_ls
         fl_signal_SA_theta = fl_signal_SA_theta.view(self.n_lines, self.minibatch_size, self.sample_size_n)
         fl_signal_SA_theta = tc.sum(fl_signal_SA_theta, axis=-1)
         

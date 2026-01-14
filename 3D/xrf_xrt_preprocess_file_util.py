@@ -633,7 +633,10 @@ def create_h5_aligned_aggregate_xrf_xrt(dir_path,
                                         xrf_array, 
                                         xrt_array,
                                         opt_dens_array, 
-                                        theta_array):
+                                        theta_array,
+                                        zero_idx_discarded,
+                                        init_edge_info,
+                                        final_edge_info):
 
     elements_xrt = ['xrt_sig', 'opt_dens']
 
@@ -658,7 +661,22 @@ def create_h5_aligned_aggregate_xrf_xrt(dir_path,
         exchange.create_dataset('data_xrf', data = xrf_array)
         exchange.create_dataset('data_xrt', data = xrt_array_new)
         exchange.create_dataset('theta', data = theta_array)
-    
+
+        if init_edge_info is not None:
+            exchange['data_xrt'].attrs['left_edge_cropped_init'] = init_edge_info['left']
+            exchange['data_xrt'].attrs['right_edge_cropped_init'] = init_edge_info['right']
+            exchange['data_xrt'].attrs['top_edge_cropped_init'] = init_edge_info['top']
+            exchange['data_xrt'].attrs['bottom_edge_cropped_init'] = init_edge_info['bottom']
+            
+        if final_edge_info is not None:
+            exchange['data_xrt'].attrs['left_edge_cropped_final'] = final_edge_info['left']
+            exchange['data_xrt'].attrs['right_edge_cropped_final'] = final_edge_info['right']
+            exchange['data_xrt'].attrs['top_edge_cropped_final'] = final_edge_info['top']
+            exchange['data_xrt'].attrs['bottom_edge_cropped_final'] = final_edge_info['bottom']
+
+        if zero_idx_discarded is not None:
+            exchange['theta'].attrs['zero_deg_idx_discarded'] = zero_idx_discarded
+
     return
 
 def extract_csv_preprocessing_input_params(file_path):
@@ -907,7 +925,8 @@ def create_aux_opt_dens_data_npy(dir_path,
                                  dx_array,
                                  dy_array,
                                  net_x_shifts_pcc_array,
-                                 net_y_shifts_pcc_array):
+                                 net_y_shifts_pcc_array,
+                                 **kwargs):
     
     subdir_path = os.path.join(dir_path, 'aux_data')
 
@@ -921,6 +940,9 @@ def create_aux_opt_dens_data_npy(dir_path,
     np.save(os.path.join(subdir_path, 'dy_iter_array.npy'), dy_array)
     np.save(os.path.join(subdir_path, 'net_x_shifts_pcc_iter_array.npy'), net_x_shifts_pcc_array)
     np.save(os.path.join(subdir_path, 'net_y_shifts_pcc_iter_array.npy'), net_y_shifts_pcc_array)
+
+    if kwargs.get('cropped_aligned_exp_proj_iter_array') is not None:
+        np.save(os.path.join(subdir_path, 'cropped_aligned_exp_proj_iter_array.npy'), kwargs['cropped_aligned_exp_proj_iter_array'])
 
     return
 
@@ -944,58 +966,3 @@ def create_csv_norm_net_shift_data(dir_path,
     df.to_csv(file_path, index = False)
 
     return
-
-def extract_h5_aggregate_xrf_xrt_data(file_path, **kwargs):
-    if not os.path.isfile(file_path):
-        print('Error: Cannot locate aggregate XRF, XRT HDF5 file. Exiting program...')
-
-        sys.exit()
-    
-    if not file_path.endswith('.h5'):
-        print('Error: Aggregate XRF, XRT file extension must be \'.h5\'. Exiting program...')
-
-        sys.exit()
-    
-    try:
-        with h5py.File(file_path, 'r') as h5:
-            elements_xrf = h5['exchange/elements_xrf'][()]
-            elements_xrt = h5['exchange/elements_xrt'][()]
-            xrf_data = h5['exchange/data_xrf'][()]
-            xrt_data = h5['exchange/data_xrt'][()]
-            theta = h5['exchange/theta'][()]
-    
-    except KeyboardInterrupt:
-        print('Keyboard interrupt. Exiting program...')
-
-        sys.exit()
-    
-    except:
-        print('Error: Incorrect HDF5 file structure. Exiting program...')
-
-        sys.exit()
-    
-    element_lines_roi = kwargs.get('element_lines_roi')
-
-    elements_xrf_string = [element.decode() for element in elements_xrf]
-    elements_xrt_string = [element.decode() for element in elements_xrt]
-
-    if element_lines_roi is not None:
-        try:
-            element_lines_roi_idx = np.array([elements_xrf_string.index(element) for element in element_lines_roi[0]])
-        
-        except KeyboardInterrupt:
-            print('Keyboard interrupt. Exiting program...')
-        
-        except:
-            print('Error: Unable to parse ')
-
-        xrf_data_roi = xrf_data[element_lines_roi_idx]
-    
-    else:
-        element_lines_roi_idx = np.arange(len(elements_xrf_string))
-        xrf_data_roi = xrf_data
-
-    opt_dens_idx = elements_xrt_string.index('opt_dens')
-    opt_dens = xrt_data[opt_dens_idx]
-
-    return element_lines_roi_idx, xrf_data_roi, opt_dens, theta

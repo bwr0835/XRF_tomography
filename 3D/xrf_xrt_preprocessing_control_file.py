@@ -25,12 +25,13 @@ def preprocess_xrf_xrt_data(synchrotron,
                             init_edge_pixel_lengths_to_crop,
                             realignment_enabled,
                             n_iter_iter_reproj,
+                            zero_idx_to_discard,
                             sigma,
                             alpha,
                             upsample_factor,
                             eps,
                             final_edge_crop_enabled,
-                            edges_to_crop,
+                            final_edge_pixel_lengths_to_crop,
                             aligned_data_output_dir_path):
 
     if create_aggregate_xrf_xrt_files_enabled:
@@ -155,7 +156,7 @@ def preprocess_xrf_xrt_data(synchrotron,
 
         if pre_existing_align_norm_file_enabled:
             print('Extracting pre-existing normalizations, net x pixel shifts, net y pixel shifts, and incident intensity...')
-            
+
             norm_array, \
             net_x_shift_array, \
             net_y_shift_array, \
@@ -200,23 +201,32 @@ def preprocess_xrf_xrt_data(synchrotron,
         print('Calculating optical densities...')
         
         opt_dens = -np.log(counts_xrt_norm/I0_cts)
-
-    if init_edge_crop_enabled:
-        print('Creating auxilliary cropped XRF, optical density projection images...')
-
-        if init_edge_pixel_lengths_to_crop is None:
-            print("Error: Empty field for 'init_edge_pixel_lengths_to_crop'. Exiting program...")
-
-            sys.exit()
-            
-        init_cropped_xrf_array, init_cropped_xrt_array = ppu.crop_array(counts_xrf_norm, opt_dens, edges_to_crop)
-        
-
+    
     xrt_od_xrf_realignment_subdir_path = os.path.join(aligned_data_output_dir_path, 'xrt_od_xrf_realignment')
 
     os.makedirs(xrt_od_xrf_realignment_subdir_path, exist_ok = True)
 
     if realignment_enabled:
+        if init_edge_crop_enabled:
+            print('Creating auxilliary cropped XRF, optical density projection images...')
+
+            if init_edge_pixel_lengths_to_crop is None:
+                print("Error: Empty field for 'init_edge_pixel_lengths_to_crop'. Exiting program...")
+
+                sys.exit()
+            
+            init_cropped_xrf_array, init_cropped_xrt_array, init_cropped_opt_dens_array = ppu.crop_array(counts_xrf_norm, counts_xrt_norm, opt_dens, init_edge_pixel_lengths_to_crop)
+        
+        else:
+            init_cropped_xrf_array = None
+            init_cropped_xrt_array = None
+            init_cropped_opt_dens_array = None
+            
+            if init_edge_pixel_lengths_to_crop is not None:
+                print("Warning: Non-empty 'init_edge_pixel_lengths_to_crop' dictionary detected. Removing items from 'init_edge_pixel_lengths_to_crop'...")
+                
+            init_edge_pixel_lengths_to_crop = None
+        
         if return_aux_data:
             aligned_proj_final_xrt_sig, \
             aligned_proj_final_opt_dens, \
@@ -224,17 +234,22 @@ def preprocess_xrf_xrt_data(synchrotron,
             net_x_shifts_pcc_final, \
             net_y_shifts_pcc_final, \
             aligned_exp_proj_array, \
+            cropped_aligned_exp_proj_array, \
             synth_proj_array, \
             pcc_2d_array, \
             recon_array, \
+            theta_final, \
             net_x_shifts_pcc_array, \
             net_y_shifts_pcc_array, \
             dx_pcc_array, \
-            dy_pcc_array = rap(synchrotron,
-                               counts_xrt_norm,
+            dy_pcc_array = rap(counts_xrt_norm,
+                               init_cropped_xrt_array,
                                opt_dens,
+                               init_cropped_opt_dens_array,
                                counts_xrf_norm,
+                               init_cropped_xrf_array,
                                theta,
+                               zero_idx_to_discard,
                                I0_cts,
                                n_iter_iter_reproj,
                                net_x_shift_array,
@@ -243,6 +258,7 @@ def preprocess_xrf_xrt_data(synchrotron,
                                alpha,
                                upsample_factor,
                                eps,
+                               init_edge_pixel_lengths_to_crop,
                                return_aux_data = True)
 
             print('Writing convolution magnitude array to NumPy (.npy) file (NOTE: Python is needed to view this!)...')
@@ -250,7 +266,14 @@ def preprocess_xrf_xrt_data(synchrotron,
             futil.create_aux_conv_mag_data_npy(xrt_od_xrf_realignment_subdir_path, conv_mag_array)
 
             print('Writing the following auxiliary, per-iteration data to NumPy (.npy) files (NOTE: Python is needed to view these!):')
-            print('     -Experimental optical density projection data')
+            
+            if init_edge_crop_enabled:
+                print('     -Remapped experimental optical density projection data')
+                print('     -Cropped experimental optical density projection data')
+            
+            else:
+                print('     -Experimental optical density projection data')
+
             print('     -Reconstructed optical density data')
             print('     -Reprojected optical density data')
             print('     -2D phase cross-correlation data')
@@ -259,26 +282,43 @@ def preprocess_xrf_xrt_data(synchrotron,
             print('     -Net x shifts')
             print('     -Net y shifts')
 
-            futil.create_aux_opt_dens_data_npy(xrt_od_xrf_realignment_subdir_path,
-                                               aligned_exp_proj_array,
-                                               recon_array,
-                                               synth_proj_array,
-                                               pcc_2d_array,
-                                               dx_pcc_array,
-                                               dy_pcc_array,
-                                               net_x_shifts_pcc_array,
-                                               net_y_shifts_pcc_array)                           
-                    
+            if init_edge_crop_enabled:
+                futil.create_aux_opt_dens_data_npy(xrt_od_xrf_realignment_subdir_path,
+                                                   aligned_exp_proj_array,
+                                                   recon_array,
+                                                   synth_proj_array,
+                                                   pcc_2d_array,
+                                                   dx_pcc_array,
+                                                   dy_pcc_array,
+                                                   net_x_shifts_pcc_array,
+                                                   net_y_shifts_pcc_array,
+                                                   cropped_aligned_exp_proj_iter_array = cropped_aligned_exp_proj_array)
+            
+            else:
+                futil.create_aux_opt_dens_data_npy(xrt_od_xrf_realignment_subdir_path,
+                                                   aligned_exp_proj_array,
+                                                   recon_array,
+                                                   synth_proj_array,
+                                                   pcc_2d_array,
+                                                   dx_pcc_array,
+                                                   dy_pcc_array,
+                                                   net_x_shifts_pcc_array,
+                                                   net_y_shifts_pcc_array)
+
         else:
             aligned_proj_final_xrt_sig, \
             aligned_proj_final_opt_dens, \
             aligned_proj_final_xrf, \
+            theta_final, \
             net_x_shifts_pcc_final, \
-            net_y_shifts_pcc_final = rap(synchrotron,
-                                         counts_xrt_norm,
+            net_y_shifts_pcc_final = rap(counts_xrt_norm,
+                                         init_cropped_xrt_array,
                                          opt_dens,
+                                         init_cropped_opt_dens_array,
                                          counts_xrf_norm,
+                                         init_cropped_xrf_array,
                                          theta,
+                                         zero_idx_to_discard,
                                          I0_cts,
                                          n_iter_iter_reproj,
                                          net_x_shift_array,
@@ -287,27 +327,47 @@ def preprocess_xrf_xrt_data(synchrotron,
                                          alpha,
                                          upsample_factor,
                                          eps)
+
+        if final_edge_crop_enabled:
+            if final_edge_pixel_lengths_to_crop is None:
+                print("Error: Empty field for 'final_edge_pixel_lengths_to_crop'. Exiting program...")
+
+                sys.exit()
+
+            print('Cropping aligned XRF, XRT, and optical density projection images...')
+
+            aligned_proj_final_xrf_cropped, \
+            aligned_proj_final_xrt_sig_cropped, \
+            aligned_proj_final_opt_dens_cropped = ppu.crop_array(aligned_proj_final_xrf,
+                                                                 aligned_proj_final_xrt_sig,
+                                                                 aligned_proj_final_opt_dens,
+                                                                 final_edge_pixel_lengths_to_crop)
+
+        else:
+            aligned_proj_final_xrf_cropped = aligned_proj_final_xrf
+            aligned_proj_final_xrt_sig_cropped = aligned_proj_final_xrt_sig
+            aligned_proj_final_opt_dens_cropped = aligned_proj_final_opt_dens
             
-        # if final_edge_crop_enabled:
-        #     if edges_to_crop is None:
-        #         print('Warning to edges specified to crop. Ignoring cropping...')
-            
-        #     else:
-                
+            if final_edge_pixel_lengths_to_crop is not None:
+                print("Warning: Non-empty 'init_edge_pixel_lengths_to_crop' dictionary detected. Removing items from 'final_edge_pixel_lengths_to_crop'...")
+
+            final_edge_pixel_lengths_to_crop = None
 
         print('Writing final aligned XRF, XRT, and optical density projection data to HDF5 file...')
             
         futil.create_h5_aligned_aggregate_xrf_xrt(xrt_od_xrf_realignment_subdir_path,
                                                   elements_xrf,
-                                                  aligned_proj_final_xrf, 
-                                                  aligned_proj_final_xrt_sig,
-                                                  aligned_proj_final_opt_dens, 
-                                                  theta)
+                                                  aligned_proj_final_xrf_cropped, 
+                                                  aligned_proj_final_xrt_sig_cropped,
+                                                  aligned_proj_final_opt_dens_cropped,
+                                                  theta_final,
+                                                  init_edge_pixel_lengths_to_crop,
+                                                  final_edge_pixel_lengths_to_crop)
             
         print('Writing per-projection normalization, final net x and y shifts, and incident intensity to CSV file...')
 
         futil.create_csv_norm_net_shift_data(xrt_od_xrf_realignment_subdir_path,
-                                             theta,
+                                             theta_final,
                                              norm_array,
                                              net_x_shifts_pcc_final,
                                              net_y_shifts_pcc_final,
@@ -321,26 +381,62 @@ def preprocess_xrf_xrt_data(synchrotron,
 
             futil.create_aux_conv_mag_data_npy(xrt_od_xrf_realignment_subdir_path, conv_mag_array)
         
-        # if final_edge_crop_enabled:
-            # 
+        if zero_idx_to_discard is not None:
+            final_xrf, \
+            final_xrt, \
+            final_opt_dens, \
+            theta_final = ppu.remove_zero_deg_proj_no_realignment(counts_xrf_norm,
+                                                                  counts_xrt_norm,
+                                                                  opt_dens,
+                                                                  zero_idx_to_discard,
+                                                                  theta)
 
+        else:
+            final_xrf = counts_xrf_norm
+            final_xrt = counts_xrt_norm
+            final_opt_dens = opt_dens
+            theta_final = theta
+
+        if final_edge_crop_enabled:
+            if final_edge_pixel_lengths_to_crop is None:
+                print("Error: Empty field for 'final_edge_pixel_lengths_to_crop'. Exiting program...")
+
+                sys.exit()
+            
+            print('Cropping XRF, XRT, and optical density projection images...')
+
+            final_xrf_cropped, \
+            final_xrt_sig_cropped, \
+            final_opt_dens_cropped = ppu.crop_array(final_xrf, final_xrt, final_opt_dens)
+
+        else:
+            final_xrf_cropped = counts_xrf_norm
+            final_xrt_sig_cropped = counts_xrt_norm
+            final_opt_dens_cropped = opt_dens
+
+            if final_edge_pixel_lengths_to_crop is not None:
+                print("Warning: Non-empty 'final_edge_pixel_lengths_to_crop' dictionary detected. Removing items from 'final_edge_pixel_lengths_to_crop'...")
+
+            final_edge_pixel_lengths_to_crop = None
 
         print('Writing normalized XRF, XRT, and optical density projection data to HDF5 file...')
 
         futil.create_h5_aligned_aggregate_xrf_xrt(xrt_od_xrf_realignment_subdir_path,
                                                   elements_xrf,
-                                                  counts_xrf_norm, 
-                                                  counts_xrt_norm,
-                                                  opt_dens, 
-                                                  theta)
+                                                  final_xrf_cropped, 
+                                                  final_xrt_sig_cropped,
+                                                  final_opt_dens_cropped, 
+                                                  theta_final)
 
         print('Writing per-projection normalization, final net x and y shifts, and incident intensity to CSV file...')
 
         futil.create_csv_norm_net_shift_data(xrt_od_xrf_realignment_subdir_path,
-                                             theta,
+                                             theta_final,
                                              norm_array,
                                              net_x_shift_array,
                                              net_y_shift_array,
                                              I0_cts)
             
         print('Done')
+    
+    return

@@ -11,6 +11,7 @@ import numpy as np, \
        xraylib_np as xlib_np, \
        xrf_xrt_jxrft_file_util as futil, \
        xrl_fluorline_macros, \
+       Atomic_number as atom_num, \
        os, \
        shutil, \
        datetime, \
@@ -154,6 +155,8 @@ def reconstruct_jXRFT_tomography(synchrotron,
                                  det_dia_cm = None,
                                  det_ds_spacing_cm = None,
                                  det_from_sample_cm = None,
+                                 det_window_element = None,
+                                 det_window_thickness_um = None,
                                  n_epochs = 50, 
                                  save_every_n_epochs = 10, 
                                  minibatch_size = None,
@@ -266,11 +269,11 @@ def reconstruct_jXRFT_tomography(synchrotron,
         Dictionary structure: {Element: Z, ...}
         Example: {'Ca': 20, 'Fe', 26, 'Ba', 56}
     element_lines_roi : ndarray
-        Elements of interest and subshells of interest
+        Elements of interest and shells of interest
         Array structure: np.array([[Element, subshell], ...])
         Example: np.array([['Si', 'K], ['Ca', 'K'], ['Ca', 'L'], ['Fe', 'K'], ['Cu', 'K'], ['Cu', 'L'], ['Ba', 'L']])
     n_line_group_each_element : ndarray
-        Number of subshells of interest for each element of interest (array-like; dtype: str)
+        Number of shells of interest for each element of interest (array-like; dtype: str)
         Example using above element_lines_roi example: np.array([1, 2, 1, 2, 1])
     b1 : float
         Regularization prefactor of XRT cost term
@@ -334,26 +337,39 @@ def reconstruct_jXRFT_tomography(synchrotron,
     # y2_true_handle = h5py.File(os.path.join(data_path, f_XRT_data), 'r') # XRT data
     ####----------------------------------------------------------------------------------####
     
+    # TODO Check parallel computing aspect of this function
+    
     elements_xrf, \
     xrf_data, \
     opt_dens_data, \
     theta_tomo = futil.extract_h5_aggregate_xrf_xrt_data(f_XRF_XRT_data, element_lines_roi = element_lines_roi)
     
-    if downsample_factor > 1 and rank == 0:
-        msg = f'Downsampling XRF, optical density projection images by factor of {downsample_factor}'
+    # TODO Check parallel computing aspect of downsampling and upsampling blocks
+
+    if rank == 0:
+        if downsample_factor > 1:
+            msg = f'Downsampling XRF, optical density projection images by factor of {downsample_factor}'
         
-        print_flush_root(rank, msg, save_stdout = False, print_terminal = True)
+            print_flush_root(rank, msg, save_stdout = False, print_terminal = True)
 
-        xrf_data_roi = downsample_proj_data(xrf_data, downsample_factor)
-        opt_dens = downsample_proj_data(opt_dens_data, downsample_factor)
+            xrf_data_roi = downsample_proj_data(xrf_data, downsample_factor)
+            opt_dens = downsample_proj_data(opt_dens_data, downsample_factor)
 
-        sample_height_n /= downsample_factor
-        sample_size_n /= downsample_factor
-    
+            sample_height_n /= downsample_factor
+            sample_size_n /= downsample_factor
+        
+        else:
+            print_flush_root("Error: 'downsample_factor' must be a positive integer. Exiting program...")
+
+            comm.Abort()
+
     else:
-        xrf_data_roi = xrf_data
-        opt_dens = opt_dens_data
+        xrf_data_roi = None
+        opt_dens = None
     
+    comm.bcast(xrf_data_roi)
+    comm.bcast(opt_dens)
+
     dia_len_n = int(1.2*(sample_height_n**2 + sample_size_n**2 + sample_size_n**2)**0.5) # dev
     n_voxel_minibatch = minibatch_size*sample_size_n # dev
     n_voxel = sample_height_n*sample_size_n**2 # dev
@@ -362,23 +378,20 @@ def reconstruct_jXRFT_tomography(synchrotron,
     n_element = len(elements_xrf)
 
     aN_ls = np.zeros(n_element, dtype = int)
+    
+    per_table = list(atom_num.AN[0])
 
     for element, idx in enumerate(elements_xrf):
-        if synchrotron == 'aps':
-            if '_' in element:
-                aN_ls[idx] = xlib_np.SymbolToAtomicNumber(element.split('_')[0])
+        if '_' in element:
+            aN_ls[idx] = xlib.SymbolToAtomicNumber(element.split('_')[0])
             
-            else:
-                aN_ls[idx] = xlib_np.SymbolToAtomicNumber(element)
+        elif element in per_table:
+            aN_ls[idx] = xlib.SymbolToAtomicNumber(element)
         
-        elif synchrotron == 'nsls-ii':
-            aN_ls[idx] = xlib_np.SymbolToAtomicNumber(element.split('_')[0])
-        
-        else:
-            if rank == 0:
-                msg = 'Error: Unable to extract at least one element symbol. Exiting program...'
+        elif rank == 0:
+            msg = 'Error: Unable to extract at least one element symbol. Exiting program...'
                 
-                print_flush_root(rank, msg, save_stdout = False, print_terminal = True)
+            print_flush_root(rank, msg, save_stdout = False, print_terminal = True)
 
             comm.Abort()
 
@@ -390,21 +403,26 @@ def reconstruct_jXRFT_tomography(synchrotron,
                                                     n_line_group_each_element, 
                                                     probe_energy_keV, 
                                                     sample_size_n, 
-                                                    sample_size_cm,
-                                                    fl_line_groups = np.array(["K", "L", "M"]), 
-                                                    fl_K = fl_K, 
-                                                    fl_L = fl_L, 
-                                                    fl_M = fl_M) #cpu
+                                                    sample_size_cm) #cpu
     
     stdout_options = {'root': 0, 'output_folder': recon_path, 'save_stdout': True, 'print_terminal': False}
     
     # FL_line_attCS_ls = tc.as_tensor(xlib_np.CS_Total(aN_ls, fl_all_lines_dic["fl_energy"])).float().to(dev) #dev
     FL_line_attCS_ls = tc.as_tensor(xlib_np.CS_Total_Kissel(aN_ls, fl_all_lines_dic["fl_energy"])).float().to(dev) #dev
+    
     detected_fl_unit_concentration = tc.as_tensor(fl_all_lines_dic["detected_fl_unit_concentration"]).float().to(dev)
     n_line_group_each_element = tc.IntTensor(fl_all_lines_dic["n_line_group_each_element"]).to(dev)
     n_lines = fl_all_lines_dic["n_lines"] #scalar
     ####--------------------------------------------------------------####
     
+    if det_window_element is not None:
+        Z_window = xlib.SymbolToAtomicNumber(det_window_element)
+    
+        FL_line_det_attCS_ls = tc.as_tensor(xlib_np.CS_Total_Kissel(Z_window, fl_all_lines_dic["fl_energy"])).float().to(dev)
+
+    else:
+        FL_line_det_att_CS_ls = tc.zeros(n_lines).float().to(dev)
+
     #### Calculate the MAC of probe ####
     # probe_attCS_ls = tc.as_tensor(xlib_np.CS_Total(aN_ls, probe_energy_keV).flatten()).to(dev)
     probe_attCS_ls = tc.as_tensor(xlib_np.CS_Total_Kissel(aN_ls, probe_energy_keV).flatten()).to(dev)
@@ -495,19 +513,67 @@ def reconstruct_jXRFT_tomography(synchrotron,
     comm.Barrier()
     P_handle = h5py.File(P_save_path + ".h5", 'r')
 
+    # TODO Check parallel computing aspect with upsampling data
+
     if cont_from_check_point == False: 
         # load the saved_initial_guess to rank0 cpu
         if use_saved_initial_guess:
             if rank == 0:
                 with h5py.File(os.path.join(recon_path, f_initial_guess + '.h5'), "r") as s:
-                    X_init = s["sample/densities"][...].astype(np.float32)
+                    X_init = s["sample/densities"][...].astype(np.float32)                    
+                    elements_loaded = s["sample/elements"][...].asstr()[:]
+                    element_line_pairs_loaded = s["sample/"]
+
+                    if np.array(elements_loaded) != list(this_aN_dic.keys()):
+                        print("Error: Loaded XRF elements do not match the element names in the 'this_aN_dic' field in input CSV file. Exiting program...")
+
+                        comm.Abort()
+
+                    det_window_element_loaded = s['sample'].attrs['det_window_element']
+                    
+                    if det_window_element_loaded == 'windowless':
+                        det_window_element_loaded = None
+
+                        if det_window_element is not None:
+                            msg = "Error: Windowless detector element loaded, but 'det_window_element' field in input CSV file is not empty. Exiting program..."
+
+                            print_flush_root(msg, save_stdout = False, print_terminal = True)
+
+                            comm.Abort()
+                    
+                    else:
+                        det_window_thickness_um_loaded = s.attrs['det_window_thickness_um']
+
+                if det_window_element is None:
+                    msg = "Error: Detector window element loaded, but 'det_window_element' in input CSV file is empty. Exiting program..."
+
+                    print_flush_root(msg, save_stdout = False, print_terminal = True)
+
+                    comm.Abort()
+
+                elif det_window_thickness_um_loaded != det_window_thickness_um:
+                    msg = "Error: Loaded detector window thickness does not match 'det_window_thickness_um' in input CSV file. Exiting program..."
+
+                    print_flush_root(msg, save_stdout = False, print_terminal = True)
+
+                    comm.Abort()
 
                 if upsample_factor > 1:
-                    msg = f'Upsampling initial guess of reconstruction slices by factor of {upsample_factor}'
+                    msg = f'Upsampling initial guess of reconstruction slices by factor of {upsample_factor}...'
         
                     print_flush_root(rank, msg, save_stdout = False, print_terminal = True)
                    
                     X = upsample_recon_data(X_init, upsample_factor)
+                
+                elif upsample_factor == 1:
+                    X = X_init
+                
+                else:
+                    msg = f"Error: 'upsample_factor' must be a positive integer. Exiting program..."
+
+                    print_flush_root(rank, msg, save_stdout = False, print_terminal = True)
+
+                    comm.Abort()
 
                 if (X.shape[0], X.shape[1]) != (y1_true.shape[2], y1_true.shape[3]): # If the number of slices and scan positions are not identical after
                                                                                          # downsampling projection data and upsampling initial reconstruction data, throw error and terminate program
@@ -532,8 +598,18 @@ def reconstruct_jXRFT_tomography(synchrotron,
                 ## Save the initial guess for future reference
                 with h5py.File(os.path.join(recon_path, f_initial_guess +'.h5'), 'w') as s:
                     sample = s.create_group("sample")
+                    
+                    if det_window_element is not None:
+                        sample.attrs['det_window_element'] = det_window_element
+                        sample.attrs['det_window_thickness_um'] = det_window_thickness_um
+                    
+                    else:
+                        sample.attrs['det_window_element'] = 'windowless'
+
                     sample_v = sample.create_dataset("densities", shape = (n_element, sample_height_n, sample_size_n, sample_size_n), dtype = "f4")
                     sample_e = sample.create_dataset("elements", shape = (n_element,), dtype = 'S5')
+                    sample_l = sample.create_dataset("line_groups", data = element_lines_roi.astype('S5'))
+
                     sample_v[...] = X
                     sample_e[...] = np.array(elements_xrf).astype('S5')
  
@@ -554,7 +630,8 @@ def reconstruct_jXRFT_tomography(synchrotron,
                 recon_params.write("starting_epoch = 0\n")
                 recon_params.write("n_epochs = %d\n" %n_epochs)
                 recon_params.write("n_ranks = %d\n" %n_ranks)
-                recon_params.write("element_line:\n" + str(element_lines_roi) + "\n") 
+                recon_params.write("element_line:\n" + str(element_lines_roi) + "\n")
+                recon_params.write("noise_model = %s\n" %noise_model)
                 recon_params.write("b1 = %.9f\n" %b1)
                 recon_params.write("b2 = %.9f\n" %b2)
                 recon_params.write("learning rate = %f\n" %lr)
@@ -564,6 +641,16 @@ def reconstruct_jXRFT_tomography(synchrotron,
                 recon_params.write("sample_size_n = %d\n" %sample_size_n)
                 recon_params.write("sample_height_n = %d\n" %sample_height_n)
                 recon_params.write("sample_size_cm = %.2f\n" %sample_size_cm)
+                
+                if det_window_element is not None:
+                    recon_params.write("detector_window_element = %s\n" %det_window_element)
+                    recon_params.write("detector_window_thickness_um = %.2f\n" %det_window_thickness_um)
+                
+                else:
+                    recon_params.write("detector_window_element = windowless\n")
+
+                recon_params.write("projection_downsample_factor = %d\n" %downsample_factor)
+                recon_params.write("recon_upsample_factor = %d\n" %upsample_factor)
                 recon_params.write("probe_energy_keV = %.2f\n" %probe_energy_keV[0])
                 recon_params.write("incident_probe_cts = %.2e\n" %probe_cts)
                 
@@ -604,7 +691,7 @@ def reconstruct_jXRFT_tomography(synchrotron,
                 ## Calculate lac using the current X. lac (linear attenuation coefficient) has the dimension of [n_element, n_lines, n_voxel_minibatch, n_voxel]
                 with h5py.File(os.path.join(recon_path, f_recon_grid +'.h5'), "r") as s:
                     X = s["sample/densities"][...].astype(np.float32)
-                    X = tc.from_numpy(X).to(dev) #dev   
+                    X = tc.from_numpy(X).to(dev) #dev
                     
                 if selfAb == True:               
                     X_ap_rot = rotate(X, theta, dev) #dev
@@ -719,8 +806,18 @@ def reconstruct_jXRFT_tomography(synchrotron,
                     if rank == 0:
                         with h5py.File(os.path.join(recon_path, f_recon_grid + "_" + str(epoch)+"_ending_condition" +'.h5'), "w") as s:
                             sample = s.create_group("sample")
+
+                            if det_window_element is not None:
+                                sample.attrs['det_window_element'] = det_window_element
+                                sample.attrs['det_window_thickness_um'] = det_window_thickness_um
+                    
+                            else:
+                                sample.attrs['det_window_element'] = 'windowless'
+
                             sample_v = sample.create_dataset("densities", shape = (n_element, sample_height_n, sample_size_n, sample_size_n), dtype="f4")
                             sample_e = sample.create_dataset("elements", shape = (n_element,), dtype = 'S5')
+                            sample_l = sample.create_dataset("line_groups", data = element_lines_roi.astype('S5'))
+                            
                             s["sample/densities"][...] = X_cpu
                             # s["sample/elements"][...] = np.array(list(this_aN_dic.keys())).astype('S5')
                             s["sample/elements"][...] = np.array(elements_xrf).astype('S5')
@@ -745,8 +842,19 @@ def reconstruct_jXRFT_tomography(synchrotron,
             if rank == 0 and ((epoch + 1) % save_every_n_epochs == 0 and (epoch + 1)//save_every_n_epochs != 0 or epoch + 1 == n_epochs):
                 with h5py.File(os.path.join(checkpoint_path, f_recon_grid + "_" + str(epoch) + '.h5'), "w") as s:
                     sample = s.create_group("sample")
+                    
+                    if det_window_element is not None:
+                        sample.attrs['det_window_element'] = det_window_element
+                        sample.attrs['det_window_thickness_um'] = det_window_thickness_um
+                    
+                    else:
+                        sample.attrs['det_window_element'] = 'windowless'    
+                    
                     sample_v = sample.create_dataset("densities", shape = (n_element, sample_height_n, sample_size_n, sample_size_n), dtype = "f4")
                     sample_e = sample.create_dataset("elements", shape = (n_element,), dtype = 'S5')
+                    
+                    sample.create_dataset("line_groups", data = element_lines_roi.astype('S5'))
+                    
                     s["sample/densities"][...] = X_cpu
                     s["sample/elements"][...] = np.array(list(this_aN_dic.keys())).astype('S5')
 #                 dxchange.write_tiff(X_cpu, os.path.join(recon_path, f_recon_grid)+"_"+str(epoch), dtype='float32', overwrite=True)  
@@ -833,7 +941,8 @@ def reconstruct_jXRFT_tomography(synchrotron,
                 recon_params.write("starting_epoch = %d\n" %starting_epoch)
                 recon_params.write("n_epochs = %d\n" %n_epochs)
                 recon_params.write("n_ranks = %d\n" %n_ranks)
-                recon_params.write("element_line:\n" + str(element_lines_roi)+"\n") 
+                recon_params.write("element_line:\n" + str(element_lines_roi)+"\n")
+                recon_params.write("noise_model = %s\n" %noise_model)
                 recon_params.write("b1 = %.9f\n" %b1)
                 recon_params.write("b2 = %.9f\n" %b2)
                 recon_params.write("learning rate = %f\n" %lr)
@@ -843,6 +952,14 @@ def reconstruct_jXRFT_tomography(synchrotron,
                 recon_params.write("sample_size_n = %d\n" %sample_size_n)
                 recon_params.write("sample_height_n = %d\n" %sample_height_n)
                 recon_params.write("sample_size_cm = %.2f\n" %sample_size_cm)
+
+                if det_window_element is not None:
+                    recon_params.write("detector_window_element = %s\n" %det_window_element)
+                    recon_params.write("detector_window_thickness_um = %.2f\n" %det_window_thickness_um)
+                
+                else:
+                    recon_params.write("detector_window_element = windowless\n")
+
                 recon_params.write("probe_energy_keV = %.2f\n" %probe_energy_keV[0])
                 recon_params.write("incident_probe_cts = %.2e\n" %probe_cts)             
                 
@@ -867,11 +984,12 @@ def reconstruct_jXRFT_tomography(synchrotron,
                 theta_ls_rand = tc.ones(n_theta)
 
             comm.Barrier() 
+            
             rand_idx = comm.bcast(rand_idx, root = 0).to(dev) 
             theta_ls_rand = comm.bcast(theta_ls_rand, root = 0).to(dev)         
+            
             comm.Barrier()     
              
-            
             stdout_options = {'root': 0, 'output_folder': recon_path, 'save_stdout': True, 'print_terminal': True}
             timestr = str(datetime.datetime.today())
             
@@ -995,10 +1113,14 @@ def reconstruct_jXRFT_tomography(synchrotron,
                     if rank == 0:
                         with h5py.File(os.path.join(recon_path, f_recon_grid + "_" + str(epoch) + "_ending_condition" + '.h5'), "w") as s:
                             sample = s.create_group("sample")
+                            
                             sample_v = sample.create_dataset("densities", shape = (n_element, sample_height_n, sample_size_n, sample_size_n), dtype = "f4")
                             sample_e = sample.create_dataset("elements", shape = (n_element,), dtype = 'S5')
+                            sample_l = sample.create_dataset("line_groups", data = element_lines_roi.astype('S5'))
+                            
                             s["sample/densities"][...] = X_cpu
                             s["sample/elements"][...] = np.array(list(this_aN_dic.keys())).astype('S5')
+                        
                         dxchange.write_tiff(X_cpu, os.path.join(recon_path, f_recon_grid) + "_" + str(epoch) + "_ending_condition", dtype = 'float32', overwrite = True)                         
                     
                     break
@@ -1021,8 +1143,11 @@ def reconstruct_jXRFT_tomography(synchrotron,
             if rank == 0 and ((epoch + 1) % save_every_n_epochs == 0 and (epoch + 1)//save_every_n_epochs != 0 or epoch + 1 == n_epochs):
                 with h5py.File(os.path.join(checkpoint_path, f_recon_grid + "_" + str(starting_epoch + epoch) + '.h5'), "w") as s:
                     sample = s.create_group("sample")
+
                     sample_v = sample.create_dataset("densities", shape = (n_element, sample_height_n, sample_size_n, sample_size_n), dtype = "f4")
                     sample_e = sample.create_dataset("elements", shape = (n_element,), dtype = 'S5')
+                    sample_l = sample.create_dataset("line_groups", data = element_lines_roi.astype('S5'))
+                    
                     s["sample/densities"][...] = X_cpu
                     s["sample/elements"][...] = np.array(list(this_aN_dic.keys())).astype('S5')
 #                 dxchange.write_tiff(X_cpu, os.path.join(recon_path, f_recon_grid)+"_"+str(epoch), dtype='float32', overwrite=True)     

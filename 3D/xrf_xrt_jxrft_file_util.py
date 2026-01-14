@@ -136,12 +136,6 @@ def extract_csv_input_jxrft_recon_params(file_path, fluor_lines, dev):
 
     input_param_dict['probe_energy_kev'] = np.array([input_param_dict['probe_energy_kev']])
     
-    if input_param_dict.get('downsample_factor') is None:
-        input_param_dict['downsample_factor'] = 1
-    
-    if input_param_dict.get('upsample_factor') is None:
-        input_param_dict['upsample_factor'] = 1
-
     input_param_dict['dev'] = dev # Device (GPU, CPU, etc.)
     input_param_dict['fl_K'] = fluor_lines['K']
     input_param_dict['fl_L'] = fluor_lines['L']
