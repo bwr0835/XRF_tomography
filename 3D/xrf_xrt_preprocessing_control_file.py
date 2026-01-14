@@ -228,38 +228,72 @@ def preprocess_xrf_xrt_data(synchrotron,
             init_edge_pixel_lengths_to_crop = None
         
         if return_aux_data:
-            aligned_proj_final_xrt_sig, \
-            aligned_proj_final_opt_dens, \
-            aligned_proj_final_xrf, \
-            net_x_shifts_pcc_final, \
-            net_y_shifts_pcc_final, \
-            aligned_exp_proj_array, \
-            cropped_aligned_exp_proj_array, \
-            synth_proj_array, \
-            pcc_2d_array, \
-            recon_array, \
-            theta_final, \
-            net_x_shifts_pcc_array, \
-            net_y_shifts_pcc_array, \
-            dx_pcc_array, \
-            dy_pcc_array = rap(counts_xrt_norm,
-                               init_cropped_xrt_array,
-                               opt_dens,
-                               init_cropped_opt_dens_array,
-                               counts_xrf_norm,
-                               init_cropped_xrf_array,
-                               theta,
-                               zero_idx_to_discard,
-                               I0_cts,
-                               n_iter_iter_reproj,
-                               net_x_shift_array,
-                               net_y_shift_array,
-                               sigma,
-                               alpha,
-                               upsample_factor,
-                               eps,
-                               init_edge_pixel_lengths_to_crop,
-                               return_aux_data = True)
+            if init_edge_crop_enabled:
+                aligned_proj_final_xrt_sig, \
+                aligned_proj_final_opt_dens, \
+                aligned_proj_final_xrf, \
+                net_x_shifts_pcc_final, \
+                net_y_shifts_pcc_final, \
+                aligned_exp_proj_array, \
+                cropped_aligned_exp_proj_array, \
+                synth_proj_array, \
+                pcc_2d_array, \
+                recon_array, \
+                theta_final, \
+                net_x_shifts_pcc_array, \
+                net_y_shifts_pcc_array, \
+                dx_pcc_array, \
+                dy_pcc_array = rap(counts_xrt_norm,
+                                   init_cropped_xrt_array,
+                                   opt_dens,
+                                   init_cropped_opt_dens_array,
+                                   counts_xrf_norm,
+                                   init_cropped_xrf_array,
+                                   theta,
+                                   zero_idx_to_discard,
+                                   I0_cts,
+                                   n_iter_iter_reproj,
+                                   net_x_shift_array,
+                                   net_y_shift_array,
+                                   sigma,
+                                   alpha,
+                                   upsample_factor,
+                                   eps,
+                                   init_edge_pixel_lengths_to_crop,
+                                   return_aux_data = True)
+            
+            else:
+                aligned_proj_final_xrt_sig, \
+                aligned_proj_final_opt_dens, \
+                aligned_proj_final_xrf, \
+                net_x_shifts_pcc_final, \
+                net_y_shifts_pcc_final, \
+                aligned_exp_proj_array, \
+                synth_proj_array, \
+                pcc_2d_array, \
+                recon_array, \
+                theta_final, \
+                net_x_shifts_pcc_array, \
+                net_y_shifts_pcc_array, \
+                dx_pcc_array, \
+                dy_pcc_array = rap(counts_xrt_norm,
+                                   init_cropped_xrt_array,
+                                   opt_dens,
+                                   init_cropped_opt_dens_array,
+                                   counts_xrf_norm,
+                                   init_cropped_xrf_array,
+                                   theta,
+                                   zero_idx_to_discard,
+                                   I0_cts,
+                                   n_iter_iter_reproj,
+                                   net_x_shift_array,
+                                   net_y_shift_array,
+                                   sigma,
+                                   alpha,
+                                   upsample_factor,
+                                   eps,
+                                   init_edge_pixel_lengths_to_crop,
+                                   return_aux_data = True)
 
             print('Writing convolution magnitude array to NumPy (.npy) file (NOTE: Python is needed to view this!)...')
             

@@ -388,7 +388,7 @@ def realign_proj(xrt_proj_img_array,
         if return_aux_data:
             if edge_info is None:
                 aligned_exp_proj_array.append(aligned_proj_new.copy())
-            
+
             else:
                 remapped_aligned_exp_proj = opt_dens_proj_img_array_new.copy()
 
@@ -580,6 +580,8 @@ def realign_proj(xrt_proj_img_array,
             print('Shifting all XRF elements by current net shifts...')
 
             for element_idx in range(n_elements_xrf):
+                print(f'\rElement {element_idx + 1}/{n_elements_xrf}', end = '', flush = True)
+                
                 for theta_idx in range(n_theta):
                     net_x_shift = net_x_shifts_pcc_new_1[i, theta_idx]
                     net_y_shift = net_y_shifts_pcc_new_1[i, theta_idx]
