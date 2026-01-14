@@ -654,6 +654,8 @@ def realign_proj(xrt_proj_img_array,
                     aligned_proj_opt_dens_final = aligned_proj_total_opt_dens
                     aligned_proj_xrf_final = aligned_proj_total_xrf
 
+                    print('\nDone')
+
     if return_aux_data:
         aligned_exp_proj_array = np.array(aligned_exp_proj_array)
         synth_proj_array = np.array(synth_proj_array)

@@ -225,7 +225,7 @@ def preprocess_xrf_xrt_data(synchrotron,
             if init_edge_pixel_lengths_to_crop is not None:
                 print("Warning: Non-empty 'init_edge_pixel_lengths_to_crop' dictionary detected. Removing items from 'init_edge_pixel_lengths_to_crop'...")
                 
-            init_edge_pixel_lengths_to_crop = None
+                init_edge_pixel_lengths_to_crop = None
         
         if return_aux_data:
             if init_edge_crop_enabled:
@@ -452,9 +452,9 @@ def preprocess_xrf_xrt_data(synchrotron,
             if final_edge_pixel_lengths_to_crop is not None:
                 print("Warning: Non-empty 'final_edge_pixel_lengths_to_crop' dictionary detected. Removing items from 'final_edge_pixel_lengths_to_crop'...")
 
-            final_edge_pixel_lengths_to_crop = None
+                final_edge_pixel_lengths_to_crop = None
 
-        print('Writing normalized XRF, XRT, and optical density projection data to HDF5 file...')
+        print('Writing normalized XRF, XRT, and optical density projection data to HDF5 file (NOTE: These contain edge crop information as well)...')
 
         futil.create_h5_aligned_aggregate_xrf_xrt(xrt_od_xrf_realignment_subdir_path,
                                                   elements_xrf,

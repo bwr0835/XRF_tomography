@@ -13,8 +13,8 @@ xrt_data_percentile: 80
 return_aux_data: True
 I0_cts_per_s:
 t_dwell_s:
-init_edge_crop_enabled: False
-init_edge_pixel_lengths_to_crop: 
+init_edge_crop_enabled: True
+init_edge_pixel_lengths_to_crop: {'right': 10}
 realignment_enabled: True
 n_iter_iter_reproj: 1
 zero_idx_to_discard:
