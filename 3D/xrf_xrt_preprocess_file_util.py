@@ -807,7 +807,7 @@ def extract_csv_preprocessing_input_params(file_path):
         sys.exit()
     
     for param in dict_params:
-        if param == 'init_edge_pixel_lengths_to_crop' or param == 'final_edge_pixel_lengths_to_crop' and input_param_dict[param] is not None:
+        if (param == 'init_edge_pixel_lengths_to_crop' or param == 'final_edge_pixel_lengths_to_crop') and input_param_dict[param] is not None:
             for key in input_param_dict[param]:
                 if key not in edge_crop_dxns:
                     print(f"Error: Unable to identify at least one specified edge for '{param}'. Exiting program...")
