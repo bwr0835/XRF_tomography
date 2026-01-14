@@ -698,7 +698,7 @@ def extract_csv_preprocessing_input_params(file_path):
                                        dtype = str,
                                        keep_default_na = False)
 
-        input_params = input_params_csv['input_param']
+        input_params = input_params_csv['input_param'].str.strip()
         values = input_params_csv['value'].str.strip().replace('', 'None') # Extract values while setting non-existent values to None
     
     except KeyboardInterrupt:
