@@ -24,8 +24,8 @@ if __name__ == '__main__':
 
     preprocessing_inputs = futil.extract_csv_preprocessing_input_params(input_param_file_path)
     
-    a = 0
-    if not a:
-        sys.exit()
+    # a = 0
+    # if not a:
+    #     sys.exit()
 
     preprocess_xrf_xrt_data(**preprocessing_inputs)

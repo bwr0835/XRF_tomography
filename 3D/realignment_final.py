@@ -285,29 +285,28 @@ def realign_proj(xrt_proj_img_array,
 
         theta_idx_array = np.arange(n_theta)
         
-        if zero_idx_to_discard is not None:
-            if zero_idx_to_discard == 'first':
-                print(f'Discarding first 0° projection image from XRT, OD, and XRF data...')
+        if zero_idx_to_discard == 'first':
+            print(f'Discarding first 0° projection image from XRT, OD, and XRF data...')
 
-                mask = theta_idx_array != first_zero_deg_idx
+            mask = theta_idx_array != first_zero_deg_idx
 
-            elif zero_idx_to_discard == 'second':
-                print(f'Discarding second 0° projection image from XRT, OD, and XRF data...')
+        elif zero_idx_to_discard == 'second':
+            print(f'Discarding second 0° projection image from XRT, OD, and XRF data...')
             
-                mask = theta_idx_array != second_zero_deg_idx
+            mask = theta_idx_array != second_zero_deg_idx
         
-            theta_array_new = theta_array[mask]
-            aligned_proj_new = aligned_proj[mask]
-            xrt_proj_img_array_new = xrt_proj_img_array[mask]
-            cropped_xrt_proj_img_array_new = cropped_xrt_proj_img_array[mask]
-            opt_dens_proj_img_array_new = opt_dens_proj_img_array[mask]
-            cropped_opt_dens_proj_img_array_new = cropped_opt_dens_proj_img_array[mask]
-            xrf_proj_img_array_new = xrf_proj_img_array[:, mask]
-            cropped_xrf_proj_img_array_new = cropped_xrf_proj_img_array[:, mask]
-            net_x_shifts_pcc_new = net_x_shifts_pcc[:, mask]
-            net_y_shifts_pcc_new = net_y_shifts_pcc[:, mask]
+        theta_array_new = theta_array[mask]
+        aligned_proj_new = aligned_proj[mask]
+        xrt_proj_img_array_new = xrt_proj_img_array[mask]
+        cropped_xrt_proj_img_array_new = cropped_xrt_proj_img_array[mask]
+        opt_dens_proj_img_array_new = opt_dens_proj_img_array[mask]
+        cropped_opt_dens_proj_img_array_new = cropped_opt_dens_proj_img_array[mask]
+        xrf_proj_img_array_new = xrf_proj_img_array[:, mask]
+        cropped_xrf_proj_img_array_new = cropped_xrf_proj_img_array[:, mask]
+        net_x_shifts_pcc_new = net_x_shifts_pcc[:, mask]
+        net_y_shifts_pcc_new = net_y_shifts_pcc[:, mask]
         
-            theta_idx_pairs_new = ppu.find_theta_combos(theta_array_new)
+        theta_idx_pairs_new = ppu.find_theta_combos(theta_array_new)
 
     else:
         # theta_idx_pairs = ppu.find_theta_combos(theta_array, dtheta = 1)
