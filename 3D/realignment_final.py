@@ -588,6 +588,7 @@ def realign_proj(xrt_proj_img_array,
                         
                     aligned_proj_total_xrf[element_idx, theta_idx] = ndi.shift(xrf_proj_img_array_new[element_idx, theta_idx], shift = (net_y_shift, net_x_shift))
             
+            
             # net_x_shifts = net_x_shifts_pcc_new[i]
             net_y_shifts = net_y_shifts_pcc_new_1[i]
 
@@ -602,7 +603,7 @@ def realign_proj(xrt_proj_img_array,
                 aligned_proj_xrf_final = xrf_proj_img_array
 
             if np.any(net_y_shifts): # Any nonzero y shifts
-                print("Truncating cropped XRT, OD, XRF projection images in y so object is in every projection image's field of view...")
+                print("\nTruncating cropped XRT, OD, XRF projection images in y so object is in every projection image's field of view...")
 
                 if edge_info is not None:
                     print("...and remapping cropped projection images back onto original counterparts...")
@@ -631,7 +632,7 @@ def realign_proj(xrt_proj_img_array,
 
             else:
                 if edge_info is not None:
-                    print("Remapping cropped XRT, OD, XRF projection images back onto original counterparts...")
+                    print("\nRemapping cropped XRT, OD, XRF projection images back onto original counterparts...")
                         
                     start_slice = edge_info['top']
                     end_slice = n_slices - edge_info['bottom']
@@ -644,10 +645,12 @@ def realign_proj(xrt_proj_img_array,
                     aligned_proj_xrf_final[:, :, start_slice:end_slice, start_column:end_column] = aligned_proj_total_xrf[:, :, start_slice:end_slice]
                     
                 else:
+                    print('\n')
+                    
                     aligned_proj_xrt_final = aligned_proj_total_xrt
                     aligned_proj_opt_dens_final = aligned_proj_total_opt_dens
                     aligned_proj_xrf_final = aligned_proj_total_xrf
-                
+
             print('Done')
 
     if return_aux_data:
