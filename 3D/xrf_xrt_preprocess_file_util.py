@@ -825,7 +825,7 @@ def extract_csv_preprocessing_input_params(file_path):
                     sys.exit()
 
             if len(param) != len(edge_crop_dxns):
-                missing_edges = set(input_param_dict[param].keys()) - set(edge_crop_dxns) # Find all edges missing from edge_dict keys relative to edge_crop_dxns
+                missing_edges = set(edge_crop_dxns) - set(input_param_dict[param].keys()) # Find all edges missing from edge_dict keys relative to edge_crop_dxns
 
                 for edge in missing_edges:
                     input_param_dict[param][edge] = 0
