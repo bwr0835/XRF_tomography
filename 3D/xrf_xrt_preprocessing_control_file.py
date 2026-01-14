@@ -426,7 +426,9 @@ def preprocess_xrf_xrt_data(synchrotron,
                                                   final_xrf_cropped, 
                                                   final_xrt_sig_cropped,
                                                   final_opt_dens_cropped, 
-                                                  theta_final)
+                                                  theta_final,
+                                                  init_edge_pixel_lengths_to_crop,
+                                                  final_edge_pixel_lengths_to_crop)
 
         print('Writing per-projection normalization, final net x and y shifts, and incident intensity to CSV file...')
 
