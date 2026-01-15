@@ -352,7 +352,7 @@ def realign_proj(xrt_proj_img_array,
 
         theta_idx_pairs_new = theta_idx_pairs
 
-    # n_theta, n_slices, n_columns = xrt_proj_img_array_new.shape
+    _, n_slices_orig, n_columns_orig = xrt_proj_img_array.shape
     n_theta, n_slices, n_columns = cropped_xrt_proj_img_array_new.shape
 
     aligned_proj_total_xrt = np.zeros((n_theta, n_slices, n_columns))
@@ -530,7 +530,7 @@ def realign_proj(xrt_proj_img_array,
                     
                     if edge_info is not None:
                         start_slice_total = start_slice + edge_info['top']
-                        end_slice_total = n_slices - edge_info['bottom'] - end_slice
+                        end_slice_total = n_slices_orig - edge_info['bottom'] - end_slice
 
                         if start_slice_total + end_slice_total >= n_slices:
                             print('Error: Overlapping edge, field-of-view crops in y. Exiting program...')
@@ -538,7 +538,7 @@ def realign_proj(xrt_proj_img_array,
                             sys.exit()
 
                         start_column = edge_info['left']
-                        end_column = n_columns - edge_info['right']
+                        end_column = n_columns_orig - edge_info['right']
 
                         aligned_proj_xrt_final[:, start_slice_total:end_slice_total, start_column:end_column] = aligned_proj_total_xrt[:, start_slice:end_slice]
                         aligned_proj_opt_dens_final[:, start_slice_total:end_slice_total, start_column:end_column] = aligned_proj_total_opt_dens[:, start_slice:end_slice]
@@ -549,10 +549,10 @@ def realign_proj(xrt_proj_img_array,
                         print("\nRemapping cropped XRT, OD, XRF projection images back onto original counterparts...")
                         
                         start_slice = edge_info['top']
-                        end_slice = n_slices - edge_info['bottom']
+                        end_slice = n_slices_orig - edge_info['bottom']
 
                         start_column = edge_info['left']
-                        end_column = n_columns - edge_info['right']
+                        end_column = n_columns_orig - edge_info['right']
 
                         aligned_proj_xrt_final[:, start_slice:end_slice, start_column:end_column] = aligned_proj_total_xrt[:, start_slice:end_slice]
                         aligned_proj_opt_dens_final[:, start_slice:end_slice, start_column:end_column] = aligned_proj_total_opt_dens[:, start_slice:end_slice]
@@ -621,7 +621,7 @@ def realign_proj(xrt_proj_img_array,
                     
                 if edge_info is not None:
                     start_slice_total = start_slice + edge_info['top']
-                    end_slice_total = n_slices - edge_info['bottom'] - end_slice
+                    end_slice_total = n_slices_orig - edge_info['bottom'] - end_slice
 
                     if start_slice_total + end_slice_total >= n_slices:
                         print('Error: Overlapping edge, field-of-view crops in y. Exiting program...')
@@ -640,10 +640,10 @@ def realign_proj(xrt_proj_img_array,
                     print("\nRemapping cropped XRT, OD, XRF projection images back onto original counterparts...")
                         
                     start_slice = edge_info['top']
-                    end_slice = n_slices - edge_info['bottom']
+                    end_slice = n_slices_orig - edge_info['bottom']
 
                     start_column = edge_info['left']
-                    end_column = n_columns - edge_info['right']
+                    end_column = n_columns_orig - edge_info['right']
 
                     aligned_proj_xrt_final[:, start_slice:end_slice, start_column:end_column] = aligned_proj_total_xrt[:, start_slice:end_slice]
                     aligned_proj_opt_dens_final[:, start_slice:end_slice, start_column:end_column] = aligned_proj_total_opt_dens[:, start_slice:end_slice]
