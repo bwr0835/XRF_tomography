@@ -391,7 +391,7 @@ def realign_proj(xrt_proj_img_array,
 
             else:
                 remapped_aligned_exp_proj = opt_dens_proj_img_array.copy()
-
+                print(remapped_aligned_exp_proj.shape)
                 start_slice = edge_info['top']
                 end_slice = n_slices - edge_info['bottom']
 
