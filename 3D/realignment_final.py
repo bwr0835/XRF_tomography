@@ -320,7 +320,7 @@ def realign_proj(xrt_proj_img_array,
         print(f'Applying initial center of rotation correction: {ppu.round_correct(-offset_init, ndec = 3)}')
 
         for theta_idx in range(n_theta):
-            aligned_proj[theta_idx] = ndi.shift(opt_dens_proj_img_array[theta_idx], shift = (0, -offset_init))
+            aligned_proj[theta_idx] = ndi.shift(cropped_opt_dens_proj_img_array[theta_idx], shift = (0, -offset_init))
 
         center_of_rotation_avg, _, _ = rot_center_avg(aligned_proj, theta_idx_pairs, theta_array)
 
