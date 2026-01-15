@@ -390,7 +390,7 @@ def realign_proj(xrt_proj_img_array,
                 aligned_exp_proj_array.append(aligned_proj_new.copy())
 
             else:
-                remapped_aligned_exp_proj = opt_dens_proj_img_array.copy()
+                remapped_aligned_exp_proj = opt_dens_proj_img_array_new.copy()
                 print(remapped_aligned_exp_proj.shape)
                 start_slice = edge_info['top']
                 end_slice = n_slices_orig - edge_info['bottom']
@@ -579,8 +579,8 @@ def realign_proj(xrt_proj_img_array,
                 net_x_shift = net_x_shifts_pcc_new_1[i]
                 net_y_shift = net_y_shifts_pcc_new_1[i]
 
-                aligned_proj_total_xrt[theta_idx] = ndi.shift(opt_dens_proj_img_array_new[theta_idx], shift = (net_y_shift, net_x_shift), cval = I0)
-                aligned_proj_total_opt_dens[theta_idx] = ndi.shift(xrt_proj_img_array_new[theta_idx], shift = (net_y_shift, net_x_shift))
+                aligned_proj_total_xrt[theta_idx] = ndi.shift(cropped_opt_dens_proj_img_array_new[theta_idx], shift = (net_y_shift, net_x_shift), cval = I0)
+                aligned_proj_total_opt_dens[theta_idx] = ndi.shift(cropped_xrt_proj_img_array_new[theta_idx], shift = (net_y_shift, net_x_shift))
             
             print('Shifting all XRF elements by current net shifts...')
 
@@ -591,7 +591,7 @@ def realign_proj(xrt_proj_img_array,
                     net_x_shift = net_x_shifts_pcc_new_1[i, theta_idx]
                     net_y_shift = net_y_shifts_pcc_new_1[i, theta_idx]
                         
-                    aligned_proj_total_xrf[element_idx, theta_idx] = ndi.shift(xrf_proj_img_array_new[element_idx, theta_idx], shift = (net_y_shift, net_x_shift))
+                    aligned_proj_total_xrf[element_idx, theta_idx] = ndi.shift(cropped_xrf_proj_img_array_new[element_idx, theta_idx], shift = (net_y_shift, net_x_shift))
             
             
             # net_x_shifts = net_x_shifts_pcc_new[i]
@@ -629,7 +629,7 @@ def realign_proj(xrt_proj_img_array,
                         sys.exit()
 
                     start_column = edge_info['left']
-                    end_column = n_columns - edge_info['right']
+                    end_column = n_columns_orig - edge_info['right']
 
                     aligned_proj_xrt_final[:, start_slice_total:end_slice_total, start_column:end_column] = aligned_proj_total_xrt[:, start_slice:end_slice]
                     aligned_proj_opt_dens_final[:, start_slice_total:end_slice_total, start_column:end_column] = aligned_proj_total_opt_dens[:, start_slice:end_slice]
