@@ -297,11 +297,11 @@ def realign_proj(xrt_proj_img_array,
         
         theta_array_new = theta_array[mask]
         aligned_proj_new = aligned_proj[mask]
-        xrt_proj_img_array_new = xrt_proj_img_array[mask]
+        # xrt_proj_img_array_new = xrt_proj_img_array[mask]
         cropped_xrt_proj_img_array_new = cropped_xrt_proj_img_array[mask]
         opt_dens_proj_img_array_new = opt_dens_proj_img_array[mask]
         cropped_opt_dens_proj_img_array_new = cropped_opt_dens_proj_img_array[mask]
-        xrf_proj_img_array_new = xrf_proj_img_array[:, mask]
+        # xrf_proj_img_array_new = xrf_proj_img_array[:, mask]
         cropped_xrf_proj_img_array_new = cropped_xrf_proj_img_array[:, mask]
         net_x_shifts_pcc_new = net_x_shifts_pcc[:, mask]
         net_y_shifts_pcc_new = net_y_shifts_pcc[:, mask]
