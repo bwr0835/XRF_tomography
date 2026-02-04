@@ -28,4 +28,4 @@ if __name__ == '__main__':
     # if not a:
     #     sys.exit()
 
-    preprocess_xrf_xrt_data(**preprocessing_inputs)
+    _ = preprocess_xrf_xrt_data(**preprocessing_inputs)

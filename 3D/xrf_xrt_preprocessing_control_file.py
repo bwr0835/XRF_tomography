@@ -61,14 +61,14 @@ def preprocess_xrf_xrt_data(synchrotron,
         print('Creating aggregate XRF data file...')
 
         if synchrotron == 'aps':
-            futil.create_aggregate_xrf_h5(xrf_file_array, 
-                                          output_xrf_filepath, 
+            futil.create_aggregate_xrf_h5(xrf_file_array,
+                                          output_xrf_filepath,
                                           synchrotron)
 
             print('Creating aggregate XRT data file...')
 
-            futil.create_aggregate_xrt_h5(xrt_file_array, 
-                                        output_xrt_filepath, 
+            futil.create_aggregate_xrt_h5(xrt_file_array,
+                                        output_xrt_filepath,
                                         synchrotron)
         
         elif synchrotron == 'nsls-ii':
@@ -104,7 +104,7 @@ def preprocess_xrf_xrt_data(synchrotron,
                                        synchrotron, 
                                        synchrotron_beamline,
                                        'xrt')
-                                       
+
         print('Done. Exiting program...')
 
         sys.exit()
