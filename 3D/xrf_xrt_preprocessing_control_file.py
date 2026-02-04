@@ -25,11 +25,14 @@ def preprocess_xrf_xrt_data(synchrotron,
                             init_edge_pixel_lengths_to_crop,
                             realignment_enabled,
                             n_iter_iter_reproj,
-                            zero_idx_to_discard,
+                            # zero_idx_to_discard,
+                            sample_flipped_remounted_mid_experiment,
+                            n_iterations_cor_correction,
+                            eps_cor_correction,
                             sigma,
                             alpha,
                             upsample_factor,
-                            eps,
+                            eps_iter_reproj,
                             final_edge_crop_enabled,
                             final_edge_pixel_lengths_to_crop,
                             aligned_data_output_dir_path):
@@ -101,6 +104,8 @@ def preprocess_xrf_xrt_data(synchrotron,
                                        synchrotron, 
                                        synchrotron_beamline,
                                        'xrt')
+                                       
+        print('Done. Exiting program...')
 
         sys.exit()
 
@@ -250,7 +255,10 @@ def preprocess_xrf_xrt_data(synchrotron,
                                    counts_xrf_norm,
                                    init_cropped_xrf_array,
                                    theta,
-                                   zero_idx_to_discard,
+                                #    zero_idx_to_discard,
+                                   sample_flipped_remounted_mid_experiment,
+                                   n_iterations_cor_correction,
+                                   eps_cor_correction,
                                    I0_cts,
                                    n_iter_iter_reproj,
                                    net_x_shift_array,
@@ -258,7 +266,7 @@ def preprocess_xrf_xrt_data(synchrotron,
                                    sigma,
                                    alpha,
                                    upsample_factor,
-                                   eps,
+                                   eps_iter_reproj,
                                    init_edge_pixel_lengths_to_crop,
                                    return_aux_data = True)
             
@@ -283,7 +291,10 @@ def preprocess_xrf_xrt_data(synchrotron,
                                    counts_xrf_norm,
                                    init_cropped_xrf_array,
                                    theta,
-                                   zero_idx_to_discard,
+                                #    zero_idx_to_discard,
+                                   sample_flipped_remounted_mid_experiment,
+                                   n_iterations_cor_correction,
+                                   eps_cor_correction,
                                    I0_cts,
                                    n_iter_iter_reproj,
                                    net_x_shift_array,
@@ -291,7 +302,7 @@ def preprocess_xrf_xrt_data(synchrotron,
                                    sigma,
                                    alpha,
                                    upsample_factor,
-                                   eps,
+                                   eps_iter_reproj,
                                    init_edge_pixel_lengths_to_crop,
                                    return_aux_data = True)
 
@@ -352,7 +363,10 @@ def preprocess_xrf_xrt_data(synchrotron,
                                          counts_xrf_norm,
                                          init_cropped_xrf_array,
                                          theta,
-                                         zero_idx_to_discard,
+                                        #  zero_idx_to_discard,
+                                         sample_flipped_remounted_mid_experiment,
+                                         n_iterations_cor_correction,
+                                         eps_cor_correction,
                                          I0_cts,
                                          n_iter_iter_reproj,
                                          net_x_shift_array,
@@ -360,7 +374,7 @@ def preprocess_xrf_xrt_data(synchrotron,
                                          sigma,
                                          alpha,
                                          upsample_factor,
-                                         eps)
+                                         eps_iter_reproj)
 
         if final_edge_crop_enabled:
             if final_edge_pixel_lengths_to_crop is None:
@@ -395,7 +409,7 @@ def preprocess_xrf_xrt_data(synchrotron,
                                                   aligned_proj_final_xrt_sig_cropped,
                                                   aligned_proj_final_opt_dens_cropped,
                                                   theta_final,
-                                                  zero_idx_to_discard,
+                                                #   zero_idx_to_discard,
                                                   init_edge_pixel_lengths_to_crop,
                                                   final_edge_pixel_lengths_to_crop)
             
@@ -416,17 +430,17 @@ def preprocess_xrf_xrt_data(synchrotron,
 
             futil.create_aux_conv_mag_data_npy(xrt_od_xrf_realignment_subdir_path, conv_mag_array)
         
-        if zero_idx_to_discard is not None:
-            final_xrf, \
-            final_xrt, \
-            final_opt_dens, \
-            theta_final = ppu.remove_zero_deg_proj_no_realignment(counts_xrf_norm,
-                                                                  counts_xrt_norm,
-                                                                  opt_dens,
-                                                                  zero_idx_to_discard,
-                                                                  theta)
+        # if zero_idx_to_discard is not None:
+        #     final_xrf, \
+        #     final_xrt, \
+        #     final_opt_dens, \
+        #     theta_final = ppu.remove_zero_deg_proj_no_realignment(counts_xrf_norm,
+        #                                                           counts_xrt_norm,
+        #                                                           opt_dens,
+        #                                                           zero_idx_to_discard,
+        #                                                           theta)
 
-        else:
+        # else:
             final_xrf = counts_xrf_norm
             final_xrt = counts_xrt_norm
             final_opt_dens = opt_dens
@@ -462,7 +476,7 @@ def preprocess_xrf_xrt_data(synchrotron,
                                                   final_xrt_sig_cropped,
                                                   final_opt_dens_cropped, 
                                                   theta_final,
-                                                  zero_idx_to_discard,
+                                                #   zero_idx_to_discard,
                                                   init_edge_pixel_lengths_to_crop,
                                                   final_edge_pixel_lengths_to_crop)
 

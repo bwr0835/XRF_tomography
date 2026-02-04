@@ -1,6 +1,7 @@
 import numpy as np, h5py, xrf_xrt_jxrft_file_util as futil, pandas as pd, xraylib_np as xrl_np, xraylib as xrl, pandas as pd
 
 from matplotlib import pyplot as plt
+from itertools import combinations as combos
 
 # mda_array = ['0116', '0117', '0118', '0119', '0120', '0121', '0122', '0123', '0124', '0125', '0126']
 # mda_array = ['0124', '0125', '0126']
@@ -168,15 +169,4 @@ from matplotlib import pyplot as plt
 
 # E = np.array([10., 11.])
 # print(xrl_np.CS_Total_Kissel(np.array([4]), E).squeeze())
-
-el_roi = np.array([['Si', 'K'], ['Ti', 'K'], ['Cr', 'K'], ['Fe', 'K'], ['Ni', 'K'], ['Ba', 'L']], dtype = 'S5')
-
-print(el_roi)
-
-with h5py.File('/Users/bwr0835/Documents/test.h5', 'w') as f:
-    a = f.create_dataset('el_line', data = el_roi)
-
-with h5py.File('/Users/bwr0835/Documents/test.h5', 'r') as f:
-    a = f['el_line'].asstr()[()]
-
-print(a)
+    

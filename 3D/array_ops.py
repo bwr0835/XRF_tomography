@@ -19,5 +19,4 @@ def initialize_guess_3d(dev, ini_kind, n_element, sample_size_n, sample_height_n
     else:
         print("Please specify the correct type of the initialization condition.")
 
-
     return X

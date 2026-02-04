@@ -59,9 +59,9 @@ class PPM(nn.Module):
         self.minibatch_size = minibatch_size
         self.sample_size_n = sample_size_n
         self.sample_size_cm = sample_size_cm
-        self.dia_len_n = int(1.2 * (self.sample_height_n**2 + self.sample_size_n**2 + self.sample_size_n**2)**0.5)
-        self.n_voxel_minibatch = self.minibatch_size * self.sample_size_n
-        self.n_voxel = self.sample_height_n * self.sample_size_n**2 
+        self.dia_len_n = int(1.2*(self.sample_height_n**2 + self.sample_size_n**2 + self.sample_size_n**2)**0.5)
+        self.n_voxel_minibatch = self.minibatch_size*self.sample_size_n
+        self.n_voxel = self.sample_height_n*self.sample_size_n**2 
         
         self.xp = self.init_xp() # initialize the values of the minibatch      
         self.probe_energy_keV = probe_energy_keV  
@@ -87,26 +87,26 @@ class PPM(nn.Module):
         Initialize self.x with the tensor of the saved intermediate reconstructing results (n_element, minibatch_size, n_y)
         """
         ## set grid_concentration[:, N(this_minibatch_st): N(this_minibatch_end), :, :] to be the model parameters
-        return nn.Parameter(self.grid_concentration[:, self.minibatch_size * self.p // self.sample_size_n : self.minibatch_size*(self.p+1) // self.sample_size_n, :, :])
+        return nn.Parameter(self.grid_concentration[:, self.minibatch_size*self.p//self.sample_size_n:self.minibatch_size*(self.p + 1)//self.sample_size_n, :, :])
     
 
     def init_SA_theta(self):
         if self.selfAb == True:
-            voxel_idx_offset = self.p * self.n_voxel_minibatch        
+            voxel_idx_offset = self.p*self.n_voxel_minibatch        
             
             # clamp the index after subtracting the offset, so that all 0 indices remains 0 (becomes negative if without clamping, and cause errors)
             att_exponent = tc.stack([self.lac[:,:, tc.clamp((self.P_minibatch[m,0] - voxel_idx_offset), 0, self.n_voxel_minibatch).to(dtype=tc.long),\
                                               self.P_minibatch[m,1].to(dtype=tc.long)]\
-                                    * self.P_minibatch[m,2].repeat(self.n_element, self.n_lines, 1) for m in range(self.n_det)])
+                                   *self.P_minibatch[m,2].repeat(self.n_element, self.n_lines, 1) for m in range(self.n_det)])
             
             # lac, dim = [n_element, n_lines, n_voxel_minibatch, n_voxel]
             # att_exponent, dim = [n_det, n_element, n_lines, n_source, n_dia_length]
             
             ## summing over the attenation exponent contributed by all intersecting voxels, dim = (n_det, n_element, n_lines, n_voxel_minibatch(FL source))
-            att_exponent_voxel_sum = tc.sum(att_exponent.view(self.n_det, self.n_element, self.n_lines, self.n_voxel_minibatch, self.dia_len_n), axis=-1)
+            att_exponent_voxel_sum = tc.sum(att_exponent.view(self.n_det, self.n_element, self.n_lines, self.n_voxel_minibatch, self.dia_len_n), axis = -1)
 
             ## calculate the attenuation caused by all elements, dim = (n_det, n_lines, n_voxel_minibatch(FL source)), and then take the average over n_det FL paths
-            SA_theta =  tc.mean(tc.exp(-tc.sum(att_exponent_voxel_sum, axis=1)), axis=0)           
+            SA_theta =  tc.mean(tc.exp(-tc.sum(att_exponent_voxel_sum, axis = 1)), axis = 0)           
             # SA_theta, dim = (n_lines, n_source)
         
         else:
@@ -115,7 +115,8 @@ class PPM(nn.Module):
         return SA_theta
 
     def init_probe(self):       
-        probe_before_attenuation = self.probe_cts * tc.ones(self.minibatch_size, self.sample_size_n, device = self.dev)
+        probe_before_attenuation = self.probe_cts*tc.ones(self.minibatch_size, self.sample_size_n, device = self.dev)
+        
         return probe_before_attenuation.view(self.n_voxel_minibatch)
     
     
@@ -134,9 +135,9 @@ class PPM(nn.Module):
         
         ## Calculate the attenuation of the probe
         # Calculate the exponent of attenuation of each voxel in the batch. (The atteuation before the probe enters each voxel.)
-        att_exponent_acc_map = tc.zeros((self.minibatch_size, self.sample_size_n+1), device=self.dev)
+        att_exponent_acc_map = tc.zeros((self.minibatch_size, self.sample_size_n + 1), device = self.dev)
         
-        fl_map_tot_flat_theta = tc.zeros((self.n_lines, self.n_voxel_minibatch), device=self.dev)
+        fl_map_tot_flat_theta = tc.zeros((self.n_lines, self.n_voxel_minibatch), device = self.dev)
         concentration_map_minibatch_rot_flat = concentration_map_minibatch_rot.view(self.n_element, self.n_voxel_minibatch)
         line_idx = 0
 
@@ -145,14 +146,14 @@ class PPM(nn.Module):
         for j in range(self.n_element):
             ## step 1: calculate the attenuation exponent at each voxel
             if self.probe_att == True:
-                lac_single = concentration_map_minibatch_rot[j] * self.probe_attCS_ls[j]
-                lac_acc = tc.cumsum(lac_single, axis=1) # dim = (minibatch_size, sample_size_n)
-                lac_acc = tc.cat((tc.zeros((self.minibatch_size, 1), device=self.dev), lac_acc), dim = 1) # dim = (minibatch_size, sample_size_n + 1)
-                att_exponent_acc = lac_acc * (self.sample_size_cm/self.sample_size_n)    
+                lac_single = concentration_map_minibatch_rot[j]*self.probe_attCS_ls[j]
+                lac_acc = tc.cumsum(lac_single, axis = 1) # dim = (minibatch_size, sample_size_n)
+                lac_acc = tc.cat((tc.zeros((self.minibatch_size, 1), device = self.dev), lac_acc), dim = 1) # dim = (minibatch_size, sample_size_n + 1)
+                att_exponent_acc = lac_acc*(self.sample_size_cm/self.sample_size_n)    
                 att_exponent_acc_map += att_exponent_acc
             
             else:
-                att_exponent_acc_map = tc.zeros(self.minibatch_size, self.sample_size_n+1).to(self.dev)
+                att_exponent_acc_map = tc.zeros(self.minibatch_size, self.sample_size_n + 1).to(self.dev)
             ## step 2: calculate the fluorescence signal generated at each voxel
             fl_unit = self.detected_fl_unit_concentration[line_idx:line_idx + self.n_line_group_each_element[j]]            
             ## FL signal over the current elemental lines for each voxel
@@ -167,19 +168,20 @@ class PPM(nn.Module):
 
         # Calculate attenuation due to detector window and add new axis/dimension so that broadcasting rules are obeyed
         # tensor.unsqueeze(dim = 1) = tensor[:, None]
-        det_window_attenuation = tc.exp(-self.FL_line_det_attCS_ls*self.det_window_dens*self.det_window_thickness).unsqueeze(dim = 1)
-
-        #### 4: Create XRF, XRT data ####           
-        probe_after_attenuation_theta = self.probe_before_attenuation_flat * attenuation_map_theta_flat 
-        # fl_signal_SA_theta, dim = (n_lines, n_minibatch)
-        fl_signal_SA_theta = tc.unsqueeze(probe_after_attenuation_theta, dim=0) * fl_map_tot_flat_theta*self.SA_theta *self.FL_line_det_attCS_ls
-        fl_signal_SA_theta = fl_signal_SA_theta.view(self.n_lines, self.minibatch_size, self.sample_size_n)
-        fl_signal_SA_theta = tc.sum(fl_signal_SA_theta, axis=-1)
         
-        fl_signal_SA_theta = fl_signal_SA_theta * self.det_solid_angle_ratio * self.signal_attenuation_factor
+        det_window_attenuation = tc.exp(-self.FL_line_det_attCS_ls*self.det_window_dens*self.det_window_thickness).unsqueeze(dim = 1)
+        
+        #### 4: Create XRF, XRT data ####           
+        probe_after_attenuation_theta = self.probe_before_attenuation_flat*attenuation_map_theta_flat 
+        # fl_signal_SA_theta, dim = (n_lines, n_minibatch)
+        fl_signal_SA_theta = tc.unsqueeze(probe_after_attenuation_theta, dim = 0)*fl_map_tot_flat_theta*self.SA_theta*self.FL_line_det_attCS_ls*det_window_attenuation
+        fl_signal_SA_theta = fl_signal_SA_theta.view(self.n_lines, self.minibatch_size, self.sample_size_n)
+        fl_signal_SA_theta = tc.sum(fl_signal_SA_theta, axis = -1)
+        
+        fl_signal_SA_theta = fl_signal_SA_theta*self.det_solid_angle_ratio*self.signal_attenuation_factor
          
         output1 = fl_signal_SA_theta
-#         output2 = self.probe_cts * transmission_theta
+#         output2 = self.probe_cts*transmission_theta
         output2 = transmission_att_exponent_theta
 
         return output1, output2

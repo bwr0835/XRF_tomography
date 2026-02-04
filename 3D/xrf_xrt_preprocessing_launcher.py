@@ -4,7 +4,7 @@ from xrf_xrt_preprocessing_control_file import preprocess_xrf_xrt_data
 
 if __name__ == '__main__':
     if len(sys.argv) == 1:
-        print('Error: Input file argument required. Exiting program...')
+        print('Error: Input CSV file argument required. Exiting program...')
 
         sys.exit()
     

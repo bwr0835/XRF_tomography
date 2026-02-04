@@ -301,14 +301,14 @@ def joint_fluct_norm(xrt_array,
     
     return xrt_array, xrf_array, norm_array, global_xrt_mask_avg
 
-def find_theta_combos(theta_array_deg, dtheta = 0):
+def find_theta_combos(theta_array_deg, dtheta = 0): # Output type: List of tuples
     '''
     
     Make sure angles are in degrees!
 
     '''
 
-    theta_array_idx_pairs = list(combos(np.arange(len(theta_array_deg)), 2)) # Generate a list of all pairs of theta_array indices
+    theta_array_idx_pairs = combos(np.arange(len(theta_array_deg)), 2) # Generate a list of all pairs of theta_array indices
 
     valid_theta_idx_pairs = [(theta_idx_1, theta_idx_2) for theta_idx_1, theta_idx_2 in theta_array_idx_pairs 
                              if (180 - dtheta <= np.abs(theta_array_deg[theta_idx_1] - theta_array_deg[theta_idx_2]) <= 180 + dtheta)]

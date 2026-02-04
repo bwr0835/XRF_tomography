@@ -1,7 +1,6 @@
 import numpy as np, \
        pandas as pd, \
        xrf_xrt_input_param_names as ipn, \
-       csv, \
        h5py, \
        ast, \
        os
@@ -172,33 +171,35 @@ def extract_h5_aggregate_xrf_xrt_data(file_path, **kwargs):
 
         comm.Abort()
     
-    element_lines_roi = kwargs.get('element_lines_roi')
-
     elements_xrf_string = [element.decode() for element in elements_xrf]
     elements_xrt_string = [element.decode() for element in elements_xrt]
 
+    element_lines_roi = kwargs.get('element_lines_roi')
+
     if element_lines_roi is not None:
-        try:
-            element_lines_roi_idx = np.array([elements_xrf_string.index(element) for element in element_lines_roi[0]])
+        _element_lines_roi = np.array(element_lines_roi)
+
+        element_lines_roi_idx = np.zeros(len(element_lines_roi), dtype = int)
         
-        except KeyboardInterrupt:
-            print(rank, 'Keyboard interrupt. Exiting program...', flush = True)
-
-            comm.Abort()
+        for idx, element_line in enumerate(_element_lines_roi):
+            if element_line[1] == 'K' and '_K' not in elements_xrf_string[idx]:
+                element_line_pair = element_line[0] + '_K'
+            
+            else:
+                element_line_pair = element_line[0]
+            
+            element_line_idx = np.argwhere(_element_lines_roi == element_line_pair)
+            
+            element_lines_roi_idx[idx] = element_line_idx
         
-        except:
-            print(rank, 'Error: Unable to parse elements and/or line(s) of interest. Exiting program...', flush = True)
-
-            comm.Abort()
-
         xrf_data_roi = xrf_data[element_lines_roi_idx]
     
     else:
         element_lines_roi_idx = np.arange(len(elements_xrf_string))
         xrf_data_roi = xrf_data
 
-    opt_dens_idx = elements_xrt_string.index('opt_dens')
-    opt_dens = xrt_data[opt_dens_idx]
+    xrt_data_idx = elements_xrt_string.index('xrt_sig')
+    xrt_sig = xrt_data[xrt_data_idx]
 
-    return element_lines_roi_idx, xrf_data_roi, opt_dens, theta
+    return element_lines_roi_idx, xrf_data_roi, xrt_sig, theta
 

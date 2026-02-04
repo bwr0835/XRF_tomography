@@ -98,6 +98,25 @@ def rot_center_avg(proj_img_array, theta_pair_array, theta_array):
 
     return center_rotation_avg, geom_center, offset
 
+# def realign_proj(xrt_proj_img_array,
+#                  cropped_xrt_proj_img_array,
+#                  opt_dens_proj_img_array,
+#                  cropped_opt_dens_proj_img_array,
+#                  xrf_proj_img_array,
+#                  cropped_xrf_proj_img_array,
+#                  theta_array,
+#                  zero_idx_to_discard,
+#                  I0,
+#                  n_iterations,
+#                  init_x_shift, 
+#                  init_y_shift,
+#                  sigma,
+#                  alpha,
+#                  upsample_factor,
+#                  eps,
+#                  edge_info,
+#                  return_aux_data = False):
+
 def realign_proj(xrt_proj_img_array,
                  cropped_xrt_proj_img_array,
                  opt_dens_proj_img_array,
@@ -105,15 +124,17 @@ def realign_proj(xrt_proj_img_array,
                  xrf_proj_img_array,
                  cropped_xrf_proj_img_array,
                  theta_array,
-                 zero_idx_to_discard,
+                 sample_flipped_remounted_mid_experiment,
+                 n_iterations_cor_correction,
+                 eps_cor_correction,
                  I0,
-                 n_iterations,
+                 n_iterations_iter_reproj,
                  init_x_shift, 
                  init_y_shift,
                  sigma,
                  alpha,
                  upsample_factor,
-                 eps,
+                 eps_iter_reproj,
                  edge_info,
                  return_aux_data = False):
 
@@ -127,7 +148,7 @@ def realign_proj(xrt_proj_img_array,
     opt_dens_proj_img_array: 3D optical density data derived from xrt_proj_img_array (projection angles, slices, scan positions) (array-like, dtype: float)
     xrf_proj_img_array: 4D XRF data (elements, projection_angles, slices, scan positions) (array-like; dtype: float)
     theta_array: Array of projection angles (array-like; dtype: float)
-    n_iterations: Maximum number of iterative reprojection iterations (dtype: int)
+    n_iterations_iter_reproj: Maximum number of iterative reprojection iterations (dtype: int)
     init_x_shift: Initial x-shifts for all projections (for helping speed up convergence) (array-like; dtype: float)    
     init_y_shift: Initial y-shifts for all projections (for helping speed up convergence) (array-like; dtype: float)
     eps: Desired differential shift for convergence criterion (dtype: float)
@@ -139,10 +160,10 @@ def realign_proj(xrt_proj_img_array,
     aligned_exp_proj_array: 1D array of experimental 3D XRF tomography data arrays for each iteration for ref_element (array-like; dtype: float)
     synth_proj_array: 1D array of synthetic 3D XRF tomography data arrays for each iteration for ref_element (array-like; dtype: float)
     recon_array: 1D array of 3D reconstruction slices for each iteration for ref_element (array-like; dtype: float)
-    net_x_shifts_pcc_new: Array of net x shifts with dimensions (n_iterations, n_theta) (array-like; dtype: float) (Note: n_iterations can be smaller the more quickly iter_reproj() converges)
-    net_y_shifts_pcc_new: Array of net y shifts with dimensions (n_iterations, n_theta) (array-like; dtype: float) (Note: n_iterations can be smaller the more quickly iter_reproj() converges)
+    net_x_shifts_pcc_new: Array of net x shifts with dimensions (n_iterations_iter_reproj, n_theta) (array-like; dtype: float) (Note: n_iterations_iter_reproj can be smaller the more quickly iter_reproj() converges)
+    net_y_shifts_pcc_new: Array of net y shifts with dimensions (n_iterations_iter_reproj, n_theta) (array-like; dtype: float) (Note: n_iterations_iter_reproj can be smaller the more quickly iter_reproj() converges)
     '''
-
+    
     if sigma is None:
         print('Warning: Positive \'sigma\' not detected. Setting \'sigma\' to 5 pixels...')
         
@@ -164,7 +185,7 @@ def realign_proj(xrt_proj_img_array,
         eps = 0.3
 
     if sigma < 0 or alpha < 0 or eps < 0:
-        print('Error: \'sigma\' and \'alpha\' must be positive numbers. Exiting program...')
+        print('Error: \'sigma\', \'alpha\', and \'eps\' must all be positive numbers. Exiting program...')
 
         sys.exit()
 
@@ -176,8 +197,8 @@ def realign_proj(xrt_proj_img_array,
     n_elements_xrf = xrf_proj_img_array.shape[0]
     n_theta = xrt_proj_img_array.shape[0]
     
-    net_x_shifts_pcc = np.zeros((n_iterations, n_theta))
-    net_y_shifts_pcc = np.zeros((n_iterations, n_theta))
+    net_x_shifts_pcc = np.zeros((n_iterations_iter_reproj, n_theta))
+    net_y_shifts_pcc = np.zeros((n_iterations_iter_reproj, n_theta))
     
     iterations = []
     
@@ -228,85 +249,179 @@ def realign_proj(xrt_proj_img_array,
                 # aligned_proj[theta_idx] = ndi.shift(opt_dens_proj_img_array[theta_idx], shift = (init_y_shift[theta_idx], 0))
                 aligned_proj[theta_idx] = ndi.shift(cropped_opt_dens_proj_img_array[theta_idx], shift = (init_y_shift[theta_idx], 0))
 
-    if zero_idx_to_discard is not None:
-        if zero_idx_to_discard != 'first' or zero_idx_to_discard != 'second':
-            print('Error: \'zero_idx_to_discard\' must be \'first\' or \'second\'. Exiting program...')
+    # if zero_idx_to_discard is not None:
+    #     if zero_idx_to_discard != 'first' or zero_idx_to_discard != 'second':
+    #         print('Error: \'zero_idx_to_discard\' must be \'first\' or \'second\'. Exiting program...')
 
-            sys.exit()
+    #         sys.exit()
 
-        if np.count_nonzero(theta_array == 0) != 2:
-            print('Error: Must have two 0° angles. Exiting program...')
+    #     if np.count_nonzero(theta_array == 0) != 2:
+    #         print('Error: Must have two 0° angles. Exiting program...')
 
-            sys.exit()
-        
-        first_zero_deg_idx, second_zero_deg_idx = np.where(theta_array == 0)[0]
+    #         sys.exit()
 
-        theta_array_first_part = theta_array[:second_zero_deg_idx]
-        theta_array_second_part = theta_array[second_zero_deg_idx:]
+        if sample_flipped_remounted_mid_experiment: # This assumes that angles are order from -180° to +180° (360° range) AND that there are two zero degree angles
+            if n_iterations_cor_correction is not None:
+                print('Error: \'n_iterations_cor_correction\' not detected. Exiting program...')
 
-        theta_idx_pairs_first_part = ppu.find_theta_combos(theta_array_first_part)
-        theta_idx_pairs_second_part = ppu.find_theta_combos(theta_array_second_part)
+                sys.exit()
 
-        center_of_rotation_avg_first_part, center_geom, offset_init_first_part = rot_center_avg(aligned_proj[:second_zero_deg_idx], 
-                                                                                                theta_idx_pairs_first_part, 
-                                                                                                theta_array_first_part)
-        
-        center_of_rotation_avg_second_part, _, offset_init_second_part = rot_center_avg(aligned_proj[second_zero_deg_idx:], 
-                                                                                        theta_idx_pairs_second_part, 
-                                                                                        theta_array_second_part)
-        
-        print(f'Average center of rotation (before flipping sample): {center_of_rotation_avg_first_part}')
-        print(f'Average center of rotation (after flipping sample): {center_of_rotation_avg_second_part}\n')
-        print(f'Geometric center: {center_geom}\n')
-        print(f'Center of rotation error (before flipping sample): {ppu.round_correct(offset_init_first_part, ndec = 3)}')
-        print(f'Center of rotation error (after flipping sample): {ppu.round_correct(offset_init_second_part, ndec = 3)}\n')
+            if n_iterations_cor_correction < 1 or not isinstance(n_iterations_cor_correction, int):
+                print('Error: \'n_iterations_cor_correction\' must be a positive integer. Exiting program...')
 
-        print(f'Applying initial center of rotation correction for angles before sample flipped: {ppu.round_correct(-offset_init_first_part, ndec = 3)}')
-        
-        for theta_idx in range(len(theta_array_first_part)):
-            # aligned_proj[theta_idx] = ndi.shift(opt_dens_proj_img_array[theta_idx], shift = (0, -offset_init_first_part))
-            aligned_proj[theta_idx] = ndi.shift(cropped_opt_dens_proj_img_array[theta_idx], shift = (0, -offset_init_first_part))
+                sys.exit()
 
-        net_x_shifts_pcc[0, :second_zero_deg_idx] -= offset_init_first_part
+            if np.count_nonzero(theta_array == 0) != 2:
+                print('Error: Must have two 0° angles. Exiting program...')
 
-        print(f'Applying initial center of rotation correction for angles after sample flipped: {ppu.round_correct(-offset_init_second_part, ndec = 3)}')
-
-        for theta_idx in range(len(theta_array_second_part)):
-            # aligned_proj[theta_idx] = ndi.shift(opt_dens_proj_img_array[theta_idx], shift = (0, -offset_init_second_part))
-            aligned_proj[theta_idx] = ndi.shift(cropped_opt_dens_proj_img_array[theta_idx], shift = (0, -offset_init_second_part))
-
-        net_x_shifts_pcc[0, second_zero_deg_idx:] -= offset_init_second_part
-    
-        print(f'Average center of rotation after initial COR correction (before flipping sample): {center_of_rotation_avg_first_part}')
-        print(f'Average center of rotation after initial COR correction (after flipping sample): {center_of_rotation_avg_second_part}\n')
-        print(f'Geometric center: {center_geom}\n')
-        print(f'Center of rotation error (before flipping sample): {ppu.round_correct(offset_init_first_part, ndec = 3)}')
-        print(f'Center of rotation error (after flipping sample): {ppu.round_correct(offset_init_second_part, ndec = 3)}\n')
-
-        theta_idx_array = np.arange(n_theta)
-        
-        if zero_idx_to_discard == 'first':
-            print(f'Discarding first 0° projection image from XRT, OD, and XRF data...')
-
-            mask = theta_idx_array != first_zero_deg_idx
-
-        elif zero_idx_to_discard == 'second':
-            print(f'Discarding second 0° projection image from XRT, OD, and XRF data...')
+                sys.exit()
             
-            mask = theta_idx_array != second_zero_deg_idx
+            zero_deg_idx_array = np.where(theta_array == 0)[0]
+            
+            theta_idx_pairs_first_part = [0, zero_deg_idx_array[0]]
+            theta_idx_pairs_second_part = [zero_deg_idx_array[1], -1]
+
+            theta_array_first_part = theta_array[:zero_deg_idx_array[1]]
+            theta_array_second_part = theta_array[zero_deg_idx_array[1]:]
+
+            dx_prev = 0
+            
+            for i in range(n_iterations_cor_correction):
+                print(f'COR correction iteration {i + 1}/{n_iterations_cor_correction}')
+                
+                center_of_rotation_avg_first_part, center_geom, offset_init_first_part = rot_center_avg(aligned_proj[:zero_deg_idx_array[1]], 
+                                                                                                        theta_idx_pairs_first_part, 
+                                                                                                        theta_array_first_part)
+                
+                center_of_rotation_avg_second_part, _, offset_init_second_part = rot_center_avg(aligned_proj[zero_deg_idx_array[1]:], 
+                                                                                                theta_idx_pairs_second_part, 
+                                                                                                theta_array_second_part)
+
+                print(f'Average center of rotation (before flipping sample): {center_of_rotation_avg_first_part}')
+                print(f'Average center of rotation (after flipping sample): {center_of_rotation_avg_second_part}\n')
+                print(f'Geometric center: {center_geom}\n')
+                print(f'Center of rotation error (before flipping sample): {ppu.round_correct(offset_init_first_part, ndec = 3)}')
+                print(f'Center of rotation error (after flipping sample): {ppu.round_correct(offset_init_second_part, ndec = 3)}\n')
+
+                if i == 0 and offset_init_first_part == 0 and offset_init_second_part == 0:
+                    print('No COR correction needed.')
+
+                    break
+
+                else:
+                    print(f'Applying initial COR correction to pre-flipped, pre-remounted sample angles: {ppu.round_correct(-offset_init_first_part, ndec = 3)}')
+                    
+                    for theta_idx in range(len(theta_array_first_part)):
+                        aligned_proj[theta_idx] = ndi.shift(cropped_opt_dens_proj_img_array[theta_idx], shift = (0, -offset_init_first_part))
+
+                    net_x_shifts_pcc[0, :zero_deg_idx_array[1]] -= offset_init_first_part
+
+                    print(f'Applying initial COR correction to post-flipped, post-remounted sample angles: {ppu.round_correct(-offset_init_second_part, ndec = 3)}')
+                    
+                    for theta_idx in range(len(theta_array_second_part)):
+                        aligned_proj[theta_idx] = ndi.shift(cropped_opt_dens_proj_img_array[theta_idx], shift = (0, -offset_init_second_part))
+
+                    center_of_rotation_avg_first_part, center_geom, offset_first_part = rot_center_avg(aligned_proj[:zero_deg_idx_array[1]], 
+                                                                                                        theta_idx_pairs_first_part, 
+                                                                                                        theta_array_first_part)
+                
+                    center_of_rotation_avg_second_part, _, offset_second_part = rot_center_avg(aligned_proj[zero_deg_idx_array[1]:], 
+                                                                                                    theta_idx_pairs_second_part, 
+                                                                                                    theta_array_second_part)
+
+                    print(f'New center of rotation (before flipping sample): {center_of_rotation_avg_first_part}')
+                    print(f'New center of rotation (after flipping sample): {center_of_rotation_avg_second_part}\n')
+                    print(f'Geometric center: {center_geom}\n')
+                    print(f'New center of rotation error (before flipping sample): {ppu.round_correct(offset_first_part, ndec = 3)}')
+                    print(f'New center of rotation error (after flipping sample): {ppu.round_correct(offset_second_part, ndec = 3)}\n')
+
+                    net_x_shifts_pcc[0, zero_deg_idx_array[1]:] -= offset_init_second_part
+
+                    _, dx = phase_xcorr(aligned_proj[zero_deg_idx_array[0]], 
+                                         aligned_proj[zero_deg_idx_array[1]], 
+                                         sigma, 
+                                         alpha, 
+                                         upsample_factor)
+
+                    if np.abs(dx - dx_prev) <= eps_cor_correction or (i == 0 and dx == 0):
+                        print('No further COR correction needed.')
+
+                        break
+                    
+                    print(f'Applying additional COR correction to pre-flipped, pre-remounted sample angles: {ppu.round_correct(-dx, ndec = 3)}')
+
+                    net_x_shifts_pcc[0, zero_deg_idx_array[1]:] += dx
+
+                    for theta_idx in range(len(theta_array_first_part)):
+                        aligned_proj[theta_idx] = ndi.shift(cropped_opt_dens_proj_img_array[theta_idx], shift = (0, net_x_shifts_pcc[0, zero_deg_idx_array[1]:]))
+
+                    dx_prev = dx
+                    
+        # theta_idx_pairs_first_part = ppu.find_theta_combos(theta_array_first_part)
+        # theta_idx_pairs_second_part = ppu.find_theta_combos(theta_array_second_part)
+            
+        # center_of_rotation_avg_first_part, center_geom, offset_init_first_part = rot_center_avg(aligned_proj[:second_zero_deg_idx], 
+        #                                                                                         theta_idx_pairs_first_part, 
+        #                                                                                         theta_array_first_part)
         
-        theta_array_new = theta_array[mask]
-        aligned_proj_new = aligned_proj[mask]
-        # xrt_proj_img_array_new = xrt_proj_img_array[mask]
-        cropped_xrt_proj_img_array_new = cropped_xrt_proj_img_array[mask]
-        opt_dens_proj_img_array_new = opt_dens_proj_img_array[mask]
-        cropped_opt_dens_proj_img_array_new = cropped_opt_dens_proj_img_array[mask]
-        # xrf_proj_img_array_new = xrf_proj_img_array[:, mask]
-        cropped_xrf_proj_img_array_new = cropped_xrf_proj_img_array[:, mask]
-        net_x_shifts_pcc_new = net_x_shifts_pcc[:, mask]
-        net_y_shifts_pcc_new = net_y_shifts_pcc[:, mask]
+
+        # center_of_rotation_avg_second_part, _, offset_init_second_part = rot_center_avg(aligned_proj[second_zero_deg_idx:], 
+        #                                                                                 theta_idx_pairs_second_part, 
+        #                                                                                 theta_array_second_part)
+
+
+        # print(f'Average center of rotation (before flipping sample): {center_of_rotation_avg_first_part}')
+        # print(f'Average center of rotation (after flipping sample): {center_of_rotation_avg_second_part}\n')
+        # print(f'Geometric center: {center_geom}\n')
+        # print(f'Center of rotation error (before flipping sample): {ppu.round_correct(offset_init_first_part, ndec = 3)}')
+        # print(f'Center of rotation error (after flipping sample): {ppu.round_correct(offset_init_second_part, ndec = 3)}\n')
+
+        # print(f'Applying initial center of rotation correction for angles before sample flipped: {ppu.round_correct(-offset_init_first_part, ndec = 3)}')
         
-        theta_idx_pairs_new = ppu.find_theta_combos(theta_array_new)
+        # for theta_idx in range(len(theta_array_first_part)):
+        #     # aligned_proj[theta_idx] = ndi.shift(opt_dens_proj_img_array[theta_idx], shift = (0, -offset_init_first_part))
+        #     aligned_proj[theta_idx] = ndi.shift(cropped_opt_dens_proj_img_array[theta_idx], shift = (0, -offset_init_first_part))
+
+        # net_x_shifts_pcc[0, :second_zero_deg_idx] -= offset_init_first_part
+
+        # print(f'Applying initial center of rotation correction for angles after sample flipped: {ppu.round_correct(-offset_init_second_part, ndec = 3)}')
+
+        # for theta_idx in range(len(theta_array_second_part)):
+        #     # aligned_proj[theta_idx] = ndi.shift(opt_dens_proj_img_array[theta_idx], shift = (0, -offset_init_second_part))
+        #     aligned_proj[theta_idx] = ndi.shift(cropped_opt_dens_proj_img_array[theta_idx], shift = (0, -offset_init_second_part))
+
+        # net_x_shifts_pcc[0, second_zero_deg_idx:] -= offset_init_second_part
+    
+        # print(f'Average center of rotation after initial COR correction (before flipping sample): {center_of_rotation_avg_first_part}')
+        # print(f'Average center of rotation after initial COR correction (after flipping sample): {center_of_rotation_avg_second_part}\n')
+        # print(f'Geometric center: {center_geom}\n')
+        # print(f'Center of rotation error (before flipping sample): {ppu.round_correct(offset_init_first_part, ndec = 3)}')
+        # print(f'Center of rotation error (after flipping sample): {ppu.round_correct(offset_init_second_part, ndec = 3)}\n')
+
+        # theta_idx_array = np.arange(n_theta)
+        
+        # if zero_idx_to_discard == 'first':
+        #     print(f'Discarding first 0° projection image from XRT, OD, and XRF data...')
+
+        #     mask = theta_idx_array != first_zero_deg_idx
+
+        # elif zero_idx_to_discard == 'second':
+        #     print(f'Discarding second 0° projection image from XRT, OD, and XRF data...')
+            
+        #     mask = theta_idx_array != second_zero_deg_idx
+        
+        # theta_array_new = theta_array[mask]
+        # aligned_proj_new = aligned_proj[mask]
+        # # xrt_proj_img_array_new = xrt_proj_img_array[mask]
+        # cropped_xrt_proj_img_array_new = cropped_xrt_proj_img_array[mask]
+        # opt_dens_proj_img_array_new = opt_dens_proj_img_array[mask]
+        # cropped_opt_dens_proj_img_array_new = cropped_opt_dens_proj_img_array[mask]
+        # # xrf_proj_img_array_new = xrf_proj_img_array[:, mask]
+        # cropped_xrf_proj_img_array_new = cropped_xrf_proj_img_array[:, mask]
+        # net_x_shifts_pcc_new = net_x_shifts_pcc[:, mask]
+        # net_y_shifts_pcc_new = net_y_shifts_pcc[:, mask]
+        
+        # theta_idx_pairs_new = ppu.find_theta_combos(theta_array_new)
 
     else:
         # theta_idx_pairs = ppu.find_theta_combos(theta_array, dtheta = 1)
@@ -339,47 +454,56 @@ def realign_proj(xrt_proj_img_array,
 
         net_x_shifts_pcc[0] -= offset_init
 
-        theta_array_new = theta_array
-        aligned_proj_new = aligned_proj
-        xrt_proj_img_array_new = xrt_proj_img_array
-        cropped_xrt_proj_img_array_new = cropped_xrt_proj_img_array
-        opt_dens_proj_img_array_new = opt_dens_proj_img_array
-        cropped_opt_dens_proj_img_array_new = cropped_opt_dens_proj_img_array
-        xrf_proj_img_array_new = xrf_proj_img_array
-        cropped_xrf_proj_img_array_new = cropped_xrf_proj_img_array
-        net_x_shifts_pcc_new = net_x_shifts_pcc
-        net_y_shifts_pcc_new = net_y_shifts_pcc
+        # theta_array_new = theta_array
+        # aligned_proj_new = aligned_proj
+        # xrt_proj_img_array_new = xrt_proj_img_array
+        # cropped_xrt_proj_img_array_new = cropped_xrt_proj_img_array
+        # opt_dens_proj_img_array_new = opt_dens_proj_img_array
+        # cropped_opt_dens_proj_img_array_new = cropped_opt_dens_proj_img_array
+        # xrf_proj_img_array_new = xrf_proj_img_array
+        # cropped_xrf_proj_img_array_new = cropped_xrf_proj_img_array
+        # net_x_shifts_pcc_new = net_x_shifts_pcc
+        # net_y_shifts_pcc_new = net_y_shifts_pcc
 
-        theta_idx_pairs_new = theta_idx_pairs
+        # theta_idx_pairs_new = theta_idx_pairs
 
     _, n_slices_orig, n_columns_orig = xrt_proj_img_array.shape
-    n_theta, n_slices, n_columns = cropped_xrt_proj_img_array_new.shape
+    # n_theta, n_slices, n_columns = cropped_xrt_proj_img_array_new.shape
+    n_theta, n_slices, n_columns = cropped_xrt_proj_img_array.shape
 
     aligned_proj_total_xrt = np.zeros((n_theta, n_slices, n_columns))
     aligned_proj_total_opt_dens = np.zeros((n_theta, n_slices, n_columns))
     aligned_proj_total_xrf = np.zeros((n_elements_xrf, n_theta, n_slices, n_columns))
     synth_proj = np.zeros((n_theta, n_slices, n_columns))
-    dx_array_pcc = np.zeros((n_iterations, n_theta))
-    dy_array_pcc = np.zeros((n_iterations, n_theta))
+    dx_array_pcc = np.zeros((n_iterations_iter_reproj, n_theta))
+    dy_array_pcc = np.zeros((n_iterations_iter_reproj, n_theta))
 
-    for i in range(n_iterations):
+    rms_x_shift_prev = 0
+
+    for i in range(n_iterations_iter_reproj):
         iterations.append(i)
         
-        print(f'Iteration {i + 1}/{n_iterations}')
+        print(f'Iteration {i + 1}/{n_iterations_iter_reproj}')
 
         if i > 0:
             for theta_idx in range(n_theta):
-                net_x_shift = net_x_shifts_pcc_new[i - 1, theta_idx]
-                net_y_shift = net_y_shifts_pcc_new[i - 1, theta_idx]
+                    # net_x_shift = net_x_shifts_pcc_new[i - 1, theta_idx]
+                    # net_y_shift = net_y_shifts_pcc_new[i - 1, theta_idx]
+
+                net_x_shift = net_x_shifts_pcc[i - 1, theta_idx]
+                net_y_shift = net_y_shifts_pcc[i - 1, theta_idx]
                 
                 if (theta_idx % 7) == 0:
-                    print(f'Shifting projection by net x shift = {ppu.round_correct(net_x_shift, ndec = 3)} (theta = {ppu.round_correct(theta_array_new[theta_idx], ndec = 1)})...')
+                    # print(f'Shifting projection by net x shift = {ppu.round_correct(net_x_shift, ndec = 3)} (theta = {ppu.round_correct(theta_array_new[theta_idx], ndec = 1)})...')
+                    print(f'Shifting projection by net x shift = {ppu.round_correct(net_x_shift, ndec = 3)} (theta = {ppu.round_correct(theta_array[theta_idx], ndec = 1)})...')
                     print(f'Shifting projection by net y shift = {ppu.round_correct(net_y_shift, ndec = 3)}...')
 
                 # aligned_proj_new[theta_idx] = ndi.shift(opt_dens_proj_img_array_new[theta_idx], shift = (net_y_shift, net_x_shift))
-                aligned_proj_new[theta_idx] = ndi.shift(cropped_opt_dens_proj_img_array_new[theta_idx], shift = (net_y_shift, net_x_shift))
+                # aligned_proj_new[theta_idx] = ndi.shift(cropped_opt_dens_proj_img_array_new[theta_idx], shift = (net_y_shift, net_x_shift))
+                aligned_proj[theta_idx] = ndi.shift(cropped_opt_dens_proj_img_array[theta_idx], shift = (net_y_shift, net_x_shift))
 
-            center_of_rotation_avg, _, offset = rot_center_avg(aligned_proj_new, theta_idx_pairs_new, theta_array_new)
+            # center_of_rotation_avg, _, offset = rot_center_avg(aligned_proj_new, theta_idx_pairs_new, theta_array_new)
+            center_of_rotation_avg, _, offset = rot_center_avg(aligned_proj, theta_idx_pairs, theta_array)
 
             print(f'Center of rotation: {ppu.round_correct(center_of_rotation_avg, ndec = 3)}')
             print(f'Geometric center: {center_geom}')
@@ -387,10 +511,11 @@ def realign_proj(xrt_proj_img_array,
     
         if return_aux_data:
             if edge_info is None:
-                aligned_exp_proj_array.append(aligned_proj_new.copy())
-
+                # aligned_exp_proj_array.append(aligned_proj_new.copy())
+                aligned_exp_proj_array.append(aligned_proj.copy())
             else:
-                remapped_aligned_exp_proj = opt_dens_proj_img_array_new.copy()
+                # remapped_aligned_exp_proj = opt_dens_proj_img_array_new.copy()
+                remapped_aligned_exp_proj = opt_dens_proj_img_array.copy()
                 print(remapped_aligned_exp_proj.shape)
                 start_slice = edge_info['top']
                 end_slice = n_slices_orig - edge_info['bottom']
@@ -398,12 +523,14 @@ def realign_proj(xrt_proj_img_array,
                 start_column = edge_info['left']
                 end_column = n_columns_orig - edge_info['right']
 
-                remapped_aligned_exp_proj[:, start_slice:end_slice, start_column:end_column] = aligned_proj_new.copy()
+                # remapped_aligned_exp_proj[:, start_slice:end_slice, start_column:end_column] = aligned_proj_new.copy()
+                remapped_aligned_exp_proj[:, start_slice:end_slice, start_column:end_column] = aligned_proj.copy()
 
                 aligned_exp_proj_array.append(remapped_aligned_exp_proj)
                 cropped_aligned_exp_proj_array.append(aligned_exp_proj_array.copy())
 
-        recon = tomo.recon(aligned_proj_new, theta_array_new*np.pi/180, algorithm = 'gridrec', filter_name = 'ramlak')
+        # recon = tomo.recon(aligned_proj_new, theta_array_new*np.pi/180, algorithm = 'gridrec', filter_name = 'ramlak')
+        recon = tomo.recon(aligned_proj, theta_array*np.pi/180, algorithm = 'gridrec', filter_name = 'ramlak')
 
         if return_aux_data:
             recon_array.append(recon)
@@ -421,15 +548,28 @@ def realign_proj(xrt_proj_img_array,
         
         for theta_idx in range(n_theta):
             if not return_aux_data:
+                # dy, dx = phase_xcorr(synth_proj[theta_idx], 
+                #                      aligned_proj_new[theta_idx], 
+                #                      sigma, 
+                #                      alpha, 
+                #                      upsample_factor)
+
                 dy, dx = phase_xcorr(synth_proj[theta_idx], 
-                                     aligned_proj_new[theta_idx], 
+                                     aligned_proj[theta_idx], 
                                      sigma, 
                                      alpha, 
                                      upsample_factor)
             
             else:
+                # dy, dx, pcc_2d = phase_xcorr(synth_proj[theta_idx], 
+                #                              aligned_proj_new[theta_idx], 
+                #                              sigma, 
+                #                              alpha, 
+                #                              upsample_factor, 
+                #                              return_pcc_2d = True)
+
                 dy, dx, pcc_2d = phase_xcorr(synth_proj[theta_idx], 
-                                             aligned_proj_new[theta_idx], 
+                                             aligned_proj[theta_idx], 
                                              sigma, 
                                              alpha, 
                                              upsample_factor, 
@@ -450,46 +590,84 @@ def realign_proj(xrt_proj_img_array,
             
             if (theta_idx % 7) == 0:
                 if theta_idx == 0:
-                    print(f'\nCurrent x-shift: {ppu.round_correct(dx, ndec = 3)} (theta = {ppu.round_correct(theta_array_new[theta_idx], ndec = 1)})')
+                    # print(f'\nCurrent x-shift: {ppu.round_correct(dx, ndec = 3)} (theta = {ppu.round_correct(theta_array_new[theta_idx], ndec = 1)})')
+                    print(f'\nCurrent x-shift: {ppu.round_correct(dx, ndec = 3)} (theta = {ppu.round_correct(theta_array[theta_idx], ndec = 1)})')
                 
                 else:
-                     print(f'Current x-shift: {ppu.round_correct(dx, ndec = 3)} (theta = {ppu.round_correct(theta_array_new[theta_idx], ndec = 1)})')
+                    #  print(f'Current x-shift: {ppu.round_correct(dx, ndec = 3)} (theta = {ppu.round_correct(theta_array_new[theta_idx], ndec = 1)})')
+                    print(f'Current x-shift: {ppu.round_correct(dx, ndec = 3)} (theta = {ppu.round_correct(theta_array[theta_idx], ndec = 1)})')
                 
                 print(f'Current y-shift: {ppu.round_correct(dy, ndec = 3)}')
 
-        center_of_rotation_avg_synth, _, offset_synth = rot_center_avg(synth_proj, theta_idx_pairs_new, theta_array_new)
 
-        print(f'Average synthetic center of rotation after jitter, dynamic COR correction attempts: {ppu.round_correct(center_of_rotation_avg_synth, ndec = 3)}')
-        print(f'Geometric center: {center_geom}')
-        print(f'Center of rotation error: {ppu.round_correct(offset_synth, ndec = 3)}')
+        if not sample_flipped_remounted_mid_experiment:
+        # center_of_rotation_avg_synth, _, offset_synth = rot_center_avg(synth_proj, theta_idx_pairs_new, theta_array_new)
+            center_of_rotation_avg_synth, _, offset_synth = rot_center_avg(synth_proj, theta_idx_pairs, theta_array)
+
+            print(f'Average synthetic center of rotation after jitter, dynamic COR correction attempts: {ppu.round_correct(center_of_rotation_avg_synth, ndec = 3)}')
+            print(f'Geometric center: {center_geom}')
+            print(f'Center of rotation error: {ppu.round_correct(offset_synth, ndec = 3)}')
         
-        if i == 1:
-            sys.exit()
+        else:
+            center_of_rotation_avg_first_part, center_geom, offset_first_part = rot_center_avg(aligned_proj[:zero_deg_idx_array[1]], 
+                                                                                               theta_idx_pairs_first_part, 
+                                                                                               theta_array_first_part)
+                
+            center_of_rotation_avg_second_part, _, offset_second_part = rot_center_avg(aligned_proj[zero_deg_idx_array[1]:], 
+                                                                                       theta_idx_pairs_second_part, 
+                                                                                       theta_array_second_part)
+
+            print(f'Synthetic center of rotation (before flipping sample): {center_of_rotation_avg_first_part}')
+            print(f'Synthetic center of rotation (after flipping sample): {center_of_rotation_avg_second_part}\n')
+            print(f'Geometric center: {center_geom}\n')
+            print(f'Center of rotation error (before flipping sample): {ppu.round_correct(offset_first_part, ndec = 3)}')
+            print(f'Center of rotation error (after flipping sample): {ppu.round_correct(offset_second_part, ndec = 3)}\n')
+
+
+            _, _dx = phase_xcorr(synth_proj[zero_deg_idx_array[0]], 
+                                 synth_proj[zero_deg_idx_array[1]], 
+                                 sigma, 
+                                 alpha, 
+                                 upsample_factor)
+            
+            print(f'The two zero degree angles are offset from each other by {ppu.round_correct(np.abs(_dx), ndec = 3)} pixels')
+        
+        # if i == 1:
+            # sys.exit()
 
         if i > (n_iter_converge - 1):
             rms_x_shift_current = np.sqrt((dx_array_pcc[i]**2).mean())  # Look at RMS shift per iteration for convergence (show that typical shifts between images are settling down)
             
-            if np.abs(rms_x_shift_current - rms_x_shift_prev) <= eps:
+            if np.abs(rms_x_shift_current - rms_x_shift_prev) <= eps_iter_reproj:
                 iterations = np.array(iterations)
 
                 dx_array_new = dx_array_pcc[:len(iterations)]
                 dy_array_new = dy_array_pcc[:len(iterations)]
            
-                net_x_shifts_pcc_new_1 = net_x_shifts_pcc_new[:len(iterations)]
-                net_y_shifts_pcc_new_1 = net_y_shifts_pcc_new[:len(iterations)]
+                # net_x_shifts_pcc_new_1 = net_x_shifts_pcc_new[:len(iterations)]
+                # net_y_shifts_pcc_new_1 = net_y_shifts_pcc_new[:len(iterations)]
+                
+                net_x_shifts_pcc_new = net_x_shifts_pcc[:len(iterations)]
+                net_y_shifts_pcc_new = net_y_shifts_pcc[:len(iterations)]
 
                 print(f'Number of iterations taken: {len(iterations)}')
                 print('Shifting all elements in cropped XRT, optical density aggregate projection arrays by current net shifts...')
 
                 for theta_idx in range(n_theta):
-                    net_x_shift = net_x_shifts_pcc_new_1[i][theta_idx]
-                    net_y_shift = net_y_shifts_pcc_new_1[i][theta_idx]
+                    # net_x_shift = net_x_shifts_pcc_new_1[i][theta_idx]
+                    # net_y_shift = net_y_shifts_pcc_new_1[i][theta_idx]
+
+                    net_x_shift = net_x_shifts_pcc_new[i][theta_idx]
+                    net_y_shift = net_y_shifts_pcc_new[i][theta_idx]
 
                     # aligned_proj_total_xrt[theta_idx] = ndi.shift(xrt_proj_img_array_new[theta_idx], shift = (net_y_shift, net_x_shift), cval = I0)
                     # aligned_proj_total_opt_dens[theta_idx] = ndi.shift(opt_dens_proj_img_array_new[theta_idx], shift = (net_y_shift, net_x_shift))
                     
-                    aligned_proj_total_xrt[theta_idx] = ndi.shift(cropped_xrt_proj_img_array_new[theta_idx], shift = (net_y_shift, net_x_shift), cval = I0)
-                    aligned_proj_total_opt_dens[theta_idx] = ndi.shift(cropped_opt_dens_proj_img_array_new[theta_idx], shift = (net_y_shift, net_x_shift))
+                    # aligned_proj_total_xrt[theta_idx] = ndi.shift(cropped_xrt_proj_img_array_new[theta_idx], shift = (net_y_shift, net_x_shift), cval = I0)
+                    # aligned_proj_total_opt_dens[theta_idx] = ndi.shift(cropped_opt_dens_proj_img_array_new[theta_idx], shift = (net_y_shift, net_x_shift))
+
+                    aligned_proj_total_xrt[theta_idx] = ndi.shift(cropped_xrt_proj_img_array[theta_idx], shift = (net_y_shift, net_x_shift), cval = I0)
+                    aligned_proj_total_opt_dens[theta_idx] = ndi.shift(cropped_opt_dens_proj_img_array[theta_idx], shift = (net_y_shift, net_x_shift))
 
                 print('Shifting all elements in cropped XRF aggregate projection array by current net shifts...')
 
@@ -497,24 +675,27 @@ def realign_proj(xrt_proj_img_array,
                     print(f'\rElement {element_idx + 1}/{n_elements_xrf}', end = '', flush = True)
                     
                     for theta_idx in range(n_theta):
-                        net_x_shift = net_x_shifts_pcc_new_1[i][theta_idx]
-                        net_y_shift = net_y_shifts_pcc_new_1[i][theta_idx]
+                        # net_x_shift = net_x_shifts_pcc_new_1[i][theta_idx]
+                        # net_y_shift = net_y_shifts_pcc_new_1[i][theta_idx]
+                        net_x_shift = net_x_shifts_pcc_new[i][theta_idx]
+                        net_y_shift = net_y_shifts_pcc_new[i][theta_idx]
 
                         # aligned_proj_total_xrf[element_idx, theta_idx] = ndi.shift(xrf_proj_img_array_new[element_idx, theta_idx], shift = (net_y_shift, net_x_shift))
-                        aligned_proj_total_xrf[element_idx, theta_idx] = ndi.shift(cropped_xrf_proj_img_array_new[element_idx, theta_idx], shift = (net_y_shift, net_x_shift))
+                        aligned_proj_total_xrf[element_idx, theta_idx] = ndi.shift(cropped_xrf_proj_img_array[element_idx, theta_idx], shift = (net_y_shift, net_x_shift))
 
                 # net_x_shifts = net_x_shifts_pcc_new[i]
-                net_y_shifts = net_y_shifts_pcc_new_1[i]
+                # net_y_shifts = net_y_shifts_pcc_new_1[i]
+                net_y_shifts = net_y_shifts_pcc_new[i]
 
-                if zero_idx_to_discard is not None:
-                    aligned_proj_xrt_final = xrt_proj_img_array[mask]
-                    aligned_proj_opt_dens_final = opt_dens_proj_img_array[mask]
-                    aligned_proj_xrf_final = xrf_proj_img_array[mask]
+                # if zero_idx_to_discard is not None:
+                #     aligned_proj_xrt_final = xrt_proj_img_array[mask]
+                #     aligned_proj_opt_dens_final = opt_dens_proj_img_array[mask]
+                #     aligned_proj_xrf_final = xrf_proj_img_array[mask]
                         
-                else:
-                    aligned_proj_xrt_final = xrt_proj_img_array
-                    aligned_proj_opt_dens_final = opt_dens_proj_img_array
-                    aligned_proj_xrf_final = xrf_proj_img_array
+                # else:
+                #     aligned_proj_xrt_final = xrt_proj_img_array
+                #     aligned_proj_opt_dens_final = opt_dens_proj_img_array
+                #     aligned_proj_xrf_final = xrf_proj_img_array
 
                 if np.any(net_y_shifts): # Any nonzero y shifts
                     print("\nTruncating cropped XRT, OD, XRF projection images in y so object is in every projection image's field of view...")
@@ -565,9 +746,9 @@ def realign_proj(xrt_proj_img_array,
 
                 break
             
-            rms_x_shift_prev = rms_x_shift_current.copy()
+            rms_x_shift_prev = rms_x_shift_current
 
-        if i == n_iterations - 1:
+        if i == n_iterations_iter_reproj - 1:
             print('Iterative reprojection complete. Shifting XRT intensities and optical densities by current net shifts...')
 
             iterations = np.array(iterations)
@@ -579,8 +760,11 @@ def realign_proj(xrt_proj_img_array,
                 net_x_shift = net_x_shifts_pcc_new_1[i]
                 net_y_shift = net_y_shifts_pcc_new_1[i]
 
-                aligned_proj_total_xrt[theta_idx] = ndi.shift(cropped_opt_dens_proj_img_array_new[theta_idx], shift = (net_y_shift, net_x_shift), cval = I0)
-                aligned_proj_total_opt_dens[theta_idx] = ndi.shift(cropped_xrt_proj_img_array_new[theta_idx], shift = (net_y_shift, net_x_shift))
+                # aligned_proj_total_xrt[theta_idx] = ndi.shift(cropped_opt_dens_proj_img_array_new[theta_idx], shift = (net_y_shift, net_x_shift), cval = I0)
+                # aligned_proj_total_opt_dens[theta_idx] = ndi.shift(cropped_xrt_proj_img_array_new[theta_idx], shift = (net_y_shift, net_x_shift))
+
+                aligned_proj_total_xrt[theta_idx] = ndi.shift(cropped_xrt_proj_img_array[theta_idx], shift = (net_y_shift, net_x_shift), cval = I0)
+                aligned_proj_total_opt_dens[theta_idx] = ndi.shift(cropped_opt_dens_proj_img_array[theta_idx], shift = (net_y_shift, net_x_shift))
             
             print('Shifting all XRF elements by current net shifts...')
 
@@ -591,21 +775,22 @@ def realign_proj(xrt_proj_img_array,
                     net_x_shift = net_x_shifts_pcc_new_1[i, theta_idx]
                     net_y_shift = net_y_shifts_pcc_new_1[i, theta_idx]
                         
-                    aligned_proj_total_xrf[element_idx, theta_idx] = ndi.shift(cropped_xrf_proj_img_array_new[element_idx, theta_idx], shift = (net_y_shift, net_x_shift))
+                    # aligned_proj_total_xrf[element_idx, theta_idx] = ndi.shift(cropped_xrf_proj_img_array_new[element_idx, theta_idx], shift = (net_y_shift, net_x_shift))
+                    aligned_proj_total_xrf[element_idx, theta_idx] = ndi.shift(cropped_xrf_proj_img_array[element_idx, theta_idx], shift = (net_y_shift, net_x_shift))
             
             
             # net_x_shifts = net_x_shifts_pcc_new[i]
             net_y_shifts = net_y_shifts_pcc_new_1[i]
 
-            if zero_idx_to_discard is not None:
-                aligned_proj_xrt_final = xrt_proj_img_array[mask]
-                aligned_proj_opt_dens_final = opt_dens_proj_img_array[mask]
-                aligned_proj_xrf_final = xrf_proj_img_array[mask]
+            # if zero_idx_to_discard is not None:
+            #     aligned_proj_xrt_final = xrt_proj_img_array[mask]
+            #     aligned_proj_opt_dens_final = opt_dens_proj_img_array[mask]
+            #     aligned_proj_xrf_final = xrf_proj_img_array[mask]
                         
-            else:
-                aligned_proj_xrt_final = xrt_proj_img_array
-                aligned_proj_opt_dens_final = opt_dens_proj_img_array
-                aligned_proj_xrf_final = xrf_proj_img_array
+            # else:
+            #     aligned_proj_xrt_final = xrt_proj_img_array
+            #     aligned_proj_opt_dens_final = opt_dens_proj_img_array
+            #     aligned_proj_xrf_final = xrf_proj_img_array
 
             if np.any(net_y_shifts): # Any nonzero y shifts
                 print("\nTruncating cropped XRT, OD, XRF projection images in y so object is in every projection image's field of view...")
@@ -663,41 +848,76 @@ def realign_proj(xrt_proj_img_array,
         recon_array = np.array(recon_array)
 
         if edge_info is not None:
+            # return aligned_proj_xrt_final, \
+            #        aligned_proj_opt_dens_final, \
+            #        aligned_proj_xrf_final, \
+            #        net_x_shifts_pcc_new_1[-1], \
+            #        net_y_shifts_pcc_new_1[-1], \
+            #        aligned_exp_proj_array, \
+            #        cropped_aligned_exp_proj_array, \
+            #        synth_proj_array, \
+            #        pcc_2d_array, \
+            #        recon_array, \
+            #        theta_array_new, \
+            #        net_x_shifts_pcc_new_1, \
+            #        net_y_shifts_pcc_new_1, \
+            #        dx_array_new, \
+            #        dy_array_new
+
             return aligned_proj_xrt_final, \
                    aligned_proj_opt_dens_final, \
                    aligned_proj_xrf_final, \
-                   net_x_shifts_pcc_new_1[-1], \
-                   net_y_shifts_pcc_new_1[-1], \
+                   net_x_shifts_pcc_new[-1], \
+                   net_y_shifts_pcc_new[-1], \
                    aligned_exp_proj_array, \
                    cropped_aligned_exp_proj_array, \
                    synth_proj_array, \
                    pcc_2d_array, \
                    recon_array, \
-                   theta_array_new, \
-                   net_x_shifts_pcc_new_1, \
-                   net_y_shifts_pcc_new_1, \
+                   net_x_shifts_pcc_new, \
+                   net_y_shifts_pcc_new, \
                    dx_array_new, \
                    dy_array_new
         
         else:
+            # return aligned_proj_xrt_final, \
+            #        aligned_proj_opt_dens_final, \
+            #        aligned_proj_xrf_final, \
+            #        net_x_shifts_pcc_new_1[-1], \
+            #        net_y_shifts_pcc_new_1[-1], \
+            #        aligned_exp_proj_array, \
+            #        synth_proj_array, \
+            #        pcc_2d_array, \
+            #        recon_array, \
+            #        theta_array_new, \
+            #        net_x_shifts_pcc_new_1, \
+            #        net_y_shifts_pcc_new_1, \
+            #        dx_array_new, \
+            #        dy_array_new
+
             return aligned_proj_xrt_final, \
                    aligned_proj_opt_dens_final, \
                    aligned_proj_xrf_final, \
-                   net_x_shifts_pcc_new_1[-1], \
-                   net_y_shifts_pcc_new_1[-1], \
+                   net_x_shifts_pcc_new[-1], \
+                   net_y_shifts_pcc_new[-1], \
                    aligned_exp_proj_array, \
                    synth_proj_array, \
                    pcc_2d_array, \
                    recon_array, \
-                   theta_array_new, \
-                   net_x_shifts_pcc_new_1, \
-                   net_y_shifts_pcc_new_1, \
+                   net_x_shifts_pcc_new, \
+                   net_y_shifts_pcc_new, \
                    dx_array_new, \
                    dy_array_new
     
+    # return aligned_proj_xrt_final, \
+    #        aligned_proj_opt_dens_final, \
+    #        aligned_proj_xrf_final, \
+    #        theta_array_new, \
+    #        net_x_shifts_pcc_new_1[-1], \
+    #        net_y_shifts_pcc_new_1[-1]
+
     return aligned_proj_xrt_final, \
            aligned_proj_opt_dens_final, \
            aligned_proj_xrf_final, \
-           theta_array_new, \
            net_x_shifts_pcc_new_1[-1], \
            net_y_shifts_pcc_new_1[-1]

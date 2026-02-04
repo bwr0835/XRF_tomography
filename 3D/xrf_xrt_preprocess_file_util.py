@@ -178,7 +178,7 @@ def extract_h5_xrf_data(file_path, synchrotron, **kwargs):
         dx_cm = 1e-4*(np.abs(x_um[0][-1] - x_um[0][0])/(nx - 1)) # Convert from µm to cm
         dy_cm = 1e-4*(np.abs(y_um[-1][0] - y_um[0][0])/(ny - 1)) # Convert from µm to cm
             
-        elements_string = [element.decode() for element in elements] # Convert the elements array from a list of bytes to a list of strings
+        elements_string = [_str.split('_')[0] if '_K' in _str else _str for _str in (element.decode() for element in elements)] # Convert the elements array from a list of bytes to a list of strings
 
         # if kwargs.get('scan_coords') == True and kwargs.get('us_ic_enabled') == True:
         if kwargs.get('us_ic_enabled') == True:
@@ -634,7 +634,7 @@ def create_h5_aligned_aggregate_xrf_xrt(dir_path,
                                         xrt_array,
                                         opt_dens_array, 
                                         theta_array,
-                                        zero_idx_discarded,
+                                        # zero_idx_discarded,
                                         init_edge_info,
                                         final_edge_info):
 
@@ -674,8 +674,8 @@ def create_h5_aligned_aggregate_xrf_xrt(dir_path,
             exchange['data_xrt'].attrs['top_edge_cropped_final'] = final_edge_info['top']
             exchange['data_xrt'].attrs['bottom_edge_cropped_final'] = final_edge_info['bottom']
 
-        if zero_idx_discarded is not None:
-            exchange['theta'].attrs['zero_deg_idx_discarded'] = zero_idx_discarded
+        # if zero_idx_discarded is not None:
+            # exchange['theta'].attrs['zero_deg_idx_discarded'] = zero_idx_discarded
 
     return
 

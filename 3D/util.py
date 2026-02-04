@@ -304,17 +304,32 @@ def MakeFLlinesDictionary(this_aN_dic,
     return FL_all_elements_dic
 
 
-def find_lines_roi_idx_from_dataset(data_path, f_XRF_data, element_lines_roi, std_sample):
-    XRF_data = h5py.File(os.path.join(data_path, f_XRF_data), 'r')
+# def find_lines_roi_idx_from_dataset(data_path, f_XRF_data, element_lines_roi, std_sample):
+#     XRF_data = h5py.File(os.path.join(data_path, f_XRF_data), 'r')
     
-    if std_sample:
-        channel_names = XRF_data['MAPS/channel_names'][...]
+#     if std_sample:
+#         channel_names = XRF_data['MAPS/channel_names'][...]
     
-    else:
-        channel_names = XRF_data['exchange/elements'][...]
+#     else:
+#         channel_names = XRF_data['exchange/elements'][...]
         
-    channel_names = np.array([str(channel_name, 'utf-8') for channel_name in channel_names])
-    element_lines_roi_idx = np.zeros(len(element_lines_roi)).astype(np.int)
+#     channel_names = np.array([str(channel_name, 'utf-8') for channel_name in channel_names])
+#     element_lines_roi_idx = np.zeros(len(element_lines_roi)).astype(np.int)
+    
+#     for i, element_line_roi in enumerate(element_lines_roi):
+#         if element_line_roi[1] == "K":
+#             channel_name_roi = element_line_roi[0]
+        
+#         else:
+#             channel_name_roi = element_line_roi[0] + "_" + element_line_roi[1]
+        
+#         element_line_idx = np.argwhere(channel_names == channel_name_roi)
+#         element_lines_roi_idx[i] = element_line_idx
+        
+#     XRF_data.close()
+#     return element_lines_roi_idx 
+def find_lines_roi_idx_from_dataset(channel_names, element_lines_roi):    
+    element_lines_roi_idx = np.zeros(len(element_lines_roi), dtype = int)
     
     for i, element_line_roi in enumerate(element_lines_roi):
         if element_line_roi[1] == "K":
@@ -325,8 +340,7 @@ def find_lines_roi_idx_from_dataset(data_path, f_XRF_data, element_lines_roi, st
         
         element_line_idx = np.argwhere(channel_names == channel_name_roi)
         element_lines_roi_idx[i] = element_line_idx
-        
-    XRF_data.close()
+
     return element_lines_roi_idx   
 
 
@@ -352,7 +366,6 @@ def MakeFLlinesDictionary_manual(element_lines_roi,
     FL_all_elements_dic["n_lines"] = len(element_lines_roi)
 
     voxel_size = sample_size_cm/sample_size_n   
-    # TODO Seemingly change summing all XRF production cross sections to just outputting the array and then summing up detector window-attenuated coefficients in forward_model.py
     for i, element_line_roi in enumerate(element_lines_roi):
         fl_energy = xlib_np.LineEnergy(np.array([AN[element_line_roi[0]]]), fl[element_line_roi[1]]).flatten()
         fl_cs = xlib_np.CS_FluorLine_Kissel_Cascade(np.array([AN[element_line_roi[0]]]), fl[element_line_roi[1]], probe_energy_keV).flatten()
