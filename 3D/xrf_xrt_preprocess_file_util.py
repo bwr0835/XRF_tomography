@@ -720,10 +720,11 @@ def extract_csv_preprocessing_input_params(file_path):
     available_synchrotrons = ipn.available_synchrotrons
     edge_crop_dxns = ipn.edge_crop_dxns
 
+    print(set(input_params))
+    print(set(all_params_ordered))
     missing_data = set(all_params_ordered) - set(input_params)
-    print(missing_data)
     extra_data = set(input_params) - set(all_params_ordered)
-    print(extra_data)
+    
     if not missing_data or not extra_data:
         if not bool(missing_data) and not bool(extra_data):
             print('Error: The following input parameters are missing:\n')
