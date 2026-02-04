@@ -54,6 +54,7 @@ preprocessing_bool_params = ['create_aggregate_xrf_xrt_files_enabled',
                              'pre_existing_align_norm_file_enabled',
                              'norm_enabled',
                              'realignment_enabled',
+                             'sample_flipped_remounted_mid_experiment',
                              'final_edge_crop_enabled']
 
 preprocessing_dict_params = ['init_edge_pixel_lengths_to_crop',
