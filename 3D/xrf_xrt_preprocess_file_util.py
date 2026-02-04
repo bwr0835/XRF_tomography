@@ -720,27 +720,13 @@ def extract_csv_preprocessing_input_params(file_path):
     available_synchrotrons = ipn.available_synchrotrons
     edge_crop_dxns = ipn.edge_crop_dxns
 
-    print(set(input_params))
-    print(set(all_params_ordered))
-    missing_data = set(all_params_ordered) - set(input_params)
-    extra_data = set(input_params) - set(all_params_ordered)
-    
-    # if not missing_data or not extra_data:
-    #     if not bool(missing_data) and not bool(extra_data):
-    #         print('Error: The following input parameters are missing:\n')
-    #         print(*(["'{}'".format(s) for s in missing_data]), sep = '\n')
-    #         print('\nAdditionally, the following input parameters should be removed:\n')
-    #         print(*(["'{}'".format(s) for s in extra_data]), sep = '\n')
+    if not input_params.equals(all_params_ordered):
+        print('Error: At least one parameter missing or at least one parameter too many.')
+        print('\nThe following input parameters are required:\n')
+        print(*(["'{}'".format(s) for s in all_params_ordered]), sep = '\n')
+        print('\nEnding program...')
 
-    #     elif not bool(missing_data):
-    #         print('Error: The following input parameters are missing:\n')
-    #         print(*(["'{}'".format(s) for s in missing_data]), sep = '\n')
-
-    #     else:
-    #         print('Error: The following input parameters should be removed:\n')
-    #         print(*(["'{}'".format(s) for s in extra_data]), sep = '\n')
-
-    #     sys.exit()
+        sys.exit()
 
     for idx, val in enumerate(values): # Convert strings supposed to be numberic or Boolean to floats, ints, or bools
         if val.lower() == 'none':
