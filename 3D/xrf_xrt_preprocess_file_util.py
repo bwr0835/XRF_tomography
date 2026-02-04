@@ -723,8 +723,8 @@ def extract_csv_preprocessing_input_params(file_path):
     missing_data = set(all_params_ordered) - set(input_params)
     extra_data = set(input_params) - set(all_params_ordered)
 
-    if not missing_data and not extra_data:
-        if not bool(missing_data) or not bool(extra_data):
+    if not missing_data or not extra_data:
+        if not bool(missing_data) and not bool(extra_data):
             print('Error: The following input parameters are missing:\n')
             print(*(["'{}'".format(s) for s in missing_data]), sep = '\n')
             print('\nAdditionally, the following input parameters should be removed:\n')
