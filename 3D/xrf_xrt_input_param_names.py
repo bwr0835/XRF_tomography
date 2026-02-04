@@ -35,7 +35,8 @@ preprocessing_params_ordered = ['synchrotron',
                                 'sigma',
                                 'alpha',
                                 'upsample_factor',
-                                'eps',
+                                # 'eps',
+                                'eps_iter_reproj',
                                 'final_edge_crop_enabled',
                                 'final_edge_pixel_lengths_to_crop',
                                 'aligned_data_output_dir_path']
@@ -45,7 +46,8 @@ preprocessing_numeric_params = ['xrt_data_percentile',
                                 't_dwell_s',
                                 'sigma',
                                 'alpha',
-                                'eps']
+                                'eps_cor_correction',
+                                'eps_iter_reproj']
 
 preprocessing_list_params = ['edges_to_crop']
 
