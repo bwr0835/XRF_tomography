@@ -848,8 +848,6 @@ def extract_csv_preprocessing_input_params(file_path):
 
             sys.exit()
 
-    print(input_param_dict['init_edge_pixel_lengths_to_crop'])
-
     return input_param_dict
 
 def create_csv_file_list(file_path_array,
