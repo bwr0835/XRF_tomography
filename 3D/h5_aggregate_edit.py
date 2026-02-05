@@ -24,7 +24,7 @@ theta_sorted = theta[theta_idx_sorted[idx]]
 filenames_sorted = filenames[theta_idx_sorted[idx]]
 data_sorted = data[:, theta_idx_sorted[idx]]
 
-print(filenames_sorted)
+print(filenames)
 
 with h5py.File(output_file_path, 'w') as f:
     exchange = f.create_group('exchange')
