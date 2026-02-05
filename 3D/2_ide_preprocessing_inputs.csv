@@ -1,7 +1,7 @@
 synchrotron = aps
 synchrotron_beamline = 2_ide
-create_aggregate_xrf_xrt_files_enabled = False
-pre_existing_aggregate_xrf_xrt_file_lists_enabled = False
+create_aggregate_xrf_xrt_files_enabled = True
+pre_existing_aggregate_xrf_xrt_file_lists_enabled = True
 aggregate_xrf_csv_file_path = /home/bwr0835/XRF_tomography/3D/2_ide_xrf_file_list.csv
 aggregate_xrt_csv_file_path = 
 aggregate_xrf_h5_file_path = /raid/users/roter/Jacobsen/img.dat/2_ide_aggregate_xrf.h5
