@@ -5,29 +5,37 @@ file_path = '/raid/users/roter/Jacobsen-nslsii/data/ptycho/h5_data/3_id_aggregat
 output_file_path = '/raid/users/roter/Jacobsen-nslsii/data/ptycho/h5_data/3_id_aggregate_xrt.h5'
 
 with h5py.File(file_path, 'r') as f:
-    theta = f['exchange/theta'][()]
-    filenames = f['filenames'][()]
-    data = f['exchange/data'][()]
-    elements = f['exchange/elements'][()]
+    theta = f['exchange/theta']
 
-idx = np.r_[:35, 36:53, 54:]
+    theta[35] = -69
+    theta[53] = -15
 
-theta_idx_sorted = np.argsort(theta)
+# with h5py.File(file_path, 'r') as f:
+#     theta = f['exchange/theta'][()]
+#     filenames = f['filenames'][()]
+#     data = f['exchange/data'][()]
+#     elements = f['exchange/elements'][()]
 
-theta_sorted = theta[theta_idx_sorted]
-filenames_sorted = filenames[theta_idx_sorted]
-data_sorted = data[:, theta_idx_sorted]
+# idx = np.r_[:35, 36:53, 54:]
 
-print(elements)
+# theta_idx_sorted = np.argsort(theta)
 
-with h5py.File(file_path, 'w') as f:
-    exchange = f.create_group('exchange', data = theta)
+# theta_sorted = theta[theta_idx_sorted]
+# filenames_sorted = filenames[theta_idx_sorted]
+# data_sorted = data[:, theta_idx_sorted]
+
+# print(elements)
+
+# with h5py.File(file_path, 'w') as f:
+#     exchange = f.create_group('exchange')
     
-    fnames = exchange.create_dataset('filenames', data = filenames_sorted)
-    intensity = exchange.create_dataset('data', data = data_sorted)
-    el = exchange.create_dataset('elements', data = elements)
+#     intensity = exchange.create_dataset('data', data = data_sorted)
+#     el = exchange.create_dataset('elements', data = elements)
+#     angle = exchange.create_dataset('theta', data = theta_sorted)
+    
+#     fnames = f.create_dataset('filenames', data = filenames_sorted)
 
-    intensity.attrs['dataset_type'] = 'xrt'
-    intensity.attrs['us_ic_scaler_name'] = 'sclr1_ch4'
-    intensity.attrs['xrt_signal_name'] = 'stxm'
+#     intensity.attrs['dataset_type'] = 'xrt'
+#     intensity.attrs['us_ic_scaler_name'] = 'sclr1_ch4'
+#     intensity.attrs['xrt_signal_name'] = 'stxm'
     
