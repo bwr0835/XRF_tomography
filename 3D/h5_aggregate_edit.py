@@ -42,6 +42,8 @@ output_file_path = '/raid/users/roter/Jacobsen-nslsii/data/ptycho/h5_data/3_id_a
 with h5py.File(output_file_path, 'r+') as f:
     theta = f['exchange/theta']
     intensity = f['exchange/data']
+
+    print(theta)
     theta_0_idx = np.where(theta == 0)[0][1]
 
     intensity[:, theta_0_idx:] = \
