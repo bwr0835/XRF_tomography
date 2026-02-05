@@ -311,7 +311,14 @@ def extract_h5_xrt_data(file_path, synchrotron, **kwargs):
 
         return elements, cts_combined, theta, nx, ny, dx_cm, dy_cm
 
-def create_aggregate_xrf_h5(file_path_array, output_h5_file, synchrotron, **kwargs):
+def create_aggregate_xrf_h5(file_path_array, 
+                            output_h5_file, 
+                            synchrotron, 
+                            sample_flipped_remounted_mid_experiment, 
+                            final_preflipped_angle, 
+                            initial_postflipped_angle, 
+                            **kwargs):
+    
     n_theta = len(file_path_array)
 
     theta_array = np.zeros(n_theta) 
@@ -400,7 +407,13 @@ def create_aggregate_xrf_h5(file_path_array, output_h5_file, synchrotron, **kwar
     
     return
 
-def create_aggregate_xrt_h5(file_path_array, output_h5_file, synchrotron, **kwargs):
+def create_aggregate_xrt_h5(file_path_array, 
+                            output_h5_file, 
+                            synchrotron, 
+                            sample_flipped_remounted_mid_experiment, 
+                            final_preflipped_angle, 
+                            initial_postflipped_angle, 
+                            **kwargs):
     n_theta = len(file_path_array)
 
     theta_array = np.zeros(n_theta) 
@@ -442,32 +455,69 @@ def create_aggregate_xrt_h5(file_path_array, output_h5_file, synchrotron, **kwar
         assert nx == nx_new and ny == ny_new, f"Dimension mismatch in {file_path}." # Check that the dimensions of the new data match the dimensions of the first data set
         assert np.array_equal(elements, elements_new), f"Element mismatch in {file_path}." # Check that the elements are the same
 
-        counts_array[:, theta_idx, :, :] = counts
+        counts_array[:, theta_idx] = counts
         theta_array[theta_idx] = theta
         file_path_array[theta_idx] = os.path.basename(file_path)
     
-    if synchrotron == 'aps':
-        theta_idx_sorted = np.argsort(theta_array) # Get indices for angles for sorting them in ascending order
+    # if synchrotron == 'aps':
+    #     theta_idx_sorted = np.argsort(theta_array) # Get indices for angles for sorting them in ascending order
     
-        theta_array_sorted = theta_array[theta_idx_sorted]
-        counts_array_sorted = counts_array[:, theta_idx_sorted, :, :]
+    #     theta_array_sorted = theta_array[theta_idx_sorted]
+    #     counts_array_sorted = counts_array[:, theta_idx_sorted, :, :]
 
-        file_path_array_sorted = [file_path_array[theta_idx] for theta_idx in theta_idx_sorted]
+    #     file_path_array_sorted = [file_path_array[theta_idx] for theta_idx in theta_idx_sorted]
     
-    elif synchrotron == 'nsls-ii':
-        # This assumes all angles are in order over 360° (scan from -90° to 90°, flip sample, scan from -90° to 90°) AND -90° is included in BOTH sample orientations
+    # elif synchrotron == 'nsls-ii':
+    #     # This assumes all angles are in order over 360° (scan from -90° to 90°, flip sample, scan from -90° to 90°) AND -90° is included in BOTH sample orientations
         
-        second_neg_90_deg_idx = (np.where(theta_array == -90)[0])[-1]
+    #     second_neg_90_deg_idx = (np.where(theta_array == -90)[0])[-1]
 
-        theta_array[:second_neg_90_deg_idx] -= 90 # Make all angles before flipping go from -180° to 0
-        theta_array[second_neg_90_deg_idx:] += 90 # Make all angles after flipping go from 0 to 180°
+    #     theta_array[:second_neg_90_deg_idx] -= 90 # Make all angles before flipping go from -180° to 0
+    #     theta_array[second_neg_90_deg_idx:] += 90 # Make all angles after flipping go from 0 to 180°
 
-        theta_array_sorted = theta_array
-        counts_array_sorted = counts_array
+    #     theta_array_sorted = theta_array
+    #     counts_array_sorted = counts_array
 
+    #     counts_array_sorted[1] = us_ic
+
+    #     file_path_array_sorted = [file_path_array[theta_idx] for theta_idx in range(n_theta)]
+    theta_idx_sorted = np.argsort(theta_array) # Get indices for angles for sorting them in ascending order
+    
+    theta_array_sorted = theta_array[theta_idx_sorted]
+    counts_array_sorted = counts_array[:, theta_idx_sorted, :, :]
+    file_path_array_sorted = [file_path_array[theta_idx] for theta_idx in range(n_theta)]
+
+    if synchrotron == 'nsls-ii' and kwargs.get('us_ic_enabled') == True:
         counts_array_sorted[1] = us_ic
+    
+    if sample_flipped_remounted_mid_experiment:
+        if len(np.where(theta_array_sorted == 0)[0]) != 2:
+        # This assumes all angles are in order over 360° (scan from -90° to 90°, flip sample, scan from -90° to 90°) AND -90° is included in BOTH sample orientations
+            print('Error: Must have two 0° projection images. Exiting program...')
 
-        file_path_array_sorted = [file_path_array[theta_idx] for theta_idx in range(n_theta)]
+            sys.exit()
+        
+        second_zero_deg_idx = np.where(theta_array_sorted == 0)[0][1]
+
+        # Convert range to [-180°, 180°]
+            
+        theta_array_sorted[:second_zero_deg_idx] -= 90
+        theta_array_sorted[second_zero_deg_idx:] += 90
+    
+        # Flip all projectino images collected after flipping and remounting sample
+
+        counts_array_sorted[:, second_zero_deg_idx:] = \
+            np.flip(counts_array_sorted[:, second_zero_deg_idx:], axis = 2)
+    # elif synchrotron == 'nsls-ii':
+    #     # This assumes all angles are in order over 360° (scan from -90° to 90°, flip sample, scan from -90° to 90°) AND -90° is included in BOTH sample orientations
+        
+    #     second_neg_90_deg_idx = (np.where(theta_array == -90)[0])[-1]
+
+    #     theta_array[:second_neg_90_deg_idx] -= 90 # Make all angles before flipping go from -180° to 0
+    #     theta_array[second_neg_90_deg_idx:] += 90 # Make all angles after flipping go from 0 to 180°
+
+    #     theta_array_sorted = theta_array
+    #     counts_array_sorted = counts_array
 
     with h5py.File(output_h5_file, 'w') as f:
         f.create_dataset('filenames', data = file_path_array_sorted)
