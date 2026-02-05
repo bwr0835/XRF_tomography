@@ -309,6 +309,8 @@ def extract_h5_xrt_data(file_path, synchrotron, **kwargs):
 
         cts_combined[2] = cts_stxm
 
+        print(f'{file_path}, {theta}')
+
         return elements, cts_combined, theta, nx, ny, dx_cm, dy_cm
 
 def create_aggregate_xrf_h5(file_path_array, output_h5_file, synchrotron, **kwargs):
