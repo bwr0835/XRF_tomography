@@ -20,9 +20,9 @@ idx = np.r_[:35, 36:53, 54:]
 
 theta_idx_sorted = np.argsort(theta)
 
-theta_sorted = theta[theta_idx_sorted][idx]
-filenames_sorted = filenames[theta_idx_sorted][idx]
-data_sorted = data[:, theta_idx_sorted][:, idx]
+theta_sorted = theta[theta_idx_sorted[idx]]
+filenames_sorted = filenames[theta_idx_sorted[idx]]
+data_sorted = data[:, theta_idx_sorted[idx]]
 
 print(elements)
 
