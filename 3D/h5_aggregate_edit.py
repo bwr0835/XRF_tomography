@@ -18,9 +18,9 @@ with h5py.File(file_path, 'r') as f:
 
 theta_idx_sorted = np.argsort(theta)
 
-theta_sorted = theta[(theta_idx_sorted != 35) | (theta_idx_sorted != 53)]
-
-data_sorted = data[:, (theta_idx_sorted != 35) | (theta_idx_sorted != 53)]
+keep = (theta_idx_sorted != 35) & (theta_idx_sorted != 53)
+theta_sorted = theta[theta_idx_sorted][keep]
+data_sorted = data[:, theta_idx_sorted][:, keep]
 
 filenames_sorted = [filenames[i] for i in theta_idx_sorted if i != 35 and i != 53]
 
