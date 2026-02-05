@@ -20,6 +20,8 @@ theta_idx_sorted = np.argsort(theta)
 
 idx = np.r_[:35, 36:53, 54:]
 
+print(theta_idx_sorted[idx])
+
 theta_sorted = theta[theta_idx_sorted[idx]]
 
 data_sorted = data[:, theta_idx_sorted[idx]]
