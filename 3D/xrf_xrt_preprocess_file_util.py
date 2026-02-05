@@ -84,7 +84,7 @@ def extract_h5_xrf_data(file_path, synchrotron, **kwargs):
 
         theta_idx = np.where(extra_pvs_names == b'2xfm:m58.VAL')[0]
         theta = float(extra_pvs_values[theta_idx][0].decode()) # Get the value of theta and decode it to a float (from a byte)
-       
+        print(theta)
         nx = len(nx_conv)
         ny = len(ny_conv) - 2 # MAPS tacks on two extra values for whatever reason
                 
