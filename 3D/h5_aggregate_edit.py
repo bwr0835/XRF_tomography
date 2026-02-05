@@ -44,5 +44,5 @@ with h5py.File(output_file_path, 'r+') as f:
     intensity = f['exchange/data']
 
     intensity[:, np.where(theta == 0)[0][1]:] = \
-        np.flip(intensity[:, np.where(theta == 0)[0][1]:], axis = 2)
+        np.flip(intensity[:, np.where(theta == 0)[1]:], axis = 2)
     
