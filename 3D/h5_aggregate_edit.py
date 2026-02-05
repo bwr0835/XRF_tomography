@@ -16,15 +16,17 @@ with h5py.File(file_path, 'r') as f:
     data = f['exchange/data'][()]
     elements = f['exchange/elements'][()]
 
-idx = np.r_[:35, 36:53, 54:]
-
 theta_idx_sorted = np.argsort(theta)
 
+idx = np.r_[:35, 36:53, 54:]
+
 theta_sorted = theta[theta_idx_sorted[idx]]
-filenames_sorted = filenames[theta_idx_sorted[idx]]
+
 data_sorted = data[:, theta_idx_sorted[idx]]
 
-print(filenames)
+filenames_sorted = [filenames[theta_idx] for theta_idx in theta_idx_sorted[idx]]
+
+print(filenames_sorted)
 
 with h5py.File(output_file_path, 'w') as f:
     exchange = f.create_group('exchange')
