@@ -1,5 +1,5 @@
 synchrotron = nsls-ii
-synchrotron_beamline = hxn
+synchrotron_beamline = 3_id
 create_aggregate_xrf_xrt_files_enabled = True
 pre_existing_aggregate_xrf_xrt_file_lists_enabled = True
 aggregate_xrf_csv_file_path = /raid/users/roter/Jacobsen-nslsii/data/xrf/3id_xrf_file_list.csv

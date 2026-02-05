@@ -175,8 +175,8 @@ def extract_h5_xrf_data(file_path, synchrotron, **kwargs):
         counts = np.delete(counts, idx_to_delete, axis = 0)
         elements = np.delete(elements, idx_to_delete, axis = 0)
         
-        dx_cm = 1e-4*(np.abs(x_um[0][-1] - x_um[0][0])/(nx - 1)) # Convert from µm to cm
-        dy_cm = 1e-4*(np.abs(y_um[-1][0] - y_um[0][0])/(ny - 1)) # Convert from µm to cm
+        dx_cm = 1e-4*(np.abs(x_um[0, -1] - x_um[0, 0])/(nx - 1)) # Convert from µm to cm
+        dy_cm = 1e-4*(np.abs(y_um[-1, 0] - y_um[0, 0])/(ny - 1)) # Convert from µm to cm
             
         elements_string = [_str.split('_')[0] if '_K' in _str else _str for _str in (element.decode() for element in elements)] # Convert the elements array from a list of bytes to a list of strings
 
@@ -308,8 +308,6 @@ def extract_h5_xrt_data(file_path, synchrotron, **kwargs):
         cts_combined = np.zeros((n_elements, ny, nx))
 
         cts_combined[2] = cts_stxm
-
-        print(f'{file_path}, {theta}')
 
         return elements, cts_combined, theta, nx, ny, dx_cm, dy_cm
 
