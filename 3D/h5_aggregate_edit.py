@@ -28,20 +28,20 @@ filenames_sorted = [filenames[i] for i in theta_idx_sorted if i != 35 and i != 5
 
 print(filenames_sorted)
 
-with h5py.File(output_file_path, 'w') as f:
-    exchange = f.create_group('exchange')
+# with h5py.File(output_file_path, 'w') as f:
+#     exchange = f.create_group('exchange')
     
-    intensity = exchange.create_dataset('data', data = data_sorted)
-    el = exchange.create_dataset('elements', data = elements)
-    angle = exchange.create_dataset('theta', data = theta_sorted)
+#     intensity = exchange.create_dataset('data', data = data_sorted)
+#     el = exchange.create_dataset('elements', data = elements)
+#     angle = exchange.create_dataset('theta', data = theta_sorted)
     
-    fnames = f.create_dataset('filenames', data = filenames_sorted)
+#     fnames = f.create_dataset('filenames', data = filenames_sorted)
 
-    intensity.attrs['dataset_type'] = 'xrt'
-    intensity.attrs['us_ic_scaler_name'] = 'sclr1_ch4'
-    intensity.attrs['xrt_signal_name'] = 'stxm'
+#     intensity.attrs['dataset_type'] = 'xrt'
+#     intensity.attrs['us_ic_scaler_name'] = 'sclr1_ch4'
+#     intensity.attrs['xrt_signal_name'] = 'stxm'
 
-with h5py.File(output_file_path, 'r+') as f:
+with h5py.File(file_path, 'r+') as f:
     # Read theta into memory so comparisons (e.g. == 0) work correctly;
     # as a Dataset, theta == 0 can return wrong shape and np.where gives empty.
     theta = np.asarray(f['exchange/theta'])
