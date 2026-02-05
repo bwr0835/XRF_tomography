@@ -14,6 +14,8 @@ theta = theta[idx]
 filenames = filenames[idx]
 data = data[:, idx]
 
+print(theta)
+
 # with h5py.File(file_path, 'w') as f:
 #     f.create_dataset('exchange/theta', data = theta)
 #     f.create_dataset('filenames', data = filenames)
