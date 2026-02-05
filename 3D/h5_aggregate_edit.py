@@ -13,7 +13,6 @@ idx = np.r_[:35, 36:53, 54:]
 theta = theta[idx]
 filenames = filenames[idx]
 data = data[:, idx]
-elements = elements[idx]
 
 # with h5py.File(file_path, 'w') as f:
 #     f.create_dataset('exchange/theta', data = theta)
