@@ -17,7 +17,7 @@ init_edge_crop_enabled = False
 init_edge_pixel_lengths_to_crop
 realignment_enabled = True
 n_iter_iter_reproj = 5
-sample_flipped_remounted_mid_experiment = True
+sample_flipped_remounted_mid_experiment = False
 n_iterations_cor_correction = 5
 eps_cor_correction = 0.001
 sigma = 5
