@@ -83,6 +83,8 @@ def extract_h5_xrf_data(file_path, synchrotron, **kwargs):
             sys.exit()    
 
         theta_idx = np.where(extra_pvs_names == b'2xfm:m58.VAL')[0]
+        print(theta_idx)
+        
         theta = float(extra_pvs_values[theta_idx][0].decode()) # Get the value of theta and decode it to a float (from a byte)
         print(theta)
         nx = len(nx_conv)
