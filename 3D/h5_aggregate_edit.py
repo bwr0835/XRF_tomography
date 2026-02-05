@@ -16,11 +16,10 @@ theta_sorted = theta[theta_idx_sorted]
 filenames_sorted = filenames[theta_idx_sorted]
 data_sorted = data[:, theta_idx_sorted]
 
-print(theta_sorted)
-print(filenames_sorted)
+print(elements)
 
 # with h5py.File(file_path, 'w') as f:
 #     f.create_dataset('exchange/theta', data = theta)
-#     f.create_dataset('filenames', data = filenames)
-#     f.create_dataset('exchange/data', data = data)
+#     f.create_dataset('filenames', data = filenames_sorted)
+#     f.create_dataset('exchange/data', data = data_sorted)
 #     f.create_dataset('exchange/elements', data = elements)
