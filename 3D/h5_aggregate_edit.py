@@ -39,10 +39,12 @@ output_file_path = '/raid/users/roter/Jacobsen-nslsii/data/ptycho/h5_data/3_id_a
 #     intensity.attrs['us_ic_scaler_name'] = 'sclr1_ch4'
 #     intensity.attrs['xrt_signal_name'] = 'stxm'
 
-with h5py.File(output_file_path, 'r+') as f:
-    theta = f['exchange/theta']
-    intensity = f['exchange/data']
+with h5py.File(output_file_path, 'r') as f:
+    theta = f['exchange/theta'][()]
+    intensity = f['exchange/data'][()]
 
-    intensity[:, np.where(theta == 0)[0][1]:] = \
-        np.flip(intensity[:, np.where(theta == 0)[1]:], axis = 2)
+print(np.where(theta == 0))
+
+intensity[:, np.where(theta == 0)[0][1]:] = \
+    np.flip(intensity[:, np.where(theta == 0)[1]:], axis = 2)
     
