@@ -40,12 +40,16 @@ output_file_path = '/raid/users/roter/Jacobsen-nslsii/data/ptycho/h5_data/3_id_a
 #     intensity.attrs['xrt_signal_name'] = 'stxm'
 
 with h5py.File(output_file_path, 'r+') as f:
-    theta = f['exchange/theta']
+    # Read theta into memory so comparisons (e.g. == 0) work correctly;
+    # as a Dataset, theta == 0 can return wrong shape and np.where gives empty.
+    theta = np.asarray(f['exchange/theta'])
     intensity = f['exchange/data']
 
     print(theta)
-    theta_0_idx = np.where(theta == 0.)[0][1]
+    theta_0_idx = np.where(theta == 0.0)[0][1]
 
-    intensity[:, theta_0_idx:] = \
-        np.flip(intensity[:, theta_0_idx:], axis = 2)
+    slice_data = np.ascontiguousarray(
+        np.flip(intensity[:, theta_0_idx:], axis=2)
+    )
+    intensity[:, theta_0_idx:] = slice_data
     
