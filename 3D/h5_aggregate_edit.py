@@ -10,11 +10,14 @@ with h5py.File(file_path, 'r') as f:
 
 idx = np.r_[:35, 36:53, 54:]
 
-theta = theta[idx]
-filenames = filenames[idx]
-data = data[:, idx]
+theta_idx_sorted = np.argsort(theta)
 
-print(theta)
+theta_sorted = theta[theta_idx_sorted]
+filenames_sorted = filenames[theta_idx_sorted]
+data_sorted = data[:, theta_idx_sorted]
+
+print(theta_sorted)
+print(filenames_sorted)
 
 # with h5py.File(file_path, 'w') as f:
 #     f.create_dataset('exchange/theta', data = theta)
