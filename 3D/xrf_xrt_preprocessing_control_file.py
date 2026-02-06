@@ -88,26 +88,27 @@ def preprocess_xrf_xrt_data(synchrotron,
                                           sample_flipped_remounted_mid_experiment,
                                           us_ic = us_ic)
 
-        print('Creating aggregate XRF, XRT file list CSV files...')
+        if not pre_existing_aggregate_xrf_xrt_file_lists_enabled:
+            print('Creating aggregate XRF, XRT file list CSV files...')
 
-        if synchrotron == 'aps':
-            futil.create_csv_file_list(xrf_file_array,
-                                       xrf_array_dir, 
-                                       synchrotron, 
-                                       synchrotron_beamline)
+            if synchrotron == 'aps':
+                futil.create_csv_file_list(xrf_file_array,
+                                           xrf_array_dir, 
+                                           synchrotron, 
+                                           synchrotron_beamline)
 
-        else:
-            futil.create_csv_file_list(xrf_file_array,
-                                       xrf_array_dir, 
-                                       synchrotron, 
-                                       synchrotron_beamline,
-                                       'xrf')
+            else:
+                futil.create_csv_file_list(xrf_file_array,
+                                           xrf_array_dir, 
+                                           synchrotron, 
+                                           synchrotron_beamline,
+                                           'xrf')
 
-            futil.create_csv_file_list(xrf_file_array,
-                                       xrf_array_dir, 
-                                       synchrotron, 
-                                       synchrotron_beamline,
-                                       'xrt')
+                futil.create_csv_file_list(xrf_file_array,
+                                           xrf_array_dir, 
+                                           synchrotron, 
+                                           synchrotron_beamline,
+                                           'xrt')
 
         print('Done. Exiting program...')
 
