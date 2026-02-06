@@ -31,7 +31,7 @@ filenames_sorted = [filenames[i] for i in theta_idx_sorted if i != 35 and i != 5
 with h5py.File(output_file_path, 'w') as f:
     exchange = f.create_group('exchange')
     
-    intensity = exchange.create_dataset('data', data = data_sorted)
+    intensity = exchange.create_dataset('data', data = data_sorted, compression = 'gzip')
     el = exchange.create_dataset('elements', data = elements)
     angle = exchange.create_dataset('theta', data = theta_sorted)
     
