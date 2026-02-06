@@ -379,7 +379,7 @@ def create_aggregate_xrf_h5(file_path_array,
 
         counts_array_sorted[:, second_neg_90_deg_idx:] = np.flip(counts_array_sorted[:, second_neg_90_deg_idx:], axis = 2)
 
-        file_path_array_sorted = [file_path_array[theta_idx] for theta_idx in range(len(theta_idx_sorted))]
+        file_path_array_sorted = [file_path_array[theta_idx] for theta_idx in range(len(theta_array_sorted))]
 
     else:
         theta_idx_sorted = np.argsort(theta_array) # Get indices for angles for sorting them in ascending order
