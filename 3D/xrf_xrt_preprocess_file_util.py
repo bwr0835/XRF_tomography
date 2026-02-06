@@ -58,7 +58,7 @@ def extract_h5_xrf_data(file_path, synchrotron, **kwargs):
                 elements_h5 = h5['MAPS/XRF_Analyzed/NNLS/Channel_Names']
             
             extra_pvs_h5 = h5['MAPS/Scan/Extra_PVs']
-                
+            print(extra_pvs_h5.keys())
             nx_h5 = h5['MAPS/Scan/x_axis']
             ny_h5 = h5['MAPS/Scan/y_axis']
                 
