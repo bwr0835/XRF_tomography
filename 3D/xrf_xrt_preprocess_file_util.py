@@ -48,9 +48,9 @@ def extract_h5_xrf_data(file_path, synchrotron, **kwargs):
         print('Error: File must be HDF5. Exiting program...')
 
         sys.exit()
-    
-    h5 = h5py.File(file_path, 'r')
     print(synchrotron)
+    h5 = h5py.File(file_path, 'r')
+    
     if synchrotron == 'aps':
         try:
             if "MAPS/XRF_Analyzed/NNLS" in h5.keys():
