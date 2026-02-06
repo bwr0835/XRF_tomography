@@ -43,7 +43,7 @@ with h5py.File(output_file_path, 'w') as f:
     exchange.attrs['raw_spectrum_fitting_method'] = 'NNLS'
     exchange.attrs['raw_spectrum_fitting_software'] = 'PyMCA'
 
-    data.attrs['dataset_type'] = 'xrf'
+    intensity.attrs['dataset_type'] = 'xrf'
 
 # with h5py.File(file_path, 'r+') as f:
 #     # Read theta into memory so comparisons (e.g. == 0) work correctly;
