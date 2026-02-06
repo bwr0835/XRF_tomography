@@ -508,6 +508,8 @@ def create_aggregate_xrt_h5(file_path_array,
             counts_array_sorted[1] = us_ic
         
         counts_array_sorted[:, second_neg_90_deg_idx:] = np.flip(counts_array_sorted[:, second_neg_90_deg_idx:], axis = 2)
+        
+        file_path_array_sorted = [file_path_array[theta_idx] for theta_idx in range(len(theta_array_sorted))]
     
     else:
         theta_idx_sorted = np.argsort(theta_array) # Get indices for angles for sorting them in ascending order
@@ -515,7 +517,7 @@ def create_aggregate_xrt_h5(file_path_array,
         theta_array_sorted = theta_array[theta_idx_sorted]
         counts_array_sorted = counts_array[:, theta_idx_sorted]
 
-    file_path_array_sorted = [file_path_array[theta_idx] for theta_idx in range(n_theta)]
+        file_path_array_sorted = [file_path_array[theta_idx] for theta_idx in theta_idx_sorted]
     
     # file_path_array_sorted = [file_path_array[theta_idx] for theta_idx in theta_idx_sorted]
     
