@@ -322,7 +322,7 @@ def create_aggregate_xrf_h5(file_path_array,
     n_theta = len(file_path_array)
 
     theta_array = np.zeros(n_theta) 
-    print(synchrotron)
+
     elements, counts, theta, nx, ny, _, _ = extract_h5_xrf_data(file_path_array[0], synchrotron) # Invoke the first time for getting the number of elements and the number of pixels
     
     n_elements = len(elements)
@@ -955,7 +955,7 @@ def extract_csv_xrf_xrt_data_file_lists(file_path_1, file_path_2 = None, **kwarg
             print('Error: No .h5 files in first file array. Exiting program...')
 
             sys.exit()
-    print(filename_array_1)
+
     if kwargs.get('synchrotron') is None:
         print('Error: Synchrotron keyword argument required. Exiting program...')
 
