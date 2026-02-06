@@ -63,15 +63,15 @@ def preprocess_xrf_xrt_data(synchrotron,
         if synchrotron == 'aps':
             futil.create_aggregate_xrf_h5(xrf_file_array,
                                           output_xrf_filepath,
-                                          sample_flipped_remounted_mid_experiment,
-                                          synchrotron)
+                                          synchrotron,
+                                          sample_flipped_remounted_mid_experiment)
 
             print('Creating aggregate XRT data file...')
 
             futil.create_aggregate_xrt_h5(xrt_file_array,
                                           output_xrt_filepath,
-                                          sample_flipped_remounted_mid_experiment,
-                                          synchrotron)
+                                          synchrotron,
+                                          sample_flipped_remounted_mid_experiment)
         
         elif synchrotron == 'nsls-ii':
             us_ic = futil.create_aggregate_xrf_h5(xrf_file_array,

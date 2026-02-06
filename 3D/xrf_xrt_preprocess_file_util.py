@@ -808,7 +808,7 @@ def extract_csv_preprocessing_input_params(file_path):
         if val.lower() == 'none':
             values[idx] = None
         
-        elif val.lower() == 'true' or val.lower() == 'false':
+        elif input_params[idx] in bool_params and (val.lower() == 'true' or val.lower() == 'false'):
             values[idx] = (val.lower() == 'true')
         
         elif input_params[idx] in list_params:
