@@ -269,6 +269,8 @@ def joint_fluct_norm(xrt_array,
 
     convolution_mag_array = np.zeros((n_theta, n_slices, n_columns))
     
+    norm_array = np.zeros(n_theta)
+    
     xrt_mask_avg_sum = 0
     
     for theta_idx in range(n_theta):
@@ -282,6 +284,8 @@ def joint_fluct_norm(xrt_array,
 
         xrt_mask_avg = xrt_array[theta_idx, mask].mean()
 
+        norm_array[theta_idx] = 1/xrt_mask_avg
+
         xrt_array[theta_idx] /= xrt_mask_avg # First part of I0' = I0(<I_theta,mask,avg>/I_theta,mask,avg)
         xrf_array[:, theta_idx] /= xrt_mask_avg
 
@@ -291,10 +295,10 @@ def joint_fluct_norm(xrt_array,
     
     global_xrt_mask_avg = xrt_mask_avg_sum/n_theta
 
+    norm_array *= global_xrt_mask_avg
+
     xrt_array *= global_xrt_mask_avg # Second part of I0' = I0(<I_theta,mask,avg>/I_theta,mask,avg)
     xrf_array *= global_xrt_mask_avg
-    
-    norm_array = xrt_mask_avg*global_xrt_mask_avg
     
     if return_conv_mag_array:
         return xrt_array, xrf_array, norm_array, global_xrt_mask_avg, np.array(convolution_mag_array)
