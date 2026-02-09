@@ -239,6 +239,7 @@ def preprocess_xrf_xrt_data(synchrotron,
 
     if realignment_enabled:
         if init_edge_crop_enabled:
+            print('Yes')
             print('Creating auxilliary cropped XRF, optical density projection images...')
 
             if init_edge_pixel_lengths_to_crop is None:
