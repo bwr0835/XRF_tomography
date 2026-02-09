@@ -5,6 +5,17 @@ import numpy as np, \
        os
 
 from realignment_final import realign_proj as rap
+from matplotlib import pyplot as plt
+from imageio import v2 as iio_v2
+
+plt.rcParams['text.usetex'] = True
+plt.rcParams['font.family'] = 'serif'
+plt.rcParams['text.latex.preamble'] = r'\usepackage{times}'
+
+plt.rcParams['xtick.major.size'] = 9
+plt.rcParams['xtick.minor.size'] = 4.5
+plt.rcParams['ytick.major.size'] = 9
+plt.rcParams['ytick.minor.size'] = 4.5
 
 def preprocess_xrf_xrt_data(synchrotron,
                             synchrotron_beamline,
@@ -17,6 +28,7 @@ def preprocess_xrf_xrt_data(synchrotron,
                             pre_existing_align_norm_file_enabled,
                             pre_existing_align_norm_file_path,
                             norm_enabled,
+                            desired_xrf_element,
                             xrt_data_percentile,
                             return_aux_data,
                             I0_cts_per_s,
@@ -35,7 +47,8 @@ def preprocess_xrf_xrt_data(synchrotron,
                             eps_iter_reproj,
                             final_edge_crop_enabled,
                             final_edge_pixel_lengths_to_crop,
-                            aligned_data_output_dir_path):
+                            aligned_data_output_dir_path,
+                            fps):
 
     if create_aggregate_xrf_xrt_files_enabled:
         if pre_existing_aggregate_xrf_xrt_file_lists_enabled:
@@ -189,28 +202,35 @@ def preprocess_xrf_xrt_data(synchrotron,
                                                                                                                 counts_xrf, 
                                                                                                                 xrt_data_percentile, 
                                                                                                                 return_conv_mag_array = True)
-
+                    opt_dens = -np.log(counts_xrt_sig/I0_cts)
+                
                 else:
                     counts_xrt_norm, counts_xrf_norm, norm_array, I0_cts = ppu.joint_fluct_norm(counts_xrt_sig,
                                                                                                 counts_xrf,
                                                                                                 xrt_data_percentile)
 
             else:
-                if I0_cts_per_s is None or I0_cts_per_s < 0 or t_dwell_s is None or t_dwell_s < 0:
-                    print('Error: Incident photon flux and dwell time must be positive values. Exiting program...')
+                if I0_cts_per_s is None or t_dwell_s is None:
+                    print('Warning: Incident photon flux and/or dwell time not provided. Optical density will be calculated using the mean incident intensity of empty space around sample.')
+                   
+                    _, _, _, I0_cts, _ = ppu.joint_fluct_norm(counts_xrt_sig, counts_xrf, xrt_data_percentile)
+                
+                else:
+                    if I0_cts_per_s < 0 or t_dwell_s < 0:
+                        print('Error: Incident photon flux and dwell time must be positive values. Exiting program...')
 
-                    sys.exit()
+                        sys.exit()
+            
+                    I0_cts = I0_cts_per_s*t_dwell_s
                 
                 norm_array = np.ones(n_theta)
 
                 counts_xrf_norm = counts_xrf
                 counts_xrt_norm = counts_xrt_sig
                 
-                I0_cts = I0_cts_per_s*t_dwell_s
-
         print('Calculating optical densities...')
         
-        opt_dens = -np.log(counts_xrt_norm/I0_cts)
+        opt_dens_norm = -np.log(counts_xrt_norm/I0_cts)
     
     xrt_od_xrf_realignment_subdir_path = os.path.join(aligned_data_output_dir_path, 'xrt_od_xrf_realignment')
 
@@ -225,7 +245,7 @@ def preprocess_xrf_xrt_data(synchrotron,
 
                 sys.exit()
             
-            init_cropped_xrf_array, init_cropped_xrt_array, init_cropped_opt_dens_array = ppu.crop_array(counts_xrf_norm, counts_xrt_norm, opt_dens, init_edge_pixel_lengths_to_crop)
+            init_cropped_xrf_array, init_cropped_xrt_array, init_cropped_opt_dens_array = ppu.crop_array(counts_xrf_norm, counts_xrt_norm, opt_dens_norm, init_edge_pixel_lengths_to_crop)
         
         else:
             init_cropped_xrf_array = None
@@ -255,7 +275,7 @@ def preprocess_xrf_xrt_data(synchrotron,
                 dx_pcc_array, \
                 dy_pcc_array = rap(counts_xrt_norm,
                                    init_cropped_xrt_array,
-                                   opt_dens,
+                                   opt_dens_norm,
                                    init_cropped_opt_dens_array,
                                    counts_xrf_norm,
                                    init_cropped_xrf_array,
@@ -291,7 +311,7 @@ def preprocess_xrf_xrt_data(synchrotron,
                 dx_pcc_array, \
                 dy_pcc_array = rap(counts_xrt_norm,
                                    init_cropped_xrt_array,
-                                   opt_dens,
+                                   opt_dens_norm,
                                    init_cropped_opt_dens_array,
                                    counts_xrf_norm,
                                    init_cropped_xrf_array,
@@ -310,10 +330,6 @@ def preprocess_xrf_xrt_data(synchrotron,
                                    eps_iter_reproj,
                                    init_edge_pixel_lengths_to_crop,
                                    return_aux_data = True)
-
-            print('Writing convolution magnitude array to NumPy (.npy) file (NOTE: Python is needed to view this!)...')
-            
-            futil.create_aux_conv_mag_data_npy(xrt_od_xrf_realignment_subdir_path, conv_mag_array)
 
             print('Writing the following auxiliary, per-iteration data to NumPy (.npy) files (NOTE: Python is needed to view these!):')
             
@@ -363,7 +379,7 @@ def preprocess_xrf_xrt_data(synchrotron,
             net_x_shifts_pcc_final, \
             net_y_shifts_pcc_final = rap(counts_xrt_norm,
                                          init_cropped_xrt_array,
-                                         opt_dens,
+                                         opt_dens_norm,
                                          init_cropped_opt_dens_array,
                                          counts_xrf_norm,
                                          init_cropped_xrf_array,
@@ -431,9 +447,39 @@ def preprocess_xrf_xrt_data(synchrotron,
 
     else:
         if return_aux_data:
-            print('Writing per-projection convolution magnitudes to NumPy (.npy) file...')
+            if norm_enabled:
+                print('Writing per-projection convolution magnitudes to NumPy (.npy) file...')
 
-            futil.create_aux_conv_mag_data_npy(xrt_od_xrf_realignment_subdir_path, conv_mag_array)
+                futil.create_aux_conv_mag_data_npy(xrt_od_xrf_realignment_subdir_path, conv_mag_array)
+            
+                print('Preparing pre-aligned, non-cropped, normalized XRF, XRT, and optical density projection data for GIF creation...')
+
+                futil.create_nonaligned_norm_non_cropped_proj_data_gif(xrt_od_xrf_realignment_subdir_path = xrt_od_xrf_realignment_subdir_path,
+                                                                       elements_xrf = elements_xrf,
+                                                                       desired_xrf_element = desired_xrf_element,
+                                                                       counts_xrf = counts_xrf_norm,
+                                                                       counts_xrf_norm = counts_xrf_norm,
+                                                                       counts_xrt = counts_xrt_sig,
+                                                                       counts_xrt_norm = counts_xrt_norm,
+                                                                       opt_dens = opt_dens,
+                                                                       opt_dens_norm = opt_dens_norm,
+                                                                       norm_enabled = norm_enabled,
+                                                                       xrt_data_percentile = xrt_data_percentile, #
+                                                                       theta = theta,
+                                                                       fps = fps)
+
+            else:
+                print('Preparing pre-aligned, non-cropped, non-normalized XRF, XRT, and optical density projection data for GIF creation...')
+            
+                futil.create_nonaligned_norm_non_cropped_proj_data_gif(xrt_od_xrf_realignment_subdir_path = xrt_od_xrf_realignment_subdir_path,
+                                                                       elements_xrf = elements_xrf,
+                                                                       desired_xrf_element = desired_xrf_element,
+                                                                       counts_xrf = counts_xrf,
+                                                                       counts_xrt = counts_xrt_sig,
+                                                                       opt_dens = opt_dens_norm, # NOTE: opt_dens is the same as opt_dens_norm since norm_enabled is False
+                                                                       norm_enabled = norm_enabled,
+                                                                       theta = theta,
+                                                                       fps = fps)
         
         # if zero_idx_to_discard is not None:
         #     final_xrf, \
@@ -448,7 +494,7 @@ def preprocess_xrf_xrt_data(synchrotron,
         # else:
             final_xrf = counts_xrf_norm
             final_xrt = counts_xrt_norm
-            final_opt_dens = opt_dens
+            final_opt_dens = opt_dens_norm
             theta_final = theta
 
         if final_edge_crop_enabled:
@@ -466,7 +512,7 @@ def preprocess_xrf_xrt_data(synchrotron,
         else:
             final_xrf_cropped = counts_xrf_norm
             final_xrt_sig_cropped = counts_xrt_norm
-            final_opt_dens_cropped = opt_dens
+            final_opt_dens_cropped = opt_dens_norm
 
             if final_edge_pixel_lengths_to_crop is not None:
                 print("Warning: Non-empty 'final_edge_pixel_lengths_to_crop' dictionary detected. Removing items from 'final_edge_pixel_lengths_to_crop'...")
