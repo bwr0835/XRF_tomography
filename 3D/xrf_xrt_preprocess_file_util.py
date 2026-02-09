@@ -27,7 +27,7 @@ def extract_h5_xrf_xrt_data_file_lists_tk(synchrotron):
     root.withdraw()
     
     if synchrotron == 'aps':
-        xrf_file_array = fd.askopenfilenames(parent = root, title = "Choose XRF files to aggregate.", filetypes = [('HDF5 files', '*.h5')])
+        xrf_file_array = list(fd.askopenfilenames(parent = root, title = "Choose XRF files to aggregate.", filetypes = [('HDF5 files', '*.h5')]))
 
         if xrf_file_array == '':
             print('Error: XRF/XRT filename array empty. Exiting program...')
@@ -37,8 +37,8 @@ def extract_h5_xrf_xrt_data_file_lists_tk(synchrotron):
         xrt_file_array = xrf_file_array.copy()
 
     else:
-        xrf_file_array = fd.askopenfilenames(parent = root, title = "Choose XRF files to aggregate.", filetypes = [('HDF5 files', '*.h5')])
-        xrt_file_array = fd.askopenfilenames(parent = root, title = "Choose XRT files to aggregate.", filetypes = [('HDF5 files', '*.h5')])
+        xrf_file_array = list(fd.askopenfilenames(parent = root, title = "Choose XRF files to aggregate.", filetypes = [('HDF5 files', '*.h5')]))
+        xrt_file_array = list(fd.askopenfilenames(parent = root, title = "Choose XRT files to aggregate.", filetypes = [('HDF5 files', '*.h5')]))
 
         if xrf_file_array == '' or xrt_file_array == '':
             print('Error: XRF and/or XRT filename array empty. Exiting program...')
