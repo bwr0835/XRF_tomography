@@ -1019,8 +1019,7 @@ def create_nonaligned_norm_non_cropped_proj_data_gif(dir_path,
                                                      counts_xrf_norm = None,
                                                      counts_xrt = None,
                                                      counts_xrt_norm = None,
-                                                     opt_dens = None, 
-                                                     opt_dens_norm = None,
+                                                     opt_dens = None,
                                                      convolution_mag_array = None,
                                                      norm_enabled = False,
                                                      data_percentile = None,
@@ -1070,9 +1069,6 @@ def create_nonaligned_norm_non_cropped_proj_data_gif(dir_path,
         vmin_xrf_norm = counts_xrf_ref_element_norm.min()
         vmax_xrf_norm = counts_xrf_ref_element_norm.max()
 
-        vmin_opt_dens_norm = opt_dens_norm.min()
-        vmax_opt_dens_norm = opt_dens_norm.max()
-
         if convolution_mag_array is not None:
             fig1, axs1 = plt.subplots(3, 2)
 
@@ -1087,15 +1083,15 @@ def create_nonaligned_norm_non_cropped_proj_data_gif(dir_path,
             im1_2 = axs1[0, 1].imshow(conv_mask, vmin = vmin_conv, vmax = vmax_conv)
             im1_3 = axs1[1, 0].imshow(counts_xrt[0], vmin = vmin_xrt, vmax = vmax_xrt)
             im1_4 = axs1[1, 1].imshow(counts_xrt_norm[0], vmin = vmin_xrt_norm, vmax = vmax_xrt_norm)
-            im1_5 = axs1[2, 0].imshow(opt_dens[0], vmin = vmin_opt_dens, vmax = vmax_opt_dens)
-            im1_6 = axs1[2, 1].imshow(opt_dens_norm[0], vmin = vmin_opt_dens_norm, vmax = vmax_opt_dens_norm)
+            im1_5 = axs1[2, 0].imshow(counts_xrf_ref_element[0], vmin = vmin_xrf, vmax = vmax_xrf)
+            im1_6 = axs1[2, 1].imshow(counts_xrf_ref_element_norm[0], vmin = vmin_xrf_norm, vmax = vmax_xrf_norm)
 
             axs1[0, 0].set_title(r'XRT conv.', fontsize = 14)
-            axs1[1, 0].set_title(r'XRT data', fontsize = 14)
-            axs1[2, 0].set_title(r'OD data', fontsize = 14)
             axs1[0, 1].set_title(r'XRT conv. mask', fontsize = 14)
+            axs1[1, 0].set_title(r'XRT data', fontsize = 14)
             axs1[1, 1].set_title(r'Norm. XRT data', fontsize = 14)
-            axs1[2, 1].set_title(r'Norm. OD data', fontsize = 14)
+            axs1[2, 0].set_title(r'XRF data ({0})'.format(desired_xrf_element), fontsize = 14)
+            axs1[2, 1].set_title(r'Norm. XRF data ({0})'.format(desired_xrf_element), fontsize = 14)
 
             text_1 = axs1[0, 0].text(0.02, 0.02, r'$\theta = {0}$\textdegree'.format(theta_array[0]), transform = axs1[0, 0].transAxes, color = 'white')
 
@@ -1112,8 +1108,8 @@ def create_nonaligned_norm_non_cropped_proj_data_gif(dir_path,
                 im1_2.set_data(conv_mask)
                 im1_3.set_data(counts_xrt[theta_idx])
                 im1_4.set_data(counts_xrt_norm[theta_idx])
-                im1_5.set_data(opt_dens[theta_idx])
-                im1_6.set_data(opt_dens_norm[theta_idx])
+                im1_5.set_data(counts_xrf_ref_element[theta_idx])
+                im1_6.set_data(counts_xrf_ref_element_norm[theta_idx])
 
                 text_1.set_text(r'$\theta = {0}$\textdegree'.format(theta_array[theta_idx]))
 
@@ -1128,13 +1124,13 @@ def create_nonaligned_norm_non_cropped_proj_data_gif(dir_path,
 
             im1_1 = axs1[0, 0].imshow(counts_xrt[0], vmin = vmin_xrt, vmax = vmax_xrt)
             im1_2 = axs1[0, 1].imshow(counts_xrt_norm[0], vmin = vmin_xrt_norm, vmax = vmax_xrt_norm)
-            im1_3 = axs1[1, 0].imshow(opt_dens[0], vmin = vmin_opt_dens, vmax = vmax_opt_dens)
-            im1_4 = axs1[1, 1].imshow(opt_dens_norm[0], vmin = vmin_opt_dens_norm, vmax = vmax_opt_dens_norm)
+            im1_3 = axs1[1, 0].imshow(counts_xrf_ref_element[0], vmin = vmin_xrf, vmax = vmax_xrf)
+            im1_4 = axs1[1, 1].imshow(counts_xrf_ref_element_norm[0], vmin = vmin_xrf_norm, vmax = vmax_xrf_norm)
 
             axs1[0, 0].set_title(r'XRT data', fontsize = 14)
             axs1[0, 1].set_title(r'Norm. XRT data', fontsize = 14)
-            axs1[1, 0].set_title(r'OD data', fontsize = 14)
-            axs1[1, 1].set_title(r'Norm. OD data', fontsize = 14)
+            axs1[1, 0].set_title(r'XRF data ({0})'.format(desired_xrf_element), fontsize = 14)
+            axs1[1, 1].set_title(r'Norm. XRF data ({0})'.format(desired_xrf_element), fontsize = 14)
 
             text_1 = axs1[0, 0].text(0.02, 0.02, r'$\theta = {0}$\textdegree'.format(theta_array[0]), transform = axs1[0, 0].transAxes, color = 'white')
 
@@ -1145,8 +1141,8 @@ def create_nonaligned_norm_non_cropped_proj_data_gif(dir_path,
             for theta_idx in range(n_theta):
                 im1_1.set_data(counts_xrt[theta_idx])
                 im1_2.set_data(counts_xrt_norm[theta_idx])
-                im1_3.set_data(opt_dens[theta_idx])
-                im1_4.set_data(opt_dens_norm[theta_idx])
+                im1_3.set_data(counts_xrf_ref_element[theta_idx])
+                im1_4.set_data(counts_xrf_ref_element_norm[theta_idx])
 
                 text_1.set_text(r'$\theta = {0}$\textdegree'.format(theta_array[theta_idx]))
 
@@ -1166,34 +1162,27 @@ def create_nonaligned_norm_non_cropped_proj_data_gif(dir_path,
 
         print('Plotting non-aligned, non-cropped, normalized XRT, optical density, XRF projection data...')
 
-        fig2, axs2 = plt.subplots(3, 2)
+        fig2, axs2 = plt.subplots(3, 1)
 
         theta_frames2 = []
 
-        im2_1 = axs2[0, 0].imshow(counts_xrt_norm[0], vmin = vmin_xrt_norm, vmax = vmax_xrt_norm)
-        im2_2 = axs2[0, 1].imshow(counts_xrf_ref_element_norm[0], vmin = vmin_xrt_norm, vmax = vmax_xrt_norm)
-        im2_3 = axs2[1, 0].imshow(opt_dens[0], vmin = vmin_opt_dens, vmax = vmax_opt_dens)
-        im2_4 = axs2[1, 1].imshow(opt_dens_norm[0], vmin = vmin_opt_dens_norm, vmax = vmax_opt_dens_norm)
-        im2_5 = axs2[2, 0].imshow(counts_xrf_ref_element[0], vmin = vmin_xrf, vmax = vmax_xrf)
-        im2_6 = axs2[2, 1].imshow(counts_xrf_ref_element_norm[0], vmin = vmin_xrf_norm, vmax = vmax_xrf_norm)
-
-        text_2 = axs2[0, 0].text(0.02, 0.02, r'$\theta = {0}$\textdegree'.format(theta_array[0]), transform = axs2[0, 0].transAxes, color = 'white')
+        im2_1 = axs2[0].imshow(counts_xrt_norm[0], vmin = vmin_xrt_norm, vmax = vmax_xrt_norm)
+        im2_2 = axs2[2].imshow(opt_dens[0], vmin = vmin_opt_dens, vmax = vmax_opt_dens)
+        im2_3 = axs2[1].imshow(counts_xrf_ref_element_norm[0], vmin = vmin_xrt_norm, vmax = vmax_xrt_norm)
         
-        axs2[0, 0].set_title(r'XRF ({0})'.format(desired_xrf_element), fontsize = 14)
-        axs2[1, 0].set_title(r'Opt. Dens.', fontsize = 14)
-        axs2[0, 1].set_title(r'Norm. XRF ({0})'.format(desired_xrf_element), fontsize = 14)
-        axs2[1, 1].set_title(r'Norm. Opt. Dens.', fontsize = 14)
+        text_2 = axs2[0].text(0.02, 0.02, r'$\theta = {0}$\textdegree'.format(theta_array[0]), transform = axs2[0, 0].transAxes, color = 'white')
+        
+        axs2[0].set_title(r'Norm. XRT', fontsize = 14)
+        axs2[1].set_title(r'Norm. Opt. Dens.', fontsize = 14)
+        axs2[2].set_title(r'Norm. XRF ({0})'.format(desired_xrf_element), fontsize = 14)
 
         for axs in fig2.axes:
             axs.axis('off')
 
         for theta_idx in range(n_theta):
             im2_1.set_data(counts_xrt_norm[theta_idx])
-            im2_2.set_data(counts_xrf_ref_element_norm[theta_idx])
-            im2_3.set_data(opt_dens[theta_idx])
-            im2_4.set_data(opt_dens_norm[theta_idx])
-            im2_5.set_data(counts_xrf_ref_element[theta_idx])
-            im2_6.set_data(counts_xrf_ref_element_norm[theta_idx])
+            im2_2.set_data(opt_dens[theta_idx])
+            im2_3.set_data(counts_xrf_ref_element_norm[theta_idx])
 
             text_2.set_text(r'$\theta = {0}$\textdegree'.format(theta_array[theta_idx]))
 
@@ -1216,7 +1205,7 @@ def create_nonaligned_norm_non_cropped_proj_data_gif(dir_path,
         fig3, axs3 = plt.subplots(3, 1)
 
         im3_1 = axs3[0].imshow(counts_xrt_norm[:, 0], vmin = vmin_xrt_norm, vmax = vmax_xrt_norm, aspect = 'auto')
-        im3_2 = axs3[1].imshow(opt_dens_norm[:, 0], vmin = vmin_opt_dens_norm, vmax = vmax_opt_dens_norm, aspect = 'auto')
+        im3_2 = axs3[1].imshow(opt_dens[:, 0], vmin = vmin_opt_dens, vmax = vmax_opt_dens, aspect = 'auto')
         im3_3 = axs3[2].imshow(counts_xrf_ref_element_norm[:, 0], vmin = vmin_xrf_norm, vmax = vmax_xrf_norm, aspect = 'auto')
 
         text_3 = axs3[0].text(0.02, 0.02, r'Slice 0/{0}'.format(n_slices - 1), transform = axs3[0].transAxes, color = 'white')
@@ -1230,7 +1219,7 @@ def create_nonaligned_norm_non_cropped_proj_data_gif(dir_path,
 
         for slice_idx in range(n_slices):
             im3_1.set_data(counts_xrt_norm[:, slice_idx])
-            im3_2.set_data(opt_dens_norm[:, slice_idx])
+            im3_2.set_data(opt_dens[:, slice_idx])
             im3_3.set_data(counts_xrf_ref_element_norm[:, slice_idx])
 
             text_3.set_text(r'Slice {0}/{1}'.format(slice_idx, n_slices - 1))

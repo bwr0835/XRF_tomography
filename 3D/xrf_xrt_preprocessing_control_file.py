@@ -192,8 +192,6 @@ def preprocess_xrf_xrt_data(synchrotron,
 
             counts_xrf_norm = counts_xrf*norm_array[None, :, None, None]
             counts_xrt_norm = counts_xrt_sig*norm_array[:, None, None]
-
-            opt_dens = -np.log(counts_xrt_sig_backup/counts_us_ic)
                 
         else:
             net_x_shift_array = np.zeros(n_theta)
@@ -207,7 +205,6 @@ def preprocess_xrf_xrt_data(synchrotron,
                                                                                                                 counts_xrf, 
                                                                                                                 xrt_data_percentile, 
                                                                                                                 return_conv_mag_array = True)
-                    opt_dens = -np.log(counts_xrt_sig_backup/counts_us_ic)
                 
                 else:
                     counts_xrt_norm, counts_xrf_norm, norm_array, I0_cts = ppu.joint_fluct_norm(counts_xrt_sig,
@@ -467,8 +464,7 @@ def preprocess_xrf_xrt_data(synchrotron,
                                                                            counts_xrf_norm = counts_xrf_norm,
                                                                            counts_xrt = counts_xrt_sig_backup,
                                                                            counts_xrt_norm = counts_xrt_norm,
-                                                                           opt_dens = opt_dens,
-                                                                           opt_dens_norm = opt_dens_norm,
+                                                                           opt_dens = opt_dens_norm,
                                                                            convolution_mag_array = conv_mag_array,
                                                                            norm_enabled = norm_enabled,
                                                                            data_percentile = xrt_data_percentile, #
@@ -485,8 +481,7 @@ def preprocess_xrf_xrt_data(synchrotron,
                                                                            counts_xrf_norm = counts_xrf_norm,
                                                                            counts_xrt = counts_xrt_sig_backup,
                                                                            counts_xrt_norm = counts_xrt_norm,
-                                                                           opt_dens = opt_dens,
-                                                                           opt_dens_norm = opt_dens_norm,
+                                                                           opt_dens = opt_dens_norm,
                                                                            norm_enabled = norm_enabled,
                                                                            data_percentile = xrt_data_percentile, #
                                                                            theta_array = theta,
@@ -500,7 +495,7 @@ def preprocess_xrf_xrt_data(synchrotron,
                                                                        desired_xrf_element = desired_xrf_element,
                                                                        counts_xrf = counts_xrf,
                                                                        counts_xrt = counts_xrt_sig,
-                                                                       opt_dens = opt_dens_norm, # NOTE: opt_dens is the same as opt_dens_norm since norm_enabled is False
+                                                                       opt_dens_norm = opt_dens_norm, # NOTE: opt_dens is the same as opt_dens_norm since norm_enabled is False
                                                                        norm_enabled = norm_enabled,
                                                                        theta_array = theta,
                                                                        fps = fps)
