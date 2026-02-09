@@ -1136,8 +1136,8 @@ def create_nonaligned_norm_non_cropped_proj_data_gif(dir_path,
 
         theta_frames2 = []
 
-        im2_1 = axs2[0, 0].imshow(counts_xrf[0], vmin = vmin_xrf, vmax = vmax_xrf)
-        im2_2 = axs2[0, 1].imshow(counts_xrf_norm[0], vmin = vmin_xrf_norm, vmax = vmax_xrf_norm)
+        im2_1 = axs2[0, 0].imshow(counts_xrf_ref_element[0], vmin = vmin_xrf, vmax = vmax_xrf)
+        im2_2 = axs2[0, 1].imshow(counts_xrf_ref_element_norm[0], vmin = vmin_xrf_norm, vmax = vmax_xrf_norm)
         im2_3 = axs2[1, 0].imshow(opt_dens[0], vmin = vmin_opt_dens, vmax = vmax_opt_dens)
         im2_4 = axs2[1, 1].imshow(opt_dens_norm[0], vmin = vmin_opt_dens_norm, vmax = vmax_opt_dens_norm)
 
@@ -1152,8 +1152,8 @@ def create_nonaligned_norm_non_cropped_proj_data_gif(dir_path,
             axs.axis('off')
 
         for theta_idx in range(n_theta):
-            im2_1.set_data(counts_xrf[theta_idx])
-            im2_2.set_data(counts_xrf_norm[theta_idx])
+            im2_1.set_data(counts_xrf_ref_element[theta_idx])
+            im2_2.set_data(counts_xrf_ref_element_norm[theta_idx])
             im2_3.set_data(opt_dens[theta_idx])
             im2_4.set_data(opt_dens_norm[theta_idx])
 
@@ -1179,7 +1179,7 @@ def create_nonaligned_norm_non_cropped_proj_data_gif(dir_path,
 
         im3_1 = axs3[0].imshow(counts_xrt_norm[:, 0, :], vmin = vmin_xrt_norm, vmax = vmax_xrt_norm)
         im3_2 = axs3[1].imshow(opt_dens_norm[:, 0, :], vmin = vmin_opt_dens_norm, vmax = vmax_opt_dens_norm)
-        im3_3 = axs3[2].imshow(counts_xrf_norm[:, 0, :], vmin = vmin_xrf_norm, vmax = vmax_xrf_norm)
+        im3_3 = axs3[2].imshow(counts_xrf_ref_element_norm[:, 0, :], vmin = vmin_xrf_norm, vmax = vmax_xrf_norm)
 
         text_3 = axs3[0].text(0.02, 0.02, r'Slice 0/{0}'.format(n_slices - 1), transform = axs3[0].transAxes, color = 'white')
         
@@ -1193,7 +1193,7 @@ def create_nonaligned_norm_non_cropped_proj_data_gif(dir_path,
         for slice_idx in range(n_slices):
             im3_1.set_data(counts_xrt_norm[:, slice_idx, :])
             im3_2.set_data(opt_dens_norm[:, slice_idx, :])
-            im3_3.set_data(counts_xrf_norm[:, slice_idx, :])
+            im3_3.set_data(counts_xrf_ref_element_norm[:, slice_idx, :])
 
             text_3.set_text(r'Slice {0}/{1}'.format(slice_idx, n_slices - 1))
 
@@ -1218,7 +1218,7 @@ def create_nonaligned_norm_non_cropped_proj_data_gif(dir_path,
 
         im1_1 = axs1[0].imshow(counts_xrt[0], vmin = vmin_xrt, vmax = vmax_xrt)
         im1_2 = axs1[1].imshow(opt_dens[0], vmin = vmin_opt_dens, vmax = vmax_opt_dens)
-        im1_3 = axs1[2].imshow(counts_xrf[0], vmin = vmin_xrf, vmax = vmax_xrf)
+        im1_3 = axs1[2].imshow(counts_xrf_ref_element[0], vmin = vmin_xrf, vmax = vmax_xrf)
 
         text_1 = axs1[0].text(0.02, 0.02, r'$\theta = {0}$\textdegree'.format(theta_array[0]), transform = axs1[0].transAxes, color = 'white')
 
@@ -1232,7 +1232,7 @@ def create_nonaligned_norm_non_cropped_proj_data_gif(dir_path,
         for theta_idx in range(n_theta):
             im1_1.set_data(counts_xrt[theta_idx])
             im1_2.set_data(opt_dens[theta_idx])
-            im1_3.set_data(counts_xrf[theta_idx])
+            im1_3.set_data(counts_xrf_ref_element[theta_idx])
 
             text_1.set_text(r'$\theta = {0}$\textdegree'.format(theta_array[theta_idx]))
 
@@ -1256,7 +1256,7 @@ def create_nonaligned_norm_non_cropped_proj_data_gif(dir_path,
 
         im2_1 = axs2[0].imshow(counts_xrt[:, 0, :], vmin = vmin_xrt, vmax = vmax_xrt)
         im2_2 = axs2[1].imshow(opt_dens[:, 0, :], vmin = vmin_opt_dens, vmax = vmax_opt_dens)
-        im2_3 = axs2[2].imshow(counts_xrf[:, 0, :], vmin = vmin_xrf, vmax = vmax_xrf)
+        im2_3 = axs2[2].imshow(counts_xrf_ref_element[:, 0, :], vmin = vmin_xrf, vmax = vmax_xrf)
 
         text_2 = axs2[0].text(0.02, 0.02, r'Slice 0/{0}'.format(n_slices - 1), transform = axs2[0].transAxes, color = 'white')
         
@@ -1270,7 +1270,7 @@ def create_nonaligned_norm_non_cropped_proj_data_gif(dir_path,
         for slice_idx in range(n_slices):
             im2_1.set_data(counts_xrt[:, slice_idx, :])
             im2_2.set_data(opt_dens[:, slice_idx, :])
-            im2_3.set_data(counts_xrf[:, slice_idx, :])
+            im2_3.set_data(counts_xrf_ref_element[:, slice_idx, :])
 
             text_2.set_text(r'Slice {0}/{1}'.format(slice_idx, n_slices - 1))
 
