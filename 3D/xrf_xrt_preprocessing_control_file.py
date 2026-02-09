@@ -454,7 +454,7 @@ def preprocess_xrf_xrt_data(synchrotron,
             
                 print('Preparing pre-aligned, non-cropped, normalized XRF, XRT, and optical density projection data for GIF creation...')
 
-                futil.create_nonaligned_norm_non_cropped_proj_data_gif(xrt_od_xrf_realignment_subdir_path = xrt_od_xrf_realignment_subdir_path,
+                futil.create_nonaligned_norm_non_cropped_proj_data_gif(dir_path = xrt_od_xrf_realignment_subdir_path,
                                                                        elements_xrf = elements_xrf,
                                                                        desired_xrf_element = desired_xrf_element,
                                                                        counts_xrf = counts_xrf_norm,
@@ -471,7 +471,7 @@ def preprocess_xrf_xrt_data(synchrotron,
             else:
                 print('Preparing pre-aligned, non-cropped, non-normalized XRF, XRT, and optical density projection data for GIF creation...')
             
-                futil.create_nonaligned_norm_non_cropped_proj_data_gif(xrt_od_xrf_realignment_subdir_path = xrt_od_xrf_realignment_subdir_path,
+                futil.create_nonaligned_norm_non_cropped_proj_data_gif(dir_path = xrt_od_xrf_realignment_subdir_path,
                                                                        elements_xrf = elements_xrf,
                                                                        desired_xrf_element = desired_xrf_element,
                                                                        counts_xrf = counts_xrf,
