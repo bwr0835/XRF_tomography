@@ -455,7 +455,7 @@ def preprocess_xrf_xrt_data(synchrotron,
                 print('Preparing pre-aligned, non-cropped, normalized XRF, XRT, and optical density projection data for GIF creation...')
 
                 futil.create_nonaligned_norm_non_cropped_proj_data_gif(dir_path = xrt_od_xrf_realignment_subdir_path,
-                                                                       elements_xrf = elements_xrf,
+                                                                       xrf_element_array = elements_xrf,
                                                                        desired_xrf_element = desired_xrf_element,
                                                                        counts_xrf = counts_xrf_norm,
                                                                        counts_xrf_norm = counts_xrf_norm,
@@ -463,22 +463,23 @@ def preprocess_xrf_xrt_data(synchrotron,
                                                                        counts_xrt_norm = counts_xrt_norm,
                                                                        opt_dens = opt_dens,
                                                                        opt_dens_norm = opt_dens_norm,
+                                                                       convolution_mag_array = conv_mag_array,
                                                                        norm_enabled = norm_enabled,
-                                                                       xrt_data_percentile = xrt_data_percentile, #
-                                                                       theta = theta,
+                                                                       data_percentile = xrt_data_percentile, #
+                                                                       theta_array = theta,
                                                                        fps = fps)
 
             else:
                 print('Preparing pre-aligned, non-cropped, non-normalized XRF, XRT, and optical density projection data for GIF creation...')
             
                 futil.create_nonaligned_norm_non_cropped_proj_data_gif(dir_path = xrt_od_xrf_realignment_subdir_path,
-                                                                       elements_xrf = elements_xrf,
+                                                                       xrf_element_array = elements_xrf,
                                                                        desired_xrf_element = desired_xrf_element,
                                                                        counts_xrf = counts_xrf,
                                                                        counts_xrt = counts_xrt_sig,
                                                                        opt_dens = opt_dens_norm, # NOTE: opt_dens is the same as opt_dens_norm since norm_enabled is False
                                                                        norm_enabled = norm_enabled,
-                                                                       theta = theta,
+                                                                       theta_array = theta,
                                                                        fps = fps)
         
         # if zero_idx_to_discard is not None:
