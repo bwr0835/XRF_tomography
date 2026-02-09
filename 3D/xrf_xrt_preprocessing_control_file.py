@@ -55,6 +55,7 @@ def preprocess_xrf_xrt_data(synchrotron,
             print('Extracting pre-existing XRF, XRT HDF5 file lists...')
             
             if synchrotron == 'aps':
+                print(synchrotron)
                 xrf_file_array, xrt_file_array = futil.extract_csv_xrf_xrt_data_file_lists(aggregate_xrf_csv_file_path, synchrotron = synchrotron)
             
             else:

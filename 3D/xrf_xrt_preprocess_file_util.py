@@ -928,8 +928,7 @@ def extract_csv_xrf_xrt_data_file_lists(file_path_1, file_path_2 = None, **kwarg
 
         sys.exit()
 
-    if kwargs.get('synchrotron') == 'aps':
-        print('Yes')        
+    if kwargs.get('synchrotron') == 'aps': 
         filename_array_2 = filename_array_1.copy()
     
     else:
