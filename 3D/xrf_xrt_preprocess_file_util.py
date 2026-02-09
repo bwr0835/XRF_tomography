@@ -635,7 +635,7 @@ def extract_csv_norm_net_shift_data(file_path, theta_array):
     norm_mass_calibration_net_shift_data = pd.read_csv(file_path)
     
     try:
-        thetas = norm_mass_calibration_net_shift_data['theta'].to_numpy().astype(float)
+        thetas = norm_mass_calibration_net_shift_data['theta_deg'].to_numpy().astype(float)
     
     except KeyboardInterrupt:
         print('\n\nKeyboardInterrupt occurred. Exiting program...')
