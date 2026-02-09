@@ -58,6 +58,8 @@ preprocessing_bool_params = ['create_aggregate_xrf_xrt_files_enabled',
                              'pre_existing_aggregate_xrf_xrt_file_lists_enabled', 
                              'pre_existing_align_norm_file_enabled',
                              'norm_enabled',
+                             'return_aux_data',
+                             'init_edge_crop_enabled',
                              'realignment_enabled',
                              'sample_flipped_remounted_mid_experiment',
                              'final_edge_crop_enabled']

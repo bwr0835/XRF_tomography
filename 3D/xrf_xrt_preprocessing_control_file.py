@@ -55,7 +55,6 @@ def preprocess_xrf_xrt_data(synchrotron,
             print('Extracting pre-existing XRF, XRT HDF5 file lists...')
             
             if synchrotron == 'aps':
-                print(synchrotron)
                 xrf_file_array, xrt_file_array = futil.extract_csv_xrf_xrt_data_file_lists(aggregate_xrf_csv_file_path, synchrotron = synchrotron)
             
             else:
@@ -239,7 +238,6 @@ def preprocess_xrf_xrt_data(synchrotron,
 
     if realignment_enabled:
         if init_edge_crop_enabled:
-            print('Yes')
             print('Creating auxilliary cropped XRF, optical density projection images...')
 
             if init_edge_pixel_lengths_to_crop is None:
