@@ -179,13 +179,18 @@ def realign_proj(xrt_proj_img_array,
 
         upsample_factor = 100
     
-    if eps is None:
-        print('Warning: Nonzero, positive \'eps\' not detected. Setting \'eps\' to 0.3 pixels...')
+    if eps_cor_correction is None:
+        print('Warning: Nonzero, positive \'eps_cor_correction\' not detected. Setting \'eps_cor_correction\' to 0.001 pixels...')
 
-        eps = 0.3
+        eps_cor_correction = 0.001
 
-    if sigma < 0 or alpha < 0 or eps < 0:
-        print('Error: \'sigma\', \'alpha\', and \'eps\' must all be positive numbers. Exiting program...')
+    if eps_iter_reproj is None:
+        print('Warning: Nonzero, positive \'eps_iter_reproj\' not detected. Setting \'eps_iter_reproj\' to 0.3 pixels...')
+
+        eps_iter_reproj = 0.3
+
+    if sigma < 0 or alpha < 0 or eps_cor_correction < 0 or eps_iter_reproj < 0:
+        print('Error: \'sigma\', \'alpha\', \'eps_cor_correction\' and \'eps_iter_reproj\' must all be positive numbers. Exiting program...')
 
         sys.exit()
 
