@@ -27,7 +27,7 @@ def extract_h5_xrf_xrt_data_file_lists_tk(synchrotron):
     root.withdraw()
     
     if synchrotron == 'aps':
-        xrf_file_array = list(fd.askopenfilenames(parent = root, title = "Choose XRF files to aggregate.", filetypes = [('HDF5 files', '*.h5')]))
+        xrf_file_array = list(fd.askopenfilenames(parent = root, title = "Choose XRF files to aggregate.", filetypes = [('HDF5 files', '*.h5')])) # List so .copy() can be used
 
         if xrf_file_array == '':
             print('Error: XRF/XRT filename array empty. Exiting program...')
@@ -37,8 +37,8 @@ def extract_h5_xrf_xrt_data_file_lists_tk(synchrotron):
         xrt_file_array = xrf_file_array.copy()
 
     else:
-        xrf_file_array = list(fd.askopenfilenames(parent = root, title = "Choose XRF files to aggregate.", filetypes = [('HDF5 files', '*.h5')]))
-        xrt_file_array = list(fd.askopenfilenames(parent = root, title = "Choose XRT files to aggregate.", filetypes = [('HDF5 files', '*.h5')]))
+        xrf_file_array = fd.askopenfilenames(parent = root, title = "Choose XRF files to aggregate.", filetypes = [('HDF5 files', '*.h5')])
+        xrt_file_array = fd.askopenfilenames(parent = root, title = "Choose XRT files to aggregate.", filetypes = [('HDF5 files', '*.h5')])
 
         if xrf_file_array == '' or xrt_file_array == '':
             print('Error: XRF and/or XRT filename array empty. Exiting program...')
@@ -887,7 +887,7 @@ def create_csv_file_list(file_path_array,
                          synchrotron_beamline, 
                          dataset_type = None):
     
-    file_path_array_full = [os.path.join(dir_path, file_path) for file_path in file_path_array]
+    file_path_array_full = [[os.path.join(dir_path, file_path) for file_path in file_path_array]] # 2D list so .writerows() does not split each list element into separate characters
     
     if synchrotron == 'aps':
         with open(os.path.join(dir_path, f'{synchrotron_beamline}_xrf_xrt_file_list.csv'), 'w', newline = '') as f:
