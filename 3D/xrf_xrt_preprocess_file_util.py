@@ -29,7 +29,7 @@ def extract_h5_xrf_xrt_data_file_lists_tk(synchrotron):
     if synchrotron == 'aps':
         xrf_file_array = fd.askopenfilenames(parent = root, title = "Choose XRF files to aggregate.", filetypes = [('HDF5 files', '*.h5')])
 
-        if xrt_file_array == '':
+        if xrf_file_array == '':
             print('Error: XRF/XRT filename array empty. Exiting program...')
 
             sys.exit()
