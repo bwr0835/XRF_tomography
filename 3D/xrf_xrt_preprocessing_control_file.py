@@ -176,6 +176,7 @@ def preprocess_xrf_xrt_data(synchrotron,
 
         counts_xrt_sig_idx = elements_xrt.index('xrt_sig')
         counts_xrt_sig = counts_xrt[counts_xrt_sig_idx]
+        counts_xrt_sig_backup = counts_xrt_sig.copy()
 
         if pre_existing_align_norm_file_enabled:
             print('Extracting pre-existing normalizations, net x pixel shifts, net y pixel shifts, and incident intensity...')
@@ -202,7 +203,7 @@ def preprocess_xrf_xrt_data(synchrotron,
                                                                                                                 counts_xrf, 
                                                                                                                 xrt_data_percentile, 
                                                                                                                 return_conv_mag_array = True)
-                    opt_dens = -np.log(counts_xrt_sig/I0_cts)
+                    opt_dens = -np.log(counts_xrt_sig_backup/I0_cts)
                 
                 else:
                     counts_xrt_norm, counts_xrf_norm, norm_array, I0_cts = ppu.joint_fluct_norm(counts_xrt_sig,
@@ -459,7 +460,7 @@ def preprocess_xrf_xrt_data(synchrotron,
                                                                        desired_xrf_element = desired_xrf_element,
                                                                        counts_xrf = counts_xrf_norm,
                                                                        counts_xrf_norm = counts_xrf_norm,
-                                                                       counts_xrt = counts_xrt_sig,
+                                                                       counts_xrt = counts_xrt_sig_backup,
                                                                        counts_xrt_norm = counts_xrt_norm,
                                                                        opt_dens = opt_dens,
                                                                        opt_dens_norm = opt_dens_norm,
