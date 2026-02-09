@@ -1170,7 +1170,7 @@ def create_nonaligned_norm_non_cropped_proj_data_gif(dir_path,
         im2_2 = axs2[2].imshow(opt_dens[0], vmin = vmin_opt_dens, vmax = vmax_opt_dens)
         im2_3 = axs2[1].imshow(counts_xrf_ref_element_norm[0], vmin = vmin_xrt_norm, vmax = vmax_xrt_norm)
         
-        text_2 = axs2[0].text(0.02, 0.02, r'$\theta = {0}$\textdegree'.format(theta_array[0]), transform = axs2[0, 0].transAxes, color = 'white')
+        text_2 = axs2[0].text(0.02, 0.02, r'$\theta = {0}$\textdegree'.format(theta_array[0]), transform = axs2[0].transAxes, color = 'white')
         
         axs2[0].set_title(r'Norm. XRT', fontsize = 14)
         axs2[1].set_title(r'Norm. Opt. Dens.', fontsize = 14)
