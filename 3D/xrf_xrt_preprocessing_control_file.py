@@ -175,6 +175,8 @@ def preprocess_xrf_xrt_data(synchrotron,
                 n_columns += 1
 
         counts_xrt_sig_idx = elements_xrt.index('xrt_sig')
+        counts_us_ic_idx = elements_xrt.index('us_ic')
+        counts_us_ic = counts_xrt[counts_us_ic_idx]
         counts_xrt_sig = counts_xrt[counts_xrt_sig_idx]
         counts_xrt_sig_backup = counts_xrt_sig.copy()
 
@@ -190,6 +192,8 @@ def preprocess_xrf_xrt_data(synchrotron,
 
             counts_xrf_norm = counts_xrf*norm_array[None, :, None, None]
             counts_xrt_norm = counts_xrt_sig*norm_array[:, None, None]
+
+            opt_dens = -np.log(counts_xrt_sig_backup/counts_us_ic)
                 
         else:
             net_x_shift_array = np.zeros(n_theta)
@@ -203,7 +207,7 @@ def preprocess_xrf_xrt_data(synchrotron,
                                                                                                                 counts_xrf, 
                                                                                                                 xrt_data_percentile, 
                                                                                                                 return_conv_mag_array = True)
-                    opt_dens = -np.log(counts_xrt_sig_backup/I0_cts)
+                    opt_dens = -np.log(counts_xrt_sig_backup/counts_us_ic)
                 
                 else:
                     counts_xrt_norm, counts_xrf_norm, norm_array, I0_cts = ppu.joint_fluct_norm(counts_xrt_sig,
@@ -449,26 +453,44 @@ def preprocess_xrf_xrt_data(synchrotron,
     else:
         if return_aux_data:
             if norm_enabled:
-                print('Writing per-projection convolution magnitudes to NumPy (.npy) file...')
+                if not pre_existing_align_norm_file_enabled:
+                    print('Writing per-projection convolution magnitudes to NumPy (.npy) file...')
 
-                futil.create_aux_conv_mag_data_npy(xrt_od_xrf_realignment_subdir_path, conv_mag_array)
+                    futil.create_aux_conv_mag_data_npy(xrt_od_xrf_realignment_subdir_path, conv_mag_array)
             
-                print('Preparing pre-aligned, non-cropped, normalized XRF, XRT, and optical density projection data for GIF creation...')
+                    print('Preparing pre-aligned, non-cropped, normalized XRF, XRT, and optical density projection data for GIF creation...')
 
-                futil.create_nonaligned_norm_non_cropped_proj_data_gif(dir_path = xrt_od_xrf_realignment_subdir_path,
-                                                                       xrf_element_array = elements_xrf,
-                                                                       desired_xrf_element = desired_xrf_element,
-                                                                       counts_xrf = counts_xrf_norm,
-                                                                       counts_xrf_norm = counts_xrf_norm,
-                                                                       counts_xrt = counts_xrt_sig_backup,
-                                                                       counts_xrt_norm = counts_xrt_norm,
-                                                                       opt_dens = opt_dens,
-                                                                       opt_dens_norm = opt_dens_norm,
-                                                                       convolution_mag_array = conv_mag_array,
-                                                                       norm_enabled = norm_enabled,
-                                                                       data_percentile = xrt_data_percentile, #
-                                                                       theta_array = theta,
-                                                                       fps = fps)
+                    futil.create_nonaligned_norm_non_cropped_proj_data_gif(dir_path = xrt_od_xrf_realignment_subdir_path,
+                                                                           xrf_element_array = elements_xrf,
+                                                                           desired_xrf_element = desired_xrf_element,
+                                                                           counts_xrf = counts_xrf_norm,
+                                                                           counts_xrf_norm = counts_xrf_norm,
+                                                                           counts_xrt = counts_xrt_sig_backup,
+                                                                           counts_xrt_norm = counts_xrt_norm,
+                                                                           opt_dens = opt_dens,
+                                                                           opt_dens_norm = opt_dens_norm,
+                                                                           convolution_mag_array = conv_mag_array,
+                                                                           norm_enabled = norm_enabled,
+                                                                           data_percentile = xrt_data_percentile, #
+                                                                           theta_array = theta,
+                                                                           fps = fps)
+                else:
+                    print('Preparing pre-aligned, non-cropped, normalized XRF, XRT, and optical density projection data for GIF creation...')
+                    print('(NOTE: Using pre-existing normalization file; thus, no updated convolution array will be output.)')
+
+                    futil.create_nonaligned_norm_non_cropped_proj_data_gif(dir_path = xrt_od_xrf_realignment_subdir_path,
+                                                                           xrf_element_array = elements_xrf,
+                                                                           desired_xrf_element = desired_xrf_element,
+                                                                           counts_xrf = counts_xrf_norm,
+                                                                           counts_xrf_norm = counts_xrf_norm,
+                                                                           counts_xrt = counts_xrt_sig_backup,
+                                                                           counts_xrt_norm = counts_xrt_norm,
+                                                                           opt_dens = opt_dens,
+                                                                           opt_dens_norm = opt_dens_norm,
+                                                                           norm_enabled = norm_enabled,
+                                                                           data_percentile = xrt_data_percentile, #
+                                                                           theta_array = theta,
+                                                                           fps = fps)
 
             else:
                 print('Preparing pre-aligned, non-cropped, non-normalized XRF, XRT, and optical density projection data for GIF creation...')
