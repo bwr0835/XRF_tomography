@@ -1027,8 +1027,7 @@ def create_nonaligned_norm_non_cropped_proj_data_gif(dir_path,
                                                      theta_array = None,
                                                      fps = None):
 
-    n_theta = counts_xrf.shape[1]
-    n_columns = counts_xrf.shape[3]
+    n_theta, n_slices, n_columns = counts_xrf.shape[1:]
 
     if desired_xrf_element is None:
         print('Error: \'desired_xrf_element\' field empty. Exiting program...')
@@ -1060,6 +1059,7 @@ def create_nonaligned_norm_non_cropped_proj_data_gif(dir_path,
     vmax_opt_dens = opt_dens.max()
 
     theta_frames1 = []
+    theta_frames3 = []
 
     if norm_enabled:
         print('Plotting non-aligned, non-cropped, normalized XRT, optical density, and convolution magnitude projection data...')
@@ -1145,7 +1145,7 @@ def create_nonaligned_norm_non_cropped_proj_data_gif(dir_path,
         
         axs2[0, 0].set_title(r'XRF $\rightarrow$', fontsize = 14)
         axs2[1, 0].set_title(r'Opt. Dens. $\rightarrow$', fontsize = 14)
-        axs2[0, 1].set_title(r'Norm. XRF', fontsize = 14)
+        axs2[0, 1].set_title(r'Norm. XRF ({0})'.format(desired_xrf_element), fontsize = 14)
         axs2[1, 1].set_title(r'Norm. Opt. Dens.', fontsize = 14)
 
         for axs in fig2.axes:
@@ -1172,6 +1172,44 @@ def create_nonaligned_norm_non_cropped_proj_data_gif(dir_path,
         gif_filename = os.path.join(dir_path, 'normalized_prealigned_xrt_od_xrf_proj_data_comp.gif')
 
         iio2.mimsave(gif_filename, theta_frames2, fps = fps)
+
+        print('Plotting non-aligned, non-cropped, normalized XRT, optical density, XRF sinograms...')
+
+        fig3, axs3 = plt.subplots(3, 1)
+
+        im3_1 = axs3[0].imshow(counts_xrt_norm[:, 0, :], vmin = vmin_xrt_norm, vmax = vmax_xrt_norm)
+        im3_2 = axs3[1].imshow(opt_dens_norm[:, 0, :], vmin = vmin_opt_dens_norm, vmax = vmax_opt_dens_norm)
+        im3_3 = axs3[2].imshow(counts_xrf_norm[:, 0, :], vmin = vmin_xrf_norm, vmax = vmax_xrf_norm)
+
+        text_3 = axs3[0].text(0.02, 0.02, r'Slice 0/{0}'.format(n_slices - 1), transform = axs3[0].transAxes, color = 'white')
+        
+        axs3[0].set_title(r'XRT', fontsize = 14)
+        axs3[1].set_title(r'Opt. Dens.', fontsize = 14)
+        axs3[2].set_title(r'XRF ({0})'.format(desired_xrf_element), fontsize = 14)
+
+        for axs in fig3.axes:
+            axs.axis('off')
+
+        for slice_idx in range(n_slices):
+            im3_1.set_data(counts_xrt_norm[:, slice_idx, :])
+            im3_2.set_data(opt_dens_norm[:, slice_idx, :])
+            im3_3.set_data(counts_xrf_norm[:, slice_idx, :])
+
+            text_3.set_text(r'Slice {0}/{1}'.format(slice_idx, n_slices - 1))
+
+            fig3.canvas.draw()
+
+            frame3 = np.array(fig3.canvas.renderer.buffer_rgba())[:, :, :3]
+
+            theta_frames3.append(frame3)
+        
+        plt.close(fig3)
+
+        print('Saving data to GIF...')
+
+        gif_filename = os.path.join(dir_path, 'normalized_prealigned_xrt_od_xrf_sinogram_data_comp.gif')
+        
+        iio2.mimsave(gif_filename, theta_frames3, fps = fps)
 
     else:
         print('Plotting non-aligned, non-cropped, non-normalized XRT, optical density, XRF projection data...')
@@ -1212,4 +1250,42 @@ def create_nonaligned_norm_non_cropped_proj_data_gif(dir_path,
         
         iio2.mimsave(gif_filename, theta_frames1, fps = fps)
 
-        return
+        print('Plotting non-aligned, non-cropped, non-normalized XRT, optical density, XRF sinograms...')
+
+        fig2, axs2 = plt.subplots(3, 1)
+
+        im2_1 = axs2[0].imshow(counts_xrt[:, 0, :], vmin = vmin_xrt, vmax = vmax_xrt)
+        im2_2 = axs2[1].imshow(opt_dens[:, 0, :], vmin = vmin_opt_dens, vmax = vmax_opt_dens)
+        im2_3 = axs2[2].imshow(counts_xrf[:, 0, :], vmin = vmin_xrf, vmax = vmax_xrf)
+
+        text_2 = axs2[0].text(0.02, 0.02, r'Slice 0/{0}'.format(n_slices - 1), transform = axs2[0].transAxes, color = 'white')
+        
+        axs2[0].set_title(r'XRT', fontsize = 14)
+        axs2[1].set_title(r'Opt. Dens.', fontsize = 14)
+        axs2[2].set_title(r'XRF', fontsize = 14)
+
+        for axs in fig2.axes:
+            axs.axis('off')
+
+        for slice_idx in range(n_slices):
+            im2_1.set_data(counts_xrt[:, slice_idx, :])
+            im2_2.set_data(opt_dens[:, slice_idx, :])
+            im2_3.set_data(counts_xrf[:, slice_idx, :])
+
+            text_2.set_text(r'Slice {0}/{1}'.format(slice_idx, n_slices - 1))
+
+            fig2.canvas.draw()
+
+            frame2 = np.array(fig2.canvas.renderer.buffer_rgba())[:, :, :3]
+
+            theta_frames2.append(frame2)
+        
+        plt.close(fig2)
+
+        print('Saving data to GIF...')
+
+        gif_filename = os.path.join(dir_path, 'nonnormalized_prealigned_xrt_od_xrf_sinogram_data.gif')
+        
+        iio2.mimsave(gif_filename, theta_frames2, fps = fps)
+        
+    return
