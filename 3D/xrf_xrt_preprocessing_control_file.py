@@ -188,8 +188,8 @@ def preprocess_xrf_xrt_data(synchrotron,
 
             print('Applying pre-existing per-projection normalizations to XRF, XRT arrays...')
 
-            counts_xrf_norm = counts_xrf*norm_array
-            counts_xrt_norm = counts_xrt_sig*norm_array
+            counts_xrf_norm = counts_xrf*norm_array[None, :, None, None]
+            counts_xrt_norm = counts_xrt_sig*norm_array[:, None, None]
                 
         else:
             net_x_shift_array = np.zeros(n_theta)
