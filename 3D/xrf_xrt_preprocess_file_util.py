@@ -928,7 +928,8 @@ def extract_csv_xrf_xrt_data_file_lists(file_path_1, file_path_2 = None, **kwarg
 
         sys.exit()
 
-    if kwargs.get('synchrotron') == 'aps':        
+    if kwargs.get('synchrotron') == 'aps':
+        print('Yes')        
         filename_array_2 = filename_array_1.copy()
     
     else:
@@ -938,7 +939,9 @@ def extract_csv_xrf_xrt_data_file_lists(file_path_1, file_path_2 = None, **kwarg
             sys.exit()
         
         if not os.path.isfile(file_path_2):
-            print('Error: CSV file path cannot be found')
+            print('Error: CSV file path cannot be found. Exiting program...')
+
+            sys.exit()
 
         with open(file_path_2, newline = '') as f:
             filename_array_2 = [fn for fn in (filename.strip() for filename in f) \
