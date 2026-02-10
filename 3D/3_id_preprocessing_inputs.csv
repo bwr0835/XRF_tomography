@@ -1,11 +1,11 @@
 synchrotron = nsls-ii
 synchrotron_beamline = 3_id
-create_aggregate_xrf_xrt_files_enabled = True
+create_aggregate_xrf_xrt_files_enabled = False
 pre_existing_aggregate_xrf_xrt_file_lists_enabled = True
 aggregate_xrf_csv_file_path = /raid/users/roter/Jacobsen-nslsii/data/xrf/3_id_xrf_file_list_orig.csv
 aggregate_xrt_csv_file_path = /raid/users/roter/Jacobsen-nslsii/data/ptycho/h5_data/3_id_xrt_file_list_orig.csv
-aggregate_xrf_h5_file_path = 
-aggregate_xrt_h5_file_path = 
+aggregate_xrf_h5_file_path = /raid/users/roter/Jacobsen-nslsii/data/xrf/3_id_aggregate_xrf.h5
+aggregate_xrt_h5_file_path = /raid/users/roter/Jacobsen-nslsii/data/ptycho/h5_data/3_id_aggregate_xrt.h5
 pre_existing_align_norm_file_enabled = False
 pre_existing_align_norm_file_path =
 norm_enabled = True
