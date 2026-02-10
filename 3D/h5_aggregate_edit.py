@@ -1,7 +1,7 @@
 import numpy as np, h5py
 
-file_path = '/raid/users/roter/Jacobsen-nslsii/data/ptycho/h5_data/3_id_aggregate_xrf_orig.h5'
-# file_path = '/raid/users/roter/Jacobsen-nslsii/data/xrf/3_id_aggregate_xrf_orig.h5'
+# file_path = '/raid/users/roter/Jacobsen-nslsii/data/ptycho/h5_data/3_id_aggregate_xrt_orig.h5'
+file_path = '/raid/users/roter/Jacobsen-nslsii/data/xrf/3_id_aggregate_xrf_orig.h5'
 
 output_file_path = '/raid/users/roter/Jacobsen-nslsii/data/ptycho/h5_data/3_id_aggregate_xrf.h5'
 # output_file_path = '/raid/users/roter/Jacobsen-nslsii/data/xrf/3_id_aggregate_xrf.h5'
