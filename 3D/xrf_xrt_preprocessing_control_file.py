@@ -175,10 +175,7 @@ def preprocess_xrf_xrt_data(synchrotron,
                 n_columns += 1
 
         counts_xrt_sig_idx = elements_xrt.index('xrt_sig')
-        counts_us_ic_idx = elements_xrt.index('us_ic')
-        counts_us_ic = counts_xrt[counts_us_ic_idx]
         counts_xrt_sig = counts_xrt[counts_xrt_sig_idx]
-        counts_xrt_sig_backup = counts_xrt_sig.copy()
 
         if pre_existing_align_norm_file_enabled:
             print('Extracting pre-existing normalizations, net x pixel shifts, net y pixel shifts, and incident intensity...')
@@ -462,7 +459,7 @@ def preprocess_xrf_xrt_data(synchrotron,
                                                                            desired_xrf_element = desired_xrf_element,
                                                                            counts_xrf = counts_xrf_norm,
                                                                            counts_xrf_norm = counts_xrf_norm,
-                                                                           counts_xrt = counts_xrt_sig_backup,
+                                                                           counts_xrt = counts_xrt_sig,
                                                                            counts_xrt_norm = counts_xrt_norm,
                                                                            opt_dens = opt_dens_norm,
                                                                            convolution_mag_array = conv_mag_array,
@@ -479,7 +476,7 @@ def preprocess_xrf_xrt_data(synchrotron,
                                                                            desired_xrf_element = desired_xrf_element,
                                                                            counts_xrf = counts_xrf_norm,
                                                                            counts_xrf_norm = counts_xrf_norm,
-                                                                           counts_xrt = counts_xrt_sig_backup,
+                                                                           counts_xrt = counts_xrt_sig,
                                                                            counts_xrt_norm = counts_xrt_norm,
                                                                            opt_dens = opt_dens_norm,
                                                                            norm_enabled = norm_enabled,
