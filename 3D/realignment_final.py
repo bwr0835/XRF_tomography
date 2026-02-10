@@ -467,8 +467,8 @@ def realign_proj(xrt_proj_img_array,
         # cropped_opt_dens_proj_img_array_new = cropped_opt_dens_proj_img_array
         # xrf_proj_img_array_new = xrf_proj_img_array
         # cropped_xrf_proj_img_array_new = cropped_xrf_proj_img_array
-        # net_x_shifts_pcc_new = net_x_shifts_pcc
-        # net_y_shifts_pcc_new = net_y_shifts_pcc
+        net_x_shifts_pcc_new = net_x_shifts_pcc
+        net_y_shifts_pcc_new = net_y_shifts_pcc
 
         # theta_idx_pairs_new = theta_idx_pairs
 
