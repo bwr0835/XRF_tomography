@@ -382,8 +382,6 @@ def create_aggregate_xrf_h5(file_path_array,
         if synchrotron == 'nsls-ii' and kwargs.get('us_ic_enabled') == True:
             us_ic_array_sorted = us_ic_array
 
-        counts_array_sorted[:, second_neg_90_deg_idx:] = np.flip(counts_array_sorted[:, second_neg_90_deg_idx:], axis = 3)
-
         file_path_array_sorted = [file_path_array[theta_idx] for theta_idx in range(len(theta_array_sorted))]
 
     else:
@@ -487,8 +485,6 @@ def create_aggregate_xrt_h5(file_path_array,
 
         if synchrotron == 'nsls-ii':
             counts_array_sorted[1] = us_ic
-        
-        counts_array_sorted[:, second_neg_90_deg_idx:] = np.flip(counts_array_sorted[:, second_neg_90_deg_idx:], axis = 3)
         
         file_path_array_sorted = [file_path_array[theta_idx] for theta_idx in range(len(theta_array_sorted))]
     
