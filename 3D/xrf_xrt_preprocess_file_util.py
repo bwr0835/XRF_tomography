@@ -1208,7 +1208,7 @@ def create_nonaligned_norm_non_cropped_proj_data_gif(dir_path,
         im3_2 = axs3[1].imshow(opt_dens[:, 0], vmin = vmin_opt_dens, vmax = vmax_opt_dens, aspect = 20)
         im3_3 = axs3[2].imshow(counts_xrf_ref_element_norm[:, 0], vmin = vmin_xrf_norm, vmax = vmax_xrf_norm, aspect = 20)
 
-        text_3 = axs3[0].text(0.02, 0.02, r'Slice 0/{0}'.format(n_slices - 1), transform = axs3[0].transAxes, color = 'white')
+        text_3 = axs3[0].text(0.02, 0.02, r'Slice index 0/{0}'.format(n_slices - 1), transform = axs3[0].transAxes, color = 'white')
         
         axs3[0].set_title(r'XRT', fontsize = 14)
         axs3[1].set_title(r'Opt. Dens.', fontsize = 14)
@@ -1222,7 +1222,7 @@ def create_nonaligned_norm_non_cropped_proj_data_gif(dir_path,
             im3_2.set_data(opt_dens[:, slice_idx])
             im3_3.set_data(counts_xrf_ref_element_norm[:, slice_idx])
 
-            text_3.set_text(r'Slice {0}/{1}'.format(slice_idx, n_slices - 1))
+            text_3.set_text(r'Slice index {0}/{1}'.format(slice_idx, n_slices - 1))
 
             fig3.canvas.draw()
 
@@ -1281,25 +1281,25 @@ def create_nonaligned_norm_non_cropped_proj_data_gif(dir_path,
 
         fig2, axs2 = plt.subplots(3, 1)
 
-        im2_1 = axs2[0].imshow(counts_xrt[:, 0], vmin = vmin_xrt, vmax = vmax_xrt, aspect = 'auto')
-        im2_2 = axs2[1].imshow(opt_dens[:, 0], vmin = vmin_opt_dens, vmax = vmax_opt_dens, aspect = 'auto')
-        im2_3 = axs2[2].imshow(counts_xrf_ref_element[:, 0], vmin = vmin_xrf, vmax = vmax_xrf, aspect = 'auto')
+        im2_1 = axs2[0].imshow(counts_xrt[:, 0], vmin = vmin_xrt, vmax = vmax_xrt, extent = [0, n_slices - 1, -180, 180], aspect = 'auto')
+        im2_2 = axs2[1].imshow(opt_dens[:, 0], vmin = vmin_opt_dens, vmax = vmax_opt_dens, extent = [0, n_slices - 1, -180, 180], aspect = 'auto')
+        im2_3 = axs2[2].imshow(counts_xrf_ref_element[:, 0], vmin = vmin_xrf, vmax = vmax_xrf, extent = [0, n_slices - 1, -180, 180], aspect = 'auto')
 
-        text_2 = axs2[0].text(0.02, 0.02, r'Slice 0/{0}'.format(n_slices - 1), transform = axs2[0].transAxes, color = 'white')
+        text_2 = axs2[0].text(0.02, 0.02, r'Slice index 0/{0}'.format(n_slices - 1), transform = axs2[0].transAxes, color = 'white')
         
         axs2[0].set_title(r'XRT', fontsize = 14)
         axs2[1].set_title(r'Opt. Dens.', fontsize = 14)
         axs2[2].set_title(r'XRF', fontsize = 14)
 
-        for axs in fig2.axes:
-            axs.axis('off')
+        # for axs in fig2.axes:
+        #     axs.axis('off')
 
         for slice_idx in range(n_slices):
             im2_1.set_data(counts_xrt[:, slice_idx])
             im2_2.set_data(opt_dens[:, slice_idx])
             im2_3.set_data(counts_xrf_ref_element[:, slice_idx])
 
-            text_2.set_text(r'Slice {0}/{1}'.format(slice_idx, n_slices - 1))
+            text_2.set_text(r'Slice index {0}/{1}'.format(slice_idx, n_slices - 1))
 
             fig2.canvas.draw()
 
