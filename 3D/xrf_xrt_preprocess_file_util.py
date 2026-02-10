@@ -532,28 +532,28 @@ def extract_h5_aggregate_xrf_data(file_path, **kwargs):
     
     h5 = h5py.File(file_path, 'r')
     
-    try:
-        counts_h5 = h5['exchange/data']
-        theta_h5 = h5['exchange/theta']
-        elements_h5 = h5['exchange/elements']
+    # try:
+    counts_h5 = h5['exchange/data']
+    theta_h5 = h5['exchange/theta']
+    elements_h5 = h5['exchange/elements']
 
-        if kwargs.get('filename_array') == True:
-            filenames_h5 = h5['filenames']
+    if kwargs.get('filename_array') == True:
+        filenames_h5 = h5['filenames']
 
-            filenames = filenames_h5[()]
+        filenames = filenames_h5[()]
 
-        dataset_type = counts_h5.attrs['dataset_type']
-        raw_spectrum_fitting_method = h5['exchange'].attrs['raw_spectrum_fitting_method']
+    dataset_type = counts_h5.attrs['dataset_type']
+    raw_spectrum_fitting_method = h5['exchange'].attrs['raw_spectrum_fitting_method']
     
-    except KeyboardInterrupt:
-        print('\n\nKeyboardInterrupt occurred. Exiting program...')
+    # except KeyboardInterrupt:
+    #     print('\n\nKeyboardInterrupt occurred. Exiting program...')
             
-        sys.exit()
+    #     sys.exit()
 
-    except:
-        print('Error: Incompatible HDF5 file structure. Exiting program...')
+    # except:
+    #     print('Error: Incompatible HDF5 file structure. Exiting program...')
 
-        sys.exit()
+    #     sys.exit()
 
     counts = counts_h5[()]
     theta = theta_h5[()]
