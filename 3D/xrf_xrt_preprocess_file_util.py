@@ -543,7 +543,7 @@ def extract_h5_aggregate_xrf_data(file_path, **kwargs):
         filenames = filenames_h5[()]
 
     dataset_type = counts_h5.attrs['dataset_type']
-    raw_spectrum_fitting_method = h5['exchange'].attrs['raw_spectrum_fitting_method ']
+    raw_spectrum_fitting_method = h5['exchange'].attrs['raw_spectrum_fitting_method']
     
     # except KeyboardInterrupt:
     #     print('\n\nKeyboardInterrupt occurred. Exiting program...')
