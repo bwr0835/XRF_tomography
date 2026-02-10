@@ -1204,9 +1204,9 @@ def create_nonaligned_norm_non_cropped_proj_data_gif(dir_path,
 
         fig3, axs3 = plt.subplots(1, 3)
 
-        im3_1 = axs3[0].imshow(counts_xrt_norm[:, 0], vmin = vmin_xrt_norm, vmax = vmax_xrt_norm, aspect = 20)
-        im3_2 = axs3[1].imshow(opt_dens[:, 0], vmin = vmin_opt_dens, vmax = vmax_opt_dens, aspect = 20)
-        im3_3 = axs3[2].imshow(counts_xrf_ref_element_norm[:, 0], vmin = vmin_xrf_norm, vmax = vmax_xrf_norm, aspect = 20)
+        im3_1 = axs3[0].imshow(counts_xrt_norm[:, 0], vmin = vmin_xrt_norm, vmax = vmax_xrt_norm, extent = [0, n_slices - 1, -180, 180], aspect = 20)
+        im3_2 = axs3[1].imshow(opt_dens[:, 0], vmin = vmin_opt_dens, vmax = vmax_opt_dens, extent = [0, n_slices - 1, -180, 180], aspect = 20)
+        im3_3 = axs3[2].imshow(counts_xrf_ref_element_norm[:, 0], vmin = vmin_xrf_norm, extent = [0, n_slices - 1, -180, 180], vmax = vmax_xrf_norm, aspect = 20)
 
         text_3 = axs3[0].text(0.02, 0.02, r'Slice index 0/{0}'.format(n_slices - 1), transform = axs3[0].transAxes, color = 'white')
         
@@ -1215,7 +1215,9 @@ def create_nonaligned_norm_non_cropped_proj_data_gif(dir_path,
         axs3[2].set_title(r'XRF ({0})'.format(desired_xrf_element), fontsize = 14)
 
         for axs in fig3.axes:
-            axs.axis('off')
+        #     axs.axis('off')
+            axs.set_xlabel(r'Pixel index', fontsize = 14)
+            axs.set_ylabel(r'$\theta$ (\textdegree)', fontsize = 14)
 
         for slice_idx in range(n_slices):
             im3_1.set_data(counts_xrt_norm[:, slice_idx])
@@ -1281,9 +1283,9 @@ def create_nonaligned_norm_non_cropped_proj_data_gif(dir_path,
 
         fig2, axs2 = plt.subplots(3, 1)
 
-        im2_1 = axs2[0].imshow(counts_xrt[:, 0], vmin = vmin_xrt, vmax = vmax_xrt, extent = [0, n_slices - 1, -180, 180], aspect = 'auto')
-        im2_2 = axs2[1].imshow(opt_dens[:, 0], vmin = vmin_opt_dens, vmax = vmax_opt_dens, extent = [0, n_slices - 1, -180, 180], aspect = 'auto')
-        im2_3 = axs2[2].imshow(counts_xrf_ref_element[:, 0], vmin = vmin_xrf, vmax = vmax_xrf, extent = [0, n_slices - 1, -180, 180], aspect = 'auto')
+        im2_1 = axs2[0].imshow(counts_xrt[:, 0], vmin = vmin_xrt, vmax = vmax_xrt, extent = [0, n_slices - 1, -180, 180], aspect = 20)
+        im2_2 = axs2[1].imshow(opt_dens[:, 0], vmin = vmin_opt_dens, vmax = vmax_opt_dens, extent = [0, n_slices - 1, -180, 180], aspect = 20)
+        im2_3 = axs2[2].imshow(counts_xrf_ref_element[:, 0], vmin = vmin_xrf, vmax = vmax_xrf, extent = [0, n_slices - 1, -180, 180], aspect = 20)
 
         text_2 = axs2[0].text(0.02, 0.02, r'Slice index 0/{0}'.format(n_slices - 1), transform = axs2[0].transAxes, color = 'white')
         
@@ -1291,8 +1293,10 @@ def create_nonaligned_norm_non_cropped_proj_data_gif(dir_path,
         axs2[1].set_title(r'Opt. Dens.', fontsize = 14)
         axs2[2].set_title(r'XRF', fontsize = 14)
 
-        # for axs in fig2.axes:
-        #     axs.axis('off')
+        for axs in fig2.axes:
+            # axs.axis('off')
+            axs.set_xlabel(r'Pixel index', fontsize = 14)
+            axs.set_ylabel(r'$\theta$ (\textdegree)', fontsize = 14)
 
         for slice_idx in range(n_slices):
             im2_1.set_data(counts_xrt[:, slice_idx])
