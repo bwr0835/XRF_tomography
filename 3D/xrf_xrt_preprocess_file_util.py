@@ -382,7 +382,7 @@ def create_aggregate_xrf_h5(file_path_array,
         if synchrotron == 'nsls-ii' and kwargs.get('us_ic_enabled') == True:
             us_ic_array_sorted = us_ic_array
 
-        counts_array_sorted[:, second_neg_90_deg_idx:] = np.flip(counts_array_sorted[:, second_neg_90_deg_idx:], axis = 2)
+        counts_array_sorted[:, second_neg_90_deg_idx:] = np.flip(counts_array_sorted[:, second_neg_90_deg_idx:], axis = 3)
 
         file_path_array_sorted = [file_path_array[theta_idx] for theta_idx in range(len(theta_array_sorted))]
 
@@ -488,7 +488,7 @@ def create_aggregate_xrt_h5(file_path_array,
         if synchrotron == 'nsls-ii':
             counts_array_sorted[1] = us_ic
         
-        counts_array_sorted[:, second_neg_90_deg_idx:] = np.flip(counts_array_sorted[:, second_neg_90_deg_idx:], axis = 2)
+        counts_array_sorted[:, second_neg_90_deg_idx:] = np.flip(counts_array_sorted[:, second_neg_90_deg_idx:], axis = 3)
         
         file_path_array_sorted = [file_path_array[theta_idx] for theta_idx in range(len(theta_array_sorted))]
     
@@ -532,28 +532,28 @@ def extract_h5_aggregate_xrf_data(file_path, **kwargs):
     
     h5 = h5py.File(file_path, 'r')
     
-    # try:
-    counts_h5 = h5['exchange/data']
-    theta_h5 = h5['exchange/theta']
-    elements_h5 = h5['exchange/elements']
+    try:
+        counts_h5 = h5['exchange/data']
+        theta_h5 = h5['exchange/theta']
+        elements_h5 = h5['exchange/elements']
 
-    if kwargs.get('filename_array') == True:
-        filenames_h5 = h5['filenames']
+        if kwargs.get('filename_array') == True:
+            filenames_h5 = h5['filenames']
 
-        filenames = filenames_h5[()]
+            filenames = filenames_h5[()]
 
-    dataset_type = counts_h5.attrs['dataset_type']
-    raw_spectrum_fitting_method = h5['exchange'].attrs['raw_spectrum_fitting_method']
+        dataset_type = counts_h5.attrs['dataset_type']
+        raw_spectrum_fitting_method = h5['exchange'].attrs['raw_spectrum_fitting_method ']
     
-    # except KeyboardInterrupt:
-    #     print('\n\nKeyboardInterrupt occurred. Exiting program...')
+    except KeyboardInterrupt:
+        print('\n\nKeyboardInterrupt occurred. Exiting program...')
             
-    #     sys.exit()
+        sys.exit()
 
-    # except:
-    #     print('Error: Incompatible HDF5 file structure. Exiting program...')
+    except:
+        print('Error: Incompatible XRF HDF5 file structure. Exiting program...')
 
-    #     sys.exit()
+        sys.exit()
 
     counts = counts_h5[()]
     theta = theta_h5[()]
@@ -602,7 +602,7 @@ def extract_h5_aggregate_xrt_data(file_path, **kwargs):
         sys.exit()
 
     except:
-        print('Error: Incompatible HDF file structure. Exiting program...')
+        print('Error: Incompatible XRT HDF5 file structure. Exiting program...')
 
         sys.exit()
 
