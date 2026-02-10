@@ -1162,7 +1162,7 @@ def create_nonaligned_norm_non_cropped_proj_data_gif(dir_path,
 
         print('Plotting non-aligned, non-cropped, normalized XRT, optical density, XRF projection data...')
 
-        fig2, axs2 = plt.subplots(1, 3)
+        fig2, axs2 = plt.subplots(3, 1)
 
         theta_frames2 = []
 
@@ -1202,7 +1202,7 @@ def create_nonaligned_norm_non_cropped_proj_data_gif(dir_path,
 
         print('Plotting non-aligned, non-cropped, normalized XRT, optical density, XRF sinograms...')
 
-        fig3, axs3 = plt.subplots(3, 1)
+        fig3, axs3 = plt.subplots(1, 3)
 
         im3_1 = axs3[0].imshow(counts_xrt_norm[:, 0], vmin = vmin_xrt_norm, vmax = vmax_xrt_norm, aspect = 2)
         im3_2 = axs3[1].imshow(opt_dens[:, 0], vmin = vmin_opt_dens, vmax = vmax_opt_dens, aspect = 2)
