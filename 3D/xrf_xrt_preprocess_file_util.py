@@ -1167,8 +1167,8 @@ def create_nonaligned_norm_non_cropped_proj_data_gif(dir_path,
         theta_frames2 = []
 
         im2_1 = axs2[0].imshow(counts_xrt_norm[0], vmin = vmin_xrt_norm, vmax = vmax_xrt_norm)
-        im2_2 = axs2[1].imshow(opt_dens[0], vmin = vmin_opt_dens, vmax = vmax_opt_dens)
-        im2_3 = axs2[2].imshow(counts_xrf_ref_element_norm[0], vmin = vmin_xrt_norm, vmax = vmax_xrt_norm)
+        im2_2 = axs2[2].imshow(opt_dens[0], vmin = vmin_opt_dens, vmax = vmax_opt_dens)
+        im2_3 = axs2[1].imshow(counts_xrf_ref_element_norm[0], vmin = vmin_xrt_norm, vmax = vmax_xrt_norm)
         
         text_2 = axs2[0].text(0.02, 0.02, r'$\theta = {0}$\textdegree'.format(theta_array[0]), transform = axs2[0].transAxes, color = 'white')
         
@@ -1281,9 +1281,9 @@ def create_nonaligned_norm_non_cropped_proj_data_gif(dir_path,
 
         fig2, axs2 = plt.subplots(3, 1)
 
-        im2_1 = axs2[0].imshow(counts_xrt_norm[:, 0], vmin = vmin_xrt, vmax = vmax_xrt, aspect = 'auto')
+        im2_1 = axs2[0].imshow(counts_xrt[:, 0], vmin = vmin_xrt, vmax = vmax_xrt, aspect = 'auto')
         im2_2 = axs2[1].imshow(opt_dens[:, 0], vmin = vmin_opt_dens, vmax = vmax_opt_dens, aspect = 'auto')
-        im2_3 = axs2[2].imshow(counts_xrf_ref_element_norm[:, 0], vmin = vmin_xrf, vmax = vmax_xrf, aspect = 'auto')
+        im2_3 = axs2[2].imshow(counts_xrf_ref_element[:, 0], vmin = vmin_xrf, vmax = vmax_xrf, aspect = 'auto')
 
         text_2 = axs2[0].text(0.02, 0.02, r'Slice 0/{0}'.format(n_slices - 1), transform = axs2[0].transAxes, color = 'white')
         
