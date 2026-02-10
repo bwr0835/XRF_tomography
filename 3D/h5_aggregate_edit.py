@@ -4,11 +4,12 @@ import numpy as np, h5py
 # file_path = '/raid/users/roter/Jacobsen-nslsii/data/xrf/3_id_aggregate_xrf_orig.h5'
 file_path = '/raid/users/roter/Jacobsen-nslsii/data/ptycho/h5_data/3_id_aggregate_xrt.h5'
 
-# output_file_path = '/raid/users/roter/Jacobsen-nslsii/data/ptycho/h5_data/3_id_aggregate_xrf.h5'
+# output_file_path = '/raid/users/roter/Jacobsen-nslsii/data/ptycho/h5_data/3_id_aggregate_xrt.h5'
 # output_file_path = '/raid/users/roter/Jacobsen-nslsii/data/xrf/3_id_aggregate_xrf.h5'
 
 with h5py.File(file_path, 'r+') as f:
-    f['exchange/data'].attrs['dataset_type'] = 'xrt'
+    data_sorted = f['exchange/data'][()]
+    # f['exchange/data'].attrs['dataset_type'] = 'xrt'
 
 # with h5py.File(file_path, 'r') as f:
 #     theta = f['exchange/theta'][()]
@@ -18,11 +19,15 @@ with h5py.File(file_path, 'r+') as f:
 
 # theta_idx_sorted = np.argsort(theta)
 
+# n_slices, n_columns = data.shape[2:]
+
 # keep = (theta_idx_sorted != 35) & (theta_idx_sorted != 53)
 # theta_sorted = theta[theta_idx_sorted][keep]
 # data_sorted = data[:, theta_idx_sorted][:, keep]
 
 # filenames_sorted = [filenames[i] for i in theta_idx_sorted if i != 35 and i != 53]
+
+    data_sorted[:, 56:] = np.flip(data_sorted[:, 56:], axis = (2, 3))
 
 # # print(filenames_sorted)
 
