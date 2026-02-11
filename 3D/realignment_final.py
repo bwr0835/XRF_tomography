@@ -282,12 +282,12 @@ def realign_proj(xrt_proj_img_array,
             sys.exit()
             
         zero_deg_idx_array = np.where(theta_array == 0)[0]
-            
-        theta_idx_pairs_first_part = [(0, zero_deg_idx_array[0])]
-        theta_idx_pairs_second_part = [(zero_deg_idx_array[1], -1)]
 
         theta_array_first_part = theta_array[:zero_deg_idx_array[1]]
         theta_array_second_part = theta_array[zero_deg_idx_array[1]:]
+
+        theta_idx_pairs_first_part = [(0, -1)] # These remap to original -180° and 0° indices
+        theta_idx_pairs_second_part = [(0, -1)] # These remap to original 0° and +180° indices
 
         dx_prev = 0
             
