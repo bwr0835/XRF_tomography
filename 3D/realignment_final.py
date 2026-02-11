@@ -558,8 +558,6 @@ def realign_proj(cor_correction_only,
                    None, \
                    None, \
                    None, \
-                   None, \
-                   None
         
         return aligned_proj_xrt_final, \
                aligned_proj_opt_dens_final, \
