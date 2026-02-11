@@ -117,25 +117,26 @@ def rot_center_avg(proj_img_array, theta_pair_array, theta_array):
 #                  edge_info,
 #                  return_aux_data = False):
 
-def realign_proj(xrt_proj_img_array,
-                 cropped_xrt_proj_img_array,
-                 opt_dens_proj_img_array,
-                 cropped_opt_dens_proj_img_array,
-                 xrf_proj_img_array,
-                 cropped_xrf_proj_img_array,
-                 theta_array,
-                 sample_flipped_remounted_mid_experiment,
-                 n_iterations_cor_correction,
-                 eps_cor_correction,
-                 I0,
-                 n_iterations_iter_reproj,
-                 init_x_shift, 
-                 init_y_shift,
-                 sigma,
-                 alpha,
-                 upsample_factor,
-                 eps_iter_reproj,
-                 edge_info,
+def realign_proj(cor_correction_only = False,
+                 xrt_proj_img_array = None,
+                 cropped_xrt_proj_img_array = None,
+                 opt_dens_proj_img_array = None,
+                 cropped_opt_dens_proj_img_array = None,
+                 xrf_proj_img_array = None,
+                 cropped_xrf_proj_img_array = None,
+                 theta_array = None,
+                 sample_flipped_remounted_mid_experiment = None,
+                 n_iterations_cor_correction = None,
+                 eps_cor_correction = None,
+                 I0 = None,
+                 n_iterations_iter_reproj = None,
+                 init_x_shift = None, 
+                 init_y_shift = None,
+                 sigma = None,
+                 alpha = None,
+                 upsample_factor = None,
+                 eps_iter_reproj = None,
+                 edge_info = None,
                  return_aux_data = False):
 
     '''
@@ -164,7 +165,7 @@ def realign_proj(xrt_proj_img_array,
     net_y_shifts_pcc_new: Array of net y shifts with dimensions (n_iterations_iter_reproj, n_theta) (array-like; dtype: float) (Note: n_iterations_iter_reproj can be smaller the more quickly iter_reproj() converges)
     '''
     
-    cropped_opt_dens_proj_img_array[56:] = np.flip(cropped_opt_dens_proj_img_array[56:], axis = 2)
+    # cropped_opt_dens_proj_img_array[56:] = np.flip(cropped_opt_dens_proj_img_array[56:], axis = 2)
     
     if sigma is None:
         print('Warning: Positive \'sigma\' not detected. Setting \'sigma\' to 5 pixels...')
@@ -180,18 +181,13 @@ def realign_proj(xrt_proj_img_array,
         print('Warning: \'upsample_factor\' not detected. Setting \'sample_factor\' to 100...')
 
         upsample_factor = 100
-    
-    if eps_cor_correction is None:
-        print('Warning: Nonzero, positive \'eps_cor_correction\' not detected. Setting \'eps_cor_correction\' to 0.001 pixels...')
-
-        eps_cor_correction = 0.001
 
     if eps_iter_reproj is None:
         print('Warning: Nonzero, positive \'eps_iter_reproj\' not detected. Setting \'eps_iter_reproj\' to 0.3 pixels...')
 
         eps_iter_reproj = 0.3
 
-    if sigma < 0 or alpha < 0 or eps_cor_correction < 0 or eps_iter_reproj < 0:
+    if sigma < 0 or alpha < 0:
         print('Error: \'sigma\', \'alpha\', \'eps_cor_correction\' and \'eps_iter_reproj\' must all be positive numbers. Exiting program...')
 
         sys.exit()
@@ -215,8 +211,6 @@ def realign_proj(xrt_proj_img_array,
         synth_proj_array = []
         pcc_2d_array = []
         recon_array = []
-    
-    n_iter_converge = 3
     
     if cropped_opt_dens_proj_img_array is not None:
         aligned_proj = cropped_opt_dens_proj_img_array.copy()
@@ -268,6 +262,16 @@ def realign_proj(xrt_proj_img_array,
     #         sys.exit()
 
     if sample_flipped_remounted_mid_experiment: # This assumes that angles are order from -180° to +180° (360° range) AND that there are two zero degree angles
+        if eps_cor_correction is None:
+            print('Warning: Nonzero, positive \'eps_cor_correction\' not detected. Setting \'eps_cor_correction\' to 0.001 pixels...')
+
+            eps_cor_correction = 0.001
+        
+        if eps_cor_correction < 0:
+            print('Error: \'eps_cor_correction\' must be a positive number. Exiting program...')
+
+            sys.exit()
+
         if n_iterations_cor_correction is None:
             print('Error: \'n_iterations_cor_correction\' not detected. Exiting program...')
 
@@ -368,7 +372,7 @@ def realign_proj(xrt_proj_img_array,
                     # aligned_proj[theta_idx] = ndi.shift(cropped_opt_dens_proj_img_array[theta_idx], shift = (0, net_x_shifts_pcc[0, theta_idx]))
 
                 dx_prev = -dx
-                    
+        
         # theta_idx_pairs_first_part = ppu.find_theta_combos(theta_array_first_part)
         # theta_idx_pairs_second_part = ppu.find_theta_combos(theta_array_second_part)
             
@@ -478,6 +482,83 @@ def realign_proj(xrt_proj_img_array,
         net_y_shifts_pcc_new = net_y_shifts_pcc
 
         # theta_idx_pairs_new = theta_idx_pairs
+
+    if cor_correction_only:
+        print('Aligning XRT, optical density, XRF projection data after COR correction only...')
+
+        print('Shifting all elements in cropped XRT, optical density aggregate projection arrays by current net shifts...')
+
+        for theta_idx in range(n_theta):
+            net_x_shift = net_x_shifts_pcc_new[0, theta_idx]
+            
+            aligned_proj_total_xrt[theta_idx] = ndi.shift(cropped_xrt_proj_img_array[theta_idx], shift = (0, net_x_shift), cval = I0)
+            aligned_proj_total_opt_dens[theta_idx] = ndi.shift(cropped_opt_dens_proj_img_array[theta_idx], shift = (0, net_x_shift))
+
+        print('Shifting all elements in cropped XRF aggregate projection array by current net shifts...')
+
+        for element_idx in range(n_elements_xrf):
+            print(f'\rElement {element_idx + 1}/{n_elements_xrf}', end = '', flush = True)
+                    
+            for theta_idx in range(n_theta):
+                net_x_shift = net_x_shifts_pcc_new[0, theta_idx]
+
+                aligned_proj_total_xrf[element_idx, theta_idx] = ndi.shift(cropped_xrf_proj_img_array[element_idx, theta_idx], shift = (0, net_x_shift))
+
+        if edge_info is not None:
+            print("Remapping cropped projection images back onto original counterparts...")
+
+            start_slice = edge_info['top']
+            end_slice = n_slices_orig - edge_info['bottom']
+                    
+            if start_slice + end_slice >= n_slices:
+                print('Error: Overlapping edge, field-of-view crops in y. Exiting program...')
+
+                sys.exit()
+
+            start_column = edge_info['left']
+            end_column = n_columns_orig - edge_info['right']
+
+            aligned_proj_xrt_final[:, start_slice_total:end_slice_total, start_column:end_column] = aligned_proj_total_xrt[:, start_slice:end_slice]
+            aligned_proj_opt_dens_final[:, start_slice_total:end_slice_total, start_column:end_column] = aligned_proj_total_opt_dens[:, start_slice:end_slice]
+            aligned_proj_xrf_final[:, :, start_slice_total:end_slice_total, start_column:end_column] = aligned_proj_total_xrf[:, :, start_slice:end_slice]
+
+        else:
+            aligned_proj_xrt_final = aligned_proj_total_xrt
+            aligned_proj_opt_dens_final = aligned_proj_total_opt_dens
+            aligned_proj_xrf_final = aligned_proj_total_xrf
+        
+        if return_aux_data:
+            aligned_exp_proj_array.append(aligned_proj_opt_dens_final)
+            cropped_aligned_exp_proj_array.append(aligned_proj_opt_dens_final)
+
+            return aligned_proj_xrt_final, \
+                   aligned_proj_opt_dens_final, \
+                   aligned_proj_xrf_final, \
+                   net_x_shifts_pcc_new[-1], \
+                   net_y_shifts_pcc_new[-1], \
+                   aligned_exp_proj_array, \
+                   cropped_aligned_exp_proj_array, \
+                   None, \
+                   None, \
+                   None, \
+                   None, \
+                   None, \
+                   None, \
+                   None, \
+                   None
+        
+        return aligned_proj_xrt_final, \
+               aligned_proj_opt_dens_final, \
+               aligned_proj_xrf_final, \
+               net_x_shifts_pcc_new[-1], \
+               net_y_shifts_pcc_new[-1],
+
+    if eps_iter_reproj < 0:
+        print('Error: \'eps_iter_reproj\' must be a positive number. Exiting program...')
+
+        sys.exit()
+
+    n_iter_converge = 3
 
     _, n_slices_orig, n_columns_orig = xrt_proj_img_array.shape
     # n_theta, n_slices, n_columns = cropped_xrt_proj_img_array_new.shape
