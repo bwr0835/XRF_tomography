@@ -342,9 +342,12 @@ def preprocess_xrf_xrt_data(synchrotron,
             
             print('     -Reconstructed optical density data')
             print('     -Reprojected optical density data')
-            print('     -2D phase cross-correlation data')
-            print('     -Incremental x shifts')
-            print('     -Incremental y shifts')
+            
+            if not cor_correction_only:
+                print('     -2D phase cross-correlation data')
+                print('     -Incremental x shifts')
+                print('     -Incremental y shifts')
+            
             print('     -Net x shifts')
             print('     -Net y shifts')
 

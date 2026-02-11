@@ -682,24 +682,26 @@ def create_h5_aligned_aggregate_xrf_xrt(dir_path,
 
     with h5py.File(output_file_path, 'w') as f:
         exchange = f.create_group('exchange')
-
-        exchange.create_dataset('elements_xrf', data = elements_xrf)
-        exchange.create_dataset('elements_xrt', data = elements_xrt)
-        exchange.create_dataset('data_xrf', data = xrf_array)
-        exchange.create_dataset('data_xrt', data = xrt_array_new)
+        data = exchange.create_group('data')
+        elements = exchange.create_group('elements')
+        
+        data.create_dataset('xrf', data = elements_xrf)
+        data.create_dataset('xrt', data = elements_xrt)
+        elements.create_dataset('xrf', data = xrf_array)
+        elements.create_dataset('xrt', data = xrt_array_new)
         exchange.create_dataset('theta', data = theta_array)
 
         if init_edge_info is not None:
-            exchange['data_xrt'].attrs['left_edge_cropped_init'] = init_edge_info['left']
-            exchange['data_xrt'].attrs['right_edge_cropped_init'] = init_edge_info['right']
-            exchange['data_xrt'].attrs['top_edge_cropped_init'] = init_edge_info['top']
-            exchange['data_xrt'].attrs['bottom_edge_cropped_init'] = init_edge_info['bottom']
+            exchange['data'].attrs['left_edge_cropped_init'] = init_edge_info['left']
+            exchange['data'].attrs['right_edge_cropped_init'] = init_edge_info['right']
+            exchange['data'].attrs['top_edge_cropped_init'] = init_edge_info['top']
+            exchange['data'].attrs['bottom_edge_cropped_init'] = init_edge_info['bottom']
             
         if final_edge_info is not None:
-            exchange['data_xrt'].attrs['left_edge_cropped_final'] = final_edge_info['left']
-            exchange['data_xrt'].attrs['right_edge_cropped_final'] = final_edge_info['right']
-            exchange['data_xrt'].attrs['top_edge_cropped_final'] = final_edge_info['top']
-            exchange['data_xrt'].attrs['bottom_edge_cropped_final'] = final_edge_info['bottom']
+            exchange['data'].attrs['left_edge_cropped_final'] = final_edge_info['left']
+            exchange['data'].attrs['right_edge_cropped_final'] = final_edge_info['right']
+            exchange['data'].attrs['top_edge_cropped_final'] = final_edge_info['top']
+            exchange['data'].attrs['bottom_edge_cropped_final'] = final_edge_info['bottom']
 
         # if zero_idx_discarded is not None:
             # exchange['theta'].attrs['zero_deg_idx_discarded'] = zero_idx_discarded

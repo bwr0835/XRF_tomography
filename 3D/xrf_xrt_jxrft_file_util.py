@@ -155,10 +155,11 @@ def extract_h5_aggregate_xrf_xrt_data(file_path, **kwargs):
     
     try:
         with h5py.File(file_path, 'r') as h5:
-            elements_xrf = h5['exchange/elements_xrf'][()]
-            elements_xrt = h5['exchange/elements_xrt'][()]
-            xrf_data = h5['exchange/data_xrf'][()]
-            xrt_data = h5['exchange/data_xrt'][()]
+            data = h5['exchange/data']
+            elements = h5['exchange/elements']
+            
+            elements_xrf, elements_xrt = elements['xrf'][()], elements['xrt'][()]
+            xrf_data, xrt_data = data['xrf'][()], data['xrt'][()]
             theta = h5['exchange/theta'][()]
     
     except KeyboardInterrupt:
