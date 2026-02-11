@@ -164,6 +164,8 @@ def realign_proj(xrt_proj_img_array,
     net_y_shifts_pcc_new: Array of net y shifts with dimensions (n_iterations_iter_reproj, n_theta) (array-like; dtype: float) (Note: n_iterations_iter_reproj can be smaller the more quickly iter_reproj() converges)
     '''
     
+    cropped_opt_dens_proj_img_array[56:] = np.flip(cropped_opt_dens_proj_img_array[56:], axis = 2)
+    
     if sigma is None:
         print('Warning: Positive \'sigma\' not detected. Setting \'sigma\' to 5 pixels...')
         
