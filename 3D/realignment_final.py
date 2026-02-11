@@ -359,7 +359,7 @@ def realign_proj(xrt_proj_img_array,
 
                 # net_x_shifts_pcc[0, :zero_deg_idx_array[1]] -=dx/2
                 # net_x_shifts_pcc[0, zero_deg_idx_array[1]:] += dx/2
-                net_x_shifts_pcc[0, zero_deg_idx_array[1]:] += dx
+                net_x_shifts_pcc[0, zero_deg_idx_array[1]:] -= dx
 
                 for theta_idx in range(len(theta_array_second_part)):
                     theta_idx_aux = theta_idx + len(theta_array_first_part)
@@ -367,7 +367,7 @@ def realign_proj(xrt_proj_img_array,
                 # for theta_idx in range(n_theta):
                     # aligned_proj[theta_idx] = ndi.shift(cropped_opt_dens_proj_img_array[theta_idx], shift = (0, net_x_shifts_pcc[0, theta_idx]))
 
-                dx_prev = dx
+                dx_prev = -dx
                     
         # theta_idx_pairs_first_part = ppu.find_theta_combos(theta_array_first_part)
         # theta_idx_pairs_second_part = ppu.find_theta_combos(theta_array_second_part)
