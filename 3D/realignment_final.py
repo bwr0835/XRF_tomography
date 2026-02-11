@@ -197,18 +197,10 @@ def realign_proj(cor_correction_only,
 
         sys.exit()
 
-    n_elements_xrf = xrf_proj_img_array.shape[0]
+    # n_elements_xrf = xrf_proj_img_array.shape[0]
     # n_theta = xrt_proj_img_array.shape[0]
-
-    _, n_slices_orig, n_columns_orig = xrt_proj_img_array.shape
-    n_theta, n_slices, n_columns = cropped_xrt_proj_img_array.shape
-
-    aligned_proj_total_xrt = np.zeros((n_theta, n_slices, n_columns))
-    aligned_proj_total_opt_dens = np.zeros((n_theta, n_slices, n_columns))
-    aligned_proj_total_xrf = np.zeros((n_elements_xrf, n_theta, n_slices, n_columns))
     
-    net_x_shifts_pcc = np.zeros((n_iterations_iter_reproj, n_theta))
-    net_y_shifts_pcc = np.zeros((n_iterations_iter_reproj, n_theta))
+   
     
     iterations = []
     
@@ -227,6 +219,17 @@ def realign_proj(cor_correction_only,
         cropped_opt_dens_proj_img_array = opt_dens_proj_img_array.copy()
         cropped_xrf_proj_img_array = xrf_proj_img_array.copy()
         aligned_proj = opt_dens_proj_img_array.copy()
+
+    n_elements_xrf = xrf_proj_img_array.shape[0]
+    _, n_slices_orig, n_columns_orig = xrt_proj_img_array.shape
+    n_theta, n_slices, n_columns = cropped_xrt_proj_img_array.shape
+
+    net_x_shifts_pcc = np.zeros((n_iterations_iter_reproj, n_theta))
+    net_y_shifts_pcc = np.zeros((n_iterations_iter_reproj, n_theta))
+
+    aligned_proj_total_xrt = np.zeros((n_theta, n_slices, n_columns))
+    aligned_proj_total_opt_dens = np.zeros((n_theta, n_slices, n_columns))
+    aligned_proj_total_xrf = np.zeros((n_elements_xrf, n_theta, n_slices, n_columns))
 
     if np.any(init_x_shift) or np.any(init_y_shift):
         if np.any(init_x_shift) and np.any(init_y_shift):
