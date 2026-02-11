@@ -17,6 +17,7 @@ t_dwell_s =
 init_edge_crop_enabled = True
 init_edge_pixel_lengths_to_crop = {'top': 40, 'bottom': 40}
 realignment_enabled = True
+cor_correction_only = False
 n_iter_iter_reproj = 5
 sample_flipped_remounted_mid_experiment = True
 n_iterations_cor_correction = 15

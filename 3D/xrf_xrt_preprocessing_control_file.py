@@ -36,6 +36,7 @@ def preprocess_xrf_xrt_data(synchrotron,
                             init_edge_crop_enabled,
                             init_edge_pixel_lengths_to_crop,
                             realignment_enabled,
+                            cor_correction_only,
                             n_iter_iter_reproj,
                             # zero_idx_to_discard,
                             sample_flipped_remounted_mid_experiment,
@@ -268,11 +269,11 @@ def preprocess_xrf_xrt_data(synchrotron,
                 synth_proj_array, \
                 pcc_2d_array, \
                 recon_array, \
-                theta_final, \
                 net_x_shifts_pcc_array, \
                 net_y_shifts_pcc_array, \
                 dx_pcc_array, \
-                dy_pcc_array = rap(counts_xrt_norm,
+                dy_pcc_array = rap(cor_correction_only,
+                                   counts_xrt_norm,
                                    init_cropped_xrt_array,
                                    opt_dens_norm,
                                    init_cropped_opt_dens_array,
@@ -304,11 +305,11 @@ def preprocess_xrf_xrt_data(synchrotron,
                 synth_proj_array, \
                 pcc_2d_array, \
                 recon_array, \
-                theta_final, \
                 net_x_shifts_pcc_array, \
                 net_y_shifts_pcc_array, \
                 dx_pcc_array, \
-                dy_pcc_array = rap(counts_xrt_norm,
+                dy_pcc_array = rap(cor_correction_only,
+                                   counts_xrt_norm,
                                    init_cropped_xrt_array,
                                    opt_dens_norm,
                                    init_cropped_opt_dens_array,
@@ -331,14 +332,14 @@ def preprocess_xrf_xrt_data(synchrotron,
                                    return_aux_data = True)
 
             print('Writing the following auxiliary, per-iteration data to NumPy (.npy) files (NOTE: Python is needed to view these!):')
-            
+
             if init_edge_crop_enabled:
                 print('     -Remapped experimental optical density projection data')
                 print('     -Cropped experimental optical density projection data')
             
             else:
                 print('     -Experimental optical density projection data')
-
+            
             print('     -Reconstructed optical density data')
             print('     -Reprojected optical density data')
             print('     -2D phase cross-correlation data')
@@ -349,6 +350,7 @@ def preprocess_xrf_xrt_data(synchrotron,
 
             if init_edge_crop_enabled:
                 futil.create_aux_opt_dens_data_npy(xrt_od_xrf_realignment_subdir_path,
+                                                   cor_correction_only,
                                                    aligned_exp_proj_array,
                                                    recon_array,
                                                    synth_proj_array,
@@ -361,6 +363,7 @@ def preprocess_xrf_xrt_data(synchrotron,
             
             else:
                 futil.create_aux_opt_dens_data_npy(xrt_od_xrf_realignment_subdir_path,
+                                                   cor_correction_only,
                                                    aligned_exp_proj_array,
                                                    recon_array,
                                                    synth_proj_array,
@@ -374,9 +377,9 @@ def preprocess_xrf_xrt_data(synchrotron,
             aligned_proj_final_xrt_sig, \
             aligned_proj_final_opt_dens, \
             aligned_proj_final_xrf, \
-            theta_final, \
             net_x_shifts_pcc_final, \
-            net_y_shifts_pcc_final = rap(counts_xrt_norm,
+            net_y_shifts_pcc_final = rap(cor_correction_only,
+                                         counts_xrt_norm,
                                          init_cropped_xrt_array,
                                          opt_dens_norm,
                                          init_cropped_opt_dens_array,

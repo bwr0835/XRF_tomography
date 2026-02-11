@@ -959,6 +959,7 @@ def create_aux_conv_mag_data_npy(dir_path, array):
     return
 
 def create_aux_opt_dens_data_npy(dir_path,
+                                 cor_correction_only,
                                  aligned_exp_proj_array,
                                  recon_array,
                                  synth_proj_array,
@@ -974,13 +975,15 @@ def create_aux_opt_dens_data_npy(dir_path,
     os.makedirs(subdir_path, exist_ok = True)
 
     np.save(os.path.join(subdir_path, 'aligned_exp_proj_iter_array.npy'), aligned_exp_proj_array)
-    np.save(os.path.join(subdir_path, 'recon_iter_array.npy'), recon_array)
-    np.save(os.path.join(subdir_path, 'synth_proj_iter_array.npy'), synth_proj_array)
-    np.save(os.path.join(subdir_path, 'pcc_2d_iter_array.npy'), pcc_2d_array)
-    np.save(os.path.join(subdir_path, 'dx_iter_array.npy'), dx_array)
-    np.save(os.path.join(subdir_path, 'dy_iter_array.npy'), dy_array)
-    np.save(os.path.join(subdir_path, 'net_x_shifts_pcc_iter_array.npy'), net_x_shifts_pcc_array)
-    np.save(os.path.join(subdir_path, 'net_y_shifts_pcc_iter_array.npy'), net_y_shifts_pcc_array)
+
+    if not cor_correction_only:
+        np.save(os.path.join(subdir_path, 'recon_iter_array.npy'), recon_array)
+        np.save(os.path.join(subdir_path, 'synth_proj_iter_array.npy'), synth_proj_array)
+        np.save(os.path.join(subdir_path, 'pcc_2d_iter_array.npy'), pcc_2d_array)
+        np.save(os.path.join(subdir_path, 'dx_iter_array.npy'), dx_array)
+        np.save(os.path.join(subdir_path, 'dy_iter_array.npy'), dy_array)
+        np.save(os.path.join(subdir_path, 'net_x_shifts_pcc_iter_array.npy'), net_x_shifts_pcc_array)
+        np.save(os.path.join(subdir_path, 'net_y_shifts_pcc_iter_array.npy'), net_y_shifts_pcc_array)
 
     if kwargs.get('cropped_aligned_exp_proj_iter_array') is not None:
         np.save(os.path.join(subdir_path, 'cropped_aligned_exp_proj_iter_array.npy'), kwargs['cropped_aligned_exp_proj_iter_array'])
