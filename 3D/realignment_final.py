@@ -200,6 +200,10 @@ def realign_proj(cor_correction_only,
     n_elements_xrf = xrf_proj_img_array.shape[0]
     n_theta = xrt_proj_img_array.shape[0]
     
+    aligned_proj_total_xrt = np.zeros((n_theta, n_slices, n_columns))
+    aligned_proj_total_opt_dens = np.zeros((n_theta, n_slices, n_columns))
+    aligned_proj_total_xrf = np.zeros((n_elements_xrf, n_theta, n_slices, n_columns))
+    
     net_x_shifts_pcc = np.zeros((n_iterations_iter_reproj, n_theta))
     net_y_shifts_pcc = np.zeros((n_iterations_iter_reproj, n_theta))
     
@@ -286,7 +290,7 @@ def realign_proj(cor_correction_only,
             print('Error: Must have two 0° angles. Exiting program...')
 
             sys.exit()
-            
+
         zero_deg_idx_array = np.where(theta_array == 0)[0]
 
         theta_array_first_part = theta_array[:zero_deg_idx_array[1]]
@@ -564,9 +568,6 @@ def realign_proj(cor_correction_only,
     # n_theta, n_slices, n_columns = cropped_xrt_proj_img_array_new.shape
     n_theta, n_slices, n_columns = cropped_xrt_proj_img_array.shape
 
-    aligned_proj_total_xrt = np.zeros((n_theta, n_slices, n_columns))
-    aligned_proj_total_opt_dens = np.zeros((n_theta, n_slices, n_columns))
-    aligned_proj_total_xrf = np.zeros((n_elements_xrf, n_theta, n_slices, n_columns))
     synth_proj = np.zeros((n_theta, n_slices, n_columns))
     dx_array_pcc = np.zeros((n_iterations_iter_reproj, n_theta))
     dy_array_pcc = np.zeros((n_iterations_iter_reproj, n_theta))
