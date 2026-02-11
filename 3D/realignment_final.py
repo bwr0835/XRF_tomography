@@ -545,13 +545,15 @@ def realign_proj(cor_correction_only,
             aligned_exp_proj_array.append(aligned_proj_opt_dens_final)
             cropped_aligned_exp_proj_array.append(aligned_proj_opt_dens_final)
 
+            print(np.array(net_x_shifts_pcc_new[-1]))
+
             return aligned_proj_xrt_final, \
                    aligned_proj_opt_dens_final, \
                    aligned_proj_xrf_final, \
-                   net_x_shifts_pcc_new[-1], \
-                   net_y_shifts_pcc_new[-1], \
-                   aligned_exp_proj_array, \
-                   cropped_aligned_exp_proj_array, \
+                   np.array(net_x_shifts_pcc_new[-1]), \
+                   np.array(net_y_shifts_pcc_new[-1]), \
+                   np.array(aligned_exp_proj_array), \
+                   np.array(cropped_aligned_exp_proj_array), \
                    None, \
                    None, \
                    None, \
@@ -562,8 +564,8 @@ def realign_proj(cor_correction_only,
         return aligned_proj_xrt_final, \
                aligned_proj_opt_dens_final, \
                aligned_proj_xrf_final, \
-               net_x_shifts_pcc_new[-1], \
-               net_y_shifts_pcc_new[-1],
+               np.array(net_x_shifts_pcc_new[-1]), \
+               np.array(net_y_shifts_pcc_new[-1]),
 
     if eps_iter_reproj < 0:
         print('Error: \'eps_iter_reproj\' must be a positive number. Exiting program...')
