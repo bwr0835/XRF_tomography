@@ -266,6 +266,8 @@ def realign_proj(xrt_proj_img_array,
     #         sys.exit()
 
         if sample_flipped_remounted_mid_experiment: # This assumes that angles are order from -180° to +180° (360° range) AND that there are two zero degree angles
+            print('Yes')
+            
             if n_iterations_cor_correction is not None:
                 print('Error: \'n_iterations_cor_correction\' not detected. Exiting program...')
 
