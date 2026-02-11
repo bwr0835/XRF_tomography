@@ -353,12 +353,14 @@ def realign_proj(xrt_proj_img_array,
 
                     break
                     
-                print(f'Applying additional COR correction to pre-flipped, pre-remounted sample angles: {ppu.round_correct(-dx, ndec = 3)}')
+                print(f'Applying additional COR correction to flipped, remounted sample angles: {ppu.round_correct(dx, ndec = 3)}')
 
                 net_x_shifts_pcc[0, zero_deg_idx_array[1]:] += dx
 
-                for theta_idx in range(len(theta_array_first_part)):
-                    aligned_proj[theta_idx] = ndi.shift(cropped_opt_dens_proj_img_array[theta_idx], shift = (0, net_x_shifts_pcc[0, zero_deg_idx_array[1]:]))
+                for theta_idx in range(len(theta_array_second_part)):
+                    theta_idx_aux = theta_idx + len(theta_array_first_part)
+                    
+                    aligned_proj[theta_idx_aux] = ndi.shift(cropped_opt_dens_proj_img_array[theta_idx_aux], shift = (0, net_x_shifts_pcc[0, theta_idx_aux]))
 
                 dx_prev = dx
                     
