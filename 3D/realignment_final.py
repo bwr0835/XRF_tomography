@@ -428,27 +428,27 @@ def realign_proj(xrt_proj_img_array,
         
         # theta_idx_pairs_new = ppu.find_theta_combos(theta_array_new)
 
-    else:
-        # theta_idx_pairs = ppu.find_theta_combos(theta_array, dtheta = 1)
-        theta_idx_pairs = ppu.find_theta_combos(theta_array)
+        else:
+        #    theta_idx_pairs = ppu.find_theta_combos(theta_array, dtheta = 1)
+            theta_idx_pairs = ppu.find_theta_combos(theta_array)
 
-        center_of_rotation_avg, center_geom, offset_init = rot_center_avg(aligned_proj, theta_idx_pairs, theta_array)
+            center_of_rotation_avg, center_geom, offset_init = rot_center_avg(aligned_proj, theta_idx_pairs, theta_array)
     
-        print(f'Average center of rotation: {center_of_rotation_avg}')
-        print(f'Geometric center: {center_geom}')
-        print(f'Center of rotation error: {ppu.round_correct(offset_init, ndec = 3)}')
-        print(f'Applying initial center of rotation correction: {ppu.round_correct(-offset_init, ndec = 3)}')
+            print(f'Average center of rotation: {center_of_rotation_avg}')
+            print(f'Geometric center: {center_geom}')
+            print(f'Center of rotation error: {ppu.round_correct(offset_init, ndec = 3)}')
+            print(f'Applying initial center of rotation correction: {ppu.round_correct(-offset_init, ndec = 3)}')
 
-        for theta_idx in range(n_theta):
-            aligned_proj[theta_idx] = ndi.shift(cropped_opt_dens_proj_img_array[theta_idx], shift = (0, -offset_init))
+            for theta_idx in range(n_theta):
+                aligned_proj[theta_idx] = ndi.shift(cropped_opt_dens_proj_img_array[theta_idx], shift = (0, -offset_init))
 
-        center_of_rotation_avg, _, _ = rot_center_avg(aligned_proj, theta_idx_pairs, theta_array)
+            center_of_rotation_avg, _, _ = rot_center_avg(aligned_proj, theta_idx_pairs, theta_array)
 
-        offset = center_of_rotation_avg - center_geom
+            offset = center_of_rotation_avg - center_geom
 
-        print(f'Center of rotation after initial COR correction: {ppu.round_correct(center_of_rotation_avg, ndec = 3)}')
-        print(f'Geometric center: {center_geom}')
-        print(f'Center of rotation error: {ppu.round_correct(offset, ndec = 3)}')
+            print(f'Center of rotation after initial COR correction: {ppu.round_correct(center_of_rotation_avg, ndec = 3)}')
+            print(f'Geometric center: {center_geom}')
+            print(f'Center of rotation error: {ppu.round_correct(offset, ndec = 3)}')
     
     # add_shift = -0.8
     
@@ -457,7 +457,7 @@ def realign_proj(xrt_proj_img_array,
     # for theta_idx in range(n_theta):
         # aligned_proj[theta_idx] = ndi.shift(xrf_proj_img_array[ref_element_idx, theta_idx], shift = (0, -(offset_init + add_shift)))
 
-        net_x_shifts_pcc[0] -= offset_init
+            net_x_shifts_pcc[0] -= offset_init
 
         # theta_array_new = theta_array
         # aligned_proj_new = aligned_proj
@@ -467,8 +467,8 @@ def realign_proj(xrt_proj_img_array,
         # cropped_opt_dens_proj_img_array_new = cropped_opt_dens_proj_img_array
         # xrf_proj_img_array_new = xrf_proj_img_array
         # cropped_xrf_proj_img_array_new = cropped_xrf_proj_img_array
-        net_x_shifts_pcc_new = net_x_shifts_pcc
-        net_y_shifts_pcc_new = net_y_shifts_pcc
+            net_x_shifts_pcc_new = net_x_shifts_pcc
+            net_y_shifts_pcc_new = net_y_shifts_pcc
 
         # theta_idx_pairs_new = theta_idx_pairs
 
