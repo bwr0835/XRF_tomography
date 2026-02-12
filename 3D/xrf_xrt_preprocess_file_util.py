@@ -685,8 +685,8 @@ def create_h5_aligned_aggregate_xrf_xrt(dir_path,
         data = exchange.create_group('data')
         elements = exchange.create_group('elements')
         
-        data.create_dataset('xrf', data = elements_xrf)
-        data.create_dataset('xrt', data = elements_xrt)
+        data.create_dataset('xrf', data = elements_xrf, compression = 'gzip')
+        data.create_dataset('xrt', data = elements_xrt, compression = 'gzip')
         elements.create_dataset('xrf', data = xrf_array)
         elements.create_dataset('xrt', data = xrt_array_new)
         exchange.create_dataset('theta', data = theta_array)
