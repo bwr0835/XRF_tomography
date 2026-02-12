@@ -495,7 +495,6 @@ def realign_proj(cor_correction_only,
         # xrf_proj_img_array_new = xrf_proj_img_array
         # cropped_xrf_proj_img_array_new = cropped_xrf_proj_img_array
         net_x_shifts_pcc_new = net_x_shifts_pcc
-        print(net_x_shifts_pcc_new[0])
         net_y_shifts_pcc_new = net_y_shifts_pcc
 
         # theta_idx_pairs_new = theta_idx_pairs
@@ -507,6 +506,9 @@ def realign_proj(cor_correction_only,
 
         for theta_idx in range(n_theta):
             net_x_shift = net_x_shifts_pcc_new[0, theta_idx]
+
+            if theta_idx == 0:
+                print(net_x_shift)
             
             aligned_proj_total_xrt[theta_idx] = ndi.shift(cropped_xrt_proj_img_array[theta_idx], shift = (0, net_x_shift), cval = I0)
             aligned_proj_total_opt_dens[theta_idx] = ndi.shift(cropped_opt_dens_proj_img_array[theta_idx], shift = (0, net_x_shift))
