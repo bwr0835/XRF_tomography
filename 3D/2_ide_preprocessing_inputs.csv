@@ -28,5 +28,5 @@ upsample_factor = 100
 eps_iter_reproj = 0.3
 final_edge_crop_enabled = False
 final_edge_pixel_lengths_to_crop =
-aligned_data_output_dir_path = /home/bwr0835/2_ide_realigned_data_02_11_2026_cor_correction_only
+aligned_data_output_dir_path = /home/bwr0835/2_ide_realigned_data_02_11_2026_iter_reproj_1_iter
 fps = 10
