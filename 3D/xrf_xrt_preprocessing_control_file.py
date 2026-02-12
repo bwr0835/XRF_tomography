@@ -6,7 +6,6 @@ import numpy as np, \
 
 from realignment_final import realign_proj as rap
 from matplotlib import pyplot as plt
-from imageio import v2 as iio_v2
 
 plt.rcParams['text.usetex'] = True
 plt.rcParams['font.family'] = 'serif'
