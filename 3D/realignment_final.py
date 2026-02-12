@@ -518,9 +518,6 @@ def realign_proj(cor_correction_only,
             for theta_idx in range(n_theta):
                 net_x_shift = net_x_shifts_pcc_new[0, theta_idx]
 
-                if theta_idx == 0:
-                    print(net_x_shift)
-
                 aligned_proj_total_xrf[element_idx, theta_idx] = ndi.shift(cropped_xrf_proj_img_array[element_idx, theta_idx], shift = (0, net_x_shift))
 
         if edge_info is not None:
@@ -550,13 +547,11 @@ def realign_proj(cor_correction_only,
             aligned_exp_proj_array.append(aligned_proj_opt_dens_final)
             cropped_aligned_exp_proj_array.append(aligned_proj_opt_dens_final)
 
-            print(np.array(net_x_shifts_pcc_new[-1]))
-
             return aligned_proj_xrt_final, \
                    aligned_proj_opt_dens_final, \
                    aligned_proj_xrf_final, \
-                   np.array(net_x_shifts_pcc_new[-1]), \
-                   np.array(net_y_shifts_pcc_new[-1]), \
+                   np.array(net_x_shifts_pcc_new[0]), \
+                   np.array(net_y_shifts_pcc_new[0]), \
                    np.array(aligned_exp_proj_array), \
                    np.array(cropped_aligned_exp_proj_array), \
                    None, \
