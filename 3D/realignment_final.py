@@ -484,6 +484,8 @@ def realign_proj(cor_correction_only,
 
         net_x_shifts_pcc[0] -= offset_init
 
+        print(net_x_shifts_pcc[0])
+
         # theta_array_new = theta_array
         # aligned_proj_new = aligned_proj
         # xrt_proj_img_array_new = xrt_proj_img_array
