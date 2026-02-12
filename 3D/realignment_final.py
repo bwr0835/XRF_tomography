@@ -634,8 +634,8 @@ def realign_proj(cor_correction_only,
                 cropped_aligned_exp_proj_array.append(aligned_exp_proj_array.copy())
 
         # recon = tomo.recon(aligned_proj_new, theta_array_new*np.pi/180, algorithm = 'gridrec', filter_name = 'ramlak')
-        # recon = tomo.recon(aligned_proj, theta_array*np.pi/180, algorithm = 'gridrec', filter_name = 'ramlak')
-        recon = tomo.recon(aligned_proj, theta_array*np.pi/180, algorithm = 'mlem', num_iter = 70)
+        recon = tomo.recon(aligned_proj, theta_array*np.pi/180, algorithm = 'gridrec', filter_name = 'ramlak')
+        # recon = tomo.recon(aligned_proj, theta_array*np.pi/180, algorithm = 'mlem', num_iter = 70)
 
         if return_aux_data:
             recon_array.append(recon)
