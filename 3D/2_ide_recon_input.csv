@@ -1,5 +1,3 @@
-synchrotron: aps
-synchrotron_beamline: 2_ide
 f_recon_parameters: 'recon_parameters.txt'
 dev:
 probe_intensity: 730712.2086470381
@@ -7,13 +5,14 @@ selfAb: True
 noise_model: gaussian
 cont_from_check_point: False
 use_saved_initial_guess: False
-ini_kind: const
+ini_kind: rand
 init_const: 0
 ini_rand_amp: 0.1
 recon_path: /home/bwr0835/2_ide_recon
 f_initial_guess: initialized_grid_concentration
 f_recon_grid: grid_concentration
 f_XRF_XRT_data:
+opt_dens_enabled: True
 downsample_factor: 
 upsample_factor:
 this_aN_dic: {'Si': 14, 'Ti': 22, 'Cr': 24, 'Fe': 26, 'Ni': 28, 'Ba': 56}
@@ -23,7 +22,7 @@ sample_size_n:
 sample_height_n:
 sample_size_cm:
 probe_energy_keV: 13
-n_epochs: 200
+n_epochs: 20
 save_every_n_epochs: 5
 minibatch_size:	124
 b1: 10000

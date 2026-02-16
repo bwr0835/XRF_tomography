@@ -86,6 +86,7 @@ recon_params_ordered = ['synchrotron',
                         'f_recon_grid',
                         'data_path'
                         'f_XRF_XRT_data'
+                        'opt_dens_enabled',
                         'this_aN_dic',
                         'element_lines_roi',
                         'n_line_group_each_element',
@@ -138,5 +139,6 @@ recon_dict_params = ['this_aN_dict']
 recon_bool_params = ['cont_from_check_point',
                      'selfAb',
                      'use_saved_initial_guess',
+                     'opt_dens_enabled',
                      'manual_det_coord',
                      'manual_det_area']

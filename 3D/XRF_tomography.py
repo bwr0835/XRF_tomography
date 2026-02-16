@@ -139,9 +139,7 @@ fl = xrl_fluorline_macros.fl
 #         fl_M = fl["M"],
 #         **kwargs):
     
-def reconstruct_jXRFT_tomography(synchrotron,
-                                 synchrotron_beamline,
-                                 sample_size_n,
+def reconstruct_jXRFT_tomography(sample_size_n,
                                  sample_height_n, 
                                  sample_size_cm,
                                  probe_energy_keV = None,
@@ -173,6 +171,7 @@ def reconstruct_jXRFT_tomography(synchrotron,
                                  f_initial_guess = None, 
                                  f_recon_grid = None,
                                  f_XRF_XRT_data = None,
+                                 opt_dens_enabled = True,
                                  downsample_factor = 1,
                                  upsample_factor = 1,
                                  this_aN_dic = None, 
@@ -340,10 +339,13 @@ def reconstruct_jXRFT_tomography(synchrotron,
     # TODO Check parallel computing aspect of this function
     # TODO Check with Chris about this_aN_dic and element_line_roi
     
+
+    print_flush_root(rank, "Extracting XRF, XRT data from aggregate file...", save_stdout = False, print_terminal = True)
+    
     elements_xrf, \
     xrf_data, \
     xrt_data, \
-    theta_tomo = futil.extract_h5_aggregate_xrf_xrt_data(f_XRF_XRT_data, element_lines_roi = element_lines_roi)
+    theta_tomo = futil.extract_h5_aggregate_xrf_xrt_data(f_XRF_XRT_data, opt_dens_enabled = opt_dens_enabled, element_lines_roi = element_lines_roi)
     
     # TODO Check parallel computing aspect of downsampling and upsampling blocks
 
@@ -391,6 +393,9 @@ def reconstruct_jXRFT_tomography(synchrotron,
     ####--------------------------------------------------------------####
     
     #### Make the lookup table of the fluorescence lines of interests ####
+
+    print_flush_root(rank, "Making lookup table of fluorescence lines of interests...", save_stdout = False, print_terminal = True)
+
     fl_all_lines_dic = MakeFLlinesDictionary_manual(element_lines_roi,                           
                                                     n_line_group_each_element, 
                                                     probe_energy_keV, 
@@ -495,7 +500,9 @@ def reconstruct_jXRFT_tomography(synchrotron,
     P_save_path = os.path.join(P_folder, f_P)
     
     # Check if the P array exists; if it doesn't exist, call the function to calculate the P array and store it as a .h5 file.
-    if not os.path.isfile(P_save_path + ".h5"):   
+    if not os.path.isfile(P_save_path + ".h5"):
+        print_flush_root(rank, "Calculating P array...", save_stdout = False, print_terminal = True)
+        
         intersecting_length_fl_detectorlet_3d_mpi_write_h5_3_manual(n_ranks, minibatch_size, rank,
                                                                     manual_det_coord, set_det_coord_cm, det_on_which_side,
                                                                     manual_det_area, det_dia_cm, det_from_sample_cm, det_ds_spacing_cm,
@@ -535,7 +542,7 @@ def reconstruct_jXRFT_tomography(synchrotron,
         # create the initial_guess in rank0 cpu
         else:
             if rank == 0:
-                X = initialize_guess_3d("cpu", ini_kind, n_element, sample_size_n, sample_height_n, recon_path, f_recon_grid, f_initial_guess, init_const) #cpu         
+                X = initialize_guess_3d("cpu", ini_kind, n_element, sample_size_n, sample_height_n, recon_path, f_recon_grid, f_initial_guess, init_const, ini_rand_amp) #cpu         
                 ## Save the initial guess for future reference
                 with h5py.File(os.path.join(recon_path, f_initial_guess +'.h5'), 'w') as s:
                     sample = s.create_group("sample")

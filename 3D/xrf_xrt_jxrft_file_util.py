@@ -54,7 +54,7 @@ def extract_csv_input_jxrft_recon_params(file_path, fluor_lines, dev):
             
         print('\n\rEnding program...', flush = True)
 
-    available_synchrotrons = ipn.available_synchrotrons
+    # available_synchrotrons = ipn.available_synchrotrons
     available_noise_models = ipn.available_noise_models
     numeric_scalar_params = ipn.recon_numeric_scalar_params
     numeric_array_params = ipn.recon_numeric_array_params
@@ -99,12 +99,12 @@ def extract_csv_input_jxrft_recon_params(file_path, fluor_lines, dev):
     
     input_param_dict = dict(zip(input_params, values))
 
-    if input_param_dict['synchrotron'] is None or input_param_dict['synchrotron_beamline'] is None:
-        print('Error: Synchrotron and/or synchrotron beamline fields empty. Exiting program...', flush = True)
+    # if input_param_dict['synchrotron'] is None or input_param_dict['synchrotron_beamline'] is None:
+        # print('Error: Synchrotron and/or synchrotron beamline fields empty. Exiting program...', flush = True)
 
-        comm.Abort()
+        # comm.Abort()
     
-    synchrotron = input_param_dict['synchrotron'].lower()
+    # synchrotron = input_param_dict['synchrotron'].lower()
     noise_model = input_param_dict['noise_model'].lower()
 
     if noise_model not in available_noise_models:
@@ -112,10 +112,10 @@ def extract_csv_input_jxrft_recon_params(file_path, fluor_lines, dev):
 
         comm.Abort()
 
-    if synchrotron not in available_synchrotrons:
-        print('Error: Synchrotron unavailable. Exiting program...', flush = True)
+    # if synchrotron not in available_synchrotrons:
+        # print('Error: Synchrotron unavailable. Exiting program...', flush = True)
 
-        comm.Abort()
+        # comm.Abort()
 
     if not all(isinstance(input_param_dict[param], bool) for param in bool_params):
         print('Error: The following input parameters must all be set to True or False:', flush = True)
@@ -142,7 +142,7 @@ def extract_csv_input_jxrft_recon_params(file_path, fluor_lines, dev):
 
     return input_param_dict
 
-def extract_h5_aggregate_xrf_xrt_data(file_path, **kwargs):
+def extract_h5_aggregate_xrf_xrt_data(file_path, opt_dens_enabled, **kwargs):
     if not os.path.isfile(file_path):
         print('Error: Cannot locate aggregate XRF, XRT HDF5 file. Exiting program...', flush = True)
 
@@ -199,6 +199,12 @@ def extract_h5_aggregate_xrf_xrt_data(file_path, **kwargs):
         element_lines_roi_idx = np.arange(len(elements_xrf_string))
         xrf_data_roi = xrf_data
 
+    if opt_dens_enabled:
+        xrt_data_idx = elements_xrt_string.index('opt_dens')
+        opt_dens = xrt_data[xrt_data_idx]
+
+        return element_lines_roi_idx, xrf_data_roi, opt_dens, theta
+    
     xrt_data_idx = elements_xrt_string.index('xrt_sig')
     xrt_sig = xrt_data[xrt_data_idx]
 
