@@ -56,7 +56,7 @@ if __name__ == "__main__":
     else:
         params = None
     
-    comm.bcast(params) # Broadcast parameter dictionary onto nonzero ranks so each rank has that information
+    params = comm.bcast(params)  # Broadcast parameter dictionary to all ranks
 
     reconstruct_jXRFT_tomography(**params)
     
