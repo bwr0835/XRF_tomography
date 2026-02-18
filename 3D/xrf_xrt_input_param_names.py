@@ -111,7 +111,7 @@ recon_params_ordered = ['f_recon_parameters',
                         'det_area_eff_cm2',
                         'det_dia_cm',
                         'P_folder',
-                        'f_P'
+                        'f_P',
                         'fl_K',
                         'fl_L',
                         'fl_M']
