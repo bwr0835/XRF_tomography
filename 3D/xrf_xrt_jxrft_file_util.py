@@ -30,7 +30,7 @@ def extract_csv_input_jxrft_recon_params(file_path, fluor_lines, dev):
                                        dtype = str,
                                        keep_default_na = False)
 
-        input_params = input_params_csv['input_param']
+        input_params = input_params_csv['input_param'].str.strip()
         values = input_params_csv['value'].str.strip().replace('', 'None') # Extract values while setting non-existent values to None
 
     except KeyboardInterrupt:
@@ -50,20 +50,20 @@ def extract_csv_input_jxrft_recon_params(file_path, fluor_lines, dev):
 
     if bool(missing_data) or bool(extra_data):
         if bool(missing_data) and bool(extra_data):
-            print('Error: The following input parameters are missing:\n', flush = True)
-            print(*(["'{}'".format(s) for s in missing_data]), sep = '\n', flush = True)
-            print('\nAdditionally, the following input parameters should be removed:\n', flush = True)
-            print(*(["'{}'".format(s) for s in extra_data]), sep = '\n', flush = True)
+            print('Error: The following input parameters are missing:\n', flush=True)
+            print(*(["'{}'".format(s) for s in missing_data]), sep='\n', flush=True)
+            print('\nAdditionally, the following input parameters should be removed:\n', flush=True)
+            print(*(["'{}'".format(s) for s in extra_data]), sep='\n', flush=True)
 
         elif bool(missing_data):
-            print('Error: The following input parameters are missing:\n', flush = True)
-            print(*(["'{}'".format(s) for s in missing_data]), sep = '\n', flush = True)
+            print('Error: The following input parameters are missing:\n', flush=True)
+            print(*(["'{}'".format(s) for s in missing_data]), sep='\n', flush=True)
 
         else:
-            print('Error: The following input parameters should be removed:\n', flush = True)
-            print(*(["'{}'".format(s) for s in extra_data]), sep = '\n', flush = True)
-            
-        print('\n\rEnding program...', flush = True)
+            print('Error: The following input parameters should be removed:\n', flush=True)
+            print(*(["'{}'".format(setattr) for s in extra_data]), sep='\n', flush=True)
+
+        print('\n\rEnding program...', flush=True)
 
         comm.Abort(1)
 
