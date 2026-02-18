@@ -364,8 +364,8 @@ def reconstruct_jXRFT_tomography(sample_size_n,
         xrf_data_roi = None
         xrt_data_new = None
     
-    comm.bcast(xrf_data_roi)
-    comm.bcast(xrt_data_new)
+    xrf_data_roi = comm.bcast(xrf_data_roi)
+    xrt_data_new = comm.bcast(xrt_data_new)
 
     dia_len_n = int(1.2*(sample_height_n**2 + sample_size_n**2 + sample_size_n**2)**0.5) # dev
     n_voxel_minibatch = minibatch_size*sample_size_n # dev
