@@ -69,9 +69,9 @@ preprocessing_bool_params = ['create_aggregate_xrf_xrt_files_enabled',
 preprocessing_dict_params = ['init_edge_pixel_lengths_to_crop',
                              'final_edge_pixel_lengths_to_crop']
 
-recon_params_ordered = ['synchrotron',
-                        'synchrotron_beamline',
-                        'f_recon_parameters',
+# recon_params_ordered = ['synchrotron',
+#                         'synchrotron_beamline',
+recon_params_ordered = ['f_recon_parameters',
                         'probe_intensity',
                         'selfAb',
                         'cont_from_check_point',
