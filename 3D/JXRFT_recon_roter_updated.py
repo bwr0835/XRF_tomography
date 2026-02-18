@@ -24,23 +24,12 @@ warnings.filterwarnings("ignore")
 # stdout_options = {'output_folder': recon_path, 'save_stdout': False, 'print_terminal': True}
 gpu_index = rank % 2
 
-print("is_built:", tc.backends.cuda.is_built())
-print("torch.version.cuda:", tc.version.cuda)
-
-try:
-    tc.cuda.init()
-    print("cuda.init(): OK")
-except Exception as e:
-    print("cuda.init() error:", e)
-
-print("is_available:", tc.cuda.is_available())
-
 sys.stdout.flush()
 # gpu_index = 1
 if tc.cuda.is_available():
     dev = tc.device('cuda:{}'.format(gpu_index))
     
-    print("Process ", rank, "running on", dev)
+    print("Process", rank, "running on", dev)
     
     sys.stdout.flush()
 

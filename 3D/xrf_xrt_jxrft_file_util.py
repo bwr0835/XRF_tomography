@@ -196,11 +196,11 @@ def extract_h5_aggregate_xrf_xrt_data(file_path, opt_dens_enabled, **kwargs):
         element_lines_roi_idx = np.zeros(len(element_lines_roi), dtype = int)
         
         for idx, element_line in enumerate(_element_lines_roi):
-            if element_line[1] == 'K' and '_K' not in elements_xrf_string[idx]:
-                element_line_pair = element_line[0] + '_K'
+            # if element_line[1] == 'K' and '_K' not in elements_xrf_string[idx]:
+            #     element_line_pair = element_line[0] + '_K'
             
-            else:
-                element_line_pair = element_line[0]
+            # else:
+            element_line_pair = element_line[0]
             
             element_line_idx = np.argwhere(_element_lines_roi == element_line_pair)
             
