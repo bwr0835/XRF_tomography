@@ -1707,19 +1707,19 @@ def downsample_proj_data(array, downsample_factor, func = np.mean):
     if array.ndim != 4:
         print_flush_root(rank, 'Error: Input projection data must be exactly 4D. Exiting program...', save_stdout = False, print_terminal = True)
 
-        comm.Abort()
+        comm.abort(1)
     
     _, _, n_slices, n_columns = array.shape
 
     if downsample_factor <= 0:
         print_flush_root(rank, 'Error: Downsampling factor must be positive. Exiting program...', save_stdout = False, print_terminal = True)
 
-        comm.Abort()
+        comm.abort(1)
 
     if n_slices % downsample_factor != 0 or n_columns % downsample_factor != 0:
         print_flush_root(rank, 'Error: Downsampling factor results in non-integer number of rows/slices and/or columns/scan positions. Exiting program...', save_stdout = False, print_terminal = True)
 
-        comm.Abort()
+        comm.abort(1)
 
     if (n_slices//downsample_factor) % 2 or (n_columns//downsample_factor) % 2:
         print('Warning: Odd number of rows/slices and/or columns/scan positions resulting from downsampling. Consider switching to even number of slices and/or scan positions being output.')
@@ -1730,19 +1730,19 @@ def upsample_recon_data(array, upsample_factor):
     if array.ndim != 3:
         print_flush_root(rank, 'Error: Input reconstructed image array must be exactly 3D. Exiting program...', save_stdout = False, print_terminal = True)
 
-        comm.Abort()
+        comm.abort(1)
     
     n_elements, _, n_rows, n_columns = array.shape
 
     if n_rows != n_columns:
         print_flush_root(rank, 'Error: Reconstruction slice arrays must be square. Exiting program...', save_stdout = False, print_terminal = True)
 
-        comm.Abort()
+        comm.abort(1)
     
     if not isinstance(upsample_factor, int) or upsample_factor <= 0:
         print_flush_root(rank, 'Error: Upsample factor must be a positive integer. Exiting program...', save_stdout = False, print_terminal = True)
         
-        comm.Abort()
+        comm.abort(1)
 
     if (n_columns*upsample_factor) % 2:
         print_flush_root(rank, 'Warning: Odd number of columns/scan positions resulting from upsampling. Consider switching to even number of scan positions being output.', save_stdout = False, print_terminal = True)

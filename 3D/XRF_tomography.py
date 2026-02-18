@@ -322,7 +322,7 @@ def reconstruct_jXRFT_tomography(sample_size_n,
 
         print_flush_root(rank, msg, save_stdout = False, print_terminal = True)
 
-        comm.Abort()
+        comm.abort(1)
     
     dia_len_n = int(1.2*(sample_height_n**2 + sample_size_n**2 + sample_size_n**2)**0.5) # dev
     n_voxel_minibatch = minibatch_size*sample_size_n # dev
@@ -841,7 +841,7 @@ def reconstruct_jXRFT_tomography(sample_size_n,
 
                     print_flush_root(rank, msg, save_stdout = False, print_terminal = True)
 
-                    comm.Abort()
+                    comm.abort(1)
 
                 if (X.shape[0], X.shape[1]) != (y1_true.shape[2], y1_true.shape[3]): # If the number of slices and scan positions are not identical after
                                                                                          # downsampling projection data and upsampling initial reconstruction data, throw error and terminate program
@@ -850,7 +850,7 @@ def reconstruct_jXRFT_tomography(sample_size_n,
                         
                     print_flush_root(rank, msg, save_stdout = False, print_terminal = True)
 
-                    comm.Abort()
+                    comm.abort(1)
 
                 X = tc.from_numpy(X)
             

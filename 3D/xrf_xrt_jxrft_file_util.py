@@ -15,12 +15,12 @@ def extract_csv_input_jxrft_recon_params(file_path, fluor_lines, dev):
     if not os.path.isfile(file_path):
         print('Error: Cannot locate input file path. Exiting program...', flush = True)
 
-        comm.Abort()
+        comm.abort(1)
     
     if not file_path.endswith('.csv'):
         print('Error: Reconstruction input parameter file must be CSV. Exiting program...', flush = True)
 
-        comm.Abort()
+        comm.abort(1)
         
     try:
         input_params_csv = pd.read_csv(file_path,
@@ -36,12 +36,12 @@ def extract_csv_input_jxrft_recon_params(file_path, fluor_lines, dev):
     except KeyboardInterrupt:
         print('\n\nKeyboardInterrupt occurred. Exiting program...', flush = True)
             
-        comm.Abort()
+        comm.abort(1)
 
     except:
         print('Error: Unable to read in reconstruction input parameter CSV file. Exiting program...', flush = True)
 
-        comm.Abort()
+        comm.abort(1)
     
     all_params_ordered = pd.Series(ipn.preprocessing_params_ordered)
 
@@ -75,7 +75,7 @@ def extract_csv_input_jxrft_recon_params(file_path, fluor_lines, dev):
             except:
                 print('Error: At least one reconstruction input parameter value cannot be converted to a NumPy array. Exiting program...', flush = True)
 
-                comm.Abort()
+                comm.abort(1)
         
         elif input_params[idx] in dict_params:
             try:
@@ -84,7 +84,7 @@ def extract_csv_input_jxrft_recon_params(file_path, fluor_lines, dev):
             except:
                 print('Error: Cannot convert value of at least one parameter to dictionary. Exiting program...', flush = True)
 
-                comm.Abort()
+                comm.abort(1)
         
         else:
             try:
@@ -102,7 +102,7 @@ def extract_csv_input_jxrft_recon_params(file_path, fluor_lines, dev):
     # if input_param_dict['synchrotron'] is None or input_param_dict['synchrotron_beamline'] is None:
         # print('Error: Synchrotron and/or synchrotron beamline fields empty. Exiting program...', flush = True)
 
-        # comm.Abort()
+        # comm.abort(1)
     
     # synchrotron = input_param_dict['synchrotron'].lower()
     noise_model = input_param_dict['noise_model'].lower()
@@ -110,12 +110,12 @@ def extract_csv_input_jxrft_recon_params(file_path, fluor_lines, dev):
     if noise_model not in available_noise_models:
         print('Error: Noise model unavailable. Exiting program...', flush = True)
 
-        comm.Abort()
+        comm.abort(1)
 
     # if synchrotron not in available_synchrotrons:
         # print('Error: Synchrotron unavailable. Exiting program...', flush = True)
 
-        # comm.Abort()
+        # comm.abort(1)
 
     if not all(isinstance(input_param_dict[param], bool) for param in bool_params):
         print('Error: The following input parameters must all be set to True or False:', flush = True)
@@ -125,13 +125,13 @@ def extract_csv_input_jxrft_recon_params(file_path, fluor_lines, dev):
             
         print('\n\rExiting program...', flush = True)
 
-        comm.Abort()
+        comm.abort(1)
 
     for param in numeric_scalar_params:
         if isinstance(input_param_dict.get(param), str):
             print(f'Error: Expected a number for input parameter \'{param}\', but got a string. Exiting program...', flush = True)
 
-            comm.Abort()
+            comm.abort(1)
 
     input_param_dict['probe_energy_kev'] = np.array([input_param_dict['probe_energy_kev']])
     
@@ -146,12 +146,12 @@ def extract_h5_aggregate_xrf_xrt_data(file_path, opt_dens_enabled, **kwargs):
     if not os.path.isfile(file_path):
         print('Error: Cannot locate aggregate XRF, XRT HDF5 file. Exiting program...', flush = True)
 
-        comm.Abort()
+        comm.abort(1)
     
     if not file_path.endswith('.h5'):
         print(rank, 'Error: Aggregate XRF, XRT file extension must be \'.h5\'. Exiting program...', flush = True)
 
-        comm.Abort()
+        comm.abort(1)
     
     try:
         with h5py.File(file_path, 'r') as h5:
@@ -165,12 +165,12 @@ def extract_h5_aggregate_xrf_xrt_data(file_path, opt_dens_enabled, **kwargs):
     except KeyboardInterrupt:
         print(rank, 'Keyboard interrupt. Exiting program...', flush = True)
 
-        comm.Abort()
+        comm.abort(1)
     
     except:
         print(rank, 'Error: Incorrect HDF5 file structure. Exiting program...', flush = True)
 
-        comm.Abort()
+        comm.abort(1)
     
     elements_xrf_string = [element.decode() for element in elements_xrf]
     elements_xrt_string = [element.decode() for element in elements_xrt]

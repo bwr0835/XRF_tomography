@@ -98,10 +98,35 @@ def rot_center_avg(proj_img_array, theta_pair_array, theta_array):
 
     return center_rotation_avg, geom_center, offset
 
-def correct_vert_jitter(proj_img_array, net_shift_array):
+def correct_vert_jitter(proj_img_array, 
+                        net_shift_array, 
+                        theta_array, 
+                        sample_flipped_remounted_mid_experiment, 
+                        sigma, 
+                        alpha, 
+                        upsample_factor):
     shifted_array = np.zeros(proj_img_array.shape)
 
+    if sample_flipped_remounted_mid_experiment:
+        zero_deg_idx_array = np.where(theta_array == 0)[0]
+        theta_array_first_part = theta_array[:zero_deg_idx_array[1]]
+        theta_array_second_part = theta_array[zero_deg_idx_array[1]:]
 
+        for theta_idx in range(1, len(theta_array_first_part)):
+            _, dy = phase_xcorr(proj_img_array[theta_idx], 
+                                proj_img_array[theta_idx - 1], 
+                                sigma, 
+                                alpha, 
+                                upsample_factor)
+
+            net_shift_array[theta_idx] += dy
+
+        # shifted_array[:zero_deg_idx_array[1]] = ndi.shift(proj_img_array[:zero_deg_idx_array[1]], shift = (net_shift_array[0], 0))
+        # shifted_array[zero_deg_idx_array[1]:] = ndi.shift(proj_img_array[zero_deg_idx_array[1]:], shift = (net_shift_array[1], 0))
+    else:
+        # shifted_array = ndi.shift(proj_img_array, shift = (net_shift_array, 0))
+
+    return shifted_array
 
 def correct_cor(proj_img_array, theta_pair_array, theta_array, net_shift_array, eps = None):
     shifted_array = np.zeros(proj_img_array.shape)
