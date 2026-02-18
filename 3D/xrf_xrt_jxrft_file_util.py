@@ -202,7 +202,7 @@ def extract_h5_aggregate_xrf_xrt_data(file_path, opt_dens_enabled, **kwargs):
             # else:
             element_line_pair = element_line[0]
             
-            element_line_idx = np.argwhere(_element_lines_roi == element_line_pair)
+            element_line_idx = np.argwhere(_element_lines_roi == element_line_pair)[1]
             
             element_lines_roi_idx[idx] = element_line_idx
         
