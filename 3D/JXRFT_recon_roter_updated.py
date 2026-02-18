@@ -34,7 +34,7 @@ if tc.cuda.is_available():
 else:
     dev = "cpu"
     
-    print("Process", rank, "running on CPU")
+    print("Process", rank, "running on CPU", sys.executable)
     
     sys.stdout.flush()
 
