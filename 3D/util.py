@@ -1158,8 +1158,8 @@ def intersecting_length_fl_detectorlet_3d_mpi_write_h5_3_manual(n_ranks, minibat
     if rank == 0:
         if not os.path.exists(P_folder):
             os.makedirs(P_folder)
+        
         with open(os.path.join(P_folder, 'P_array_parameters.txt'), "w") as P_params:             
-            
             if not manual_det_area:
                 P_params.write("det_size_cm = %f\n" %det_size_cm)    
             
@@ -1708,8 +1708,13 @@ def downsample_proj_data(array, downsample_factor, func = np.mean):
     
     _, _, n_slices, n_columns = array.shape
 
-    if not isinstance(downsample_factor, int) or downsample_factor <= 0:
-        print_flush_root(rank, 'Error: Downsampling factor must be a positive integer. Exiting program...', save_stdout = False, print_terminal = True)
+    if downsample_factor <= 0:
+        print_flush_root(rank, 'Error: Downsampling factor must be positive. Exiting program...', save_stdout = False, print_terminal = True)
+
+        comm.Abort()
+
+    if n_slices % downsample_factor != 0 or n_columns % downsample_factor != 0:
+        print_flush_root(rank, 'Error: Downsampling factor results in non-integer number of rows/slices and/or columns/scan positions. Exiting program...', save_stdout = False, print_terminal = True)
 
         comm.Abort()
 
@@ -1724,7 +1729,7 @@ def upsample_recon_data(array, upsample_factor):
 
         comm.Abort()
     
-    _, n_rows, n_columns = array.shape
+    n_elements, _, n_rows, n_columns = array.shape
 
     if n_rows != n_columns:
         print_flush_root(rank, 'Error: Reconstruction slice arrays must be square. Exiting program...', save_stdout = False, print_terminal = True)
@@ -1739,5 +1744,5 @@ def upsample_recon_data(array, upsample_factor):
     if (n_columns*upsample_factor) % 2:
         print_flush_root(rank, 'Warning: Odd number of columns/scan positions resulting from upsampling. Consider switching to even number of scan positions being output.', save_stdout = False, print_terminal = True)
 
-    return ndi.zoom(array, zoom = (1, upsample_factor, upsample_factor), grid_mode = True) # For interpolation purposes, any pixels beyond input array bounds are set to zero (assuming XRF or optical density arrays used)
-                                                                                           # Cubic splin interpolation used (the default)                                                                                # grid_mode = True defines pixel gridding (for interpolation purposes) by pixel edges instead of centers
+    for i in range(n_elements):
+        array[i] = ndi.zoom(array[i], zoom = upsample_factor)

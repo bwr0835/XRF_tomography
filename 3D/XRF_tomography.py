@@ -350,21 +350,15 @@ def reconstruct_jXRFT_tomography(sample_size_n,
     # TODO Check parallel computing aspect of downsampling and upsampling blocks
 
     if rank == 0:
-        if downsample_factor > 1:
-            msg = f'Downsampling XRF, optical density projection images by factor of {downsample_factor}'
+        msg = f'Downsampling XRF, optical density projection images by factor of {downsample_factor}'
         
-            print_flush_root(rank, msg, save_stdout = False, print_terminal = True)
+        print_flush_root(rank, msg, save_stdout = False, print_terminal = True)
 
-            xrf_data_roi = downsample_proj_data(xrf_data, downsample_factor)
-            xrt_data_new = downsample_proj_data(xrt_data, downsample_factor)
+        xrf_data_roi = downsample_proj_data(xrf_data, downsample_factor)
+        xrt_data_new = downsample_proj_data(xrt_data, downsample_factor)
 
-            sample_height_n /= downsample_factor
-            sample_size_n /= downsample_factor
-        
-        else:
-            print_flush_root("Error: 'downsample_factor' must be a positive integer. Exiting program...")
-
-            comm.Abort()    
+        sample_height_n /= downsample_factor
+        sample_size_n /= downsample_factor  
 
     else:
         xrf_data_roi = None
@@ -790,7 +784,6 @@ def reconstruct_jXRFT_tomography(sample_size_n,
                     s["sample/elements"][...] = np.array(list(this_aN_dic.keys())).astype('S5')
 #                 dxchange.write_tiff(X_cpu, os.path.join(recon_path, f_recon_grid)+"_"+str(epoch), dtype='float32', overwrite=True)  
                 
-
         ## It's important to close the hdf5 file handle in the end of the reconstruction.
         P_handle.close()
         # y1_true_handle.close()
@@ -1047,13 +1040,11 @@ def reconstruct_jXRFT_tomography(sample_size_n,
                     XRF_loss_whole_obj_cont[n_theta*epoch + idx] = tc.mean(XRF_loss_n_batch)
                     XRT_loss_whole_obj_cont[n_theta*epoch + idx] = tc.mean(XRT_loss_n_batch)
 
-                    
                 comm.Barrier()                    
                 
                 del lac
 #                 tc.cuda.empty_cache()
-                
-                
+                         
             stdout_options = {'root':0, 'output_folder': recon_path, 'save_stdout': True, 'print_terminal': False}
             per_epoch_time = time.perf_counter() - t0_epoch
             

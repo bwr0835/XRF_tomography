@@ -24,7 +24,7 @@ def extract_csv_input_jxrft_recon_params(file_path, fluor_lines, dev):
         
     try:
         input_params_csv = pd.read_csv(file_path,
-                                       delimiter = ':', 
+                                       delimiter = '=', 
                                        header = None, 
                                        names = ['input_param', 'value'],
                                        dtype = str,
@@ -209,4 +209,3 @@ def extract_h5_aggregate_xrf_xrt_data(file_path, opt_dens_enabled, **kwargs):
     xrt_sig = xrt_data[xrt_data_idx]
 
     return element_lines_roi_idx, xrf_data_roi, xrt_sig, theta
-
