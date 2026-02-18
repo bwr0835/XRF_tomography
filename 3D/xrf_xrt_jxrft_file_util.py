@@ -43,7 +43,7 @@ def extract_csv_input_jxrft_recon_params(file_path, fluor_lines, dev):
 
         comm.abort(1)
     
-    all_params_ordered = pd.Series(ipn.preprocessing_params_ordered)
+    all_params_ordered = pd.Series(ipn.recon_params_ordered)
 
     if not input_params.equals(all_params_ordered):
         print('Error: At least one parameter missing or at least one parameter too many.', flush = True)
