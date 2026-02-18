@@ -72,8 +72,10 @@ preprocessing_dict_params = ['init_edge_pixel_lengths_to_crop',
 # recon_params_ordered = ['synchrotron',
 #                         'synchrotron_beamline',
 recon_params_ordered = ['f_recon_parameters',
+                        'dev',
                         'probe_intensity',
                         'selfAb',
+                        'noise_model',
                         'cont_from_check_point',
                         'use_saved_initial_guess',
                         'downsample_factor',
@@ -84,8 +86,8 @@ recon_params_ordered = ['f_recon_parameters',
                         'recon_path',
                         'f_initial_guess',
                         'f_recon_grid',
-                        'data_path'
-                        'f_XRF_XRT_data'
+                        'data_path',
+                        'f_XRF_XRT_data',
                         'opt_dens_enabled',
                         'this_aN_dic',
                         'element_lines_roi',
@@ -99,6 +101,7 @@ recon_params_ordered = ['f_recon_parameters',
                         'minibatch_size',
                         'b1',
                         'b2',
+                        'lr',
                         'manual_det_coord',
                         'set_det_coord_cm',
                         'det_on_which_side',
@@ -108,13 +111,16 @@ recon_params_ordered = ['f_recon_parameters',
                         'det_area_eff_cm2',
                         'det_dia_cm',
                         'P_folder',
-                        'f_P']
+                        'f_P'
+                        'fl_K',
+                        'fl_L',
+                        'fl_M']
 
 recon_numeric_scalar_params = ['probe_intensity',
                                'downsample_factor',
                                'upsample_factor',
                                'init_const',
-                               'ini_rand_amp'
+                               'ini_rand_amp',
                                'sample_size_n',
                                'sample_height_n',
                                'sample_size_cm',
@@ -130,7 +136,7 @@ recon_numeric_scalar_params = ['probe_intensity',
                                'det_dia_cm']
 
 recon_numeric_array_params = ['element_lines_roi',
-                              'n_line_group_each_element'
+                              'n_line_group_each_element',
                               'probe_energy_keV',
                               'set_det_coord_cm']
 

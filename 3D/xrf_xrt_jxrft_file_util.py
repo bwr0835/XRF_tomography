@@ -63,7 +63,7 @@ def extract_csv_input_jxrft_recon_params(file_path, fluor_lines, dev):
             print('Error: The following input parameters should be removed:\n', flush = True)
             print(*(["'{}'".format(s) for s in extra_data]), sep = '\n', flush = True)
 
-            print('\n\rEnding program...', flush = True)
+        print('\n\rEnding program...', flush = True)
 
         comm.Abort(1)
 
