@@ -54,6 +54,8 @@ def extract_csv_input_jxrft_recon_params(file_path, fluor_lines, dev):
             
         print('\n\rEnding program...', flush = True)
 
+        comm.abort(1)
+
     # available_synchrotrons = ipn.available_synchrotrons
     available_noise_models = ipn.available_noise_models
     numeric_scalar_params = ipn.recon_numeric_scalar_params
