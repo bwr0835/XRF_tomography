@@ -14,7 +14,8 @@ import datetime, \
        torch as tc, \
        torch.nn.functional as F, \
        os, \
-       sys
+       sys, \
+       xrl_fluorline_macros
 
 from mpi4py import MPI
 from numpy.random import default_rng
@@ -32,13 +33,15 @@ rank = comm.Get_rank()
 
 # sub-lines of K, L, M lines with the required format by xraylib.
 
-fl = {"K": np.array([xlib.KA1_LINE, xlib.KA2_LINE, xlib.KA3_LINE, xlib.KB1_LINE, xlib.KB2_LINE,
-                 xlib.KB3_LINE, xlib.KB4_LINE, xlib.KB5_LINE]),
-      "L": np.array([xlib.LA1_LINE, xlib.LA2_LINE, xlib.LB1_LINE, xlib.LB2_LINE, xlib.LB3_LINE,
-                 xlib.LB4_LINE, xlib.LB5_LINE, xlib.LB6_LINE, xlib.LB7_LINE, xlib.LB9_LINE,
-                 xlib.LB10_LINE, xlib.LB15_LINE, xlib.LB17_LINE]),              
-      "M": np.array([xlib.MA1_LINE, xlib.MA2_LINE, xlib.MB_LINE])               
-     }
+# fl = {"K": np.array([xlib.KA1_LINE, xlib.KA2_LINE, xlib.KA3_LINE, xlib.KB1_LINE, xlib.KB2_LINE,
+#                  xlib.KB3_LINE, xlib.KB4_LINE, xlib.KB5_LINE]),
+#       "L": np.array([xlib.LA1_LINE, xlib.LA2_LINE, xlib.LB1_LINE, xlib.LB2_LINE, xlib.LB3_LINE,
+#                  xlib.LB4_LINE, xlib.LB5_LINE, xlib.LB6_LINE, xlib.LB7_LINE, xlib.LB9_LINE,
+#                  xlib.LB10_LINE, xlib.LB15_LINE, xlib.LB17_LINE]),              
+#       "M": np.array([xlib.MA1_LINE, xlib.MA2_LINE, xlib.MB_LINE])               
+#      }
+
+fl = xrl_fluorline_macros.fl
 
 
 fl_line_groups = np.array(["K", "L", "M"])
