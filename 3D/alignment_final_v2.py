@@ -98,6 +98,11 @@ def rot_center_avg(proj_img_array, theta_pair_array, theta_array):
 
     return center_rotation_avg, geom_center, offset
 
+def correct_vert_jitter(proj_img_array, net_shift_array):
+    shifted_array = np.zeros(proj_img_array.shape)
+
+
+
 def correct_cor(proj_img_array, theta_pair_array, theta_array, net_shift_array, eps = None):
     shifted_array = np.zeros(proj_img_array.shape)
     
@@ -115,7 +120,7 @@ def correct_cor(proj_img_array, theta_pair_array, theta_array, net_shift_array, 
 
     return shifted_array, net_shift_array
 
-def correct_jitter(orig_proj,
+def correct_hor_jitter(orig_proj,
                    aligned_proj,
                    init_net_shifts_x = None, 
                    init_net_shifts_y = None,
