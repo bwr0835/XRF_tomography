@@ -189,7 +189,7 @@ class PPM(nn.Module):
         print(fl_map_tot_flat_theta.shape)
         print(self.SA_theta.shape)
         print(self.FL_line_det_attCS_ls.shape)
-        print(det_window_attenuation.shape)
+        # print(det_window_attenuation.shape)
 
         fl_signal_SA_theta = tc.unsqueeze(probe_after_attenuation_theta, dim = 0)*fl_map_tot_flat_theta*self.SA_theta*self.FL_line_det_attCS_ls*det_window_attenuation
         fl_signal_SA_theta = fl_signal_SA_theta.view(self.n_lines, self.minibatch_size, self.sample_size_n)
