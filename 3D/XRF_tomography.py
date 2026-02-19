@@ -777,6 +777,8 @@ def reconstruct_jXRFT_tomography(sample_size_n = None,
                 
                 if epsilon < 1e-12:             
                     if rank == 0:
+                        print_flush_root(rank, "Saving ending condition...", save_stdout = False, print_terminal = True)
+                        
                         with h5py.File(os.path.join(recon_path, f_recon_grid + "_" + str(epoch)+"_ending_condition" +'.h5'), "w") as s:
                             sample = s.create_group("sample")
 
@@ -1120,6 +1122,8 @@ def reconstruct_jXRFT_tomography(sample_size_n = None,
                 
                 if epsilon < 1e-12:
                     if rank == 0:
+                        print_flush_root(rank, "Saving ending condition...", save_stdout = False, print_terminal = True)
+                        
                         with h5py.File(os.path.join(recon_path, f_recon_grid + "_" + str(epoch) + "_ending_condition" + '.h5'), "w") as s:
                             sample = s.create_group("sample")
                             
@@ -1198,3 +1202,4 @@ def reconstruct_jXRFT_tomography(sample_size_n = None,
             np.save(os.path.join(recon_path, 'XRT_loss_signal.npy'), XRT_loss_whole_obj.numpy())
             np.save(os.path.join(recon_path, 'loss_signal.npy'), loss_whole_obj.numpy())
              
+    return
