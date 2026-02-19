@@ -42,7 +42,8 @@ from mpl_toolkits.axes_grid1 import make_axes_locatable
 tc.set_default_dtype(tc.float32)
 
 matplotlib.rcParams['pdf.fonttype'] = 'truetype'
-fontProperties = {'family': 'sans-serif', 'sans-serif': ['Helvetica'], 'weight': 'normal', 'size': 12}
+# fontProperties = {'family': 'sans-serif', 'sans-serif': ['Helvetica'], 'weight': 'normal', 'size': 12}
+fontProperties = {'family': 'sans-serif', 'sans-serif': ['Arial'], 'weight': 'normal', 'size': 12}
 plt.rc('font', **fontProperties)
 
 warnings.filterwarnings("ignore")
