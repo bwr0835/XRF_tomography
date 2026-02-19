@@ -356,8 +356,8 @@ def reconstruct_jXRFT_tomography(sample_size_n = None,
         xrf_data_roi = downsample_proj_data(xrf_data, 'xrf', downsample_factor)
         xrt_data_new = downsample_proj_data(xrt_data, 'xrt', downsample_factor)
 
-        sample_height_n /= downsample_factor
-        sample_size_n /= downsample_factor
+        sample_height_n //= downsample_factor
+        sample_size_n //= downsample_factor
 
     else:
         xrf_data_roi = None
