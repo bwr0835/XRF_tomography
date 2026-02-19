@@ -91,7 +91,7 @@ class PPM(nn.Module):
         Initialize self.x with the tensor of the saved intermediate reconstructing results (n_element, minibatch_size, n_y)
         """
         ## set grid_concentration[:, N(this_minibatch_st): N(this_minibatch_end), :, :] to be the model parameters
-        return nn.Parameter(self.grid_concentration[:, self.minibatch_size*self.p//self.sample_size_n:self.minibatch_size*(self.p + 1)//self.sample_size_n, :, :])
+        return nn.Parameter(self.grid_concentration[:, self.minibatch_size*self.p//self.sample_size_n:self.minibatch_size*(self.p + 1)//self.sample_size_n])
     
 
     def init_SA_theta(self):
@@ -99,9 +99,9 @@ class PPM(nn.Module):
             voxel_idx_offset = self.p*self.n_voxel_minibatch        
             
             # clamp the index after subtracting the offset, so that all 0 indices remains 0 (becomes negative if without clamping, and cause errors)
-            att_exponent = tc.stack([self.lac[:,:, tc.clamp((self.P_minibatch[m,0] - voxel_idx_offset), 0, self.n_voxel_minibatch).to(dtype=tc.long),\
-                                              self.P_minibatch[m,1].to(dtype=tc.long)]\
-                                   *self.P_minibatch[m,2].repeat(self.n_element, self.n_lines, 1) for m in range(self.n_det)])
+            att_exponent = tc.stack([self.lac[:, :, tc.clamp((self.P_minibatch[m, 0] - voxel_idx_offset), 0, self.n_voxel_minibatch - 1).to(dtype = tc.long), \
+                                              self.P_minibatch[m, 1].to(dtype=tc.long)] \
+                                              *self.P_minibatch[m, 2].repeat(self.n_element, self.n_lines, 1) for m in range(self.n_det)])
             
             # lac, dim = [n_element, n_lines, n_voxel_minibatch, n_voxel]
             # att_exponent, dim = [n_det, n_element, n_lines, n_source, n_dia_length]
