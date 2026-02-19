@@ -356,15 +356,15 @@ def reconstruct_jXRFT_tomography(sample_size_n = None,
         xrf_data_roi = downsample_proj_data(xrf_data, 'xrf', downsample_factor)
         xrt_data_new = downsample_proj_data(xrt_data, 'xrt', downsample_factor)
 
-        sample_height_n //= downsample_factor
-        sample_size_n //= downsample_factor
-
     else:
         xrf_data_roi = None
         xrt_data_new = None
     
     xrf_data_roi = comm.bcast(xrf_data_roi)
     xrt_data_new = comm.bcast(xrt_data_new)
+
+    sample_height_n //= downsample_factor
+    sample_size_n //= downsample_factor
 
     print_flush_root(rank, xrf_data_roi.shape, save_stdout = False, print_terminal = True)
     print_flush_root(rank, xrt_data_new.shape, save_stdout = False, print_terminal = True)
