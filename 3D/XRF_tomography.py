@@ -38,7 +38,8 @@ from misc import print_flush_root, print_flush_all
 from matplotlib import pyplot as plt, ticker as mtick, gridspec
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 
-tc.set_default_tensor_type(tc.FloatTensor)
+# tc.set_default_tensor_type(tc.FloatTensor)
+tc.set_default_dtype(tc.FloatTensor)
 
 matplotlib.rcParams['pdf.fonttype'] = 'truetype'
 fontProperties = {'family': 'sans-serif', 'sans-serif': ['Helvetica'], 'weight': 'normal', 'size': 12}
