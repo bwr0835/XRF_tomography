@@ -102,20 +102,9 @@ class PPM(nn.Module):
 
             print(f'lac shape: {lac_cpu.shape}')
             print(f'P_minibatch shape: {P_minibatch_cpu.shape}')
-
-            
+            print('P_minibatch min/max: ', P_minibatch_cpu.min().item(), P_minibatch_cpu.max().item())
 
             voxel_idx_offset = self.p*self.n_voxel_minibatch
-
-            for i in range(3):
-                idx0_raw = P_minibatch_cpu[i, 0] - voxel_idx_offset
-                idx0 = idx0_raw.clamp(0, self.n_voxel_minibatch).to(dtype = tc.long)
-                idx1 = P_minibatch_cpu[i, 1].to(dtype = tc.long)
-
-                print(f'i={i}')
-                print('   idx0_raw min/max:', idx0_raw.min().item(), idx0_raw.max().item())
-                print('   idx0 min/max:', idx0.min().item(), idx0.max().item(), 'allowed [0,',lac_cpu.size(2) - 1, ']')
-                print('   idx1 min/max:', idx1.min().item(), idx1.max().item(), 'allowed [0,',lac_cpu.size(3) - 1, ']')
             
             # clamp the index after subtracting the offset, so that all 0 indices remains 0 (becomes negative if without clamping, and cause errors)
             att_exponent = tc.stack([self.lac[:, :, tc.clamp((self.P_minibatch[m, 0] - voxel_idx_offset), 0, self.n_voxel_minibatch).to(dtype = tc.long), \
