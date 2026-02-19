@@ -366,6 +366,8 @@ def reconstruct_jXRFT_tomography(sample_size_n = None,
     xrf_data_roi = comm.bcast(xrf_data_roi)
     xrt_data_new = comm.bcast(xrt_data_new)
 
+    print_flush_root(rank, xrf_data_roi.shape, save_stdout = False, print_terminal = True)
+    print_flush_root(rank, xrt_data_new.shape, save_stdout = False, print_terminal = True)
     dia_len_n = int(1.2*(sample_height_n**2 + sample_size_n**2 + sample_size_n**2)**0.5) # dev
     n_voxel_minibatch = minibatch_size*sample_size_n # dev
     n_voxel = sample_height_n*sample_size_n**2 # dev
