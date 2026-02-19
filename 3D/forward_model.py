@@ -97,8 +97,8 @@ class PPM(nn.Module):
     def init_SA_theta(self):
         if self.selfAb == True:
 
-            lac_cpu = self.lac.cpu()
-            P_minibatch_cpu = self.P_minibatch.cpu()
+            lac_cpu = self.lac
+            P_minibatch_cpu = self.P_minibatch
 
             print(f'lac shape: {lac_cpu.shape}')
             print(f'P_minibatch shape: {P_minibatch_cpu.shape}')
