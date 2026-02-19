@@ -1703,13 +1703,27 @@ def create_XRF_data_3d(n_ranks, rank, P_folder, f_P, theta_st, theta_end, n_thet
                                  sample_size_cm, sample_height_n, this_aN_dic, probe_cts, probe_energy_keV, save_path, save_fname, Poisson_noise, dev, this_theta_idx)
         P_handle.close()
 
-def downsample_proj_data(array, downsample_factor, func = np.mean):
-    if array.ndim != 4:
-        print_flush_root(rank, 'Error: Input projection data must be exactly 4D. Exiting program...', save_stdout = False, print_terminal = True)
+def downsample_proj_data(array, data_type,downsample_factor, func = np.mean):
+    if data_type == 'xrf':
+        if array.ndim != 4:
+            print_flush_root(rank, 'Error: Input XRF projection data must be exactly 4D. Exiting program...', save_stdout = False, print_terminal = True)
 
-        comm.Abort(1)
+            comm.Abort(1)
     
-    _, _, n_slices, n_columns = array.shape
+        _, _, n_slices, n_columns = array.shape
+    
+    elif data_type == 'xrt':
+        if array.ndim != 3:
+            print_flush_root(rank, 'Error: Input XRT/OD projection data must be exactly 3D. Exiting program...', save_stdout = False, print_terminal = True)
+
+            comm.Abort(1)
+
+        _, n_slices, n_columns = array.shape
+    
+    else:
+        print_flush_root(rank, 'Error: Invalid data type. Exiting program...', save_stdout = False, print_terminal = True)
+        
+        comm.Abort(1)
 
     if downsample_factor <= 0:
         print_flush_root(rank, 'Error: Downsampling factor must be positive. Exiting program...', save_stdout = False, print_terminal = True)
@@ -1724,28 +1738,36 @@ def downsample_proj_data(array, downsample_factor, func = np.mean):
     if (n_slices//downsample_factor) % 2 or (n_columns//downsample_factor) % 2:
         print('Warning: Odd number of rows/slices and/or columns/scan positions resulting from downsampling. Consider switching to even number of slices and/or scan positions being output.')
 
-    return meas.block_reduce(array, block_size = (1, 1, downsample_factor, downsample_factor), func = func) # 
+    if data_type == 'xrf':
+        return meas.block_reduce(array, block_size = (1, 1, downsample_factor, downsample_factor), func = func) # 
+    
+    else:
+        return meas.block_reduce(array, block_size = (1, downsample_factor, downsample_factor), func = func)
 
 def upsample_recon_data(array, upsample_factor):
-    if array.ndim != 3:
-        print_flush_root(rank, 'Error: Input reconstructed image array must be exactly 3D. Exiting program...', save_stdout = False, print_terminal = True)
+    if array.ndim != 4:
+        print_flush_root(rank, 'Error: Input reconstructed image array must be exactly 4D. Exiting program...', save_stdout = False, print_terminal = True)
 
         comm.Abort(1)
     
-    n_elements, _, n_rows, n_columns = array.shape
+    _, n_slices, n_rows, n_columns = array.shape
 
     if n_rows != n_columns:
         print_flush_root(rank, 'Error: Reconstruction slice arrays must be square. Exiting program...', save_stdout = False, print_terminal = True)
 
         comm.Abort(1)
     
-    if not isinstance(upsample_factor, int) or upsample_factor <= 0:
-        print_flush_root(rank, 'Error: Upsample factor must be a positive integer. Exiting program...', save_stdout = False, print_terminal = True)
+    if upsample_factor <= 0:
+        print_flush_root(rank, 'Error: Upsample factor must be positive. Exiting program...', save_stdout = False, print_terminal = True)
         
+        comm.Abort(1)
+    
+    if not (n_columns*upsample_factor).is_integer() or not (n_slices*upsample_factor).is_integer():
+        print_flush_root(rank, 'Error: Upsample factor results in non-integer number of slices and/or scan positions. Exiting program...', save_stdout = False, print_terminal = True)
+
         comm.Abort(1)
 
     if (n_columns*upsample_factor) % 2:
         print_flush_root(rank, 'Warning: Odd number of columns/scan positions resulting from upsampling. Consider switching to even number of scan positions being output.', save_stdout = False, print_terminal = True)
 
-    for i in range(n_elements):
-        array[i] = ndi.zoom(array[i], zoom = upsample_factor)
+    return ndi.zoom(array, zoom = (1, upsample_factor, upsample_factor, upsample_factor))

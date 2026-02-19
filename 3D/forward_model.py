@@ -37,7 +37,8 @@ class PPM(nn.Module):
                  det_from_sample_cm, 
                  det_solid_angle_ratio,
                  det_window_dens,
-                 det_window_thickness):
+                 det_window_thickness_cm,
+                 opt_dens_enabled):
         """
         Initialize the attributes of PPM. 
         """
@@ -69,7 +70,7 @@ class PPM(nn.Module):
         self.probe_att = probe_att
         self.probe_attCS_ls = probe_attCS_ls
         self.probe_before_attenuation_flat = self.init_probe()        
-              
+
         self.theta = theta
         self.signal_attenuation_factor = signal_attenuation_factor
              
@@ -80,7 +81,9 @@ class PPM(nn.Module):
         self.SA_theta = self.init_SA_theta()
         self.det_solid_angle_ratio = det_solid_angle_ratio
         self.det_window_dens = det_window_dens
-        self.det_window_thickness = det_window_thickness
+        self.det_window_thickness_cm = det_window_thickness_cm
+
+        self.opt_dens_enabled = opt_dens_enabled
         
     def init_xp(self):
         """
@@ -163,13 +166,18 @@ class PPM(nn.Module):
             line_idx = line_idx + len(fl_unit)
             
         attenuation_map_theta_flat = tc.exp(-(att_exponent_acc_map[:,:-1])).view(self.n_voxel_minibatch)
-#         transmission_theta = tc.exp(-att_exponent_acc_map[:,-1])
-        transmission_att_exponent_theta = att_exponent_acc_map[:,-1]
+        
+        if self.opt_dens_enabled:
+            transmission_att_exponent_theta = att_exponent_acc_map[:,-1]
+        
+        else:
+            transmission_theta = tc.exp(-att_exponent_acc_map[:,-1])
+        
 
         # Calculate attenuation due to detector window and add new axis/dimension so that broadcasting rules are obeyed
         # tensor.unsqueeze(dim = 1) = tensor[:, None]
         
-        det_window_attenuation = tc.exp(-self.FL_line_det_attCS_ls*self.det_window_dens*self.det_window_thickness).unsqueeze(dim = 1)
+        det_window_attenuation = tc.exp(-self.FL_line_det_attCS_ls*self.det_window_dens*self.det_window_thickness_cm).unsqueeze(dim = 1)
         
         #### 4: Create XRF, XRT data ####           
         probe_after_attenuation_theta = self.probe_before_attenuation_flat*attenuation_map_theta_flat 
@@ -181,8 +189,13 @@ class PPM(nn.Module):
         fl_signal_SA_theta = fl_signal_SA_theta*self.det_solid_angle_ratio*self.signal_attenuation_factor
          
         output1 = fl_signal_SA_theta
-#         output2 = self.probe_cts*transmission_theta
-        output2 = transmission_att_exponent_theta
+
+        if self.opt_dens_enabled:
+            output2 = transmission_att_exponent_theta
+        
+        else:
+            output2 = self.probe_cts*transmission_theta
+        
 
         return output1, output2
     

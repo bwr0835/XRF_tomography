@@ -109,6 +109,8 @@ recon_params_ordered = ['f_recon_parameters',
                         'manual_det_area',
                         'det_area_eff_cm2',
                         'det_dia_cm',
+                        'det_window_element',
+                        'det_window_thickness_cm',
                         'P_folder',
                         'f_P',
                         'fl_K',
@@ -132,7 +134,8 @@ recon_numeric_scalar_params = ['probe_intensity',
                                'det_from_sample_cm',
                                'det_ds_spacing_cm',
                                'det_area_eff_cm2',
-                               'det_dia_cm']
+                               'det_dia_cm',
+                               'det_window_thickness_cm']
 
 recon_numeric_array_params = ['element_lines_roi',
                               'n_line_group_each_element',

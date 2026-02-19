@@ -139,9 +139,9 @@ fl = xrl_fluorline_macros.fl
 #         fl_M = fl["M"],
 #         **kwargs):
     
-def reconstruct_jXRFT_tomography(sample_size_n,
-                                 sample_height_n, 
-                                 sample_size_cm,
+def reconstruct_jXRFT_tomography(sample_size_n = None,
+                                 sample_height_n = None, 
+                                 sample_size_cm = None,
                                  probe_energy_keV = None,
                                  probe_intensity = None,
                                  probe_att = True,
@@ -154,7 +154,7 @@ def reconstruct_jXRFT_tomography(sample_size_n,
                                  det_ds_spacing_cm = None,
                                  det_from_sample_cm = None,
                                  det_window_element = None,
-                                 det_window_thickness_um = None,
+                                 det_window_thickness_cm = None,
                                  n_epochs = 50, 
                                  save_every_n_epochs = 10, 
                                  minibatch_size = None,
@@ -184,8 +184,7 @@ def reconstruct_jXRFT_tomography(sample_size_n,
                                  f_P = None, 
                                  fl_K = fl["K"], 
                                  fl_L = fl["L"], 
-                                 fl_M = fl["M"],
-                                 **kwargs):
+                                 fl_M = fl["M"]):
 
     '''
     Perform joint iterative X-ray fluorescence (XRF) and X-ray transmission (XRT) reconstruction via automatic differentiation 
@@ -339,8 +338,8 @@ def reconstruct_jXRFT_tomography(sample_size_n,
     # TODO Check parallel computing aspect of this function
     # TODO Check with Chris about this_aN_dic and element_line_roi
     
-
-    print_flush_root(rank, "Extracting XRF, XRT data from aggregate file...", save_stdout = False, print_terminal = True)
+    if rank == 0:
+        print_flush_root(rank, "Extracting XRF, XRT data from aggregate file...", save_stdout = False, print_terminal = True)
     
     elements_xrf, \
     xrf_data, \
@@ -354,11 +353,11 @@ def reconstruct_jXRFT_tomography(sample_size_n,
         
         print_flush_root(rank, msg, save_stdout = False, print_terminal = True)
 
-        xrf_data_roi = downsample_proj_data(xrf_data, downsample_factor)
-        xrt_data_new = downsample_proj_data(xrt_data, downsample_factor)
+        xrf_data_roi = downsample_proj_data(xrf_data, 'xrf', downsample_factor)
+        xrt_data_new = downsample_proj_data(xrt_data, 'xrt', downsample_factor)
 
         sample_height_n /= downsample_factor
-        sample_size_n /= downsample_factor  
+        sample_size_n /= downsample_factor
 
     else:
         xrf_data_roi = None
@@ -406,12 +405,15 @@ def reconstruct_jXRFT_tomography(sample_size_n,
     n_lines = fl_all_lines_dic["n_lines"] #scalar
     ####--------------------------------------------------------------####
     
-    if det_window_element is not None:
+    if det_window_element is not None and det_window_element.lower() != 'windowless':
         Z_window = xlib.SymbolToAtomicNumber(det_window_element)
-    
+        det_window_dens = xlib.ElementDensity(Z_window)
+        
         FL_line_det_attCS_ls = tc.as_tensor(xlib_np.CS_Total_Kissel(Z_window, fl_all_lines_dic["fl_energy"])).float().to(dev)
 
     else:
+        det_window_dens = 0.
+        
         FL_line_det_attCS_ls = tc.zeros(n_lines).float().to(dev)
 
     #### Calculate the MAC of probe ####
@@ -578,13 +580,13 @@ def reconstruct_jXRFT_tomography(sample_size_n,
                 recon_params.write("sample_height_n = %d\n" %sample_height_n)
                 recon_params.write("sample_size_cm = %.2f\n" %sample_size_cm)
 
-                if det_window_element is not None:
+                if det_window_element is not None and det_window_element.lower() != 'windowless':
                     recon_params.write("detector_window_element = %s\n" %det_window_element)
-                    recon_params.write("detector_window_thickness_um = %.2f\n" %det_window_thickness_um)
+                    recon_params.write("detector_window_thickness_cm = %.2f\n" %det_window_thickness_cm)
                 
                 else:
                     recon_params.write("detector_window_element = windowless\n")
-                    recon_params.write("detector_window_thickness_um = n/a\n")
+                    recon_params.write("detector_window_thickness_cm = n/a\n")
 
                 recon_params.write("probe_energy_keV = %.2f\n" %probe_energy_keV[0])
                 recon_params.write("incident_probe_cts = %.2e\n" %probe_cts)             
@@ -669,12 +671,35 @@ def reconstruct_jXRFT_tomography(sample_size_n,
 #                     print_flush_root(rank, val=minibatch_ls, output_file='minibatch_ls.csv', **stdout_options)
                     
                     ## Load us_ic as the incoming probe count in this minibatch
-                    model = PPM(dev, selfAb, lac, X, p, n_element, n_lines, FL_line_attCS_ls, FL_line_det_attCS_ls,
-                                detected_fl_unit_concentration, n_line_group_each_element,
-                                sample_height_n, minibatch_size, sample_size_n, sample_size_cm,
-                                probe_energy_keV, probe_cts, probe_att, probe_attCS_ls,
-                                theta, signal_attenuation_factor,
-                                n_det, P_minibatch, det_dia_cm, det_from_sample_cm, det_solid_angle_ratio)
+                    model = PPM(dev, 
+                                selfAb, 
+                                lac, 
+                                X, 
+                                p, 
+                                n_element, 
+                                n_lines, 
+                                FL_line_attCS_ls, 
+                                FL_line_det_attCS_ls,
+                                detected_fl_unit_concentration, 
+                                n_line_group_each_element,
+                                sample_height_n, 
+                                minibatch_size, 
+                                sample_size_n, 
+                                sample_size_cm,
+                                probe_energy_keV, 
+                                probe_cts, 
+                                probe_att, 
+                                probe_attCS_ls,
+                                theta, 
+                                signal_attenuation_factor,
+                                n_det, 
+                                P_minibatch, 
+                                det_dia_cm, 
+                                det_from_sample_cm, 
+                                det_solid_angle_ratio,
+                                det_window_dens,
+                                det_window_thickness_cm,
+                                opt_dens_enabled)
                     
                     optimizer = tc.optim.Adam(model.parameters(), lr = lr)              
                                     
@@ -899,13 +924,13 @@ def reconstruct_jXRFT_tomography(sample_size_n,
                 recon_params.write("sample_height_n = %d\n" %sample_height_n)
                 recon_params.write("sample_size_cm = %.2f\n" %sample_size_cm)
 
-                if det_window_element is not None:
+                if det_window_element is not None and det_window_element.lower() != 'windowless':
                     recon_params.write("detector_window_element = %s\n" %det_window_element)
-                    recon_params.write("detector_window_thickness_um = %.2f\n" %det_window_thickness_um)
+                    recon_params.write("detector_window_thickness_cm = %.2f\n" %det_window_thickness_cm)
                 
                 else:
                     recon_params.write("detector_window_element = windowless\n")
-                    recon_params.write("detector_window_thickness_um = 0\n")
+                    recon_params.write("detector_window_thickness_cm = 0\n")
 
                 recon_params.write("probe_energy_keV = %.2f\n" %probe_energy_keV[0])
                 recon_params.write("incident_probe_cts = %.2e\n" %probe_cts)             
