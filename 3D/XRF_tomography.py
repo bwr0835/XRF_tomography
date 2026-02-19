@@ -324,9 +324,9 @@ def reconstruct_jXRFT_tomography(sample_size_n = None,
 
         comm.Abort(1)
     
-    dia_len_n = int(1.2*(sample_height_n**2 + sample_size_n**2 + sample_size_n**2)**0.5) # dev
-    n_voxel_minibatch = minibatch_size*sample_size_n # dev
-    n_voxel = sample_height_n*sample_size_n**2 # dev
+    # dia_len_n = int(1.2*(sample_height_n**2 + sample_size_n**2 + sample_size_n**2)**0.5) # dev
+    # n_voxel_minibatch = minibatch_size*sample_size_n # dev
+    # n_voxel = sample_height_n*sample_size_n**2 # dev
     
     #### create the file handle for experimental data; y1: channel data, y2: scalers data ####
     
