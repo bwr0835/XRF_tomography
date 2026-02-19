@@ -428,7 +428,7 @@ def reconstruct_jXRFT_tomography(sample_size_n = None,
     #### original dim = (n_lines_roi, n_theta, sample_height_n, sample_size_n)
     
     # y1_true = tc.from_numpy(y1_true_handle['exchange/data'][element_lines_roi_idx]).view(len(element_lines_roi_idx), n_theta, sample_height_n*sample_size_n).to(dev)
-    y1_true = tc.from_numpy(xrf_data_roi).view(n_element, n_theta, sample_height_n*sample_size_n).to(dev)
+    y1_true = tc.from_numpy(xrf_data_roi).view(n_element, n_theta, sample_height_n*sample_size_n).float().to(dev) # .float() to avoid type mismatch error (float32 is required, but float64 data may be passed))
 #     #### pick the probe photon counts after the ion chamber from the scalers data as the transmission data
     # y2_true = tc.from_numpy(y2_true_handle['exchange/data'][scaler_counts_ds_ic_dataset_idx]).view(n_theta, sample_height_n * sample_size_n).to(dev)
     
@@ -437,7 +437,7 @@ def reconstruct_jXRFT_tomography(sample_size_n = None,
 
     # y2_true = -tc.log(y2_true)
 
-    y2_true = tc.from_numpy(xrt_data_new).view(n_theta, sample_height_n*sample_size_n).to(dev)
+    y2_true = tc.from_numpy(xrt_data_new).view(n_theta, sample_height_n*sample_size_n).float().to(dev) # .float() to avoid type mismatch error (float32 is required, but float64 data may be passed))
     
     #### pick the probe photon counts calibrated for all optics and detectors
     # if use_std_calibation:
