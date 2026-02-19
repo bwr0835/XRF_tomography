@@ -405,12 +405,12 @@ def reconstruct_jXRFT_tomography(sample_size_n = None,
         Z_window = xlib.SymbolToAtomicNumber(det_window_element)
         det_window_dens = xlib.ElementDensity(Z_window)
         
-        FL_line_det_attCS_ls = tc.as_tensor(xlib_np.CS_Total_Kissel(np.array([Z_window]), fl_all_lines_dic["fl_energy"])).float().unsqueeze(dim = 1).to(dev)
+        FL_line_det_attCS_ls = tc.as_tensor(xlib_np.CS_Total_Kissel(np.array([Z_window]), fl_all_lines_dic["fl_energy"])).float().to(dev)
 
     else:
         det_window_dens = 0.
         
-        FL_line_det_attCS_ls = tc.zeros((n_lines, 1)).float().to(dev)
+        FL_line_det_attCS_ls = tc.zeros(n_lines).float().to(dev)
 
     #### Calculate the MAC of probe ####
     # probe_attCS_ls = tc.as_tensor(xlib_np.CS_Total(aN_ls, probe_energy_keV).flatten()).to(dev)
