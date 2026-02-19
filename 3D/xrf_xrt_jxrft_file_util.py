@@ -146,7 +146,7 @@ def extract_csv_input_jxrft_recon_params(file_path, fluor_lines, dev):
 
             comm.Abort(1)
 
-    input_param_dict['probe_energy_keV'] = np.array([input_param_dict['probe_energy_keV']])
+    input_param_dict['probe_energy_keV'] = np.array([input_param_dict['probe_energy_keV']]).astype(float)
     
     input_param_dict['dev'] = dev # Device (GPU, CPU, etc.)
     input_param_dict['fl_K'] = fluor_lines['K']
