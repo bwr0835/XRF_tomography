@@ -39,7 +39,7 @@ from matplotlib import pyplot as plt, ticker as mtick, gridspec
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 
 # tc.set_default_tensor_type(tc.FloatTensor)
-tc.set_default_dtype(tc.FloatTensor)
+tc.set_default_dtype(tc.float32)
 
 matplotlib.rcParams['pdf.fonttype'] = 'truetype'
 fontProperties = {'family': 'sans-serif', 'sans-serif': ['Helvetica'], 'weight': 'normal', 'size': 12}
