@@ -664,7 +664,7 @@ def intersecting_length_fl_detectorlet_3d_mpi_write_h5(n_ranks, rank, det_size_c
     n_det = len(det_pos_ls_flat)
     
     if rank == 0:
-        print(f"numbder of detecting points: {n_det}")
+        print(f"number of detecting points: {n_det}")
         sys.stdout.flush()
         
     ## define sample edges: 
@@ -1252,7 +1252,7 @@ def intersecting_length_fl_detectorlet_3d_mpi_write_h5_3_manual(n_ranks, minibat
     n_det = len(det_pos_ls_flat)
     
     if rank == 0:
-        print(f"numbder of detecting points: {n_det}")
+        print(f"number of detecting points: {n_det}")
         sys.stdout.flush()
         
     ## define sample edges: 
@@ -1451,7 +1451,7 @@ def intersecting_length_fl_detectorlet_3d(det_size_cm, det_from_sample_cm, det_d
         P = np.load(P_save_path + ".npy")
         n_det = P.shape[0]
         longest_int_length_n = P.shape[2]//(sample_height_n * sample_size_n**2)
-        print(f"numbder of detecting points: {n_det}")
+        print(f"number of detecting points: {n_det}")
         sys.stdout.flush()
         
     
