@@ -190,7 +190,7 @@ def extract_h5_aggregate_xrf_xrt_data(file_path, opt_dens_enabled, **kwargs):
     if element_lines_roi is not None:
         _element_lines_roi = np.array(element_lines_roi)
         
-        for element_line in enumerate(_element_lines_roi):
+        for element_line in _element_lines_roi:
             if element_line[1] == 'K':
                 element_lines_roi_idx = np.argwhere(elements_xrf == element_line[0])[0, 0]
             
