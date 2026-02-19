@@ -171,7 +171,7 @@ def extract_h5_aggregate_xrf_xrt_data(file_path, opt_dens_enabled, **kwargs):
             data = h5['exchange/data']
             elements = h5['exchange/elements']
             
-            elements_xrf, elements_xrt = elements['xrf'], elements['xrt']
+            elements_xrf, elements_xrt = elements['xrf'].asstr()[:], elements['xrt'].asstr()[:]
             xrf_data, xrt_data = data['xrf'][()], data['xrt'][()]
             theta = h5['exchange/theta'][()]
     
@@ -184,9 +184,6 @@ def extract_h5_aggregate_xrf_xrt_data(file_path, opt_dens_enabled, **kwargs):
         print(rank, 'Error: Incorrect HDF5 file structure. Exiting program...', flush = True)
 
         comm.Abort(1)
-    
-    elements_xrf_string = [element.decode() for element in elements_xrf]
-    elements_xrt_string = [element.decode() for element in elements_xrt]
 
     element_lines_roi = kwargs.get('element_lines_roi')
 
@@ -209,16 +206,16 @@ def extract_h5_aggregate_xrf_xrt_data(file_path, opt_dens_enabled, **kwargs):
         xrf_data_roi = xrf_data[element_lines_roi_idx]
     
     else:
-        element_lines_roi_idx = np.arange(len(elements_xrf_string))
+        element_lines_roi_idx = np.arange(len(elements_xrf))
         xrf_data_roi = xrf_data
 
     if opt_dens_enabled:
-        xrt_data_idx = elements_xrt_string.index('opt_dens')
+        xrt_data_idx = elements_xrt.index('opt_dens')
         opt_dens = xrt_data[xrt_data_idx]
 
         return element_lines_roi_idx, xrf_data_roi, opt_dens, theta
     
-    xrt_data_idx = elements_xrt_string.index('xrt_sig')
+    xrt_data_idx = elements_xrt.index('xrt_sig')
     xrt_sig = xrt_data[xrt_data_idx]
 
     return element_lines_roi_idx, xrf_data_roi, xrt_sig, theta
