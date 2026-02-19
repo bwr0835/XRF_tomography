@@ -341,8 +341,7 @@ def reconstruct_jXRFT_tomography(sample_size_n = None,
     
     if rank == 0:
         print_flush_root(rank, "Extracting XRF, XRT data from aggregate file...", save_stdout = False, print_terminal = True)
-    
-    elements_xrf, \
+
     xrf_data, \
     xrt_data, \
     theta_tomo = futil.extract_h5_aggregate_xrf_xrt_data(f_XRF_XRT_data, opt_dens_enabled = opt_dens_enabled, element_lines_roi = element_lines_roi)
@@ -372,21 +371,11 @@ def reconstruct_jXRFT_tomography(sample_size_n = None,
     n_voxel = sample_height_n*sample_size_n**2 # dev
 
     #### Calculate the number of elements in the reconstructed object, list the atomic numbers ####
-    n_element = len(elements_xrf)
+    n_element = len(this_aN_dic)
 
-    aN_ls = np.zeros(n_element, dtype = int)
-
-    for element, idx in enumerate(elements_xrf):
-        element_str = str(element)
-        if rank == 0:
-            print_flush_root(rank, element_str, save_stdout = False, print_terminal = True)
-        if '_' in element_str:
-            aN_ls[idx] = xlib.SymbolToAtomicNumber(element_str.split('_')[0])
-            
-        else:
-            aN_ls[idx] = xlib.SymbolToAtomicNumber(element_str)
-
-    # aN_ls = np.array(list(this_aN_dic.values()))
+    aN_ls = np.array(list(this_aN_dic.values()))
+    elements_xrf_ls = np.array(list(this_aN_dic.keys()))
+    
     ####--------------------------------------------------------------####
     
     #### Make the lookup table of the fluorescence lines of interests ####
@@ -551,7 +540,7 @@ def reconstruct_jXRFT_tomography(sample_size_n = None,
                     sample_e = sample.create_dataset("elements", shape = (n_element,), dtype = 'S5')
 
                     sample_v[...] = X
-                    sample_e[...] = np.array(elements_xrf).astype('S5')
+                    sample_e[...] = np.array(elements_xrf_ls).astype('S5')
  
                 ## Save the initial guess which will be used in reconstruction and will be updated to the current reconstructing result 
                 shutil.copy(os.path.join(recon_path, f_initial_guess + '.h5'), os.path.join(recon_path, f_recon_grid + '.h5'))
@@ -783,7 +772,7 @@ def reconstruct_jXRFT_tomography(sample_size_n = None,
                             
                             s["sample/densities"][...] = X_cpu
                             # s["sample/elements"][...] = np.array(list(this_aN_dic.keys())).astype('S5')
-                            s["sample/elements"][...] = np.array(elements_xrf).astype('S5')
+                            s["sample/elements"][...] = elements_xrf_ls.astype('S5')
                         
                         dxchange.write_tiff(X_cpu, os.path.join(recon_path, f_recon_grid) + "_" + str(epoch) + "_ending_condition", dtype = 'float32', overwrite = True)                     
                     

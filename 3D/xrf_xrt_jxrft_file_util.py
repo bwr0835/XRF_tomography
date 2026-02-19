@@ -189,24 +189,17 @@ def extract_h5_aggregate_xrf_xrt_data(file_path, opt_dens_enabled, **kwargs):
 
     if element_lines_roi is not None:
         _element_lines_roi = np.array(element_lines_roi)
-
-        element_lines_roi_idx = np.zeros(len(element_lines_roi), dtype = int)
         
-        for idx, element_line in enumerate(_element_lines_roi):
-            # if element_line[1] == 'K' and '_K' not in elements_xrf_string[idx]:
-            #     element_line_pair = element_line[0] + '_K'
+        for element_line in enumerate(_element_lines_roi):
+            if element_line[1] == 'K':
+                element_lines_roi_idx = np.argwhere(elements_xrf == element_line[0])[0, 0]
             
-            # else:
-            element_line_pair = element_line[0]
-            
-            element_line_idx = np.argwhere(_element_lines_roi == element_line_pair)[0, 1]
-            
-            element_lines_roi_idx[idx] = element_line_idx
+            else:
+                element_lines_roi_idx = np.argwhere(elements_xrf == element_line[0] + '_' + element_line[1])[0]
         
         xrf_data_roi = xrf_data[element_lines_roi_idx]
     
     else:
-        element_lines_roi_idx = np.arange(len(elements_xrf))
         xrf_data_roi = xrf_data
 
     if opt_dens_enabled:
@@ -214,10 +207,10 @@ def extract_h5_aggregate_xrf_xrt_data(file_path, opt_dens_enabled, **kwargs):
         xrt_data_idx = np.argwhere(elements_xrt == 'opt_dens')[0, 0]
         opt_dens = xrt_data[xrt_data_idx]
 
-        return element_lines_roi_idx, xrf_data_roi, opt_dens, theta
+        return xrf_data_roi, opt_dens, theta
     
     # xrt_data_idx = elements_xrt.index('xrt_sig')
     xrt_data_idx = np.argwhere(elements_xrt == 'xrt_sig')[0, 0]
     xrt_sig = xrt_data[xrt_data_idx]
 
-    return element_lines_roi_idx, xrf_data_roi, xrt_sig, theta
+    return xrf_data_roi, xrt_sig, theta
