@@ -376,11 +376,13 @@ def reconstruct_jXRFT_tomography(sample_size_n = None,
     aN_ls = np.zeros(n_element, dtype = int)
 
     for element, idx in enumerate(elements_xrf):
-        if '_' in element:
-            aN_ls[idx] = xlib.SymbolToAtomicNumber(element.split('_')[0])
+        element_str = str(element)
+        
+        if '_' in element_str:
+            aN_ls[idx] = xlib.SymbolToAtomicNumber(element_str.split('_')[0])
             
         else:
-            aN_ls[idx] = xlib.SymbolToAtomicNumber(element)
+            aN_ls[idx] = xlib.SymbolToAtomicNumber(element_str)
 
     # aN_ls = np.array(list(this_aN_dic.values()))
     ####--------------------------------------------------------------####
