@@ -6,7 +6,8 @@ import torch.nn as nn
 
 from util import rotate, MakeFLlinesDictionary_manual
 
-tc.set_default_tensor_type(tc.FloatTensor)
+# tc.set_default_tensor_type(tc.FloatTensor)
+tc.set_default_dtype(tc.float32)
 
 class PPM(nn.Module):
     def __init__(self,
