@@ -96,10 +96,29 @@ class PPM(nn.Module):
 
     def init_SA_theta(self):
         if self.selfAb == True:
-            voxel_idx_offset = self.p*self.n_voxel_minibatch        
+
+            lac_cpu = self.lac.cpu()
+            P_minibatch_cpu = self.P_minibatch.cpu()
+
+            print(f'lac shape: {lac_cpu.shape}')
+            print(f'P_minibatch shape: {P_minibatch_cpu.shape}')
+
+            
+
+            voxel_idx_offset = self.p*self.n_voxel_minibatch
+
+            for i in range(3):
+                idx0_raw = P_minibatch_cpu[i, 0] - voxel_idx_offset
+                idx0 = idx0_raw.clamp(0, self.n_voxel_minibatch).to(dtype = tc.long)
+                idx1 = P_minibatch_cpu[i, 1].to(dtype = tc.long)
+
+                print(f'i={i}')
+                print('   idx0_raw min/max:', idx0_raw.min().item(), idx0_raw.max().item())
+                print('   idx0 min/max:', idx0.min().item(), idx0.max().item(), 'allowed [0,',lac_cpu.size(2) - 1, ']')
+                print('   idx1 min/max:', idx1.min().item(), idx1.max().item(), 'allowed [0,',lac_cpu.size(3) - 1, ']')
             
             # clamp the index after subtracting the offset, so that all 0 indices remains 0 (becomes negative if without clamping, and cause errors)
-            att_exponent = tc.stack([self.lac[:, :, tc.clamp((self.P_minibatch[m, 0] - voxel_idx_offset), 0, self.n_voxel_minibatch - 1).to(dtype = tc.long), \
+            att_exponent = tc.stack([self.lac[:, :, tc.clamp((self.P_minibatch[m, 0] - voxel_idx_offset), 0, self.n_voxel_minibatch).to(dtype = tc.long), \
                                               self.P_minibatch[m, 1].to(dtype=tc.long)] \
                                               *self.P_minibatch[m, 2].repeat(self.n_element, self.n_lines, 1) for m in range(self.n_det)])
             
@@ -186,10 +205,10 @@ class PPM(nn.Module):
         #### 4: Create XRF, XRT data ####           
         probe_after_attenuation_theta = self.probe_before_attenuation_flat*attenuation_map_theta_flat 
         # fl_signal_SA_theta, dim = (n_lines, n_minibatch)
-        print(probe_after_attenuation_theta.shape)
-        print(fl_map_tot_flat_theta.shape)
-        print(self.SA_theta.shape)
-        print(self.FL_line_det_attCS_ls.shape)
+        # print(probe_after_attenuation_theta.shape)
+        # print(fl_map_tot_flat_theta.shape)
+        # print(self.SA_theta.shape)
+        # print(self.FL_line_det_attCS_ls.shape)
         # print(det_window_attenuation.shape)
 
         fl_signal_SA_theta = tc.unsqueeze(probe_after_attenuation_theta, dim = 0)*fl_map_tot_flat_theta*self.SA_theta*self.FL_line_det_attCS_ls*det_window_attenuation
