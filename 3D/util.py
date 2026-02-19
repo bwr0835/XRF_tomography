@@ -1281,89 +1281,89 @@ def intersecting_length_fl_detectorlet_3d_mpi_write_h5_3_manual(n_ranks, minibat
             j_offset = p * minibatch_size * sample_size_n
             
             voxel_pos_ls_flat_minibatch = voxel_pos_ls_flat[p * minibatch_size * sample_size_n: (p+1) * minibatch_size * sample_size_n] 
-            
-            for j, v in enumerate(voxel_pos_ls_flat_minibatch): 
                 
-                # Solving the intersection of the ray with the sample boundary along axis-0
-                bdx_int = trace_beam_x(v[0], v[1], v[2], det_pos[0], det_pos[1], det_pos[2], sample_x_edge)
-
-                # Solving the intersection of the ray with the sample boundaries along axis-1 and axis-2, we will get 2 solutions for each axis since there're 2 bdry plane on each axis
-                # The desired intersecting point is within the segment(voxel - detectorlet) which is always the one with the larger x coordinate
-                bdy_int = trace_beam_y(v[0], v[1], v[2], det_pos[0], det_pos[1], det_pos[2], sample_y_edge)
-                if len(bdy_int) != 0:
-                    if det_on_which_side == "positive": 
-                        bdy_int = np.array([bdy_int[np.argmax(bdy_int[:,1])]])
-                    else:
-                        bdy_int = np.array([bdy_int[np.argmin(bdy_int[:,1])]])
-                        
-                else:
-                    pass
-
-
-                bdz_int = trace_beam_z(v[0], v[1], v[2], det_pos[0], det_pos[1], det_pos[2], sample_z_edge)
-                if len(bdz_int) != 0:
-                    if det_on_which_side == "positive": 
-                        bdz_int = np.array([bdz_int[np.argmax(bdz_int[:,1])]])
-                    else:
-                        bdz_int = np.array([bdz_int[np.argmin(bdz_int[:,1])]])
-                        
-                else:
-                    pass
-
-                # Pick the intersecting point that first hit the boundary plan. This point is with the least(greatest) x value among the 3 intersections
-                # if the detector is at positive(negative) x 
-                bd_int_ls = np.concatenate((bdz_int, bdx_int, bdy_int))
+                for j, v in enumerate(voxel_pos_ls_flat_minibatch): 
                 
-                if det_on_which_side == "positive":
-                    bd_int = np.clip(np.abs(bd_int_ls[np.argmin(bd_int_ls[:,1])]), 0, sample_size_n)
+                    # Solving the intersection of the ray with the sample boundary along axis-0
+                    bdx_int = trace_beam_x(v[0], v[1], v[2], det_pos[0], det_pos[1], det_pos[2], sample_x_edge)
+
+                    # Solving the intersection of the ray with the sample boundaries along axis-1 and axis-2, we will get 2 solutions for each axis since there're 2 bdry plane on each axis
+                    # The desired intersecting point is within the segment(voxel - detectorlet) which is always the one with the larger x coordinate
+                    bdy_int = trace_beam_y(v[0], v[1], v[2], det_pos[0], det_pos[1], det_pos[2], sample_y_edge)
+                    if len(bdy_int) != 0:
+                        if det_on_which_side == "positive": 
+                            bdy_int = np.array([bdy_int[np.argmax(bdy_int[:,1])]])
+                        else:
+                            bdy_int = np.array([bdy_int[np.argmin(bdy_int[:,1])]])
+                            
+                    else:
+                        pass
+
+
+                    bdz_int = trace_beam_z(v[0], v[1], v[2], det_pos[0], det_pos[1], det_pos[2], sample_z_edge)
+                    if len(bdz_int) != 0:
+                        if det_on_which_side == "positive": 
+                            bdz_int = np.array([bdz_int[np.argmax(bdz_int[:,1])]])
+                        else:
+                            bdz_int = np.array([bdz_int[np.argmin(bdz_int[:,1])]])
+                            
+                    else:
+                        pass
+
+                    # Pick the intersecting point that first hit the boundary plan. This point is with the least(greatest) x value among the 3 intersections
+                    # if the detector is at positive(negative) x 
+                    bd_int_ls = np.concatenate((bdz_int, bdx_int, bdy_int))
                     
-                else:                  
-                    bd_int = np.clip(np.abs(bd_int_ls[np.argmax(bd_int_ls[:,1])]), 0, sample_size_n)
+                    if det_on_which_side == "positive":
+                        bd_int = np.clip(np.abs(bd_int_ls[np.argmin(bd_int_ls[:,1])]), 0, sample_size_n)
+                        
+                    else:                  
+                        bd_int = np.clip(np.abs(bd_int_ls[np.argmax(bd_int_ls[:,1])]), 0, sample_size_n)
 
-                
-                # when the beam intersects with a voxel, it either intersects with the x or y or z boundary plane of the voxel
-                # find the x,y,z-value of the voxel boundary except the ones on the sample edge
-                
-                z_edge_ls = np.where(bd_int[0] > v[0], np.linspace(np.ceil(bd_int[0])-1, np.ceil(v[0]), int(np.abs(np.ceil(bd_int[0]) - np.ceil(v[0])))),
-                                                       np.linspace(np.ceil(v[0])-1, np.ceil(bd_int[0]), int(np.abs(np.ceil(bd_int[0]) - np.ceil(v[0])))))
+                    
+                    # when the beam intersects with a voxel, it either intersects with the x or y or z boundary plane of the voxel
+                    # find the x,y,z-value of the voxel boundary except the ones on the sample edge
+                    
+                    z_edge_ls = np.where(bd_int[0] > v[0], np.linspace(np.ceil(bd_int[0])-1, np.ceil(v[0]), int(np.abs(np.ceil(bd_int[0]) - np.ceil(v[0])))),
+                                                           np.linspace(np.ceil(v[0])-1, np.ceil(bd_int[0]), int(np.abs(np.ceil(bd_int[0]) - np.ceil(v[0])))))
 
-                x_edge_ls = np.where(bd_int[1] > v[1], np.linspace(np.ceil(bd_int[1])-1, np.ceil(v[1]), int(np.abs(np.ceil(bd_int[1]) - np.ceil(v[1])))),
-                                                       np.linspace(np.ceil(v[1])-1, np.ceil(bd_int[1]), int(np.abs(np.ceil(bd_int[1]) - np.ceil(v[1])))))
+                    x_edge_ls = np.where(bd_int[1] > v[1], np.linspace(np.ceil(bd_int[1])-1, np.ceil(v[1]), int(np.abs(np.ceil(bd_int[1]) - np.ceil(v[1])))),
+                                                           np.linspace(np.ceil(v[1])-1, np.ceil(bd_int[1]), int(np.abs(np.ceil(bd_int[1]) - np.ceil(v[1])))))
 
-                y_edge_ls = np.where(bd_int[2] > v[2], np.linspace(np.ceil(bd_int[2])-1, np.ceil(v[2]), int(np.abs(np.ceil(bd_int[2]) - np.ceil(v[2])))),
-                                                       np.linspace(np.ceil(v[2])-1, np.ceil(bd_int[2]), int(np.abs(np.ceil(bd_int[2]) - np.ceil(v[2])))))
+                    y_edge_ls = np.where(bd_int[2] > v[2], np.linspace(np.ceil(bd_int[2])-1, np.ceil(v[2]), int(np.abs(np.ceil(bd_int[2]) - np.ceil(v[2])))),
+                                                           np.linspace(np.ceil(v[2])-1, np.ceil(bd_int[2]), int(np.abs(np.ceil(bd_int[2]) - np.ceil(v[2])))))
 
-                
-                z_edge_int_ls = trace_beam_z(v[0], v[1], v[2], det_pos[0], det_pos[1], det_pos[2], z_edge_ls)
-                x_edge_int_ls = trace_beam_x(v[0], v[1], v[2], det_pos[0], det_pos[1], det_pos[2], x_edge_ls)
-                y_edge_int_ls = trace_beam_y(v[0], v[1], v[2], det_pos[0], det_pos[1], det_pos[2], y_edge_ls)
-                
+                    
+                    z_edge_int_ls = trace_beam_z(v[0], v[1], v[2], det_pos[0], det_pos[1], det_pos[2], z_edge_ls)
+                    x_edge_int_ls = trace_beam_x(v[0], v[1], v[2], det_pos[0], det_pos[1], det_pos[2], x_edge_ls)
+                    y_edge_int_ls = trace_beam_y(v[0], v[1], v[2], det_pos[0], det_pos[1], det_pos[2], y_edge_ls)
+                    
 
-                # Collect all intersecting points and sort all intersections using the x coordinate
-                int_ls = np.concatenate((x_edge_int_ls, y_edge_int_ls, z_edge_int_ls, np.array(bd_int)[np.newaxis,:]))
-                int_ls = int_ls[np.argsort(int_ls[:,1])]
+                    # Collect all intersecting points and sort all intersections using the x coordinate
+                    int_ls = np.concatenate((x_edge_int_ls, y_edge_int_ls, z_edge_int_ls, np.array(bd_int)[np.newaxis,:]))
+                    int_ls = int_ls[np.argsort(int_ls[:,1])]
 
-                # calculate the intersecting length in the intersecting voxels
-                int_length = np.sqrt(np.diff(int_ls[:,0])**2 + np.diff(int_ls[:,1])**2 + np.diff(int_ls[:,2])**2)
-                # just in case that we count some intersections twice, delete the duplicates
-                idx_duplicate = np.array(np.where(int_length==0)).flatten()
-                int_ls = np.delete(int_ls, idx_duplicate, 0)
-                int_length = np.delete(int_length, idx_duplicate) 
-             
-                # determine the indices of the intersecting voxels according to the intersecting x,y,z-coordinates
-                int_ls_shift = np.zeros((int_ls.shape))
-                int_ls_shift[1:] = int_ls[:-1]
-                int_idx = np.floor((int_ls + int_ls_shift)/2)[1:]
-        #                 int_idx = (int_idx[:,0].astype('int'), int_idx[:,1].astype('int'), int_idx[:,2].astype('int'))
+                    # calculate the intersecting length in the intersecting voxels
+                    int_length = np.sqrt(np.diff(int_ls[:,0])**2 + np.diff(int_ls[:,1])**2 + np.diff(int_ls[:,2])**2)
+                    # just in case that we count some intersections twice, delete the duplicates
+                    idx_duplicate = np.array(np.where(int_length==0)).flatten()
+                    int_ls = np.delete(int_ls, idx_duplicate, 0)
+                    int_length = np.delete(int_length, idx_duplicate) 
+                 
+                    # determine the indices of the intersecting voxels according to the intersecting x,y,z-coordinates
+                    int_ls_shift = np.zeros((int_ls.shape))
+                    int_ls_shift[1:] = int_ls[:-1]
+                    int_idx = np.floor((int_ls + int_ls_shift)/2)[1:]
+            #                 int_idx = (int_idx[:,0].astype('int'), int_idx[:,1].astype('int'), int_idx[:,2].astype('int'))
 #                 int_idx_flat = int_idx[:,0] * (sample_height_n * sample_size_n) + int_idx[:,1] * sample_size_n + int_idx[:,2]
-                int_idx_flat = int_idx[:,0] * (sample_size_n * sample_size_n) + int_idx[:,1] * sample_size_n + int_idx[:,2]
-                    
+                    int_idx_flat = int_idx[:,0] * (sample_size_n * sample_size_n) + int_idx[:,1] * sample_size_n + int_idx[:,2]
+                        
 #                 if len(int_idx_flat) > longest_int_length:
 #                     longest_int_length = len(int_idx_flat)
-                
-                P[i, 0, (j_offset+j) * dia_len_n: (j_offset+j) * dia_len_n + len(int_idx_flat)] = j_offset+j
-                P[i, 1, (j_offset+j) * dia_len_n: (j_offset+j) * dia_len_n + len(int_idx_flat)] = np.array(int_idx_flat)
-                P[i, 2, (j_offset+j) * dia_len_n: (j_offset+j) * dia_len_n + len(int_idx_flat)] = np.array(int_length * voxel_size_cm)            
+                    
+                    P[i, 0, (j_offset+j) * dia_len_n: (j_offset+j) * dia_len_n + len(int_idx_flat)] = j_offset+j
+                    P[i, 1, (j_offset+j) * dia_len_n: (j_offset+j) * dia_len_n + len(int_idx_flat)] = np.array(int_idx_flat)
+                    P[i, 2, (j_offset+j) * dia_len_n: (j_offset+j) * dia_len_n + len(int_idx_flat)] = np.array(int_length * voxel_size_cm)            
 
     
 #     f_short = h5py.File(P_save_path +'_short.h5', 'w', driver='mpio', comm=comm)

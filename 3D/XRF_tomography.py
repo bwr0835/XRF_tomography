@@ -511,6 +511,8 @@ def reconstruct_jXRFT_tomography(sample_size_n = None,
         # load the saved_initial_guess to rank0 cpu
         if use_saved_initial_guess:
             if rank == 0:
+                print_flush_root(rank, "Loading saved initial object guess...", save_stdout = False, print_terminal = True)
+                
                 with h5py.File(os.path.join(recon_path, f_initial_guess + '.h5'), "r") as s:
                     X_init = s["sample/densities"][...].astype(np.float32)                    
 
@@ -534,7 +536,15 @@ def reconstruct_jXRFT_tomography(sample_size_n = None,
         # create the initial_guess in rank0 cpu
         else:
             if rank == 0:
-                X = initialize_guess_3d("cpu", ini_kind, n_element, sample_size_n, sample_height_n, recon_path, f_recon_grid, f_initial_guess, init_const, ini_rand_amp) #cpu         
+                print_flush_root(rank, "Creating initial object guess...", save_stdout = False, print_terminal = True)
+                
+                X = initialize_guess_3d("cpu", 
+                                        ini_kind, 
+                                        n_element, 
+                                        sample_size_n, 
+                                        sample_height_n, 
+                                        init_const, 
+                                        ini_rand_amp) #cpu         
                 ## Save the initial guess for future reference
                 with h5py.File(os.path.join(recon_path, f_initial_guess +'.h5'), 'w') as s:
                     sample = s.create_group("sample")
@@ -843,7 +853,10 @@ def reconstruct_jXRFT_tomography(sample_size_n = None,
         comm.Barrier()
         
     if cont_from_check_point == True:
-        if rank == 0:           
+        if rank == 0:
+            if upsample_factor > 1:
+                print_flush_root(rank, "Loading saved object guess...", save_stdout = False, print_terminal = True)
+            
             with h5py.File(os.path.join(recon_path, f_recon_grid + ".h5"), "r") as s:
                 X_init = s["sample/densities"][...].astype(np.float32)
 
@@ -864,7 +877,7 @@ def reconstruct_jXRFT_tomography(sample_size_n = None,
 
                     comm.Abort(1)
 
-                if (X.shape[0], X.shape[1]) != (y1_true.shape[2], y1_true.shape[3]): # If the number of slices and scan positions are not identical after
+                if X.shape != (y1_true.shape[0], y1_true.shape[2], y1_true.shape[3], y1_true.shape[3]): # If the number of slices and scan positions are not identical after
                                                                                          # downsampling projection data and upsampling initial reconstruction data, throw error and terminate program
                         
                     msg = 'Error: Number of slices and scan positions do not match between upsampled initial reconstruction guess and downsampled projection data. Exiting program...'
@@ -1007,12 +1020,35 @@ def reconstruct_jXRFT_tomography(sample_size_n = None,
                         P_minibatch = 0
                         n_det = 0                    
                                        
-                    model = PPM(dev, selfAb, lac, X, p, n_element, n_lines, FL_line_attCS_ls, FL_line_det_attCS_ls,
-                                 detected_fl_unit_concentration, n_line_group_each_element,
-                                 sample_height_n, minibatch_size, sample_size_n, sample_size_cm,
-                                 probe_energy_keV, probe_cts, probe_att, probe_attCS_ls,
-                                 theta, signal_attenuation_factor,
-                                 n_det, P_minibatch, det_dia_cm, det_from_sample_cm, det_solid_angle_ratio)
+                    model = PPM(dev, 
+                                selfAb, 
+                                lac, 
+                                X, 
+                                p, 
+                                n_element, 
+                                n_lines, 
+                                FL_line_attCS_ls, 
+                                FL_line_det_attCS_ls,
+                                detected_fl_unit_concentration, 
+                                n_line_group_each_element,
+                                sample_height_n, 
+                                minibatch_size, 
+                                sample_size_n, 
+                                sample_size_cm,
+                                probe_energy_keV, 
+                                probe_cts, 
+                                probe_att, 
+                                probe_attCS_ls,
+                                theta, 
+                                signal_attenuation_factor,
+                                n_det, 
+                                P_minibatch, 
+                                det_dia_cm, 
+                                det_from_sample_cm, 
+                                det_solid_angle_ratio,
+                                det_window_dens,
+                                det_window_thickness_cm,
+                                opt_dens_enabled)
 
                     optimizer = tc.optim.Adam(model.parameters(), lr=lr)   
             

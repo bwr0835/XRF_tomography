@@ -3,7 +3,14 @@ import torch as tc
 import os
 import dxchange
 
-def initialize_guess_3d(dev, ini_kind, n_element, sample_size_n, sample_height_n, init_const = 0.5, ini_rand_amp = 0.1):
+def initialize_guess_3d(dev, 
+                        ini_kind, 
+                        n_element, 
+                        sample_size_n, 
+                        sample_height_n, 
+                        init_const = 0.5, 
+                        ini_rand_amp = 0.1):
+    
     if ini_kind == "rand": # Offset + random numbers between 0 and 1 based on uniform distribution (each number is equally likely to be chosen)
         X = init_const + ini_rand_amp * tc.rand(n_element, sample_height_n, sample_size_n, sample_size_n, device=dev)
         X = tc.clamp(X, 0, float('inf'))
