@@ -492,7 +492,8 @@ def reconstruct_jXRFT_tomography(sample_size_n = None,
     
     # Check if the P array exists; if it doesn't exist, call the function to calculate the P array and store it as a .h5 file.
     if not os.path.isfile(P_save_path + ".h5"):
-        print_flush_root(rank, "Calculating P array...", save_stdout = False, print_terminal = True)
+        if rank == 0:
+            print_flush_root(rank, "Calculating P array...", save_stdout = False, print_terminal = True)
         
         intersecting_length_fl_detectorlet_3d_mpi_write_h5_3_manual(n_ranks, minibatch_size, rank,
                                                                     manual_det_coord, set_det_coord_cm, det_on_which_side,
