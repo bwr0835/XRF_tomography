@@ -6,6 +6,7 @@ import numpy as np, \
        os
 
 from mpi4py import MPI
+from util import find_lines_roi_idx_from_dataset
 
 comm = MPI.COMM_WORLD
 n_ranks = comm.Get_size()
@@ -188,14 +189,15 @@ def extract_h5_aggregate_xrf_xrt_data(file_path, opt_dens_enabled, **kwargs):
     element_lines_roi = kwargs.get('element_lines_roi')
 
     if element_lines_roi is not None:
-        _element_lines_roi = np.array(element_lines_roi)
+        element_lines_roi_idx = find_lines_roi_idx_from_dataset(elements_xrf, element_lines_roi)
+    #     _element_lines_roi = np.array(element_lines_roi)
         
-        for element_line in _element_lines_roi:
-            if element_line[1] == 'K':
-                element_lines_roi_idx = np.argwhere(elements_xrf == element_line[0])[0, 0]
+    #     for element_line in _element_lines_roi:
+    #         if element_line[1] == 'K':
+    #             element_lines_roi_idx = np.argwhere(elements_xrf == element_line[0])[0, 0]
             
-            else:
-                element_lines_roi_idx = np.argwhere(elements_xrf == element_line[0] + '_' + element_line[1])[0]
+    #         else:
+    #             element_lines_roi_idx = np.argwhere(elements_xrf == element_line[0] + '_' + element_line[1])[0]
         
         xrf_data_roi = xrf_data[element_lines_roi_idx]
     
