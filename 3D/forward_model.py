@@ -179,9 +179,9 @@ class PPM(nn.Module):
         # tensor.unsqueeze(dim = 1) = tensor[:, None]
         
         # det_window_attenuation = tc.exp(-self.FL_line_det_attCS_ls*self.det_window_dens*self.det_window_thickness_cm).unsqueeze(dim = 1)
-        det_window_attenuation = tc.exp(-self.FL_line_det_attCS_ls*self.det_window_dens*self.det_window_thickness_cm).view(self.n_lines, 1)
+        # det_window_attenuation = tc.exp(-self.FL_line_det_attCS_ls*self.det_window_dens*self.det_window_thickness_cm).view(self.n_lines, 1)
         # det_window_attenuation = tc.exp(-self.FL_line_det_attCS_ls*self.det_window_dens*self.det_window_thickness_cm)
-        # det_window_attenuation = 1
+        det_window_attenuation = 1.
         
         #### 4: Create XRF, XRT data ####           
         probe_after_attenuation_theta = self.probe_before_attenuation_flat*attenuation_map_theta_flat 
