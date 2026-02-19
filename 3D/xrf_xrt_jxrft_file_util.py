@@ -211,13 +211,13 @@ def extract_h5_aggregate_xrf_xrt_data(file_path, opt_dens_enabled, **kwargs):
 
     if opt_dens_enabled:
         # xrt_data_idx = elements_xrt.index('opt_dens')
-        xrt_data_idx = np.where(elements_xrt == 'opt_dens')[0, 0]
+        xrt_data_idx = np.argwhere(elements_xrt == 'opt_dens')[0, 0]
         opt_dens = xrt_data[xrt_data_idx]
 
         return element_lines_roi_idx, xrf_data_roi, opt_dens, theta
     
     # xrt_data_idx = elements_xrt.index('xrt_sig')
-    xrt_data_idx = np.where(elements_xrt == 'xrt_sig')[0, 0]
+    xrt_data_idx = np.argwhere(elements_xrt == 'xrt_sig')[0, 0]
     xrt_sig = xrt_data[xrt_data_idx]
 
     return element_lines_roi_idx, xrf_data_roi, xrt_sig, theta
