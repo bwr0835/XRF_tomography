@@ -142,7 +142,7 @@ recon_numeric_array_params = ['element_lines_roi',
                               'probe_energy_keV',
                               'set_det_coord_cm']
 
-recon_dict_params = ['this_aN_dict']
+recon_dict_params = ['this_aN_dic']
 
 recon_bool_params = ['cont_from_check_point',
                      'selfAb',
