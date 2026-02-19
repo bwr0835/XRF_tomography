@@ -393,8 +393,7 @@ def reconstruct_jXRFT_tomography(sample_size_n = None,
     
     stdout_options = {'root': 0, 'output_folder': recon_path, 'save_stdout': True, 'print_terminal': False}
     
-    # FL_line_attCS_ls = tc.as_tensor(xlib_np.CS_Total(aN_ls, fl_all_lines_dic["fl_energy"])).float().to(dev) #dev
-    FL_line_attCS_ls = tc.as_tensor(xlib_np.CS_Total_Kissel(aN_ls, fl_all_lines_dic["fl_energy"])).float().view(n_element, 1).to(dev) #dev
+    FL_line_attCS_ls = tc.as_tensor(xlib_np.CS_Total(aN_ls, fl_all_lines_dic["fl_energy"])).float().to(dev) #dev
     
     detected_fl_unit_concentration = tc.as_tensor(fl_all_lines_dic["detected_fl_unit_concentration"]).float().to(dev)
     n_line_group_each_element = tc.IntTensor(fl_all_lines_dic["n_line_group_each_element"]).to(dev)
@@ -410,7 +409,7 @@ def reconstruct_jXRFT_tomography(sample_size_n = None,
     else:
         det_window_dens = 0.
         
-        FL_line_det_attCS_ls = tc.zeros((1, n_lines)).float().to(dev)
+        FL_line_det_attCS_ls = tc.zeros((n_lines, 1)).float().to(dev)
 
     #### Calculate the MAC of probe ####
     # probe_attCS_ls = tc.as_tensor(xlib_np.CS_Total(aN_ls, probe_energy_keV).flatten()).to(dev)
