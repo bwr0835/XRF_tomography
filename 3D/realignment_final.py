@@ -56,6 +56,8 @@ def correct_pre_cor_vert_jitter(xrf_proj_img_array,
     net_shift_array_copy = net_shift_array.copy()
 
     for element_idx in range(len(xrf_proj_img_array)):
+        net_shift_array_copy = net_shift_array.copy()
+        
         for theta_idx in range(1, len(theta_array)):
             _, dy = phase_xcorr(xrf_proj_img_array[element_idx, theta_idx], 
                                 xrf_proj_img_array[element_idx, theta_idx - 1], 
@@ -66,9 +68,11 @@ def correct_pre_cor_vert_jitter(xrf_proj_img_array,
             if theta_idx % 7 == 0:
                 print(f'dy = {ppu.round_correct(dy, ndec = 3)} (theta = {ppu.round_correct(theta_array[theta_idx], ndec = 1)}); element = {xrf_element_array[element_idx]}...')
 
-            net_shift_array[0, theta_idx] += dy
+            net_shift_array_copy[0, theta_idx] += dy
 
-            shifted_xrf_proj_array[element_idx, theta_idx] = ndi.shift(xrf_proj_img_array[element_idx, theta_idx], shift = (net_shift_array[0, theta_idx], 0))
+            shifted_xrf_proj_array[element_idx, theta_idx] = ndi.shift(xrf_proj_img_array[element_idx, theta_idx], shift = (net_shift_array_copy[0, theta_idx], 0))
+
+    net_shift_array_copy = net_shift_array.copy()
 
     for theta_idx in range(len(theta_array)):
         _, dy = phase_xcorr(opt_dens_proj_img_array[theta_idx], 
@@ -342,7 +346,7 @@ def realign_proj(cor_correction_only,
         print('Correcting for vertical jitter...')
 
         dir_path = '/home/bwr0835/3_id_realigned_data_02_10_2026'
-        desired_xrf_elements = ['Ni_K', 'Fe_K']
+        desired_xrf_elements = ['Ni_K', 'Cu_K']
         xrf_element_array = ['Ni_K', 'Fe_K', 'Ce_L', 'Zn_K', 'Si_K', 'Cu_K', 'Cr_K']
         net_y_shifts_pcc = correct_pre_cor_vert_jitter(xrf_proj_img_array, 
                                                        opt_dens_proj_img_array,
