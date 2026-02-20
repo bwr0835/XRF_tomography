@@ -47,6 +47,7 @@ def correct_pre_cor_vert_jitter(xrf_proj_img_array,
                                 return_aux_data = None,
                                 dir_path = None,
                                 desired_xrf_elements = None, 
+                                xrf_element_array = None,
                                 fps = None):
     
     shifted_xrf_proj_array = np.zeros_like(xrf_proj_img_array)
@@ -80,7 +81,15 @@ def correct_pre_cor_vert_jitter(xrf_proj_img_array,
         
         shifted_opt_dens_proj_array[theta_idx] = ndi.shift(opt_dens_proj_img_array[theta_idx], shift = (net_shift_array_copy[0, theta_idx], 0))
 
-    futil.create_vert_jitter_corrected_norm_non_cropped_proj_data_gif(dir_path, desired_xrf_elements, shifted_xrf_proj_array, shifted_opt_dens_proj_array)
+    futil.create_vert_jitter_corrected_norm_non_cropped_proj_data_gif_v1(dir_path,
+                                                                         desired_xrf_elements,
+                                                                         xrf_element_array,
+                                                                         xrf_proj_img_array,
+                                                                         opt_dens_proj_img_array,
+                                                                         shifted_xrf_proj_array,
+                                                                         shifted_opt_dens_proj_array,
+                                                                         theta_array = theta_array,
+                                                                         fps = fps)
     
     a = 1
     
@@ -330,7 +339,8 @@ def realign_proj(cor_correction_only,
         print('Correcting for vertical jitter...')
 
         dir_path = '/home/bwr0835/3_id_realigned_data_02_10_2026'
-        desired_xrf_elements = ['Ni', 'Fe']
+        desired_xrf_elements = ['Ni_K', 'Fe_K']
+        xrf_element_array = ['Ni_K', 'Fe_K', 'Ce_L', 'Zn_K', 'Si_K', 'Cu_K', 'Cr_K']
         net_y_shifts_pcc = correct_pre_cor_vert_jitter(xrf_proj_img_array, 
                                                        opt_dens_proj_img_array,
                                                        net_y_shifts_pcc, 
@@ -340,6 +350,7 @@ def realign_proj(cor_correction_only,
                                                        upsample_factor,
                                                        dir_path = dir_path,
                                                        desired_xrf_elements = desired_xrf_elements,
+                                                       xrf_element_array = xrf_element_array,
                                                        fps = 10)
 
     if sample_flipped_remounted_mid_experiment: # This assumes that angles are order from -180° to +180° (360° range) AND that there are two zero degree angles

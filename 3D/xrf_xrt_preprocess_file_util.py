@@ -1328,9 +1328,9 @@ def create_vert_jitter_corrected_norm_non_cropped_proj_data_gif_v1(dir_path,
                                                                    counts_xrf,
                                                                    opt_dens,
                                                                    shifted_counts_xrf,
-                                                                   shifted_opt_dens = None,
-                                                                   theta_array = None,
-                                                                   fps = None):
+                                                                   shifted_opt_dens,
+                                                                   theta_array,
+                                                                   fps):
 
     n_theta, n_slices, n_columns = counts_xrf.shape[1:]
     
