@@ -62,9 +62,9 @@ def correct_pre_cor_vert_jitter(xrf_proj_img_array,
                                 alpha, 
                                 upsample_factor)
 
-            net_shift_array[theta_idx] += dy
+            net_shift_array[0, theta_idx] += dy
 
-            shifted_xrf_proj_array[element_idx, theta_idx] = ndi.shift(xrf_proj_img_array[element_idx, theta_idx], shift = (net_shift_array[theta_idx], 0))
+            shifted_xrf_proj_array[element_idx, theta_idx] = ndi.shift(xrf_proj_img_array[element_idx, theta_idx], shift = (net_shift_array[0, theta_idx], 0))
 
     for theta_idx in range(len(theta_array)):
         _, dy = phase_xcorr(opt_dens_proj_img_array[element_idx, theta_idx], 
@@ -73,9 +73,9 @@ def correct_pre_cor_vert_jitter(xrf_proj_img_array,
                                 alpha, 
                                 upsample_factor)
         
-        net_shift_array_copy[theta_idx] += dy
+        net_shift_array_copy[0, theta_idx] += dy
         
-        shifted_opt_dens_proj_array[theta_idx] = ndi.shift(opt_dens_proj_img_array[theta_idx], shift = (net_shift_array_copy[theta_idx], 0))
+        shifted_opt_dens_proj_array[theta_idx] = ndi.shift(opt_dens_proj_img_array[theta_idx], shift = (net_shift_array_copy[0, theta_idx], 0))
 
     futil.create_vert_jitter_corrected_norm_non_cropped_proj_data_gif(dir_path, desired_xrf_elements, shifted_xrf_proj_array, shifted_opt_dens_proj_array)
     
