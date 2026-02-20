@@ -70,11 +70,11 @@ def correct_pre_cor_vert_jitter(xrf_proj_img_array,
             shifted_xrf_proj_array[element_idx, theta_idx] = ndi.shift(xrf_proj_img_array[element_idx, theta_idx], shift = (net_shift_array[0, theta_idx], 0))
 
     for theta_idx in range(len(theta_array)):
-        _, dy = phase_xcorr(opt_dens_proj_img_array[element_idx, theta_idx], 
-                                opt_dens_proj_img_array[theta_idx - 1], 
-                                sigma, 
-                                alpha, 
-                                upsample_factor)
+        _, dy = phase_xcorr(opt_dens_proj_img_array[theta_idx], 
+                            opt_dens_proj_img_array[theta_idx - 1], 
+                            sigma, 
+                            alpha, 
+                            upsample_factor)
         
         net_shift_array_copy[0, theta_idx] += dy
         
