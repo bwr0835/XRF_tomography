@@ -44,21 +44,23 @@ def correct_pre_cor_vert_jitter(xrf_proj_img_array,
                                 sigma,
                                 alpha,
                                 upsample_factor,
-                                return_aux_data = None,
-                                dir_path = None,
-                                desired_xrf_elements = None, 
-                                xrf_element_array = None,
-                                fps = None):
+                                return_aux_data,
+                                dir_path,
+                                desired_xrf_elements, 
+                                xrf_element_array,
+                                fps):
     
-    shifted_xrf_proj_array = np.zeros_like(xrf_proj_img_array)
+    desired_elements_idx = [xrf_element_array.index(element) for element in desired_xrf_elements]
+
+    shifted_xrf_proj_array = np.zeros_like(xrf_proj_img_array[desired_elements_idx])
     shifted_opt_dens_proj_array = np.zeros_like(opt_dens_proj_img_array)
 
     net_shift_array_copy = net_shift_array.copy()
 
-    for element_idx in range(len(xrf_proj_img_array)):
+    for element_idx in range(len(xrf_proj_img_array[desired_elements_idx])):
         for theta_idx in range(1, len(theta_array)):
-            _, dy = phase_xcorr(xrf_proj_img_array[element_idx, theta_idx], 
-                                xrf_proj_img_array[element_idx, theta_idx - 1], 
+            _, dy = phase_xcorr(xrf_proj_img_array[desired_elements_idx][element_idx, theta_idx], 
+                                xrf_proj_img_array[desired_elements_idx][element_idx, theta_idx - 1], 
                                 sigma, 
                                 alpha, 
                                 upsample_factor)
@@ -68,7 +70,7 @@ def correct_pre_cor_vert_jitter(xrf_proj_img_array,
 
             net_shift_array[0, theta_idx] += dy
 
-            shifted_xrf_proj_array[element_idx, theta_idx] = ndi.shift(xrf_proj_img_array[element_idx, theta_idx], shift = (net_shift_array[0, theta_idx], 0))
+            shifted_xrf_proj_array[element_idx, theta_idx] = ndi.shift(xrf_proj_img_array[desired_elements_idx][element_idx, theta_idx], shift = (net_shift_array[0, theta_idx], 0))
 
     for theta_idx in range(len(theta_array)):
         _, dy = phase_xcorr(opt_dens_proj_img_array[theta_idx], 
