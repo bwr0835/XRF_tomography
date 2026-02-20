@@ -1321,3 +1321,424 @@ def create_nonaligned_norm_non_cropped_proj_data_gif(dir_path,
         iio2.mimsave(gif_filename, theta_frames2, fps = fps)
         
     return
+
+def create_vert_jitter_corrected_norm_non_cropped_proj_data_gif_v1(dir_path,
+                                                                   desired_xrf_elements,
+                                                                   xrf_element_array,
+                                                                   counts_xrf,
+                                                                   opt_dens,
+                                                                   shifted_counts_xrf,
+                                                                   shifted_opt_dens = None,
+                                                                   theta_array = None,
+                                                                   fps = None):
+
+    n_theta, n_slices, n_columns = counts_xrf.shape[1:]
+    
+    ref_element_idx_xrf_1 = xrf_element_array.index(desired_xrf_elements[0])
+    ref_element_idx_xrf_2 = xrf_element_array.index(desired_xrf_elements[1])
+
+    counts_xrf_ref_element_1 = counts_xrf[ref_element_idx_xrf_1]
+    counts_xrf_ref_element_2 = counts_xrf[ref_element_idx_xrf_2]
+
+    shifted_counts_xrf_ref_element_1 = shifted_counts_xrf[ref_element_idx_xrf_1]
+    shifted_counts_xrf_ref_element_2 = shifted_counts_xrf[ref_element_idx_xrf_2]
+    
+    vmin_xrf_1 = np.min([counts_xrf_ref_element_1.min(), shifted_counts_xrf_ref_element_1.min()])
+    vmax_xrf_1 = np.max([counts_xrf_ref_element_1.max(), shifted_counts_xrf_ref_element_1.max()])
+
+    vmin_xrf_2 = np.min([counts_xrf_ref_element_2.min(), shifted_counts_xrf_ref_element_2.min()])
+    vmax_xrf_2 = np.max([counts_xrf_ref_element_2.max(), shifted_counts_xrf_ref_element_2.max()])
+
+    vmin_opt_dens = np.min([opt_dens.min(), shifted_opt_dens.min()])
+    vmax_opt_dens = np.max([opt_dens.max(), shifted_opt_dens.max()])
+
+    theta_frames1 = []
+    theta_frames2 = []
+
+    fig1, axs1 = plt.subplots(3, 2)
+
+    im1_1 = axs1[0, 0].imshow(opt_dens[0], vmin = vmin_opt_dens, vmax = vmax_opt_dens)
+    im1_2 = axs1[0, 1].imshow(shifted_opt_dens, vmin = vmin_opt_dens, vmax = vmax_opt_dens)
+    im1_3 = axs1[1, 0].imshow(counts_xrf_ref_element_1[0], vmin = vmin_xrf_1, vmax = vmax_xrf_1)
+    im1_4 = axs1[1, 1].imshow(shifted_counts_xrf_ref_element_1[0], vmin = vmin_xrf_1, vmax = vmax_xrf_1)
+    im1_5 = axs1[2, 0].imshow(counts_xrf_ref_element_2[0], vmin = vmin_xrf_2, vmax = vmax_xrf_2)
+    im1_6 = axs1[2, 1].imshow(shifted_counts_xrf_ref_element_2[0], vmin = vmin_xrf_2, vmax = vmax_xrf_2)
+
+    text_1 = axs1[2, 0].text(0.02, 0.02, r'$\theta = {0}$\textdegree'.format(theta_array[0]), transform = axs1[2, 0].transAxes, color = 'white')
+
+    axs1[0, 0].set_title(r'Opt. Dens.', fontsize = 14)
+    axs1[0, 1].set_title(r'Sh. Opt. Dens.', fontsize = 14)
+    axs1[1, 0].set_title(r'XRF ({0})'.format(desired_xrf_elements[0]), fontsize = 14)
+    axs1[1, 1].set_title(r'Sh. XRF ({0})'.format(desired_xrf_elements[0]), fontsize = 14)
+    axs1[2, 0].set_title(r'XRF ({0})'.format(desired_xrf_elements[1]), fontsize = 14)
+    axs1[2, 1].set_title(r'Sh. XRF ({0})'.format(desired_xrf_elements[1]), fontsize = 14)
+
+    for axs in fig1.axes:
+        axs.axis('off')
+        axs.axvline(x = n_columns//2, color = 'red', linewidth = 2)
+
+    for theta_idx in range(n_theta):
+        im1_1.set_data(opt_dens[theta_idx])
+        im1_2.set_data(shifted_opt_dens[theta_idx])
+        im1_3.set_data(counts_xrf_ref_element_1[theta_idx])
+        im1_4.set_data(shifted_counts_xrf_ref_element_1[theta_idx])
+        im1_5.set_data(counts_xrf_ref_element_2[theta_idx])
+        im1_6.set_data(shifted_counts_xrf_ref_element_2[theta_idx])
+
+        text_1.set_text(r'$\theta = {0}$\textdegree'.format(theta_array[theta_idx]))
+
+        fig1.canvas.draw()
+
+        frame1 = np.array(fig1.canvas.renderer.buffer_rgba())[:, :, :3]
+        
+        theta_frames1.append(frame1)
+
+    plt.close(fig1)
+
+    gif_filename = os.path.join(dir_path, 'vert_jitter_corrected_non_cropped_proj_data.gif')
+
+    print('Saving projection data to GIF...')
+
+    iio2.mimsave(gif_filename, theta_frames1, fps = fps)
+
+    fig2, axs2 = plt.subplots(1, 3)
+
+    im2_1 = axs2[0].imshow(shifted_opt_dens[:, 0], vmin = vmin_opt_dens, vmax = vmax_opt_dens, origin = 'lower', aspect = 20)
+    im2_2 = axs2[1].imshow(shifted_counts_xrf_ref_element_1[:, 0], vmin = vmin_xrf_1, vmax = vmax_xrf_1, origin = 'lower', aspect = 20)
+    im2_3 = axs2[2].imshow(shifted_counts_xrf_ref_element_2[:, 0], vmin = vmin_xrf_2, vmax = vmax_xrf_2, origin = 'lower', aspect = 20)
+
+    text_2 = axs2[2].text(0.02, 0.02, r'Slice index 0/{0}'.format(n_slices - 1), transform = axs2[2].transAxes, color = 'white')
+    
+    axs2[0].set_title(r'Sh. Opt. Dens.', fontsize = 14)
+    axs2[1].set_title(r'Sh. XRF ({0})'.format(desired_xrf_elements[0]), fontsize = 14)
+    axs2[2].set_title(r'Sh. XRF ({0})'.format(desired_xrf_elements[1]), fontsize = 14)
+
+    for axs in fig2.axes:
+        axs.axis('off')
+
+    for slice_idx in range(n_slices):
+        im2_1.set_data(opt_dens[:, slice_idx])
+        im2_2.set_data(shifted_counts_xrf_ref_element_1[:, slice_idx])
+        im2_3.set_data(shifted_counts_xrf_ref_element_2[:, slice_idx])
+
+        text_2.set_text(r'Slice index {0}/{1}'.format(slice_idx, n_slices - 1))
+
+        frame2 = np.array(fig2.canvas.renderer.buffer_rgba())[:, :, :3]
+        
+        theta_frames2.append(frame2)
+
+    plt.close(fig2)
+
+    gif_filename = os.path.join(dir_path, 'vert_jitter_corrected_non_cropped_sinogram_data.gif')
+
+    print('Saving sinogram data to GIF...')
+
+    iio2.mimsave(gif_filename, theta_frames2, fps = fps)
+    
+    return
+
+# def create_vert_jitter_corrected_norm_non_cropped_proj_data_gif_v2(dir_path,
+#                                                                 xrf_element_array,
+#                                                                 desired_xrf_elements,
+#                                                                 counts_xrf,
+#                                                                 opt_dens = None,
+#                                                                 convolution_mag_array = None,
+#                                                                 norm_enabled = False,
+#                                                                 data_percentile = None,
+#                                                                 theta_array = None,
+#                                                                 fps = None):
+
+#     n_theta, n_slices, n_columns = counts_xrf.shape[1:]
+
+#     if desired_xrf_element is None:
+#         print('Error: \'desired_xrf_element\' field empty. Exiting program...')
+
+#         sys.exit()
+    
+#     if desired_xrf_element not in xrf_element_array:
+#         print(f'Error: Desired XRF element not an XRF element channel. Exiting program...')
+
+#         sys.exit()
+    
+#     if fps is None or fps <= 0:
+#         print('Error: \'fps\' (frames per second) must be a positive number. Exiting program...')
+
+#         sys.exit()
+    
+#     ref_element_idx_xrf = xrf_element_array.index(desired_xrf_element)
+
+#     counts_xrf_ref_element = counts_xrf[ref_element_idx_xrf]
+#     counts_xrf_ref_element_norm = counts_xrf_norm[ref_element_idx_xrf]
+    
+#     vmin_xrf = counts_xrf_ref_element.min()
+#     vmax_xrf = counts_xrf_ref_element.max()
+
+#     vmin_xrt = counts_xrt.min()
+#     vmax_xrt = counts_xrt.max()
+
+#     vmin_opt_dens = opt_dens.min()
+#     vmax_opt_dens = opt_dens.max()
+
+#     theta_frames1 = []
+#     theta_frames3 = []
+
+#     if norm_enabled:
+#         print('Plotting non-aligned, non-cropped, normalized XRT, optical density, and convolution magnitude projection data...')
+    
+#         vmin_xrt_norm = counts_xrt_norm.min()
+#         vmax_xrt_norm = counts_xrt_norm.max()
+
+#         vmin_xrf_norm = counts_xrf_ref_element_norm.min()
+#         vmax_xrf_norm = counts_xrf_ref_element_norm.max()
+
+#         if convolution_mag_array is not None:
+#             fig1, axs1 = plt.subplots(3, 2)
+
+#             vmin_conv = convolution_mag_array.min()
+#             vmax_conv = convolution_mag_array.max()
+
+#             threshold = np.percentile(convolution_mag_array[0], data_percentile)
+
+#             conv_mask = np.where(convolution_mag_array[0] >= threshold, convolution_mag_array[0], 0)
+
+#             im1_1 = axs1[0, 0].imshow(convolution_mag_array[0], vmin = vmin_conv, vmax = vmax_conv)
+#             im1_2 = axs1[0, 1].imshow(conv_mask, vmin = vmin_conv, vmax = vmax_conv)
+#             im1_3 = axs1[1, 0].imshow(counts_xrt[0], vmin = vmin_xrt, vmax = vmax_xrt)
+#             im1_4 = axs1[1, 1].imshow(counts_xrt_norm[0], vmin = vmin_xrt_norm, vmax = vmax_xrt_norm)
+#             im1_5 = axs1[2, 0].imshow(counts_xrf_ref_element[0], vmin = vmin_xrf, vmax = vmax_xrf)
+#             im1_6 = axs1[2, 1].imshow(counts_xrf_ref_element_norm[0], vmin = vmin_xrf_norm, vmax = vmax_xrf_norm)
+
+#             axs1[0, 0].set_title(r'XRT conv.', fontsize = 14)
+#             axs1[0, 1].set_title(r'XRT conv. mask', fontsize = 14)
+#             axs1[1, 0].set_title(r'XRT data', fontsize = 14)
+#             axs1[1, 1].set_title(r'Norm. XRT data', fontsize = 14)
+#             axs1[2, 0].set_title(r'XRF data ({0})'.format(desired_xrf_element), fontsize = 14)
+#             axs1[2, 1].set_title(r'Norm. XRF data ({0})'.format(desired_xrf_element), fontsize = 14)
+
+#             text_1 = axs1[0, 0].text(0.02, 0.02, r'$\theta = {0}$\textdegree'.format(theta_array[0]), transform = axs1[0, 0].transAxes, color = 'white')
+
+#             for axs in fig1.axes:
+#                 axs.axis('off')
+#                 axs.axvline(x = n_columns//2, color = 'red', linewidth = 2)
+
+#             for theta_idx in range(n_theta):
+#                 threshold = np.percentile(convolution_mag_array[theta_idx], data_percentile)
+            
+#                 conv_mask = np.where(convolution_mag_array[theta_idx] >= threshold, convolution_mag_array[theta_idx], 0)
+
+#                 im1_1.set_data(convolution_mag_array[theta_idx])
+#                 im1_2.set_data(conv_mask)
+#                 im1_3.set_data(counts_xrt[theta_idx])
+#                 im1_4.set_data(counts_xrt_norm[theta_idx])
+#                 im1_5.set_data(counts_xrf_ref_element[theta_idx])
+#                 im1_6.set_data(counts_xrf_ref_element_norm[theta_idx])
+
+#                 text_1.set_text(r'$\theta = {0}$\textdegree'.format(theta_array[theta_idx]))
+
+#                 fig1.canvas.draw()
+
+#                 frame1 = np.array(fig1.canvas.renderer.buffer_rgba())[:, :, :3]
+
+#                 theta_frames1.append(frame1)
+        
+#         else:
+#             fig1, axs1 = plt.subplots(2, 2)
+
+#             im1_1 = axs1[0, 0].imshow(counts_xrt[0], vmin = vmin_xrt, vmax = vmax_xrt)
+#             im1_2 = axs1[0, 1].imshow(counts_xrt_norm[0], vmin = vmin_xrt_norm, vmax = vmax_xrt_norm)
+#             im1_3 = axs1[1, 0].imshow(counts_xrf_ref_element[0], vmin = vmin_xrf, vmax = vmax_xrf)
+#             im1_4 = axs1[1, 1].imshow(counts_xrf_ref_element_norm[0], vmin = vmin_xrf_norm, vmax = vmax_xrf_norm)
+
+#             axs1[0, 0].set_title(r'XRT data', fontsize = 14)
+#             axs1[0, 1].set_title(r'Norm. XRT data', fontsize = 14)
+#             axs1[1, 0].set_title(r'XRF data ({0})'.format(desired_xrf_element), fontsize = 14)
+#             axs1[1, 1].set_title(r'Norm. XRF data ({0})'.format(desired_xrf_element), fontsize = 14)
+
+#             text_1 = axs1[0, 0].text(0.02, 0.02, r'$\theta = {0}$\textdegree'.format(theta_array[0]), transform = axs1[0, 0].transAxes, color = 'white')
+
+#             for axs in fig1.axes:
+#                 axs.axis('off')
+#                 axs.axvline(x = n_columns//2, color = 'red', linewidth = 2)
+
+#             for theta_idx in range(n_theta):
+#                 im1_1.set_data(counts_xrt[theta_idx])
+#                 im1_2.set_data(counts_xrt_norm[theta_idx])
+#                 im1_3.set_data(counts_xrf_ref_element[theta_idx])
+#                 im1_4.set_data(counts_xrf_ref_element_norm[theta_idx])
+
+#                 text_1.set_text(r'$\theta = {0}$\textdegree'.format(theta_array[theta_idx]))
+
+#                 fig1.canvas.draw()
+
+#                 frame1 = np.array(fig1.canvas.renderer.buffer_rgba())[:, :, :3]
+
+#                 theta_frames1.append(frame1)
+
+#         plt.close(fig1)
+
+#         gif_filename = os.path.join(dir_path, 'normalized_prealigned_conv_xrt_od_proj_data.gif')
+
+#         print('Saving data to GIF...')
+
+#         iio2.mimsave(gif_filename, theta_frames1, fps = fps)
+
+#         print('Plotting non-aligned, non-cropped, normalized XRT, optical density, XRF projection data...')
+
+#         fig2, axs2 = plt.subplots(3, 1)
+
+#         theta_frames2 = []
+
+#         im2_1 = axs2[0].imshow(counts_xrt_norm[0], vmin = vmin_xrt_norm, vmax = vmax_xrt_norm)
+#         im2_2 = axs2[1].imshow(opt_dens[0], vmin = vmin_opt_dens, vmax = vmax_opt_dens)
+#         im2_3 = axs2[2].imshow(counts_xrf_ref_element_norm[0], vmin = vmin_xrf_norm, vmax = vmax_xrf_norm)
+        
+#         text_2 = axs2[0].text(0.02, 0.02, r'$\theta = {0}$\textdegree'.format(theta_array[0]), transform = axs2[0].transAxes, color = 'white')
+        
+#         axs2[0].set_title(r'Norm. XRT', fontsize = 14)
+#         axs2[1].set_title(r'Norm. Opt. Dens.', fontsize = 14)
+#         axs2[2].set_title(r'Norm. XRF ({0})'.format(desired_xrf_element), fontsize = 14)
+
+#         for axs in fig2.axes:
+#             axs.axis('off')
+
+#         for theta_idx in range(n_theta):
+#             im2_1.set_data(counts_xrt_norm[theta_idx])
+#             im2_2.set_data(opt_dens[theta_idx])
+#             im2_3.set_data(counts_xrf_ref_element_norm[theta_idx])
+
+#             text_2.set_text(r'$\theta = {0}$\textdegree'.format(theta_array[theta_idx]))
+
+#             fig2.canvas.draw()
+
+#             frame2 = np.array(fig2.canvas.renderer.buffer_rgba())[:, :, :3]
+
+#             theta_frames2.append(frame2)
+        
+#         plt.close(fig2)
+
+#         print('Saving data to GIF...')
+
+#         gif_filename = os.path.join(dir_path, 'normalized_prealigned_xrt_od_xrf_proj_data_comp.gif')
+
+#         iio2.mimsave(gif_filename, theta_frames2, fps = fps)
+
+#         print('Plotting non-aligned, non-cropped, normalized XRT, optical density, XRF sinograms...')
+
+#         fig3, axs3 = plt.subplots(1, 3, figsize = (11, 6))
+
+#         im3_1 = axs3[0].imshow(counts_xrt_norm[:, 0], vmin = vmin_xrt_norm, vmax = vmax_xrt_norm, origin = 'lower', extent = [0, n_slices - 1, -180, 180], aspect = 1.5)
+#         im3_2 = axs3[1].imshow(opt_dens[:, 0], vmin = vmin_opt_dens, vmax = vmax_opt_dens, origin = 'lower', extent = [0, n_slices - 1, -180, 180], aspect = 1.5)
+#         im3_3 = axs3[2].imshow(counts_xrf_ref_element_norm[:, 0], vmin = vmin_xrf_norm, origin = 'lower', extent = [0, n_slices - 1, -180, 180], vmax = vmax_xrf_norm, aspect = 1.5)
+
+#         text_3 = axs3[0].text(0.02, 0.02, r'Slice index 0/{0}'.format(n_slices - 1), transform = axs3[0].transAxes, color = 'white')
+        
+#         axs3[0].set_title(r'XRT', fontsize = 14)
+#         axs3[1].set_title(r'Opt. Dens.', fontsize = 14)
+#         axs3[2].set_title(r'XRF ({0})'.format(desired_xrf_element), fontsize = 14)
+
+#         for axs in fig3.axes:
+#         #     axs.axis('off')
+#             axs.set_xlabel(r'Pixel index', fontsize = 14)
+#             axs.set_ylabel(r'$\theta$ (\textdegree)', fontsize = 14)
+
+#         for slice_idx in range(n_slices):
+#             im3_1.set_data(counts_xrt_norm[:, slice_idx])
+#             im3_2.set_data(opt_dens[:, slice_idx])
+#             im3_3.set_data(counts_xrf_ref_element_norm[:, slice_idx])
+
+#             text_3.set_text(r'Slice index {0}/{1}'.format(slice_idx, n_slices - 1))
+
+#             fig3.canvas.draw()
+
+#             frame3 = np.array(fig3.canvas.renderer.buffer_rgba())[:, :, :3]
+
+#             theta_frames3.append(frame3)
+        
+#         plt.close(fig3)
+
+#         print('Saving data to GIF...')
+
+#         gif_filename = os.path.join(dir_path, 'normalized_prealigned_xrt_od_xrf_sinogram_data_comp.gif')
+        
+#         iio2.mimsave(gif_filename, theta_frames3, fps = fps)
+
+#     else:
+#         print('Plotting non-aligned, non-cropped, non-normalized XRT, optical density, XRF projection data...')
+        
+#         fig1, axs1 = plt.subplots(3, 1)
+
+#         im1_1 = axs1[0].imshow(counts_xrt[0], vmin = vmin_xrt, vmax = vmax_xrt)
+#         im1_2 = axs1[1].imshow(opt_dens[0], vmin = vmin_opt_dens, vmax = vmax_opt_dens)
+#         im1_3 = axs1[2].imshow(counts_xrf_ref_element[0], vmin = vmin_xrf, vmax = vmax_xrf)
+
+#         text_1 = axs1[0].text(0.02, 0.02, r'$\theta = {0}$\textdegree'.format(theta_array[0]), transform = axs1[0].transAxes, color = 'white')
+
+#         axs1[0].set_title(r'XRT', fontsize = 14)
+#         axs1[1].set_title(r'Opt. Dens.', fontsize = 14)
+#         axs1[2].set_title(r'XRF', fontsize = 14)
+
+#         for axs in fig1.axes:
+#             axs.axis('off')
+
+#         for theta_idx in range(n_theta):
+#             im1_1.set_data(counts_xrt[theta_idx])
+#             im1_2.set_data(opt_dens[theta_idx])
+#             im1_3.set_data(counts_xrf_ref_element[theta_idx])
+
+#             text_1.set_text(r'$\theta = {0}$\textdegree'.format(theta_array[theta_idx]))
+
+#             fig1.canvas.draw()
+
+#             frame1 = np.array(fig1.canvas.renderer.buffer_rgba())[:, :, :3]
+
+#             theta_frames1.append(frame1)
+        
+#         plt.close(fig1)
+
+#         print('Saving data to GIF...')
+
+#         gif_filename = os.path.join(dir_path, 'nonnormalized_prealigned_xrt_od_xrf_proj_data.gif')
+        
+#         iio2.mimsave(gif_filename, theta_frames1, fps = fps)
+
+#         print('Plotting non-aligned, non-cropped, non-normalized XRT, optical density, XRF sinograms...')
+
+#         fig2, axs2 = plt.subplots(3, 1)
+
+#         im2_1 = axs2[0].imshow(counts_xrt[:, 0], vmin = vmin_xrt, vmax = vmax_xrt, origin = 'lower', extent = [0, n_slices - 1, -180, 180], aspect = 20)
+#         im2_2 = axs2[1].imshow(opt_dens[:, 0], vmin = vmin_opt_dens, vmax = vmax_opt_dens, origin = 'lower', extent = [0, n_slices - 1, -180, 180], aspect = 20)
+#         im2_3 = axs2[2].imshow(counts_xrf_ref_element[:, 0], vmin = vmin_xrf, vmax = vmax_xrf, origin = 'lower', extent = [0, n_slices - 1, -180, 180], aspect = 20)
+
+#         text_2 = axs2[0].text(0.02, 0.02, r'Slice index 0/{0}'.format(n_slices - 1), transform = axs2[0].transAxes, color = 'white')
+        
+#         axs2[0].set_title(r'XRT', fontsize = 14)
+#         axs2[1].set_title(r'Opt. Dens.', fontsize = 14)
+#         axs2[2].set_title(r'XRF', fontsize = 14)
+
+#         for axs in fig2.axes:
+#             # axs.axis('off')
+#             axs.set_xlabel(r'Pixel index', fontsize = 14)
+#             axs.set_ylabel(r'$\theta$ (\textdegree)', fontsize = 14)
+
+#         for slice_idx in range(n_slices):
+#             im2_1.set_data(counts_xrt[:, slice_idx])
+#             im2_2.set_data(opt_dens[:, slice_idx])
+#             im2_3.set_data(counts_xrf_ref_element[:, slice_idx])
+
+#             text_2.set_text(r'Slice index {0}/{1}'.format(slice_idx, n_slices - 1))
+
+#             fig2.canvas.draw()
+
+#             frame2 = np.array(fig2.canvas.renderer.buffer_rgba())[:, :, :3]
+
+#             theta_frames2.append(frame2)
+        
+#         plt.close(fig2)
+
+#         print('Saving data to GIF...')
+
+#         gif_filename = os.path.join(dir_path, 'nonnormalized_prealigned_xrt_od_xrf_sinogram_data.gif')
+        
+#         iio2.mimsave(gif_filename, theta_frames2, fps = fps)
+        
+#     return

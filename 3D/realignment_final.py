@@ -1,6 +1,7 @@
 import numpy as np, \
        tomopy as tomo, \
        xrf_xrt_preprocess_utils as ppu, \
+       xrf_xrt_preprocess_file_util as futil, \
        sys
 
 from skimage import transform as xform, registration as reg
@@ -35,6 +36,55 @@ def phase_xcorr(recon_proj,
         return y_shift, x_shift, pcc_2d
     
     return y_shift, x_shift
+
+def correct_pre_cor_vert_jitter(xrf_proj_img_array,
+                                opt_dens_proj_img_array,
+                                net_shift_array,
+                                theta_array,
+                                sigma,
+                                alpha,
+                                upsample_factor,
+                                return_aux_data = None,
+                                dir_path = None,
+                                desired_xrf_elements = None, 
+                                fps = None):
+    
+    shifted_xrf_proj_array = np.zeros_like(xrf_proj_img_array)
+    shifted_opt_dens_proj_array = np.zeros_like(opt_dens_proj_img_array)
+
+    net_shift_array_copy = net_shift_array.copy()
+
+    for element_idx in range(len(xrf_proj_img_array)):
+        for theta_idx in range(1, len(theta_array)):
+            _, dy = phase_xcorr(xrf_proj_img_array[element_idx, theta_idx], 
+                                xrf_proj_img_array[element_idx, theta_idx - 1], 
+                                sigma, 
+                                alpha, 
+                                upsample_factor)
+
+            net_shift_array[theta_idx] += dy
+
+            shifted_xrf_proj_array[element_idx, theta_idx] = ndi.shift(xrf_proj_img_array[element_idx, theta_idx], shift = (net_shift_array[theta_idx], 0))
+
+    for theta_idx in range(len(theta_array)):
+        _, dy = phase_xcorr(opt_dens_proj_img_array[element_idx, theta_idx], 
+                                opt_dens_proj_img_array[theta_idx - 1], 
+                                sigma, 
+                                alpha, 
+                                upsample_factor)
+        
+        net_shift_array_copy[theta_idx] += dy
+        
+        shifted_opt_dens_proj_array[theta_idx] = ndi.shift(opt_dens_proj_img_array[theta_idx], shift = (net_shift_array_copy[theta_idx], 0))
+
+    futil.create_vert_jitter_corrected_norm_non_cropped_proj_data_gif(dir_path, desired_xrf_elements, shifted_xrf_proj_array, shifted_opt_dens_proj_array)
+    
+    a = 1
+    
+    if a:
+        sys.exit()
+    
+    return net_shift_array
 
 def rot_center(theta_sum):
     """
@@ -270,6 +320,24 @@ def realign_proj(cor_correction_only,
     #         print('Error: Must have two 0° angles. Exiting program...')
 
     #         sys.exit()
+
+    vert_jitter_correction_enabled = True
+
+    if vert_jitter_correction_enabled:
+        print('Correcting for vertical jitter...')
+
+        dir_path = '/home/bwr0835/3_id_realigned_data_02_10_2026'
+        desired_xrf_elements = ['Ni', 'Fe']
+        net_y_shifts_pcc = correct_pre_cor_vert_jitter(xrf_proj_img_array, 
+                                                       opt_dens_proj_img_array,
+                                                       net_y_shifts_pcc, 
+                                                       theta_array, 
+                                                       sigma, 
+                                                       alpha, 
+                                                       upsample_factor,
+                                                       dir_path = dir_path,
+                                                       desired_xrf_elements = desired_xrf_elements,
+                                                       fps = 10)
 
     if sample_flipped_remounted_mid_experiment: # This assumes that angles are order from -180° to +180° (360° range) AND that there are two zero degree angles
         if eps_cor_correction is None:
