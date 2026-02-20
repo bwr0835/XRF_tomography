@@ -1401,7 +1401,7 @@ def create_vert_jitter_corrected_norm_non_cropped_proj_data_gif_v1(dir_path,
 
     iio2.mimsave(gif_filename, theta_frames1, fps = fps)
 
-    fig2, axs2 = plt.subplots(1, 3)
+    fig2, axs2 = plt.subplots(1, 3, figsize = (11, 6))
 
     im2_1 = axs2[0].imshow(shifted_opt_dens[:, 0], vmin = vmin_opt_dens, vmax = vmax_opt_dens, origin = 'lower', aspect = 20)
     im2_2 = axs2[1].imshow(shifted_counts_xrf_ref_element_1[:, 0], vmin = vmin_xrf_1, vmax = vmax_xrf_1, origin = 'lower', aspect = 20)
