@@ -1423,6 +1423,8 @@ def create_vert_jitter_corrected_norm_non_cropped_proj_data_gif_v1(dir_path,
 
         text_2.set_text(r'Slice index {0}/{1}'.format(slice_idx, n_slices - 1))
 
+        fig2.canvas.draw()
+        
         frame2 = np.array(fig2.canvas.renderer.buffer_rgba())[:, :, :3]
         
         theta_frames2.append(frame2)
