@@ -95,6 +95,8 @@ def correct_pre_cor_vert_jitter(xrf_proj_img_array,
                                                                          opt_dens_proj_img_array,
                                                                          shifted_xrf_proj_array,
                                                                          shifted_opt_dens_proj_array,
+                                                                         sigma,
+                                                                         alpha,
                                                                          theta_array = theta_array,
                                                                          fps = fps)
     

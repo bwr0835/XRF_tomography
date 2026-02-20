@@ -1329,6 +1329,8 @@ def create_vert_jitter_corrected_norm_non_cropped_proj_data_gif_v1(dir_path,
                                                                    opt_dens,
                                                                    shifted_counts_xrf,
                                                                    shifted_opt_dens,
+                                                                   sigma,
+                                                                   alpha,
                                                                    theta_array,
                                                                    fps):
 
@@ -1395,7 +1397,7 @@ def create_vert_jitter_corrected_norm_non_cropped_proj_data_gif_v1(dir_path,
 
     plt.close(fig1)
 
-    gif_filename = os.path.join(dir_path, 'vert_jitter_corrected_non_cropped_proj_data.gif')
+    gif_filename = os.path.join(dir_path, f'vert_jitter_corrected_non_cropped_proj_data_sigma_{sigma}_alpha_{alpha}.gif')
 
     print('Saving projection data to GIF...')
 
@@ -1431,7 +1433,7 @@ def create_vert_jitter_corrected_norm_non_cropped_proj_data_gif_v1(dir_path,
 
     plt.close(fig2)
 
-    gif_filename = os.path.join(dir_path, 'vert_jitter_corrected_non_cropped_sinogram_data.gif')
+    gif_filename = os.path.join(dir_path, f'vert_jitter_corrected_non_cropped_sinogram_data_sigma_{sigma}_alpha_{alpha}.gif')
 
     print('Saving sinogram data to GIF...')
 
