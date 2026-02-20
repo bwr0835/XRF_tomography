@@ -1358,7 +1358,7 @@ def create_vert_jitter_corrected_norm_non_cropped_proj_data_gif_v1(dir_path,
     fig1, axs1 = plt.subplots(3, 2)
 
     im1_1 = axs1[0, 0].imshow(opt_dens[0], vmin = vmin_opt_dens, vmax = vmax_opt_dens)
-    im1_2 = axs1[0, 1].imshow(shifted_opt_dens, vmin = vmin_opt_dens, vmax = vmax_opt_dens)
+    im1_2 = axs1[0, 1].imshow(shifted_opt_dens[0], vmin = vmin_opt_dens, vmax = vmax_opt_dens)
     im1_3 = axs1[1, 0].imshow(counts_xrf_ref_element_1[0], vmin = vmin_xrf_1, vmax = vmax_xrf_1)
     im1_4 = axs1[1, 1].imshow(shifted_counts_xrf_ref_element_1[0], vmin = vmin_xrf_1, vmax = vmax_xrf_1)
     im1_5 = axs1[2, 0].imshow(counts_xrf_ref_element_2[0], vmin = vmin_xrf_2, vmax = vmax_xrf_2)
