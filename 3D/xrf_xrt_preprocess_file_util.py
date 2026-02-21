@@ -1416,10 +1416,11 @@ def create_vert_jitter_corrected_norm_non_cropped_proj_data_gif_v1(dir_path,
     axs2[2].set_title(r'Sh. XRF ({0})'.format(desired_xrf_elements[1]), fontsize = 14)
 
     for axs in fig2.axes:
-        axs.axis('off')
+        axs.set_xlabel(r'Pixel index', fontsize = 14)
+        axs.set_ylabel(r'$\theta$ (\textdegree)', fontsize = 14)
 
     for slice_idx in range(n_slices):
-        im2_1.set_data(opt_dens[:, slice_idx])
+        im2_1.set_data(shifted_opt_dens[:, slice_idx])
         im2_2.set_data(shifted_counts_xrf_ref_element_1[:, slice_idx])
         im2_3.set_data(shifted_counts_xrf_ref_element_2[:, slice_idx])
 
