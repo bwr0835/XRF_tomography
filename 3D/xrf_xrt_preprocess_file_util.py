@@ -1405,9 +1405,9 @@ def create_vert_jitter_corrected_norm_non_cropped_proj_data_gif_v1(dir_path,
 
     fig2, axs2 = plt.subplots(1, 3, figsize = (11, 6))
 
-    im2_1 = axs2[0].imshow(shifted_opt_dens[:, 0], vmin = vmin_opt_dens, vmax = vmax_opt_dens, origin = 'lower', aspect = 1.5)
-    im2_2 = axs2[1].imshow(shifted_counts_xrf_ref_element_1[:, 0], vmin = vmin_xrf_1, vmax = vmax_xrf_1, origin = 'lower', aspect = 1.5)
-    im2_3 = axs2[2].imshow(shifted_counts_xrf_ref_element_2[:, 0], vmin = vmin_xrf_2, vmax = vmax_xrf_2, origin = 'lower', aspect = 1.5)
+    im2_1 = axs2[0].imshow(shifted_opt_dens[:, 0], vmin = vmin_opt_dens, vmax = vmax_opt_dens, origin = 'lower', aspect = 10)
+    im2_2 = axs2[1].imshow(shifted_counts_xrf_ref_element_1[:, 0], vmin = vmin_xrf_1, vmax = vmax_xrf_1, origin = 'lower', aspect = 10)
+    im2_3 = axs2[2].imshow(shifted_counts_xrf_ref_element_2[:, 0], vmin = vmin_xrf_2, vmax = vmax_xrf_2, origin = 'lower', aspect = 10)
 
     text_2 = axs2[2].text(0.02, 0.02, r'Slice index 0/{0}'.format(n_slices - 1), transform = axs2[2].transAxes, color = 'white')
     
