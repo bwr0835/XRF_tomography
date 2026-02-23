@@ -46,7 +46,7 @@ def xcorr_vert_parabolic_fit(xcorr_img, pixel_rad):
     pcc_max_idx_remapped = start_slice_idx + pcc_max_idx[0] + subpix_shift
     print(pcc_max_idx_remapped)
 
-    dy = pcc_max_idx_remapped - center_slice_idx
+    dy = center_slice_idx - pcc_max_idx_remapped
     
     return xcorr_img_truncated, dy
 
