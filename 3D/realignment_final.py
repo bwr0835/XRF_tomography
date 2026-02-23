@@ -4,6 +4,8 @@ import numpy as np, \
        xrf_xrt_preprocess_file_util as futil, \
        sys
 
+from matplotlib import pyplot as plt
+
 from skimage import transform as xform, registration as reg
 from scipy import ndimage as ndi, fft
 
