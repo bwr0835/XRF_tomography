@@ -73,7 +73,7 @@ def correct_pre_cor_vert_jitter(xrf_proj_img_array,
             if theta_array[theta_idx] == -147:
                 print(f'dy = {ppu.round_correct(dy, ndec = 3)} (theta = {ppu.round_correct(theta_array[theta_idx], ndec = 1)}); element = {xrf_element_array[element_idx]}...')
 
-            net_shift_array_copy[0, theta_idx] = dy
+            net_shift_array_copy[0, theta_idx] = -dy
 
             shifted_xrf_proj_array[element_idx, theta_idx] = ndi.shift(xrf_proj_img_array[element_idx, theta_idx], shift = (net_shift_array_copy[0, theta_idx], 0))
 
@@ -89,7 +89,7 @@ def correct_pre_cor_vert_jitter(xrf_proj_img_array,
         if theta_array[theta_idx] == -147:
             print(f'dy = {ppu.round_correct(dy, ndec = 3)} (theta = {ppu.round_correct(theta_array[theta_idx], ndec = 1)}); element = opt_dens...')
         
-        net_shift_array_copy[0, theta_idx] = dy
+        net_shift_array_copy[0, theta_idx] = -dy
         
         shifted_opt_dens_proj_array[theta_idx] = ndi.shift(opt_dens_proj_img_array[theta_idx], shift = (net_shift_array_copy[0, theta_idx], 0))
 
