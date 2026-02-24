@@ -55,8 +55,8 @@ def correct_pre_cor_vert_jitter(xrf_proj_img_array,
     shifted_xrf_proj_array = np.zeros_like(xrf_proj_img_array)
     shifted_opt_dens_proj_array = np.zeros_like(opt_dens_proj_img_array)
 
-    shifted_opt_dens_proj_array[0] = opt_dens_proj_img_array[0]
-    shifted_xrf_proj_array[:, 0] = xrf_proj_img_array[:, 0]
+    shifted_opt_dens_proj_array[0] = opt_dens_proj_img_array[0].copy()
+    shifted_xrf_proj_array[:, 0] = xrf_proj_img_array[:, 0].copy()
 
     net_shift_array_copy = net_shift_array.copy()
 

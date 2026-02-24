@@ -46,6 +46,7 @@ def xcorr_vert_parabolic_fit(xcorr_img, pixel_rad):
     pcc_max_idx_remapped = start_slice_idx + pcc_max_idx[0] + subpix_shift
     print(pcc_max_idx_remapped)
 
+    # Match skimage convention: shift = peak - center (negate vs center-peak).
     dy = pcc_max_idx_remapped - center_slice_idx
     
     return xcorr_img_truncated, dy
@@ -119,7 +120,7 @@ def create_phase_xcorr_fig(phase_xcorr_array_xrf,
 
     return fig, axs
 
-sigma = 5
+sigma = 25
 alpha = 10
 
 aggregate_xrf_h5_file_path = '/Users/bwr0835/Documents/3_id_aggregate_xrf.h5'
@@ -160,7 +161,8 @@ counts_xrt_sig_idx = elements_xrt.index('xrt_sig')
 counts_xrt_sig = counts_xrt[counts_xrt_sig_idx]
 
 desired_elements_xrf = ['Ni', 'Cu']
-desired_theta = [-150, -147]
+# desired_theta = [-150, -147]
+desired_theta = [45, 55]
 
 element_idx_array = []
 theta_idx_array = []
@@ -177,6 +179,7 @@ for theta_idx in range(n_theta):
 desired_theta_array = theta_xrt[theta_idx_array]
 desired_element_array = [elements_xrf[i] for i in element_idx_array]
 
+print(desired_theta_array)
 counts_xrt_norm, counts_xrf_norm, norm_array, I0_cts = ppu.joint_fluct_norm(counts_xrt_sig,
                                                                             counts_xrf,
                                                                             xrt_data_percentile = 80)
@@ -212,6 +215,12 @@ print(dy_pcc_od[0])
 print('\n')
 print(dy_xrf_array)
 print(dy_opt_dens)
+
+# shifted_counts_xrf_norm_array = np.zeros_like(counts_xrf_norm_array)
+# shifted_opt_dens = np.zeros_like(opt_dens)
+
+# shifted_counts_xrf_norm_array[:, 0] = counts_xrf_norm_array[:, 0]
+# shifted_opt_dens[0] = opt_dens[0]
 
 fig1, axs1 = create_raw_img_fig(opt_dens, counts_xrf_norm_array, desired_theta_array, desired_element_array)
 fig2, axs2 = create_phase_xcorr_fig(phase_xcorr_array_xrf, phase_xcorr_array_xrf_truncated, phase_xcorr_opt_dens, phase_xcorr_opt_dens_truncated, desired_element_array)
