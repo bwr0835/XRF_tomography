@@ -64,8 +64,7 @@ def correct_pre_cor_vert_jitter(xrf_proj_img_array,
         net_shift_array_copy = net_shift_array.copy()
         
         for theta_idx in range(1, len(theta_array)):
-            dy, _ = phase_xcorr(xrf_proj_img_array[element_idx, 0],
-                                # xrf_proj_img_array[element_idx, theta_idx - 1],
+            dy, _ = phase_xcorr(xrf_proj_img_array[element_idx, theta_idx - 1],
                                 xrf_proj_img_array[element_idx, theta_idx], 
                                 sigma, 
                                 alpha, 
@@ -81,12 +80,14 @@ def correct_pre_cor_vert_jitter(xrf_proj_img_array,
     net_shift_array_copy = net_shift_array.copy()
 
     for theta_idx in range(1, len(theta_array)):
-        dy, _ = phase_xcorr(opt_dens_proj_img_array[0],
-                            # opt_dens_proj_img_array[theta_idx - 1],
+        dy, _ = phase_xcorr(opt_dens_proj_img_array[theta_idx - 1],
                             opt_dens_proj_img_array[theta_idx],     
                             sigma, 
-                            alpha,
+                            alpha, 
                             upsample_factor)
+
+        if theta_array[theta_idx] == -147:
+            print(f'dy = {ppu.round_correct(dy, ndec = 3)} (theta = {ppu.round_correct(theta_array[theta_idx], ndec = 1)}); element = opt_dens...')
         
         net_shift_array_copy[0, theta_idx] = dy
         

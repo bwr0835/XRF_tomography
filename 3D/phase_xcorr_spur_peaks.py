@@ -161,8 +161,8 @@ counts_xrt_sig_idx = elements_xrt.index('xrt_sig')
 counts_xrt_sig = counts_xrt[counts_xrt_sig_idx]
 
 desired_elements_xrf = ['Ni', 'Cu']
-# desired_theta = [-150, -147]
-desired_theta = [45, 55]
+desired_theta = [-150, -147]
+# desired_theta = [45, 55]
 
 element_idx_array = []
 theta_idx_array = []
@@ -189,7 +189,7 @@ counts_xrf_norm_array = counts_xrf_norm[element_idx_array][:, theta_idx_array]
 
 phase_xcorr_array_xrf = np.zeros((len(desired_elements_xrf), n_slices, n_columns))
 
-phase_xcorr_opt_dens = phase_xcorr_manual(opt_dens[0], opt_dens[1], sigma, alpha)
+phase_xcorr_opt_dens = phase_xcorr_manual(opt_dens[1], opt_dens[0], sigma, alpha)
 
 for element_idx in range(len(desired_elements_xrf)):
     phase_xcorr_array_xrf[element_idx] = phase_xcorr_manual(counts_xrf_norm_array[element_idx, 0], counts_xrf_norm_array[element_idx, 1], sigma, alpha)
