@@ -73,8 +73,8 @@ def create_raw_img_fig(opt_dens,
         ax.axvline(x = n_columns//2, color = 'red', linewidth = 2)
         ax.axhline(y = n_slices//2, color = 'red', linewidth = 2)
     
-    text_1 = axs[2, 0].text(0.02, 0.02, r'$\theta = {0}$\textdegree'.format(theta_array[0]), transform = axs[2, 0].transAxes, color = 'white')
-    text_2 = axs[2, 1].text(0.02, 0.02, r'$\theta = {0}$\textdegree'.format(theta_array[1]), transform = axs[2, 1].transAxes, color = 'white')
+    text_1 = axs[1, 0].text(0.02, 0.02, r'$\theta = {0}$\textdegree'.format(theta_array[0]), transform = axs[1, 0].transAxes, color = 'white')
+    text_2 = axs[1, 1].text(0.02, 0.02, r'$\theta = {0}$\textdegree'.format(theta_array[1]), transform = axs[1, 1].transAxes, color = 'white')
 
     axs[0, 0].set_title(r'Opt. Dens.', fontsize = 14)
     axs[1, 0].set_title(r'XRF ({0})'.format(element_array[0]), fontsize = 14)
@@ -89,10 +89,15 @@ def create_phase_xcorr_fig(phase_xcorr_array_xrf,
                            phase_xcorr_array_xrf_truncated,
                            phase_xcorr_array_opt_dens, 
                            phase_xcorr_array_opt_dens_truncated,
-                           element_array):
+                           element_array,
+                           theta_array):
     
     n_slices = phase_xcorr_array_xrf.shape[1]
     n_columns = phase_xcorr_array_xrf.shape[2]
+
+    n_slices_truncated = phase_xcorr_array_opt_dens_truncated.shape[0]
+    n_columns_truncated = phase_xcorr_array_opt_dens_truncated.shape[1]
+    
     
     fig, axs = plt.subplots(3, 2)
 
@@ -103,21 +108,74 @@ def create_phase_xcorr_fig(phase_xcorr_array_xrf,
     im1_2 = axs[1, 0].imshow((phase_xcorr_array_xrf[0]))
     im1_3 = axs[2, 0].imshow((phase_xcorr_array_xrf[1]))
     im1_4 = axs[0, 1].imshow((phase_xcorr_array_opt_dens_truncated), vmin = phase_xcorr_array_opt_dens.min())
-    im1_5 = axs[1, 1].imshow((phase_xcorr_array_xrf_truncated[0]), vmin = phase_xcorr_array_xrf[0].min())
-    im1_6 = axs[2, 1].imshow((phase_xcorr_array_xrf_truncated[1]), vmin = phase_xcorr_array_xrf[1].min())
-            
+    im1_5 = axs[1, 1].imshow((phase_xcorr_array_xrf_truncated[0]), vmin = phase_xcorr_array_xrf[0].min() + 0.015)
+    im1_6 = axs[2, 1].imshow((phase_xcorr_array_xrf_truncated[1]), vmin = phase_xcorr_array_xrf[1].min() + 0.01)
+
     for ax in fig.axes:
         ax.axis('off')
-        # axs.axvline(x = n_columns//2, color = 'red', linewidth = 2)
-        # axs.axhline(y = n_slices//2, color = 'red', linewidth = 2)
+        if ax == axs[0, 0] or ax == axs[1, 0] or ax == axs[2, 0]:
+            ax.vlines(x = n_columns//2, ymin = n_slices//2 - 15, ymax = n_slices//2 - 5, color = 'red', linewidth = 2)
+            ax.vlines(x = n_columns//2, ymin = n_slices//2 + 5, ymax = n_slices//2 + 15, color = 'red', linewidth = 2)
+            ax.hlines(y = n_slices//2, xmin = n_columns//2 - 15, xmax = n_columns//2 - 5, color = 'red', linewidth = 2)
+            ax.hlines(y = n_slices//2, xmin = n_columns//2 + 5, xmax = n_columns//2 + 15, color = 'red', linewidth = 2)
+        
+        else:
+            ax.vlines(x = n_columns_truncated//2, ymin = n_slices_truncated//2 - 15, ymax = n_slices_truncated//2 - 5, color = 'red', linewidth = 2)
+            ax.vlines(x = n_columns_truncated//2, ymin = n_slices_truncated//2 + 5, ymax = n_slices_truncated//2 + 15, color = 'red', linewidth = 2)
+            ax.hlines(y = n_slices_truncated//2, xmin = n_columns_truncated//2 - 15, xmax = n_columns_truncated//2 - 5, color = 'red', linewidth = 2)
+            ax.hlines(y = n_slices_truncated//2, xmin = n_columns_truncated//2 + 5, xmax = n_columns_truncated//2 + 15, color = 'red', linewidth = 2)
 
     axs[0, 0].set_title(r'Opt. Dens.', fontsize = 14)
     axs[1, 0].set_title(r'XRF ({0})'.format(element_array[0]), fontsize = 14)
     axs[2, 0].set_title(r'XRF ({0})'.format(element_array[1]), fontsize = 14) 
-    axs[0, 1].set_title(r'Opt. Dens (Tr.)', fontsize = 14)
+    axs[0, 1].set_title(r'Opt. Dens. (Tr.)', fontsize = 14)
     axs[1, 1].set_title(r'XRF ({0}) (Tr.)'.format(element_array[0]), fontsize = 14)
     axs[2, 1].set_title(r'XRF ({0}) (Tr.)'.format(element_array[1]), fontsize = 14)
 
+    text_1 = axs[1, 0].text(0.02, 0.02, r'$\theta = {0}^{{\circ}}, \theta^{{\prime}} = {1}^{{\circ}}$'.format(theta_array[0], theta_array[1]), transform = axs[1, 0].transAxes, color = 'white')
+    
+    return fig, axs
+
+def create_shifted_img_fig(counts_xrf,
+                           opt_dens,
+                           shifted_counts_xrf,
+                           shifted_opt_dens,
+                           desired_element_array):
+    
+    fig, axs = plt.subplots(3, 3)
+
+    n_slices = counts_xrf.shape[2]
+    n_columns = counts_xrf.shape[3]
+
+    axs[0, 0].imshow(opt_dens[0])
+    axs[1, 0].imshow(counts_xrf[0, 0])
+    axs[2, 0].imshow(counts_xrf[1, 0])
+    axs[0, 1].imshow(opt_dens[1])
+    axs[1, 1].imshow(counts_xrf[0, 1])
+    axs[2, 1].imshow(counts_xrf[1, 1])
+    axs[0, 2].imshow(shifted_opt_dens)
+    axs[1, 2].imshow(shifted_counts_xrf[0])
+    axs[2, 2].imshow(shifted_counts_xrf[1])
+
+    for ax in fig.axes:
+        ax.axis('off')
+        ax.axvline(x = n_columns//2, color = 'red', linewidth = 2)
+        ax.axhline(y = n_slices//2, color = 'red', linewidth = 2)
+
+    axs[0, 0].set_title(r'Opt. Dens.', fontsize = 14)
+    axs[1, 0].set_title(r'XRF ({0})'.format(desired_element_array[0]), fontsize = 14)
+    axs[2, 0].set_title(r'XRF ({0})'.format(desired_element_array[1]), fontsize = 14)
+    axs[0, 1].set_title(r'Opt. Dens. (Tr.)', fontsize = 14)
+    axs[1, 1].set_title(r'XRF ({0}) (Tr.)'.format(desired_element_array[0]), fontsize = 14)
+    axs[2, 1].set_title(r'XRF ({0}) (Tr.)'.format(desired_element_array[1]), fontsize = 14)
+    axs[0, 2].set_title(r'Sh. Opt. Dens.', fontsize = 14)
+    axs[1, 2].set_title(r'Sh. XRF ({0})'.format(desired_element_array[0]), fontsize = 14)
+    axs[2, 2].set_title(r'Sh. XRF ({0})'.format(desired_element_array[1]), fontsize = 14)
+
+    text_1 = axs[1, 0].text(0.02, 0.02, r'$\theta = {0}$\textdegree'.format(desired_theta_array[0]), transform = axs[1, 0].transAxes, color = 'white')
+    text_2 = axs[1, 1].text(0.02, 0.02, r'$\theta = {0}$\textdegree'.format(desired_theta_array[1]), transform = axs[1, 1].transAxes, color = 'white')
+    text_3 = axs[1, 2].text(0.02, 0.02, r'$\theta = {0}$\textdegree'.format(desired_theta_array[1]), transform = axs[1, 2].transAxes, color = 'white')
+    
     return fig, axs
 
 sigma = 25
@@ -161,8 +219,8 @@ counts_xrt_sig_idx = elements_xrt.index('xrt_sig')
 counts_xrt_sig = counts_xrt[counts_xrt_sig_idx]
 
 desired_elements_xrf = ['Ni', 'Cu']
-desired_theta = [-150, -147]
-# desired_theta = [45, 55]
+# desired_theta = [-150, -147]
+desired_theta = [45, 55]
 
 element_idx_array = []
 theta_idx_array = []
@@ -189,12 +247,13 @@ counts_xrf_norm_array = counts_xrf_norm[element_idx_array][:, theta_idx_array]
 
 phase_xcorr_array_xrf = np.zeros((len(desired_elements_xrf), n_slices, n_columns))
 
-phase_xcorr_opt_dens = phase_xcorr_manual(opt_dens[1], opt_dens[0], sigma, alpha)
+phase_xcorr_opt_dens = phase_xcorr_manual(opt_dens[0], opt_dens[1], sigma, alpha)
 
 for element_idx in range(len(desired_elements_xrf)):
     phase_xcorr_array_xrf[element_idx] = phase_xcorr_manual(counts_xrf_norm_array[element_idx, 0], counts_xrf_norm_array[element_idx, 1], sigma, alpha)
 
-pixel_rad = 35
+# pixel_rad = 35
+pixel_rad = 5
 
 dy_xrf_array = np.zeros(len(desired_elements_xrf))
 phase_xcorr_array_xrf_truncated = np.zeros((len(desired_elements_xrf), 2 * pixel_rad, 2 * pixel_rad))
@@ -216,13 +275,16 @@ print('\n')
 print(dy_xrf_array)
 print(dy_opt_dens)
 
-# shifted_counts_xrf_norm_array = np.zeros_like(counts_xrf_norm_array)
-# shifted_opt_dens = np.zeros_like(opt_dens)
+shifted_counts_xrf_norm_array = np.zeros((len(desired_elements_xrf), n_slices, n_columns))
+shifted_opt_dens = np.zeros((n_slices, n_columns))
 
-# shifted_counts_xrf_norm_array[:, 0] = counts_xrf_norm_array[:, 0]
-# shifted_opt_dens[0] = opt_dens[0]
+for element_idx in range(len(desired_elements_xrf)):
+    shifted_counts_xrf_norm_array[element_idx] = ndi.shift(counts_xrf_norm_array[element_idx, 1], shift = (dy_xrf_array[element_idx], 0))
+
+shifted_opt_dens = ndi.shift(opt_dens[1], shift = (dy_opt_dens, 0))
 
 fig1, axs1 = create_raw_img_fig(opt_dens, counts_xrf_norm_array, desired_theta_array, desired_element_array)
-fig2, axs2 = create_phase_xcorr_fig(phase_xcorr_array_xrf, phase_xcorr_array_xrf_truncated, phase_xcorr_opt_dens, phase_xcorr_opt_dens_truncated, desired_element_array)
+fig2, axs2 = create_phase_xcorr_fig(phase_xcorr_array_xrf, phase_xcorr_array_xrf_truncated, phase_xcorr_opt_dens, phase_xcorr_opt_dens_truncated, desired_element_array, desired_theta_array)
+fig3, axs3 = create_shifted_img_fig(counts_xrf_norm_array, opt_dens, shifted_counts_xrf_norm_array, shifted_opt_dens, desired_element_array)
 
 plt.show()
