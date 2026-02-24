@@ -46,7 +46,7 @@ def xcorr_vert_parabolic_fit(xcorr_img, pixel_rad):
     pcc_max_idx_remapped = start_slice_idx + pcc_max_idx[0] + subpix_shift
     print(pcc_max_idx_remapped)
 
-    dy = center_slice_idx - pcc_max_idx_remapped
+    dy = pcc_max_idx_remapped - center_slice_idx
     
     return xcorr_img_truncated, dy
 
@@ -201,13 +201,14 @@ for element_idx in range(len(desired_elements_xrf)):
 
 phase_xcorr_opt_dens_truncated, dy_opt_dens = xcorr_vert_parabolic_fit(phase_xcorr_opt_dens, pixel_rad)
 
-dy_pcc_od, _, _ = reg.phase_cross_correlation(opt_dens[0], opt_dens[1], upsample_factor = 100)
 dy_pcc_xrf_1, _, _ = reg.phase_cross_correlation(counts_xrf_norm_array[0, 0], counts_xrf_norm_array[0, 1], upsample_factor = 100)
 dy_pcc_xrf_2, _, _ = reg.phase_cross_correlation(counts_xrf_norm_array[1, 0], counts_xrf_norm_array[1, 1], upsample_factor = 100)
+dy_pcc_od, _, _ = reg.phase_cross_correlation(opt_dens[0], opt_dens[1], upsample_factor = 100)
 
-print(dy_pcc_od[0])
+
 print(dy_pcc_xrf_1[0])
 print(dy_pcc_xrf_2[0])
+print(dy_pcc_od[0])
 print('\n')
 print(dy_xrf_array)
 print(dy_opt_dens)
