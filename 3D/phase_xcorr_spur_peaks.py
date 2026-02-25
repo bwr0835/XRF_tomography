@@ -6,6 +6,7 @@ import numpy as np, \
 from scipy import fft, ndimage as ndi
 from matplotlib import pyplot as plt
 from skimage import registration as reg
+from imageio import v2 as iio2
 
 def phase_xcorr_manual(ref_img, mov_img, sigma, alpha):    
     n_slices = ref_img.shape[0]
@@ -22,6 +23,9 @@ def phase_xcorr_manual(ref_img, mov_img, sigma, alpha):
     return fft.fftshift(phase_xcorr)
 
 def xcorr_vert_parabolic_fit(xcorr_img, pixel_rad):
+    pixel_rad = int(np.atleast_1d(pixel_rad).flat[0])  # ensure scalar
+    pixel_rad = max(pixel_rad, 2)  # need at least 4x4 truncated region
+
     center_slice_idx = xcorr_img.shape[0]//2
     center_column_idx = xcorr_img.shape[1]//2
 
@@ -35,38 +39,57 @@ def xcorr_vert_parabolic_fit(xcorr_img, pixel_rad):
 
     pcc_max_idx = np.unravel_index(np.argmax(xcorr_img_truncated), xcorr_img_truncated.shape)
 
-    pcc_p = xcorr_img_truncated[pcc_max_idx[0] + 1, pcc_max_idx[1]]
-    pcc_0 = xcorr_img_truncated[pcc_max_idx[0], pcc_max_idx[1]]
-    pcc_n = xcorr_img_truncated[pcc_max_idx[0] - 1, pcc_max_idx[1]]
+    n_rows = xcorr_img_truncated.shape[0]
+
+    if pcc_max_idx[0] + 1 < n_rows and pcc_max_idx[0] - 1 >= 0:
+        pcc_p = xcorr_img_truncated[pcc_max_idx[0] + 1, pcc_max_idx[1]]
+        pcc_0 = xcorr_img_truncated[pcc_max_idx[0], pcc_max_idx[1]]
+        pcc_n = xcorr_img_truncated[pcc_max_idx[0] - 1, pcc_max_idx[1]]
+        
+        denom = pcc_p + pcc_n - 2*pcc_0
+        
+        subpix_shift = -0.5*(pcc_p - pcc_n)/denom
+        
+        if not np.isfinite(subpix_shift):
+            print('Warning: Subpixel shift is not finite. Returning 0 for subpixel shift.')
+            
+            subpix_shift = 0
     
-    subpix_shift = -0.5*(pcc_p - pcc_n)/(pcc_p + pcc_n - 2*pcc_0)
+    else:
+        print('Warning: Parabolic fit failed (The peak is at an edge or corner of the truncated region). Returning 0 for subpixel shift.')
+        
+        subpix_shift = 0
     # print(start_slice_idx)
     # print(subpix_shift)
-    print(pcc_max_idx[0])
+    # print(pcc_max_idx[0])
     pcc_max_idx_remapped = start_slice_idx + pcc_max_idx[0] + subpix_shift
-    print(pcc_max_idx_remapped)
+    # print(pcc_max_idx_remapped)
 
     # Match skimage convention: shift = peak - center (negate vs center-peak).
     dy = pcc_max_idx_remapped - center_slice_idx
     
     return xcorr_img_truncated, dy
 
-def create_raw_img_fig(opt_dens,
-                         counts_xrf, 
-                         theta_array, 
-                         element_array):
+def create_raw_img_fig(dir_path,
+                       opt_dens,
+                       counts_xrf_array, 
+                       theta_array, 
+                       element_array,
+                       sigma,
+                       alpha,
+                       fps):
     
     fig, axs = plt.subplots(3, 2)
     
     n_slices = opt_dens.shape[1]
     n_columns = opt_dens.shape[2]
     
-    im1_1 = axs[0, 0].imshow(opt_dens[0])
-    im1_2 = axs[1, 0].imshow(counts_xrf[0, 0])
-    im1_3 = axs[2, 0].imshow(counts_xrf[1, 0])
-    im1_4 = axs[0, 1].imshow(opt_dens[1])
-    im1_5 = axs[1, 1].imshow(counts_xrf[0, 1])
-    im1_6 = axs[2, 1].imshow(counts_xrf[1, 1])
+    im1_1 = axs[0, 0].imshow(opt_dens[0], vmin = opt_dens.min(), vmax = opt_dens.max())
+    im1_2 = axs[1, 0].imshow(counts_xrf[0, 0], vmin = counts_xrf[0].min(), vmax = counts_xrf[0].max())
+    im1_3 = axs[2, 0].imshow(counts_xrf[1, 0], vmin = counts_xrf[1].min(), vmax = counts_xrf[1].max())
+    im1_4 = axs[0, 1].imshow(opt_dens[1], vmin = opt_dens.min(), vmax = opt_dens.max())
+    im1_5 = axs[1, 1].imshow(counts_xrf[0, 1], vmin = counts_xrf[0].min(), vmax = counts_xrf[0].max())
+    im1_6 = axs[2, 1].imshow(counts_xrf[1, 1], vmin = counts_xrf[1].min(), vmax = counts_xrf[1].max())
 
     for ax in fig.axes:
         ax.axis('off')
@@ -83,47 +106,76 @@ def create_raw_img_fig(opt_dens,
     axs[1, 1].set_title(r'XRF ({0})'.format(element_array[0]), fontsize = 14)
     axs[2, 1].set_title(r'XRF ({0})'.format(element_array[1]), fontsize = 14)
 
-    return fig, axs
+    theta_frames = []
 
-def create_phase_xcorr_fig(phase_xcorr_array_xrf,
+    for theta_idx in range(1, n_theta):
+        im1_1.set_data(opt_dens[theta_idx - 1])
+        im1_2.set_data(counts_xrf_array[0, theta_idx - 1])
+        im1_3.set_data(counts_xrf_array[1, theta_idx - 1])
+        im1_4.set_data(opt_dens[theta_idx])
+        im1_5.set_data(counts_xrf_array[0, theta_idx])
+        im1_6.set_data(counts_xrf_array[1, theta_idx])
+
+        text_1.set_text(r'$\theta = {0}$\textdegree'.format(theta_array[theta_idx - 1]))
+        text_2.set_text(r'$\theta = {0}$\textdegree'.format(theta_array[theta_idx]))
+
+        fig.canvas.draw()
+
+        frame1 = np.array(fig.canvas.renderer.buffer_rgba())[:, :, :3]
+
+        theta_frames.append(frame1)
+    
+    plt.close(fig)
+
+    gif_filename = os.path.join(dir_path, f'raw_img_comp_sigma_{sigma}_alpha_{alpha}.gif')
+
+    iio2.mimsave(gif_filename, theta_frames, fps = fps)
+
+    return
+
+def create_phase_xcorr_fig(dir_path,
+                           phase_xcorr_array_xrf,
                            phase_xcorr_array_xrf_truncated,
                            phase_xcorr_array_opt_dens, 
                            phase_xcorr_array_opt_dens_truncated,
                            element_array,
-                           theta_array):
+                           theta_array,
+                           sigma,
+                           alpha,
+                           fps):
     
-    n_slices = phase_xcorr_array_xrf.shape[1]
-    n_columns = phase_xcorr_array_xrf.shape[2]
+    n_elements = phase_xcorr_array_xrf.shape[0]
+    n_theta_angles = phase_xcorr_array_xrf.shape[1]
+    n_slices = phase_xcorr_array_xrf.shape[2]
+    n_columns = phase_xcorr_array_xrf.shape[3]
 
-    n_slices_truncated = phase_xcorr_array_opt_dens_truncated.shape[0]
-    n_columns_truncated = phase_xcorr_array_opt_dens_truncated.shape[1]
+    # n_slices_truncated = phase_xcorr_array_opt_dens_truncated.shape[0]
+    # n_columns_truncated = phase_xcorr_array_opt_dens_truncated.shape[1]
     
     
     fig, axs = plt.subplots(3, 2)
 
-    # im1_1 = axs[0].imshow(np.log10(phase_xcorr_array_opt_dens), vmin = np.log10(phase_xcorr_array_opt_dens.min()))
-    # im1_2 = axs[1].imshow(np.log10(phase_xcorr_array_xrf[0]), vmin = np.log10(phase_xcorr_array_xrf[0].min()))
-    # im1_3 = axs[2].imshow(np.log10(phase_xcorr_array_xrf[1]), vmin = np.log10(phase_xcorr_array_xrf[1].min()))
-    im1_1 = axs[0, 0].imshow((phase_xcorr_array_opt_dens))
-    im1_2 = axs[1, 0].imshow((phase_xcorr_array_xrf[0]))
-    im1_3 = axs[2, 0].imshow((phase_xcorr_array_xrf[1]))
-    im1_4 = axs[0, 1].imshow((phase_xcorr_array_opt_dens_truncated), vmin = phase_xcorr_array_opt_dens.min())
-    im1_5 = axs[1, 1].imshow((phase_xcorr_array_xrf_truncated[0]), vmin = phase_xcorr_array_xrf[0].min() + 0.015)
-    im1_6 = axs[2, 1].imshow((phase_xcorr_array_xrf_truncated[1]), vmin = phase_xcorr_array_xrf[1].min() + 0.01)
+    im1_1 = axs[0, 0].imshow((phase_xcorr_array_opt_dens[1]), vmin = phase_xcorr_array_opt_dens.min(), vmax = phase_xcorr_array_opt_dens.max())
+    im1_2 = axs[1, 0].imshow((phase_xcorr_array_xrf[0, 1]), vmin = phase_xcorr_array_xrf[0].min(), vmax = phase_xcorr_array_xrf[0].max())
+    im1_3 = axs[2, 0].imshow((phase_xcorr_array_xrf[1, 1]), vmin = phase_xcorr_array_xrf[1].min(), vmax = phase_xcorr_array_xrf[1].max())
+    im1_4 = axs[0, 1].imshow((phase_xcorr_array_opt_dens_truncated[0]), vmin = phase_xcorr_array_opt_dens.min(), vmax = phase_xcorr_array_opt_dens.max())
+    im1_5 = axs[1, 1].imshow((phase_xcorr_array_xrf_truncated[0]), vmin = phase_xcorr_array_xrf[0].min(), vmax = phase_xcorr_array_xrf[0].max())
+    im1_6 = axs[2, 1].imshow((phase_xcorr_array_xrf_truncated[n_theta_angles - 1]), vmin = phase_xcorr_array_xrf[1].min(), vmax = phase_xcorr_array_xrf[1].max())
 
     for ax in fig.axes:
         ax.axis('off')
+        
         if ax == axs[0, 0] or ax == axs[1, 0] or ax == axs[2, 0]:
             ax.vlines(x = n_columns//2, ymin = n_slices//2 - 15, ymax = n_slices//2 - 5, color = 'red', linewidth = 2)
             ax.vlines(x = n_columns//2, ymin = n_slices//2 + 5, ymax = n_slices//2 + 15, color = 'red', linewidth = 2)
             ax.hlines(y = n_slices//2, xmin = n_columns//2 - 15, xmax = n_columns//2 - 5, color = 'red', linewidth = 2)
             ax.hlines(y = n_slices//2, xmin = n_columns//2 + 5, xmax = n_columns//2 + 15, color = 'red', linewidth = 2)
         
-        else:
-            ax.vlines(x = n_columns_truncated//2, ymin = n_slices_truncated//2 - 15, ymax = n_slices_truncated//2 - 5, color = 'red', linewidth = 2)
-            ax.vlines(x = n_columns_truncated//2, ymin = n_slices_truncated//2 + 5, ymax = n_slices_truncated//2 + 15, color = 'red', linewidth = 2)
-            ax.hlines(y = n_slices_truncated//2, xmin = n_columns_truncated//2 - 15, xmax = n_columns_truncated//2 - 5, color = 'red', linewidth = 2)
-            ax.hlines(y = n_slices_truncated//2, xmin = n_columns_truncated//2 + 5, xmax = n_columns_truncated//2 + 15, color = 'red', linewidth = 2)
+        # else:
+            # ax.vlines(x = n_columns_truncated//2, ymin = n_slices_truncated//2 - 15, ymax = n_slices_truncated//2 - 5, color = 'red', linewidth = 2)
+            # ax.vlines(x = n_columns_truncated//2, ymin = n_slices_truncated//2 + 5, ymax = n_slices_truncated//2 + 15, color = 'red', linewidth = 2)
+            # ax.hlines(y = n_slices_truncated//2, xmin = n_columns_truncated//2 - 15, xmax = n_columns_truncated//2 - 5, color = 'red', linewidth = 2)
+            # ax.hlines(y = n_slices_truncated//2, xmin = n_columns_truncated//2 + 5, xmax = n_columns_truncated//2 + 15, color = 'red', linewidth = 2)
 
     axs[0, 0].set_title(r'Opt. Dens.', fontsize = 14)
     axs[1, 0].set_title(r'XRF ({0})'.format(element_array[0]), fontsize = 14)
@@ -134,28 +186,58 @@ def create_phase_xcorr_fig(phase_xcorr_array_xrf,
 
     text_1 = axs[1, 0].text(0.02, 0.02, r'$\theta = {0}^{{\circ}}, \theta^{{\prime}} = {1}^{{\circ}}$'.format(theta_array[0], theta_array[1]), transform = axs[1, 0].transAxes, color = 'white')
     
-    return fig, axs
+    theta_frames = []
 
-def create_shifted_img_fig(counts_xrf,
+    for theta_idx in range(1, n_theta_angles):
+        im1_1.set_data(phase_xcorr_array_opt_dens[theta_idx])
+        im1_2.set_data(phase_xcorr_array_xrf[0, theta_idx])
+        im1_3.set_data(phase_xcorr_array_xrf[1, theta_idx])
+        im1_4.set_data(phase_xcorr_array_opt_dens_truncated[theta_idx - 1])
+        im1_5.set_data(phase_xcorr_array_xrf_truncated[theta_idx - 1])
+        im1_6.set_data(phase_xcorr_array_xrf_truncated[theta_idx + n_theta_angles - 2])
+
+        text_1.set_text(r'$\theta = {0}^{{\circ}}, \theta^{{\prime}} = {1}^{{\circ}}$'.format(theta_array[theta_idx - 1], theta_array[theta_idx]))
+
+        fig.canvas.draw()
+
+        frame1 = np.array(fig.canvas.renderer.buffer_rgba())[:, :, :3]
+
+        theta_frames.append(frame1)
+
+    plt.close(fig)
+
+    gif_filename = os.path.join(dir_path, f'phase_xcorr_comp_sigma_{sigma}_alpha_{alpha}.gif')
+
+    iio2.mimsave(gif_filename, theta_frames, fps = fps)
+
+    return
+
+def create_shifted_img_fig(dir_path,
+                           counts_xrf,
                            opt_dens,
                            shifted_counts_xrf,
                            shifted_opt_dens,
-                           desired_element_array):
+                           desired_element_array,
+                           theta_array,
+                           sigma,
+                           alpha,
+                           fps):
     
     fig, axs = plt.subplots(3, 3)
 
+    n_theta = counts_xrf.shape[1]
     n_slices = counts_xrf.shape[2]
     n_columns = counts_xrf.shape[3]
 
-    axs[0, 0].imshow(opt_dens[0])
-    axs[1, 0].imshow(counts_xrf[0, 0])
-    axs[2, 0].imshow(counts_xrf[1, 0])
-    axs[0, 1].imshow(opt_dens[1])
-    axs[1, 1].imshow(counts_xrf[0, 1])
-    axs[2, 1].imshow(counts_xrf[1, 1])
-    axs[0, 2].imshow(shifted_opt_dens)
-    axs[1, 2].imshow(shifted_counts_xrf[0])
-    axs[2, 2].imshow(shifted_counts_xrf[1])
+    im1_1 = axs[0, 0].imshow(opt_dens[0])
+    im1_2 = axs[1, 0].imshow(counts_xrf[0, 0])
+    im1_3 = axs[2, 0].imshow(counts_xrf[1, 0])
+    im1_4 = axs[0, 1].imshow(opt_dens[1])
+    im1_5 = axs[1, 1].imshow(counts_xrf[0, 1])
+    im1_6 = axs[2, 1].imshow(counts_xrf[1, 1])
+    im1_7 = axs[0, 2].imshow(shifted_opt_dens[0])
+    im1_8 = axs[1, 2].imshow(shifted_counts_xrf[0, 0])
+    im1_9 = axs[2, 2].imshow(shifted_counts_xrf[1, 0])
 
     for ax in fig.axes:
         ax.axis('off')
@@ -172,17 +254,48 @@ def create_shifted_img_fig(counts_xrf,
     axs[1, 2].set_title(r'Sh. XRF ({0})'.format(desired_element_array[0]), fontsize = 14)
     axs[2, 2].set_title(r'Sh. XRF ({0})'.format(desired_element_array[1]), fontsize = 14)
 
-    text_1 = axs[1, 0].text(0.02, 0.02, r'$\theta = {0}$\textdegree'.format(desired_theta_array[0]), transform = axs[1, 0].transAxes, color = 'white')
-    text_2 = axs[1, 1].text(0.02, 0.02, r'$\theta = {0}$\textdegree'.format(desired_theta_array[1]), transform = axs[1, 1].transAxes, color = 'white')
-    text_3 = axs[1, 2].text(0.02, 0.02, r'$\theta = {0}$\textdegree'.format(desired_theta_array[1]), transform = axs[1, 2].transAxes, color = 'white')
+    text_1 = axs[1, 0].text(0.02, 0.02, r'$\theta = {0}$\textdegree'.format(theta_array[0]), transform = axs[1, 0].transAxes, color = 'white')
+    text_2 = axs[1, 1].text(0.02, 0.02, r'$\theta = {0}$\textdegree'.format(theta_array[1]), transform = axs[1, 1].transAxes, color = 'white')
+    text_3 = axs[1, 2].text(0.02, 0.02, r'$\theta = {0}$\textdegree'.format(theta_array[1]), transform = axs[1, 2].transAxes, color = 'white')
     
-    return fig, axs
+    theta_frames = []
+    
+    for theta_idx in range(1, n_theta):
+        im1_1.set_data(opt_dens[theta_idx - 1])
+        im1_2.set_data(counts_xrf[0, theta_idx - 1])
+        im1_3.set_data(counts_xrf[1, theta_idx - 1])
+        im1_4.set_data(opt_dens[theta_idx])
+        im1_5.set_data(counts_xrf[0, theta_idx])
+        im1_6.set_data(counts_xrf[1, theta_idx])
+        im1_7.set_data(shifted_opt_dens[theta_idx])
+        im1_8.set_data(shifted_counts_xrf[0, theta_idx])
+        im1_9.set_data(shifted_counts_xrf[1, theta_idx])
+        
+        text_1.set_text(r'$\theta = {0}$\textdegree'.format(theta_array[theta_idx - 1]))
+        text_2.set_text(r'$\theta = {0}$\textdegree'.format(theta_array[theta_idx]))
+        text_3.set_text(r'$\theta = {0}$\textdegree'.format(theta_array[theta_idx]))
+
+        fig.canvas.draw()
+
+        frame1 = np.array(fig.canvas.renderer.buffer_rgba())[:, :, :3]
+
+        theta_frames.append(frame1)
+    
+    plt.close(fig)
+
+    gif_filename = os.path.join(dir_path, f'shifted_img_comp_sigma_{sigma}_alpha_{alpha}.gif')
+
+    iio2.mimsave(gif_filename, theta_frames, fps = fps)
+
+    return
 
 sigma = 25
 alpha = 10
 
 aggregate_xrf_h5_file_path = '/Users/bwr0835/Documents/3_id_aggregate_xrf.h5'
 aggregate_xrt_h5_file_path = '/Users/bwr0835/Documents/3_id_aggregate_xrt.h5'
+
+dir_path = '/Users/bwr0835/Documents/3_id_realigned_data_02_10_2026'
 
 elements_xrf, counts_xrf, theta, _, dataset_type = futil.extract_h5_aggregate_xrf_data(aggregate_xrf_h5_file_path)
 elements_xrt, counts_xrt, theta_xrt, _, dataset_type = futil.extract_h5_aggregate_xrt_data(aggregate_xrt_h5_file_path)
@@ -237,54 +350,106 @@ for theta_idx in range(n_theta):
 desired_theta_array = theta_xrt[theta_idx_array]
 desired_element_array = [elements_xrf[i] for i in element_idx_array]
 
-print(desired_theta_array)
 counts_xrt_norm, counts_xrf_norm, norm_array, I0_cts = ppu.joint_fluct_norm(counts_xrt_sig,
                                                                             counts_xrf,
                                                                             xrt_data_percentile = 80)
 
-opt_dens = -np.log(counts_xrt_norm/I0_cts)[theta_idx_array]
-counts_xrf_norm_array = counts_xrf_norm[element_idx_array][:, theta_idx_array]
+opt_dens = -np.log(counts_xrt_norm/I0_cts)
+counts_xrf_norm_array = counts_xrf_norm[element_idx_array]
 
-phase_xcorr_array_xrf = np.zeros((len(desired_elements_xrf), n_slices, n_columns))
+phase_xcorr_array_opt_dens = np.zeros((n_theta, n_slices, n_columns))
+phase_xcorr_array_xrf = np.zeros((len(desired_elements_xrf), n_theta, n_slices, n_columns))
 
-phase_xcorr_opt_dens = phase_xcorr_manual(opt_dens[0], opt_dens[1], sigma, alpha)
+pixel_rad_array_xrf = np.full((len(desired_elements_xrf), n_theta), 15)
 
-for element_idx in range(len(desired_elements_xrf)):
-    phase_xcorr_array_xrf[element_idx] = phase_xcorr_manual(counts_xrf_norm_array[element_idx, 0], counts_xrf_norm_array[element_idx, 1], sigma, alpha)
+zero_theta_idx_array = np.where(theta == 0)[0]
+theta_147_idx = np.where(theta == -147)[0][0]
+theta_3_idx = np.where(theta == 3)[0][0]
+theta_135_idx = np.where(theta == -135)[0][0]
+theta_45_idx = np.where(theta == 45)[0][0]
+theta_55_idx = np.where(theta == 55)[0][0]
+theta_120_idx = np.where(theta == 120)[0][0]
 
-# pixel_rad = 35
-pixel_rad = 5
+pixel_rad_array_opt_dens = np.full(n_theta, 15)
+pixel_rad_array_opt_dens[[theta_147_idx, theta_3_idx]] = 35
+pixel_rad_array_opt_dens[[theta_135_idx, theta_45_idx, theta_55_idx, theta_120_idx, zero_theta_idx_array[1]]] = 5
 
-dy_xrf_array = np.zeros(len(desired_elements_xrf))
-phase_xcorr_array_xrf_truncated = np.zeros((len(desired_elements_xrf), 2 * pixel_rad, 2 * pixel_rad))
+pixel_rad_array_xrf[:, [theta_147_idx, theta_3_idx]] = 35
+pixel_rad_array_xrf[:, [theta_55_idx, theta_120_idx]] = 5
 
-for element_idx in range(len(desired_elements_xrf)):
-    phase_xcorr_array_xrf_truncated[element_idx], dy_xrf_array[element_idx] = xcorr_vert_parabolic_fit(phase_xcorr_array_xrf[element_idx], pixel_rad)
+dy_array_pcc = np.zeros(n_theta)
 
-phase_xcorr_opt_dens_truncated, dy_opt_dens = xcorr_vert_parabolic_fit(phase_xcorr_opt_dens, pixel_rad)
-
-dy_pcc_xrf_1, _, _ = reg.phase_cross_correlation(counts_xrf_norm_array[0, 0], counts_xrf_norm_array[0, 1], upsample_factor = 100)
-dy_pcc_xrf_2, _, _ = reg.phase_cross_correlation(counts_xrf_norm_array[1, 0], counts_xrf_norm_array[1, 1], upsample_factor = 100)
-dy_pcc_od, _, _ = reg.phase_cross_correlation(opt_dens[0], opt_dens[1], upsample_factor = 100)
-
-
-print(dy_pcc_xrf_1[0])
-print(dy_pcc_xrf_2[0])
-print(dy_pcc_od[0])
-print('\n')
-print(dy_xrf_array)
-print(dy_opt_dens)
-
-shifted_counts_xrf_norm_array = np.zeros((len(desired_elements_xrf), n_slices, n_columns))
-shifted_opt_dens = np.zeros((n_slices, n_columns))
+for theta_idx in range(1, n_theta):
+    phase_xcorr_array_opt_dens[theta_idx] = phase_xcorr_manual(counts_xrt_norm[theta_idx - 1], counts_xrt_norm[theta_idx], sigma, alpha)
 
 for element_idx in range(len(desired_elements_xrf)):
-    shifted_counts_xrf_norm_array[element_idx] = ndi.shift(counts_xrf_norm_array[element_idx, 1], shift = (dy_xrf_array[element_idx], 0))
+    for theta_idx in range(1, n_theta):
+        phase_xcorr_array_xrf[element_idx, theta_idx] = phase_xcorr_manual(counts_xrf_norm_array[element_idx, theta_idx - 1], counts_xrf_norm_array[element_idx, theta_idx], sigma, alpha)
 
-shifted_opt_dens = ndi.shift(opt_dens[1], shift = (dy_opt_dens, 0))
+dy_xrf_array = np.zeros((len(desired_elements_xrf), n_theta))
+dy_opt_dens_array = np.zeros(n_theta)
 
-fig1, axs1 = create_raw_img_fig(opt_dens, counts_xrf_norm_array, desired_theta_array, desired_element_array)
-fig2, axs2 = create_phase_xcorr_fig(phase_xcorr_array_xrf, phase_xcorr_array_xrf_truncated, phase_xcorr_opt_dens, phase_xcorr_opt_dens_truncated, desired_element_array, desired_theta_array)
-fig3, axs3 = create_shifted_img_fig(counts_xrf_norm_array, opt_dens, shifted_counts_xrf_norm_array, shifted_opt_dens, desired_element_array)
+phase_xcorr_array_xrf_truncated_list = []
+phase_xcorr_array_opt_dens_truncated_list = []
 
-plt.show()
+phase_corr_array_xrf_truncated_aggregate = np.zeros((2*pixel_rad_array_xrf.max(), 2*pixel_rad_array_xrf.max()))
+phase_corr_array_opt_dens_truncated_aggregate = np.zeros((2*pixel_rad_array_opt_dens.max(), 2*pixel_rad_array_opt_dens.max()))
+
+phase_corr_array_xrf_truncated_aggregate_midpt_idy, \
+phase_corr_array_xrf_truncated_aggregate_midpt_idx = phase_corr_array_opt_dens_truncated_aggregate.shape[0]//2, \
+                                                     phase_corr_array_opt_dens_truncated_aggregate.shape[1]//2
+
+for element_idx in range(len(desired_elements_xrf)):
+    for theta_idx in range(1, n_theta):
+        phase_xcorr_array_xrf_truncated, dy_xrf_array[element_idx, theta_idx] = xcorr_vert_parabolic_fit(phase_xcorr_array_xrf[element_idx, theta_idx], pixel_rad_array_xrf[element_idx, theta_idx])
+        
+        start_y = phase_corr_array_xrf_truncated_aggregate_midpt_idy - pixel_rad_array_xrf[element_idx, theta_idx]
+        start_x = phase_corr_array_xrf_truncated_aggregate_midpt_idx - pixel_rad_array_xrf[element_idx, theta_idx]
+
+        end_y = phase_corr_array_xrf_truncated_aggregate_midpt_idy + pixel_rad_array_xrf[element_idx, theta_idx]
+        end_x = phase_corr_array_xrf_truncated_aggregate_midpt_idx + pixel_rad_array_xrf[element_idx, theta_idx]
+        
+        phase_corr_array_xrf_truncated_aggregate[start_y:end_y, start_x:end_x] = phase_xcorr_array_xrf_truncated
+        
+        phase_xcorr_array_xrf_truncated_list.append(phase_xcorr_array_xrf_truncated)
+
+for theta_idx in range(1, n_theta):
+    phase_xcorr_array_opt_dens_truncated = np.zeros((2*pixel_rad_array_opt_dens[theta_idx], 2*pixel_rad_array_opt_dens[theta_idx]))
+    phase_xcorr_array_opt_dens_truncated, dy_opt_dens_array[theta_idx] = xcorr_vert_parabolic_fit(phase_xcorr_array_opt_dens[theta_idx], pixel_rad_array_opt_dens[theta_idx])
+    phase_xcorr_array_opt_dens_truncated_list.append(phase_xcorr_array_opt_dens_truncated)
+
+print(dy_array_pcc)
+print(dy_opt_dens_array)
+
+# dy_pcc_xrf_1, _, _ = reg.phase_cross_correlation(counts_xrf_norm_array[0, 0], counts_xrf_norm_array[0, 1], upsample_factor = 100)
+# dy_pcc_xrf_2, _, _ = reg.phase_cross_correlation(counts_xrf_norm_array[1, 0], counts_xrf_norm_array[1, 1], upsample_factor = 100)
+# dy_pcc_od, _, _ = reg.phase_cross_correlation(opt_dens[0], opt_dens[1], upsample_factor = 100)
+
+
+# print(dy_pcc_xrf_1[0])
+# print(dy_pcc_xrf_2[0])
+# print(dy_pcc_od[0])
+# print('\n')
+# print(dy_xrf_array)
+# print(dy_opt_dens)
+
+shifted_counts_xrf_norm_array = np.zeros((len(desired_elements_xrf), n_theta, n_slices, n_columns))
+shifted_opt_dens = np.zeros((n_theta, n_slices, n_columns))
+
+shifted_counts_xrf_norm_array[:, 0] = counts_xrf_norm_array[:, 0].copy()
+shifted_opt_dens[0] = opt_dens[0].copy()
+
+for element_idx in range(len(desired_elements_xrf)):
+    for theta_idx in range(1, n_theta):
+        shifted_counts_xrf_norm_array[element_idx, theta_idx] = ndi.shift(counts_xrf_norm_array[element_idx, theta_idx], shift = (dy_xrf_array[element_idx, theta_idx], 0))
+
+for theta_idx in range(1, n_theta):
+    shifted_opt_dens[theta_idx] = ndi.shift(opt_dens[theta_idx], shift = (dy_opt_dens_array[theta_idx], 0))
+
+fps = 10
+
+create_raw_img_fig(dir_path, opt_dens, counts_xrf_norm_array, theta, desired_element_array, sigma, alpha, fps)
+create_phase_xcorr_fig(dir_path, phase_xcorr_array_xrf, phase_xcorr_array_xrf_truncated_list, phase_xcorr_array_opt_dens, phase_xcorr_array_opt_dens_truncated_list, desired_element_array, theta, sigma, alpha, fps)
+create_shifted_img_fig(dir_path, counts_xrf_norm_array, opt_dens, shifted_counts_xrf_norm_array, shifted_opt_dens, desired_element_array, theta, sigma, alpha, fps)
+
+# plt.show()

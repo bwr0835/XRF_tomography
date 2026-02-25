@@ -9,6 +9,48 @@ from matplotlib import pyplot as plt
 from skimage import transform as xform, registration as reg
 from scipy import ndimage as ndi, fft
 
+def phase_xcorr_manual(ref_img, mov_img, sigma, alpha):
+    n_slices = ref_img.shape[0]
+    n_columns = ref_img.shape[1]
+    
+    ref_img_filtered = ppu.edge_gauss_filter(ref_img, sigma, alpha, nx = n_columns, ny = n_slices)
+    mov_img_filtered = ppu.edge_gauss_filter(mov_img, sigma, alpha, nx = n_columns, ny = n_slices)
+
+    ref_img_fft = fft.fft2(ref_img_filtered)
+    mov_img_fft = fft.fft2(mov_img_filtered)
+
+    phase_xcorr = np.abs(fft.ifft2(ref_img_fft*mov_img_fft.conjugate()/np.abs(ref_img_fft*mov_img_fft.conjugate())))
+
+    return fft.fftshift(phase_xcorr)
+
+def subpix_shift(phase_xcorr, pixel_rad):
+    n_slices = phase_xcorr.shape[0]
+    n_columns = phase_xcorr.shape[1]
+
+    center_slice_idx = n_slices//2
+    center_column_idx = n_columns//2
+
+    start_slice_idx = center_slice_idx - pixel_rad
+    end_slice_idx = center_slice_idx + pixel_rad
+
+    start_column_idx = center_column_idx - pixel_rad
+    end_column_idx = center_column_idx + pixel_rad
+
+    phase_xcorr_truncated = phase_xcorr[start_slice_idx:end_slice_idx, start_column_idx:end_column_idx]
+
+    pcc_max_idx = np.unravel_index(np.argmax(phase_xcorr_truncated), phase_xcorr_truncated.shape)
+
+    n_rows_truncated = phase_xcorr_truncated.shape[0]
+    
+
+        pcc_p = phase_xcorr_truncated[pcc_max_idx[0] + 1, pcc_max_idx[1]]
+        pcc_0 = phase_xcorr_truncated[pcc_max_idx[0], pcc_max_idx[1]]
+        pcc_n = phase_xcorr_truncated[pcc_max_idx[0] - 1, pcc_max_idx[1]]
+        denom = pcc_p + pcc_n - 2*pcc_0
+        subpix_shift = -0.5*(pcc_p - pcc_n)/denom if abs(denom) > 1e-10 else 0.0
+    else:
+        subpix_shift = 0.0
+
 def phase_xcorr(recon_proj,
                 exp_proj, 
                 sigma, 
