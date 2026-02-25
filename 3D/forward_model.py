@@ -100,9 +100,9 @@ class PPM(nn.Module):
             lac_cpu = self.lac
             P_minibatch_cpu = self.P_minibatch
 
-            print(f'lac shape: {lac_cpu.shape}')
-            print(f'P_minibatch shape: {P_minibatch_cpu.shape}')
-            print('P_minibatch min/max: ', P_minibatch_cpu.min().item(), P_minibatch_cpu.max().item())
+            # print(f'lac shape: {lac_cpu.shape}')
+            # print(f'P_minibatch shape: {P_minibatch_cpu.shape}')
+            # print('P_minibatch min/max: ', P_minibatch_cpu.min().item(), P_minibatch_cpu.max().item())
 
             voxel_idx_offset = self.p*self.n_voxel_minibatch
             
