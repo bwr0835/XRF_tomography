@@ -655,6 +655,9 @@ def reconstruct_jXRFT_tomography(sample_size_n = None,
                     XRF_loss_n_batch = tc.zeros(n_batch)
                     XRT_loss_n_batch = tc.zeros(n_batch)
                     total_loss_n_batch = tc.zeros(n_batch)
+                
+                if rank == 0:
+                    print_flush_root(rank, theta, save_stdout = False, print_terminal = True)
                     
                 for m in range(n_batch):                    
                     minibatch_ls = n_ranks*m + minibatch_ls_0  #dev, e.g. [5,6,7,8]
@@ -669,8 +672,6 @@ def reconstruct_jXRFT_tomography(sample_size_n = None,
                         P_minibatch = 0
                         n_det = 0
                     
-                    if rank == 0:
-                        print_flush_root(rank, theta, save_stdout = False, print_terminal = True)
 #                     stdout_options = {'output_folder': recon_path, 'save_stdout': True, 'print_terminal': False}
 #                     print_flush_all(rank, val=p * dia_len_n * minibatch_size * sample_size_n, output_file=f'P_start_idx_{rank}.csv', **stdout_options)
 #                     print_flush_all(rank, val=(p+1) * dia_len_n * minibatch_size * sample_size_n, output_file=f'P_end_idx_{rank}.csv', **stdout_options)
