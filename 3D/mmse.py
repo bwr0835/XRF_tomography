@@ -30,50 +30,53 @@ def create_recon_gif(dir_path, recon_array, desired_elements, element_array, fps
     n_slices = recon_array.shape[0]
 
     desired_elements_idx = [element_array.index(element) for element in desired_elements]
-
+    imgs = []
+    
     for idx, ax in enumerate(fig.axes):
         vmin = recon_array[desired_elements_idx[idx], :, 0].min()
         vmax = recon_array[desired_elements_idx[idx], :, 0].max()
 
-        ax.imshow(recon_array[desired_elements_idx[idx], :, 0], vmin = vmin, vmax = vmax)
+        img = ax.imshow(recon_array[desired_elements_idx[idx], :, 0], vmin = vmin, vmax = vmax)
         ax.axis('off')
         ax.set_title(r'{0}'.format(element_array[desired_elements_idx[idx]]))
+        
+        imgs.append(img)
 
     text = axs[0].text(0.02, 0.02, r'Slice index 0/{0}'.format(n_slices - 1), transform = axs[0].transAxes, color = 'white')
 
-    slice_frames = []
+    frames = []
     
     for slice_idx in range(n_slices):
-        for idx, ax in enumerate(fig.axes):
-            ax.set_data(recon_array[desired_elements_idx[idx], :, slice_idx])
+        for idx, img in enumerate(imgs):
+            img.set_data(recon_array[desired_elements_idx[idx], :, slice_idx])
 
         text.set_text(r'Slice index {0}/{1}'.format(slice_idx, n_slices - 1))
         
         fig.canvas.draw()
         
-        slice_frame = np.array(fig.canvas.renderer.buffer_rgba())[:, :, :3]
+        frame = np.array(fig.canvas.renderer.buffer_rgba())[:, :, :3]
         
-        slice_frames.append(slice_frame)
+        frames.append(frame)
     
     gif_filename = os.path.join(dir_path, f'recon_movie.gif')
     
-    iio2.mimsave(gif_filename, slice_frames, fps = fps)
+    iio2.mimsave(gif_filename, frames, fps = fps)
     
     plt.close(fig)
     
     return
 
 file_name = '/home/bwr0835/2_ide_realigned_data_02_12_2026_iter_reproj_cor_correction_only/model_change_mse_epoch.csv'
-recon_file_name = '/home/bwr0835/2_ide_realigned_data_02_12_2026_iter_reproj_cor_correction_only/grid_concentration.h5'
+recon_file_name = '/home/bwr0835/2_ide_realigned_data_02_12_2026_iter_reproj_cor_correction_only/2_ide_realigned_data_02_12_2026_iter_reproj_cor_correction_only/grid_concentration.h5'
 
-dir_path = '/home/bwr0835/2_ide_realigned_data_02_12_2026_iter_reproj_cor_correction_only'
+dir_path = '/home/bwr0835/2_ide_realigned_data_02_12_2026_iter_reproj_cor_correction_only/2_ide_realigned_data_02_12_2026_iter_reproj_cor_correction_only'
 
 mmse_array = np.loadtxt(file_name, delimiter = ',')
 densities, elements = futil.extract_h5_post_recon_data_non_mpi(recon_file_name)
 
-desired_elements = ['Si', 'Fe', 'Ba']
+desired_elements = ['Si', 'Fe', 'Ba_L']
 
-create_recon_gif(dir_path, densities, desired_elements, list(elements), fps = 10)
+create_recon_gif(dir_path, densities, desired_elements, elements, fps = 10)
 
 fig, axs = create_mmse_plot(mmse_array[:, 1])
 
