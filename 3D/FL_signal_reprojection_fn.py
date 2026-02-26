@@ -215,7 +215,7 @@ def generate_reconstructed_FL_signal(dev, use_simulation_sample, simulation_prob
             
             y1_hat, y2_hat = model() #y1_hat dimension: (n_lines, minibatch_size); y2_hat dimension: (minibatch_size,)
             y1_hat = np.clip(y1_hat.detach().numpy(), 0, np.inf)
-            y2_hat = np.exp(- y2_hat.detach().numpy())
+            y2_hat = np.exp(-y2_hat.detach().numpy())
             
             #### Use mpi to write the generated dataset to the hdf5 file
             with h5py.File(os.path.join(recon_path, f_reconstructed_XRF_signal +'.h5'), 'r+', driver='mpio', comm=comm) as d:

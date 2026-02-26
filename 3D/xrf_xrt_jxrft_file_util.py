@@ -3,7 +3,8 @@ import numpy as np, \
        xrf_xrt_input_param_names as ipn, \
        h5py, \
        ast, \
-       os
+       os, \
+       sys
 
 from mpi4py import MPI
 from util import find_lines_roi_idx_from_dataset
@@ -197,29 +198,81 @@ def extract_h5_aggregate_xrf_xrt_data(file_path, opt_dens_enabled, **kwargs):
 
     if element_lines_roi is not None:
         element_lines_roi_idx = find_lines_roi_idx_from_dataset(elements_xrf, element_lines_roi)
-    #     _element_lines_roi = np.array(element_lines_roi)
-        
-    #     for element_line in _element_lines_roi:
-    #         if element_line[1] == 'K':
-    #             element_lines_roi_idx = np.argwhere(elements_xrf == element_line[0])[0, 0]
-            
-    #         else:
-    #             element_lines_roi_idx = np.argwhere(elements_xrf == element_line[0] + '_' + element_line[1])[0]
-        
+
         xrf_data_roi = xrf_data[element_lines_roi_idx]
     
     else:
         xrf_data_roi = xrf_data
 
     if opt_dens_enabled:
-        # xrt_data_idx = elements_xrt.index('opt_dens')
         xrt_data_idx = np.argwhere(elements_xrt == 'opt_dens')[0, 0]
         opt_dens = xrt_data[xrt_data_idx]
 
         return xrf_data_roi, opt_dens, theta
     
-    # xrt_data_idx = elements_xrt.index('xrt_sig')
     xrt_data_idx = np.argwhere(elements_xrt == 'xrt_sig')[0, 0]
     xrt_sig = xrt_data[xrt_data_idx]
 
     return xrf_data_roi, xrt_sig, theta
+
+def extract_h5_post_recon_data_mpi(file_path):
+    comm, n_ranks, rank = get_mpi()
+
+    if not os.path.isfile(file_path):
+        print('Error: Cannot locate post-reconstruction HDF5 file. Exiting program...', flush = True)
+
+        comm.Abort(1)
+    
+    if not file_path.endswith('.h5'):
+        print('Error: Post-reconstruction file extension must be \'.h5\'. Exiting program...', flush = True)
+
+        comm.Abort(1)
+    
+    try:
+        with h5py.File(file_path, 'r') as h5:
+            sample = h5['sample']
+            
+            densities = sample['densities'][()]
+            elements = sample['elements'].asstr()[:]
+    
+    except KeyboardInterrupt:
+        print('Keyboard interrupt. Exiting program...', flush = True)
+
+        comm.Abort(1)
+    
+    except:
+        print('Error: Incorrect post-reconstruction HDF5 file structure. Exiting program...')
+
+        comm.Abort(1)
+
+    return densities, elements
+
+def extract_h5_post_recon_data_non_mpi(file_path):
+    if not os.path.isfile(file_path):
+        print('Error: Cannot locate post-reconstruction HDF5 file. Exiting program...', flush = True)
+
+        sys.exit()
+    
+    if not file_path.endswith('.h5'):
+        print('Error: Post-reconstruction file extension must be \'.h5\'. Exiting program...', flush = True)
+
+        sys.exit()
+    
+    try:
+        with h5py.File(file_path, 'r') as h5:
+            sample = h5['sample']
+        
+            densities = sample['densities'][()]
+            elements = sample['elements'].asstr()[:]
+    
+    except KeyboardInterrupt:
+        print('Keyboard interrupt. Exiting program...')
+
+        sys.exit()
+    
+    except:
+        print('Error: Incorrect post-reconstruction HDF5 file structure. Exiting program...')
+
+        sys.exit()
+
+    return densities, elements
