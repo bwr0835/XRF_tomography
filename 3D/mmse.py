@@ -10,3 +10,6 @@ plt.plot(mmse_array[:, 1])
 plt.xlabel('Epoch')
 plt.ylabel('MMSE')
 plt.show()
+
+a = np.array([1, 2, 3, 4, 5])
+print()

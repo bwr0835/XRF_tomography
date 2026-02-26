@@ -8,11 +8,16 @@ import numpy as np, \
 from mpi4py import MPI
 from util import find_lines_roi_idx_from_dataset
 
-comm = MPI.COMM_WORLD
-n_ranks = comm.Get_size()
-rank = comm.Get_rank()
+def get_mpi():
+    comm = MPI.COMM_WORLD
+    n_ranks = comm.Get_size()
+    rank = comm.Get_rank()
+
+    return comm, n_ranks, rank
 
 def extract_csv_input_jxrft_recon_params(file_path, fluor_lines, dev):
+    comm, n_ranks, rank = get_mpi()
+    
     if not os.path.isfile(file_path):
         print('Error: Cannot locate input file path. Exiting program...', flush = True)
 
@@ -157,13 +162,15 @@ def extract_csv_input_jxrft_recon_params(file_path, fluor_lines, dev):
     return input_param_dict
 
 def extract_h5_aggregate_xrf_xrt_data(file_path, opt_dens_enabled, **kwargs):
+    comm, n_ranks, rank = get_mpi()
+
     if not os.path.isfile(file_path):
         print('Error: Cannot locate aggregate XRF, XRT HDF5 file. Exiting program...', flush = True)
 
         comm.Abort(1)
     
     if not file_path.endswith('.h5'):
-        print(rank, 'Error: Aggregate XRF, XRT file extension must be \'.h5\'. Exiting program...', flush = True)
+        print('Error: Aggregate XRF, XRT file extension must be \'.h5\'. Exiting program...', flush = True)
 
         comm.Abort(1)
     
@@ -177,12 +184,12 @@ def extract_h5_aggregate_xrf_xrt_data(file_path, opt_dens_enabled, **kwargs):
             theta = h5['exchange/theta'][()]
     
     except KeyboardInterrupt:
-        print(rank, 'Keyboard interrupt. Exiting program...', flush = True)
+        print('Keyboard interrupt. Exiting program...', flush = True)
 
         comm.Abort(1)
     
     except:
-        print(rank, 'Error: Incorrect HDF5 file structure. Exiting program...', flush = True)
+        print('Error: Incorrect HDF5 file structure. Exiting program...', flush = True)
 
         comm.Abort(1)
 

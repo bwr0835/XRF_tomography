@@ -1,10 +1,10 @@
 import numpy as np, \
        xrf_xrt_preprocess_file_util as futil, \
        xrf_xrt_preprocess_utils as ppu, \
+       realignment_final as realign, \
        sys, \
        os
 
-from realignment_final import realign_proj as rap
 from matplotlib import pyplot as plt
 
 plt.rcParams['text.usetex'] = True
@@ -32,12 +32,13 @@ def preprocess_xrf_xrt_data(synchrotron,
                             return_aux_data,
                             I0_cts_per_s,
                             t_dwell_s,
+                            aligning_element,
+                            pre_cor_correction_vert_jitter_correction_only_enabled,
                             init_edge_crop_enabled,
                             init_edge_pixel_lengths_to_crop,
                             realignment_enabled,
                             cor_correction_only,
                             n_iter_iter_reproj,
-                            # zero_idx_to_discard,
                             sample_flipped_remounted_mid_experiment,
                             n_iterations_cor_correction,
                             eps_cor_correction,
@@ -189,7 +190,7 @@ def preprocess_xrf_xrt_data(synchrotron,
 
             counts_xrf_norm = counts_xrf*norm_array[None, :, None, None]
             counts_xrt_norm = counts_xrt_sig*norm_array[:, None, None]
-                
+
         else:
             net_x_shift_array = np.zeros(n_theta)
             net_y_shift_array = np.zeros(n_theta)
@@ -236,6 +237,12 @@ def preprocess_xrf_xrt_data(synchrotron,
     os.makedirs(xrt_od_xrf_realignment_subdir_path, exist_ok = True)
 
     if realignment_enabled:
+        if pre_cor_correction_vert_jitter_correction_only_enabled:
+            print('Calculating required shifts for vertical jitter correction pre-center of rotation error correction...')
+            
+            if aligning_element == 'opt_dens':
+                net_y_shifts_pcc_aux, _ = realign.correct_adjacent_angle_jitter(opt_dens_norm, net_y_shifts_pcc, sigma, alpha, pixel_rad = None, return_aux_data = True)
+
         if init_edge_crop_enabled:
             print('Creating auxilliary cropped XRF, optical density projection images...')
 
@@ -271,28 +278,28 @@ def preprocess_xrf_xrt_data(synchrotron,
                 net_x_shifts_pcc_array, \
                 net_y_shifts_pcc_array, \
                 dx_pcc_array, \
-                dy_pcc_array = rap(cor_correction_only,
-                                   counts_xrt_norm,
-                                   init_cropped_xrt_array,
-                                   opt_dens_norm,
-                                   init_cropped_opt_dens_array,
-                                   counts_xrf_norm,
-                                   init_cropped_xrf_array,
-                                   theta,
-                                #    zero_idx_to_discard,
-                                   sample_flipped_remounted_mid_experiment,
-                                   n_iterations_cor_correction,
-                                   eps_cor_correction,
-                                   I0_cts,
-                                   n_iter_iter_reproj,
-                                   net_x_shift_array,
-                                   net_y_shift_array,
-                                   sigma,
-                                   alpha,
-                                   upsample_factor,
-                                   eps_iter_reproj,
-                                   init_edge_pixel_lengths_to_crop,
-                                   return_aux_data = True)
+                dy_pcc_array = realign.realign_proj(cor_correction_only,
+                                                    counts_xrt_norm,
+                                                    init_cropped_xrt_array,
+                                                    opt_dens_norm,
+                                                    init_cropped_opt_dens_array,
+                                                    counts_xrf_norm,
+                                                    init_cropped_xrf_array,
+                                                    theta,
+                                                    #    zero_idx_to_discard,
+                                                    sample_flipped_remounted_mid_experiment,
+                                                    n_iterations_cor_correction,
+                                                    eps_cor_correction,
+                                                    I0_cts,
+                                                    n_iter_iter_reproj,
+                                                    net_x_shift_array,
+                                                    net_y_shift_array,
+                                                    sigma,
+                                                    alpha,
+                                                    upsample_factor,
+                                                    eps_iter_reproj,
+                                                    init_edge_pixel_lengths_to_crop,
+                                                    return_aux_data = True)
             
             else:
                 aligned_proj_final_xrt_sig, \
@@ -307,28 +314,28 @@ def preprocess_xrf_xrt_data(synchrotron,
                 net_x_shifts_pcc_array, \
                 net_y_shifts_pcc_array, \
                 dx_pcc_array, \
-                dy_pcc_array = rap(cor_correction_only,
-                                   counts_xrt_norm,
-                                   init_cropped_xrt_array,
-                                   opt_dens_norm,
-                                   init_cropped_opt_dens_array,
-                                   counts_xrf_norm,
-                                   init_cropped_xrf_array,
-                                   theta,
-                                #    zero_idx_to_discard,
-                                   sample_flipped_remounted_mid_experiment,
-                                   n_iterations_cor_correction,
-                                   eps_cor_correction,
-                                   I0_cts,
-                                   n_iter_iter_reproj,
-                                   net_x_shift_array,
-                                   net_y_shift_array,
-                                   sigma,
-                                   alpha,
-                                   upsample_factor,
-                                   eps_iter_reproj,
-                                   init_edge_pixel_lengths_to_crop,
-                                   return_aux_data = True)
+                dy_pcc_array = realign.realign_proj(cor_correction_only,
+                                                    counts_xrt_norm,
+                                                    init_cropped_xrt_array,
+                                                    opt_dens_norm,
+                                                    init_cropped_opt_dens_array,
+                                                    counts_xrf_norm,
+                                                    init_cropped_xrf_array,
+                                                    theta,
+                                                    #    zero_idx_to_discard,
+                                                    sample_flipped_remounted_mid_experiment,
+                                                    n_iterations_cor_correction,
+                                                    eps_cor_correction,
+                                                    I0_cts,
+                                                    n_iter_iter_reproj,
+                                                    net_x_shift_array,
+                                                    net_y_shift_array,
+                                                    sigma,
+                                                    alpha,
+                                                    upsample_factor,
+                                                    eps_iter_reproj,
+                                                    init_edge_pixel_lengths_to_crop,
+                                                    return_aux_data = True)
 
             print('Writing the following auxiliary, per-iteration data to NumPy (.npy) files (NOTE: Python is needed to view these!):')
 
@@ -380,26 +387,26 @@ def preprocess_xrf_xrt_data(synchrotron,
             aligned_proj_final_opt_dens, \
             aligned_proj_final_xrf, \
             net_x_shifts_pcc_final, \
-            net_y_shifts_pcc_final = rap(cor_correction_only,
-                                         counts_xrt_norm,
-                                         init_cropped_xrt_array,
-                                         opt_dens_norm,
-                                         init_cropped_opt_dens_array,
-                                         counts_xrf_norm,
-                                         init_cropped_xrf_array,
-                                         theta,
-                                        #  zero_idx_to_discard,
-                                         sample_flipped_remounted_mid_experiment,
-                                         n_iterations_cor_correction,
-                                         eps_cor_correction,
-                                         I0_cts,
-                                         n_iter_iter_reproj,
-                                         net_x_shift_array,
-                                         net_y_shift_array,
-                                         sigma,
-                                         alpha,
-                                         upsample_factor,
-                                         eps_iter_reproj)
+            net_y_shifts_pcc_final = realign.realign_proj(cor_correction_only,
+                                                          counts_xrt_norm,
+                                                          init_cropped_xrt_array,
+                                                          opt_dens_norm,
+                                                          init_cropped_opt_dens_array,
+                                                          counts_xrf_norm,
+                                                          init_cropped_xrf_array,
+                                                          theta,
+                                                         #  zero_idx_to_discard,
+                                                          sample_flipped_remounted_mid_experiment,
+                                                          n_iterations_cor_correction,
+                                                          eps_cor_correction,
+                                                          I0_cts,
+                                                          n_iter_iter_reproj,
+                                                          net_x_shift_array,
+                                                          net_y_shift_array,
+                                                          sigma,
+                                                          alpha,
+                                                          upsample_factor,
+                                                          eps_iter_reproj)
 
         if final_edge_crop_enabled:
             if final_edge_pixel_lengths_to_crop is None:

@@ -1,6 +1,6 @@
-import numpy as np, tkinter as tk, os, re
+import numpy as np, tkinter as tk, os
 
-from matplotlib import pyplot as plt, animation as anim
+from matplotlib import pyplot as plt
 from tkinter import filedialog
 from numpy.fft import fftshift
 

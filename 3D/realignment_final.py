@@ -9,7 +9,12 @@ from matplotlib import pyplot as plt
 from skimage import transform as xform, registration as reg
 from scipy import ndimage as ndi, fft
 
-def phase_xcorr_manual(ref_img, mov_img, sigma, alpha):
+def phase_xcorr_manual(ref_img,
+                       mov_img, 
+                       sigma, 
+                       alpha, 
+                       pixel_rad):
+    
     n_slices = ref_img.shape[0]
     n_columns = ref_img.shape[1]
     
@@ -19,140 +24,140 @@ def phase_xcorr_manual(ref_img, mov_img, sigma, alpha):
     ref_img_fft = fft.fft2(ref_img_filtered)
     mov_img_fft = fft.fft2(mov_img_filtered)
 
-    phase_xcorr = np.abs(fft.ifft2(ref_img_fft*mov_img_fft.conjugate()/np.abs(ref_img_fft*mov_img_fft.conjugate())))
-
-    return fft.fftshift(phase_xcorr)
-
-def subpix_shift(phase_xcorr, pixel_rad):
-    n_slices = phase_xcorr.shape[0]
-    n_columns = phase_xcorr.shape[1]
+    phase_xcorr = fft.fftshift(np.abs(fft.ifft2(ref_img_fft*mov_img_fft.conjugate()/np.abs(ref_img_fft*mov_img_fft.conjugate()))))
 
     center_slice_idx = n_slices//2
     center_column_idx = n_columns//2
 
-    start_slice_idx = center_slice_idx - pixel_rad
-    end_slice_idx = center_slice_idx + pixel_rad
+    if pixel_rad > 0:
+        start_slice_idx = center_slice_idx - pixel_rad
+        end_slice_idx = center_slice_idx + pixel_rad
 
-    start_column_idx = center_column_idx - pixel_rad
-    end_column_idx = center_column_idx + pixel_rad
+        start_column_idx = center_column_idx - pixel_rad
+        end_column_idx = center_column_idx + pixel_rad
 
-    phase_xcorr_truncated = phase_xcorr[start_slice_idx:end_slice_idx, start_column_idx:end_column_idx]
+        phase_xcorr_truncated = phase_xcorr[start_slice_idx:end_slice_idx, start_column_idx:end_column_idx]
+
+    else:
+        phase_xcorr_truncated = phase_xcorr
 
     pcc_max_idx = np.unravel_index(np.argmax(phase_xcorr_truncated), phase_xcorr_truncated.shape)
 
     n_rows_truncated = phase_xcorr_truncated.shape[0]
+    n_columns_truncated = phase_xcorr_truncated.shape[1]
     
-
+    if pcc_max_idx[0] + 1 < n_rows_truncated and pcc_max_idx[0] - 1 >= 0:
         pcc_p = phase_xcorr_truncated[pcc_max_idx[0] + 1, pcc_max_idx[1]]
         pcc_0 = phase_xcorr_truncated[pcc_max_idx[0], pcc_max_idx[1]]
         pcc_n = phase_xcorr_truncated[pcc_max_idx[0] - 1, pcc_max_idx[1]]
+        
         denom = pcc_p + pcc_n - 2*pcc_0
-        subpix_shift = -0.5*(pcc_p - pcc_n)/denom if abs(denom) > 1e-10 else 0.0
+        
+        subpix_shift_y = -0.5*(pcc_p - pcc_n)/denom
+
+        if not np.isfinite(subpix_shift_y):
+            print('Warning: Subpixel shift is not finite. Returning 0 for subpixel shift.')
+            
+            subpix_shift_y = 0
+   
     else:
-        subpix_shift = 0.0
-
-def phase_xcorr(recon_proj,
-                exp_proj, 
-                sigma, 
-                alpha, 
-                upsample_factor, 
-                return_pcc_2d = False):
+        subpix_shift_y = 0
     
-    n_columns = recon_proj.shape[1]
-    n_slices = recon_proj.shape[0]
-
-    recon_proj_filtered = ppu.edge_gauss_filter(recon_proj, sigma, alpha, nx = n_columns, ny = n_slices)
-    exp_proj_filtered = ppu.edge_gauss_filter(exp_proj, sigma, alpha, nx = n_columns, ny = n_slices)
-    
-    if return_pcc_2d:
-        recon_proj_fft = fft.fft2(recon_proj_filtered)
-        orig_proj_fft = fft.fft2(exp_proj_filtered)
+    if pcc_max_idx[1] + 1 < n_columns_truncated and pcc_max_idx[1] - 1 >= 0:
+        pcc_p = phase_xcorr_truncated[pcc_max_idx[0], pcc_max_idx[1] + 1]
+        pcc_0 = phase_xcorr_truncated[pcc_max_idx[0], pcc_max_idx[1]]
+        pcc_n = phase_xcorr_truncated[pcc_max_idx[0], pcc_max_idx[1] - 1]
         
-        # NOTE: Most likely, there will a slight variation in the following array relative to skimage.registration.phase_cross_correlation();
-        # however, for rough estimates of PCC for diagnostics, for instance, that variation can be ignored.
-        pcc_2d = np.abs(fft.ifft2(recon_proj_fft*orig_proj_fft.conjugate()/np.abs(recon_proj_fft*orig_proj_fft.conjugate())))
+        subpix_shift_x = -0.5*(pcc_p - pcc_n)/(pcc_p + pcc_n - 2*pcc_0)
 
-    shift, _, _ = reg.phase_cross_correlation(reference_image = recon_proj_filtered, moving_image = exp_proj_filtered, upsample_factor = upsample_factor)
+        if not np.isfinite(subpix_shift_x):
+            print('Warning: Subpixel shift is not finite. Returning 0 for subpixel shift.')
+            
+            subpix_shift_x = 0
 
-    y_shift, x_shift = shift[0], shift[1]
-
-    if return_pcc_2d:
-        return y_shift, x_shift, pcc_2d
+    else:
+        subpix_shift_x = 0
     
-    return y_shift, x_shift
+    return np.array([subpix_shift_y, subpix_shift_x]), phase_xcorr, phase_xcorr_truncated
 
-def correct_pre_cor_vert_jitter(xrf_proj_img_array,
-                                opt_dens_proj_img_array,
-                                net_shift_array,
-                                theta_array,
-                                sigma,
-                                alpha,
-                                upsample_factor,
-                                # return_aux_data,
-                                dir_path,
-                                desired_xrf_elements, 
-                                xrf_element_array,
-                                fps):
+def correct_adjacent_angle_jitter_pre_cor_correction(init_proj_array,
+                                  net_shift_array,
+                                  sigma,
+                                  alpha,
+                                  pixel_rad,
+                                  return_aux_data):
 
-    shifted_xrf_proj_array = np.zeros_like(xrf_proj_img_array)
-    shifted_opt_dens_proj_array = np.zeros_like(opt_dens_proj_img_array)
+    n_theta, n_slices, n_columns = init_proj_array.shape
 
-    shifted_opt_dens_proj_array[0] = opt_dens_proj_img_array[0].copy()
-    shifted_xrf_proj_array[:, 0] = xrf_proj_img_array[:, 0].copy()
+    shifted_proj_array = np.zeros_like(init_proj_array)
+    shifted_proj_array[0] = init_proj_array[0].copy()
 
-    net_shift_array_copy = net_shift_array.copy()
+    phase_xcorr_2d_aggregate = np.zeros((n_theta - 1, n_slices, n_columns))
+    
+    if pixel_rad is None:
+        print('Warning: \'pixel_rad\' not detected. Performing peak search without truncation...')
 
-    for element_idx in range(len(xrf_proj_img_array)):
-        net_shift_array_copy = net_shift_array.copy()
+        pixel_rad = 0
+
+        phase_xcorr_2d_truncated_aggregate = np.zeros_like(init_proj_array)
+    
+    else:
+        if not isinstance(pixel_rad, np.ndarray):
+            print('Error: \'pixel_rad\' must be a numpy array. Exiting program...')
+
+            sys.exit()
+
+        if pixel_rad.ndim != 1:
+            print('Error: \'pixel_rad\' must be a 1D numpy array. Exiting program...')
+
+            sys.exit()
+
+        if pixel_rad.shape[0] != n_theta - 1:
+            print('Error: \'pixel_rad\' must have the same number of elements as the number of theta angles. Exiting program...')
+
+            sys.exit()
         
-        for theta_idx in range(1, len(theta_array)):
-            dy, _ = phase_xcorr(xrf_proj_img_array[element_idx, theta_idx - 1],
-                                xrf_proj_img_array[element_idx, theta_idx], 
-                                sigma, 
-                                alpha, 
-                                upsample_factor)
+        if np.any(pixel_rad == 0):
+            phase_xcorr_2d_truncated_aggregate = np.zeros((n_theta - 1, n_slices, n_columns))
 
-            if theta_array[theta_idx] == -147:
-                print(f'dy = {ppu.round_correct(dy, ndec = 3)} (theta = {ppu.round_correct(theta_array[theta_idx], ndec = 1)}); element = {xrf_element_array[element_idx]}...')
+        else:
+            phase_xcorr_2d_truncated_aggregate = np.zeros((n_theta - 1, 2*pixel_rad.max(), 2*pixel_rad.max()))
 
-            net_shift_array_copy[0, theta_idx] = dy
+    for theta_idx in range(n_theta - 1):
+        shifts, phase_xcorr_2d, phase_xcorr_2d_truncated = phase_xcorr_manual(init_proj_array[theta_idx],
+                                                                              init_proj_array[theta_idx + 1], 
+                                                                              sigma, 
+                                                                              alpha, 
+                                                                              pixel_rad)
 
-            shifted_xrf_proj_array[element_idx, theta_idx] = ndi.shift(xrf_proj_img_array[element_idx, theta_idx], shift = (net_shift_array_copy[0, theta_idx], 0))
+        phase_xcorr_2d
 
-    net_shift_array_copy = net_shift_array.copy()
-
-    for theta_idx in range(1, len(theta_array)):
-        dy, _ = phase_xcorr(opt_dens_proj_img_array[theta_idx - 1],
-                            opt_dens_proj_img_array[theta_idx],     
-                            sigma, 
-                            alpha, 
-                            upsample_factor)
-
-        if theta_array[theta_idx] == -147:
-            print(f'dy = {ppu.round_correct(dy, ndec = 3)} (theta = {ppu.round_correct(theta_array[theta_idx], ndec = 1)}); element = opt_dens...')
+        net_shift_array[0, theta_idx] += shifts[0]
         
-        net_shift_array_copy[0, theta_idx] = dy
-        
-        shifted_opt_dens_proj_array[theta_idx] = ndi.shift(opt_dens_proj_img_array[theta_idx], shift = (net_shift_array_copy[0, theta_idx], 0))
+        shifted_proj_array[theta_idx] = ndi.shift(init_proj_array[theta_idx], shift = (net_shift_array[0, theta_idx], 0))
 
-    futil.create_vert_jitter_corrected_norm_non_cropped_proj_data_gif_v1(dir_path,
-                                                                         desired_xrf_elements,
-                                                                         xrf_element_array,
-                                                                         xrf_proj_img_array,
-                                                                         opt_dens_proj_img_array,
-                                                                         shifted_xrf_proj_array,
-                                                                         shifted_opt_dens_proj_array,
-                                                                         sigma,
-                                                                         alpha,
-                                                                         theta_array = theta_array,
-                                                                         fps = fps)
+        if pixel_rad is not None:
+            phase_xcorr_2d_truncated_aggregate_midpt_idy, \
+            phase_xcorr_2d_truncated_aggregate_midpt_idx = phase_xcorr_2d_truncated_aggregate.shape[0]//2, \
+                                                           phase_xcorr_2d_truncated_aggregate.shape[1]//2
+            
+            start_y = phase_xcorr_2d_truncated_aggregate_midpt_idy - pixel_rad[theta_idx]
+            start_x = phase_xcorr_2d_truncated_aggregate_midpt_idx - pixel_rad[theta_idx]
+
+            end_y = phase_xcorr_2d_truncated_aggregate_midpt_idy + pixel_rad[theta_idx]
+            end_x = phase_xcorr_2d_truncated_aggregate_midpt_idx + pixel_rad[theta_idx]
+
+            phase_xcorr_2d_truncated_aggregate[theta_idx, start_y:end_y, start_x:end_x] = phase_xcorr_2d_truncated
+        
+        else:
+            phase_xcorr_2d_truncated_aggregate[theta_idx] = phase_xcorr_2d_truncated
+        
+        phase_xcorr_2d_aggregate[theta_idx] = phase_xcorr_2d
+
+    if return_aux_data:
+        return net_shift_array, phase_xcorr_2d_aggregate, phase_xcorr_2d_truncated_aggregate
     
-    a = 1
-    
-    if a:
-        sys.exit()
-    
-    return net_shift_array
+    return net_shift_array, None, None
 
 def rot_center(theta_sum):
     """
@@ -245,6 +250,7 @@ def realign_proj(cor_correction_only,
                  theta_array,
                  sample_flipped_remounted_mid_experiment,
                  n_iterations_cor_correction,
+                 pixel_rad_cor_correction,
                  eps_cor_correction,
                  I0,
                  n_iterations_iter_reproj,
@@ -252,7 +258,7 @@ def realign_proj(cor_correction_only,
                  init_y_shift,
                  sigma,
                  alpha,
-                 upsample_factor,
+                 pixel_rad_iter_reproj,
                  eps_iter_reproj,
                  edge_info,
                  return_aux_data = False):
@@ -295,31 +301,11 @@ def realign_proj(cor_correction_only,
         
         alpha = 10
 
-    if upsample_factor is None:
-        print('Warning: \'upsample_factor\' not detected. Setting \'sample_factor\' to 100...')
-
-        upsample_factor = 100
-
-    if eps_iter_reproj is None:
-        print('Warning: Nonzero, positive \'eps_iter_reproj\' not detected. Setting \'eps_iter_reproj\' to 0.3 pixels...')
-
-        eps_iter_reproj = 0.3
-
     if sigma < 0 or alpha < 0:
         print('Error: \'sigma\', \'alpha\', \'eps_cor_correction\' and \'eps_iter_reproj\' must all be positive numbers. Exiting program...')
 
         sys.exit()
 
-    if not isinstance(sigma, int) or not isinstance(upsample_factor, int):
-        print('Error: \'sigma\' and \'upsample_factor\' must be positive integers. Exiting program...')
-
-        sys.exit()
-
-    # n_elements_xrf = xrf_proj_img_array.shape[0]
-    # n_theta = xrt_proj_img_array.shape[0]
-    
-   
-    
     iterations = []
     
     if return_aux_data:
@@ -389,26 +375,6 @@ def realign_proj(cor_correction_only,
 
     #         sys.exit()
 
-    vert_jitter_correction_enabled = True
-
-    if vert_jitter_correction_enabled:
-        print('Correcting for vertical jitter...')
-
-        dir_path = '/home/bwr0835/3_id_realigned_data_02_10_2026'
-        desired_xrf_elements = ['Ni_K', 'Cu_K']
-        xrf_element_array = ['Ni_K', 'Fe_K', 'Ce_L', 'Zn_K', 'Si_K', 'Cu_K', 'Cr_K']
-        net_y_shifts_pcc = correct_pre_cor_vert_jitter(xrf_proj_img_array, 
-                                                       opt_dens_proj_img_array,
-                                                       net_y_shifts_pcc, 
-                                                       theta_array, 
-                                                       sigma, 
-                                                       alpha, 
-                                                       upsample_factor,
-                                                       dir_path = dir_path,
-                                                       desired_xrf_elements = desired_xrf_elements,
-                                                       xrf_element_array = xrf_element_array,
-                                                       fps = 10)
-
     if sample_flipped_remounted_mid_experiment: # This assumes that angles are order from -180° to +180° (360° range) AND that there are two zero degree angles
         if eps_cor_correction is None:
             print('Warning: Nonzero, positive \'eps_cor_correction\' not detected. Setting \'eps_cor_correction\' to 0.001 pixels...')
@@ -435,6 +401,11 @@ def realign_proj(cor_correction_only,
 
             sys.exit()
         
+        if pixel_rad_cor_correction is None and return_aux_data:
+            print('Warning: \'pixel_rad_cor_correction\' not detected. Setting \'pixel_rad_cor_correction\' to None...')
+
+
+
         # aligned_proj_total_xrt = np.zeros((n_theta, n_slices, n_columns))
         # aligned_proj_total_opt_dens = np.zeros((n_theta, n_slices, n_columns))
         # aligned_proj_total_xrf = np.zeros((n_elements_xrf, n_theta, n_slices, n_columns))
@@ -500,12 +471,14 @@ def realign_proj(cor_correction_only,
 
                 net_x_shifts_pcc[0, zero_deg_idx_array[1]:] -= offset_init_second_part
 
-                _, dx = phase_xcorr(aligned_proj[zero_deg_idx_array[0]], 
-                                    aligned_proj[zero_deg_idx_array[1]], 
-                                    sigma, 
-                                    alpha, 
-                                    upsample_factor)
-
+                shifts, _, _ = phase_xcorr_manual(aligned_proj[zero_deg_idx_array[0]], 
+                                                  aligned_proj[zero_deg_idx_array[1]], 
+                                                  sigma, 
+                                                  alpha, 
+                                                  pixel_rad_cor_correction)
+                
+                dx = shifts[1]
+                
                 if np.abs(dx - dx_prev) <= eps_cor_correction or (i == 0 and dx == 0):
                     print('No further COR correction needed.')
 
@@ -703,13 +676,26 @@ def realign_proj(cor_correction_only,
                aligned_proj_opt_dens_final, \
                aligned_proj_xrf_final, \
                np.array(net_x_shifts_pcc_new[-1]), \
-               np.array(net_y_shifts_pcc_new[-1]),
+               np.array(net_y_shifts_pcc_new[-1]), \
+               None, \
+               None, \
+               None, \
+               None, \
+               None, \
+               None, \
+               None, \
+               None
+    
+    if eps_iter_reproj is None:
+        print('Warning: Nonzero, positive \'eps_iter_reproj\' not detected. Setting \'eps_iter_reproj\' to 0.3 pixels...')
 
+        eps_iter_reproj = 0.3
+    
     if eps_iter_reproj < 0:
         print('Error: \'eps_iter_reproj\' must be a positive number. Exiting program...')
 
         sys.exit()
-
+    
     n_iter_converge = 3
 
     _, n_slices_orig, n_columns_orig = xrt_proj_img_array.shape
@@ -791,35 +777,21 @@ def realign_proj(cor_correction_only,
         
         for theta_idx in range(n_theta):
             if not return_aux_data:
-                # dy, dx = phase_xcorr(synth_proj[theta_idx], 
-                #                      aligned_proj_new[theta_idx], 
-                #                      sigma, 
-                #                      alpha, 
-                #                      upsample_factor)
-
-                dy, dx = phase_xcorr(synth_proj[theta_idx], 
-                                     aligned_proj[theta_idx], 
-                                     sigma, 
-                                     alpha, 
-                                     upsample_factor)
+                shifts, _, _ = phase_xcorr_manual(synth_proj[theta_idx], 
+                                                  aligned_proj[theta_idx], 
+                                                  sigma, 
+                                                  alpha, 
+                                                  pixel_rad_iter_reproj)
             
             else:
-                # dy, dx, pcc_2d = phase_xcorr(synth_proj[theta_idx], 
-                #                              aligned_proj_new[theta_idx], 
-                #                              sigma, 
-                #                              alpha, 
-                #                              upsample_factor, 
-                #                              return_pcc_2d = True)
-
-                dy, dx, pcc_2d = phase_xcorr(synth_proj[theta_idx], 
-                                             aligned_proj[theta_idx], 
-                                             sigma, 
-                                             alpha, 
-                                             upsample_factor, 
-                                             return_pcc_2d = True)
-
-                pcc_2d_array.append(pcc_2d)
-
+                shifts, phase_xcorr_2d, phase_xcorr_2d_truncated = phase_xcorr_manual(synth_proj[theta_idx], 
+                                                                                      aligned_proj[theta_idx], 
+                                                                                      sigma, 
+                                                                                      alpha, 
+                                                                                      pixel_rad_iter_reproj)
+            
+            dy, dx = shifts[0], shifts[1]
+            
             dx_array_pcc[i, theta_idx] = dx
             dy_array_pcc[i, theta_idx] = dy
             
@@ -833,18 +805,15 @@ def realign_proj(cor_correction_only,
             
             if (theta_idx % 7) == 0:
                 if theta_idx == 0:
-                    # print(f'\nCurrent x-shift: {ppu.round_correct(dx, ndec = 3)} (theta = {ppu.round_correct(theta_array_new[theta_idx], ndec = 1)})')
                     print(f'\nCurrent x-shift: {ppu.round_correct(dx, ndec = 3)} (theta = {ppu.round_correct(theta_array[theta_idx], ndec = 1)})')
                 
                 else:
-                    #  print(f'Current x-shift: {ppu.round_correct(dx, ndec = 3)} (theta = {ppu.round_correct(theta_array_new[theta_idx], ndec = 1)})')
                     print(f'Current x-shift: {ppu.round_correct(dx, ndec = 3)} (theta = {ppu.round_correct(theta_array[theta_idx], ndec = 1)})')
                 
                 print(f'Current y-shift: {ppu.round_correct(dy, ndec = 3)}')
 
 
         if not sample_flipped_remounted_mid_experiment:
-        # center_of_rotation_avg_synth, _, offset_synth = rot_center_avg(synth_proj, theta_idx_pairs_new, theta_array_new)
             center_of_rotation_avg_synth, _, offset_synth = rot_center_avg(synth_proj, theta_idx_pairs, theta_array)
 
             print(f'Average synthetic center of rotation after jitter, dynamic COR correction attempts: {ppu.round_correct(center_of_rotation_avg_synth, ndec = 3)}')
@@ -867,13 +836,13 @@ def realign_proj(cor_correction_only,
             print(f'Center of rotation error (after flipping sample): {ppu.round_correct(offset_second_part, ndec = 3)}\n')
 
 
-            _, _dx = phase_xcorr(synth_proj[zero_deg_idx_array[0]], 
-                                 synth_proj[zero_deg_idx_array[1]], 
-                                 sigma, 
-                                 alpha, 
-                                 upsample_factor)
+            shifts, _, _ = phase_xcorr_manual(synth_proj[zero_deg_idx_array[0]], 
+                                              synth_proj[zero_deg_idx_array[1]], 
+                                              sigma, 
+                                              alpha, 
+                                              pixel_rad_cor_correction)
             
-            print(f'The two zero degree angles are offset from each other by {ppu.round_correct(np.abs(_dx), ndec = 3)} pixels')
+            print(f'The two zero degree angles are offset from each other by {ppu.round_correct(np.abs(shifts[1]), ndec = 3)} pixels')
         
         # if i == 1:
             # sys.exit()
