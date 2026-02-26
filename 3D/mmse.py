@@ -73,7 +73,7 @@ densities, elements = futil.extract_h5_post_recon_data_non_mpi(recon_file_name)
 
 desired_elements = ['Si', 'Fe', 'Ba_L']
 
-create_recon_gif(dir_path, densities, desired_elements, elements, fps = 10)
+create_recon_gif(dir_path, densities, desired_elements, list(elements), fps = 10)
 
 fig, axs = create_mmse_plot(mmse_array[:, 1])
 
