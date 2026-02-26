@@ -74,7 +74,7 @@ dir_path = '/home/bwr0835/2_ide_realigned_data_02_12_2026_iter_reproj_cor_correc
 mmse_array = np.loadtxt(file_name, delimiter = ',')
 densities, elements = futil.extract_h5_post_recon_data_non_mpi(recon_file_name)
 
-desired_elements = ['Si', 'Fe', 'Ba_L']
+desired_elements = ['Si', 'Fe', 'Ba']
 
 create_recon_gif(dir_path, densities, desired_elements, list(elements), fps = 10)
 
