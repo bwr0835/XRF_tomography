@@ -61,18 +61,20 @@ def create_recon_gif(dir_path, recon_array, desired_elements, element_array, fps
     
     plt.close(fig)
     
-    return fig, axs
+    return
 
 file_name = '/home/bwr0835/2_ide_realigned_data_02_12_2026_iter_reproj_cor_correction_only/2_ide_realigned_data_02_12_2026_iter_reproj_cor_correction_only/model_change_mse_epoch.csv'
 recon_file_name = '/home/bwr0835/2_ide_realigned_data_02_12_2026_iter_reproj_cor_correction_only/2_ide_realigned_data_02_12_2026_iter_reproj_cor_correction_only/grid_concentration.h5'
 
+dir_path = '/home/bwr0835/2_ide_realigned_data_02_12_2026_iter_reproj_cor_correction_only/2_ide_realigned_data_02_12_2026_iter_reproj_cor_correction_only'
+
 mmse_array = np.loadtxt(file_name, delimiter = ',')
 densities, elements = futil.extract_h5_post_recon_data_non_mpi(recon_file_name)
 
+desired_elements = ['Si', 'Fe', 'Ba_L']
 
+create_recon_gif(dir_path, densities, desired_elements, elements, fps = 10)
 
-plt.plot(mmse_array[:, 1])
-plt.xlabel('Epoch')
-plt.ylabel('MMSE')
+fig, axs = create_mmse_plot(mmse_array[:, 1])
 
 plt.show()
