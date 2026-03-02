@@ -14,13 +14,16 @@ plt.rcParams['xtick.minor.size'] = 4.5
 plt.rcParams['ytick.major.size'] = 9
 plt.rcParams['ytick.minor.size'] = 4.5
 
-def create_mmse_plot(mmse):
+def create_mmse_plot(mmse_arrays):
     fig, axs = plt.subplots()
     
-    axs.semilogy(np.arange(len(mmse)) + 1, mmse, 'k')
-    axs.set_xlabel('Epoch')
-    axs.set_ylabel('MMSE')
-    axs.minorticks_on()
+    colors = ['k', 'r', 'b', 'g', 'y', 'c', 'm']
+
+    for idx, mmse_array in enumerate(mmse_arrays):
+        axs.semilogy(np.arange(len(mmse_array)) + 1, mmse_array, colors[idx])
+        axs.set_xlabel('Epoch')
+        axs.set_ylabel('MMSE')
+        axs.minorticks_on()
 
     return fig, axs
 
@@ -66,19 +69,24 @@ def create_recon_gif(dir_path, recon_array, desired_elements, element_array, fps
     
     return
 
-file_name = '/Users/bwr0835/Documents/2_ide_realigned_data_02_12_2026_iter_reproj_cor_correction_only_reg_100/2_ide_realigned_data_02_12_2026_iter_reproj_cor_correction_only_reg_100/model_change_mse_epoch.csv'
+# file_name = '/Users/bwr0835/Documents/2_ide_realigned_data_02_12_2026_iter_reproj_cor_correction_only_reg_100/2_ide_realigned_data_02_12_2026_iter_reproj_cor_correction_only_reg_100/model_change_mse_epoch.csv'
 # file_name = '/home/bwr0835/2_ide_realigned_data_02_12_2026_iter_reproj_cor_correction_only/model_change_mse_epoch.csv'
 # recon_file_name = '/home/bwr0835/2_ide_realigned_data_02_12_2026_iter_reproj_cor_correction_only/grid_concentration.h5'
+file_name = '/Users/bwr0835/Documents/2_ide_realigned_data_02_12_2026_iter_reproj_cor_only_reg_1_mmse.csv'
+file_name2 = '/Users/bwr0835/Documents/2_ide_realigned_data_02_12_2026_iter_reproj_cor_correction_only_reg_100/2_ide_realigned_data_02_12_2026_iter_reproj_cor_correction_only_reg_100/model_change_mse_epoch.csv'
 
 dir_path = '/home/bwr0835/2_ide_realigned_data_02_12_2026_iter_reproj_cor_correction_only'
 
-mmse_array = np.loadtxt(file_name, delimiter = ',')
+mmse_array1 = np.loadtxt(file_name, delimiter = ',')
+mmse_array2 = np.loadtxt(file_name2, delimiter = ',')
+
+mmse_arrays = [mmse_array1[:, 1], mmse_array2[:, 1]]
 # densities, elements = futil.extract_h5_post_recon_data_non_mpi(recon_file_name)
 
 desired_elements = ['Si', 'Fe', 'Ba']
 
 # create_recon_gif(dir_path, densities, desired_elements, list(elements), fps = 10)
 
-fig, axs = create_mmse_plot(mmse_array[:, 1])
+fig, axs = create_mmse_plot(mmse_arrays)
 
 plt.show()

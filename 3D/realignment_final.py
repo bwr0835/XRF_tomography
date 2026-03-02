@@ -274,13 +274,34 @@ def rot_center_avg(proj_img_array, theta_pair_array, theta_array):
 #                  edge_info,
 #                  return_aux_data = False):
 
+# def realign_proj(cor_correction_only,
+#                  xrt_proj_img_array,
+#                  cropped_xrt_proj_img_array,
+#                  opt_dens_proj_img_array,
+#                  cropped_opt_dens_proj_img_array,
+#                  xrf_proj_img_array,
+#                  cropped_xrf_proj_img_array,
+#                  theta_array,
+#                  sample_flipped_remounted_mid_experiment,
+#                  n_iterations_cor_correction,
+#                  pixel_rad_cor_correction,
+#                  eps_cor_correction,
+#                  I0,
+#                  n_iterations_iter_reproj,
+#                  init_x_shift, 
+#                  init_y_shift,
+#                  sigma,
+#                  alpha,
+#                  pixel_rad_iter_reproj,
+#                  eps_iter_reproj,
+#                  edge_info,
+#                  return_aux_data):
 def realign_proj(cor_correction_only,
+                 aligning_element,
+                 xrf_element_list,
                  xrt_proj_img_array,
-                 cropped_xrt_proj_img_array,
                  opt_dens_proj_img_array,
-                 cropped_opt_dens_proj_img_array,
                  xrf_proj_img_array,
-                 cropped_xrf_proj_img_array,
                  theta_array,
                  sample_flipped_remounted_mid_experiment,
                  n_iterations_cor_correction,
@@ -295,7 +316,7 @@ def realign_proj(cor_correction_only,
                  pixel_rad_iter_reproj,
                  eps_iter_reproj,
                  edge_info,
-                 return_aux_data = False):
+                 return_aux_data):
 
     '''
     realign_proj: Perform phase symmetry and iterative reprojection on experimental optical density (OD) projection images 
@@ -344,26 +365,33 @@ def realign_proj(cor_correction_only,
     
     if return_aux_data:
         aligned_exp_proj_array = []
-        cropped_aligned_exp_proj_array = []
         synth_proj_array = []
         pcc_2d_array = []
         recon_array = []
-
-    if cropped_opt_dens_proj_img_array is not None:
-        aligned_proj = cropped_opt_dens_proj_img_array.copy()
-        
-    else:
-        cropped_xrt_proj_img_array = xrt_proj_img_array.copy()
-        cropped_opt_dens_proj_img_array = opt_dens_proj_img_array.copy()
-        cropped_xrf_proj_img_array = xrf_proj_img_array.copy()
+    
+    if aligning_element == 'opt_dens':
+        proj_img_array_element_to_align_with = opt_dens_proj_img_array.copy()
         aligned_proj = opt_dens_proj_img_array.copy()
+    
+    elif aligning_element in xrf_element_list:
+        element_to_align_with_idx = xrf_element_list.index(aligning_element)
+        
+        proj_img_array_element_to_align_with = xrf_proj_img_array[element_to_align_with_idx].copy()
+        aligned_proj = xrf_proj_img_array[element_to_align_with_idx].copy()
 
+    elif aligning_element == 'xrt':
+        proj_img_array_element_to_align_with = xrt_proj_img_array.copy()
+        aligned_proj = xrt_proj_img_array.copy()
+    
+    else: 
+        print('Error: \'aligning_element\' must be \'opt_dens\', an element in \'xrf_element_list\', or \'xrt\'. Exiting program...')
+
+        sys.exit()
+    
     n_elements_xrf = xrf_proj_img_array.shape[0]
-    _, n_slices_orig, n_columns_orig = xrt_proj_img_array.shape
-    n_theta, n_slices, n_columns = cropped_xrt_proj_img_array.shape
 
-    net_x_shifts_pcc = np.zeros((n_iterations_iter_reproj, n_theta))
-    net_y_shifts_pcc = np.zeros((n_iterations_iter_reproj, n_theta))
+    net_x_shifts_pcc = np.zeros((n_iterations_iter_reproj, n_theta, n_slices))
+    net_y_shifts_pcc = np.zeros((n_iterations_iter_reproj, n_theta, n_slices))
 
     aligned_proj_total_xrt = np.zeros((n_theta, n_slices, n_columns))
     aligned_proj_total_opt_dens = np.zeros((n_theta, n_slices, n_columns))
@@ -377,8 +405,7 @@ def realign_proj(cor_correction_only,
             net_y_shifts_pcc[0] += init_y_shift
 
             for theta_idx in range(n_theta):
-                # aligned_proj[theta_idx] = ndi.shift(opt_dens_proj_img_array[theta_idx], shift = (init_y_shift[theta_idx], init_x_shift[theta_idx]))
-                aligned_proj[theta_idx] = ndi.shift(cropped_opt_dens_proj_img_array[theta_idx], shift = (init_y_shift[theta_idx], init_x_shift[theta_idx]))
+                aligned_proj[theta_idx] = ndi.shift(proj_img_array_element_to_align_with[theta_idx], shift = (init_y_shift[theta_idx], init_x_shift[theta_idx]))
 
         elif np.any(init_x_shift):
             print('Executing initial shift(s) in x')
@@ -386,28 +413,32 @@ def realign_proj(cor_correction_only,
             net_x_shifts_pcc[0] += init_x_shift
 
             for theta_idx in range(n_theta):
-                # aligned_proj[theta_idx] = ndi.shift(opt_dens_proj_img_array[theta_idx], shift = (0, init_x_shift[theta_idx]))
-                aligned_proj[theta_idx] = ndi.shift(cropped_opt_dens_proj_img_array[theta_idx], shift = (0, init_x_shift[theta_idx]))
+                aligned_proj[theta_idx] = ndi.shift(proj_img_array_element_to_align_with[theta_idx], shift = (0, init_x_shift[theta_idx]))
                 
         else:
-            print('Executing initial shift(s) in x')
+            print('Executing initial shift(s) in y')
             
             net_y_shifts_pcc[0] += init_y_shift
 
             for theta_idx in range(n_theta):
-                # aligned_proj[theta_idx] = ndi.shift(opt_dens_proj_img_array[theta_idx], shift = (init_y_shift[theta_idx], 0))
-                aligned_proj[theta_idx] = ndi.shift(cropped_opt_dens_proj_img_array[theta_idx], shift = (init_y_shift[theta_idx], 0))
+                aligned_proj[theta_idx] = ndi.shift(proj_img_array_element_to_align_with[theta_idx], shift = (init_y_shift[theta_idx], 0))
 
-    # if zero_idx_to_discard is not None:
-    #     if zero_idx_to_discard != 'first' or zero_idx_to_discard != 'second':
-    #         print('Error: \'zero_idx_to_discard\' must be \'first\' or \'second\'. Exiting program...')
+    if edge_info is not None:
+        start_slice = edge_info['top']
+        end_slice = n_slices - edge_info['bottom']
+            
+        if start_slice + end_slice >= n_slices:
+            print('Error: Overlapping edge, field-of-view crops in y. Exiting program...')
 
-    #         sys.exit()
+            sys.exit()
+                
+        start_column = edge_info['left']
+        end_column = n_columns - edge_info['right']
 
-    #     if np.count_nonzero(theta_array == 0) != 2:
-    #         print('Error: Must have two 0° angles. Exiting program...')
+        cropped_proj_img_array_element_to_align_with = proj_img_array_element_to_align_with[:, start_slice:end_slice, start_column:end_column]
 
-    #         sys.exit()
+    else:
+        cropped_proj_img_array_element_to_align_with = proj_img_array_element_to_align_with
 
     if sample_flipped_remounted_mid_experiment: # This assumes that angles are order from -180° to +180° (360° range) AND that there are two zero degree angles
         if eps_cor_correction is None:
@@ -436,9 +467,7 @@ def realign_proj(cor_correction_only,
             sys.exit()
         
         if pixel_rad_cor_correction is None and return_aux_data:
-            print('Warning: \'pixel_rad_cor_correction\' not detected. Setting \'pixel_rad_cor_correction\' to None...')
-
-
+            print('Warning: \'pixel_rad_cor_correction\' not detected. Setting \'pixel_rad_cor_correction\' to zero pixels...')
 
         # aligned_proj_total_xrt = np.zeros((n_theta, n_slices, n_columns))
         # aligned_proj_total_opt_dens = np.zeros((n_theta, n_slices, n_columns))
@@ -453,15 +482,15 @@ def realign_proj(cor_correction_only,
         theta_idx_pairs_second_part = [(0, -1)] # These remap to original 0° and +180° indices
 
         dx_prev = 0
-            
+
         for i in range(n_iterations_cor_correction):
             print(f'COR correction iteration {i + 1}/{n_iterations_cor_correction}')
                 
-            center_of_rotation_avg_first_part, center_geom, offset_init_first_part = rot_center_avg(aligned_proj[:zero_deg_idx_array[1]], 
+            center_of_rotation_avg_first_part, center_geom, offset_init_first_part = rot_center_avg(cropped_proj_img_array_element_to_align_with[:zero_deg_idx_array[1]], 
                                                                                                     theta_idx_pairs_first_part, 
                                                                                                     theta_array_first_part)
                 
-            center_of_rotation_avg_second_part, _, offset_init_second_part = rot_center_avg(aligned_proj[zero_deg_idx_array[1]:], 
+            center_of_rotation_avg_second_part, _, offset_init_second_part = rot_center_avg(cropped_proj_img_array_element_to_align_with[zero_deg_idx_array[1]:], 
                                                                                             theta_idx_pairs_second_part, 
                                                                                             theta_array_second_part)
 
@@ -480,20 +509,35 @@ def realign_proj(cor_correction_only,
                 print(f'Applying initial COR correction to pre-flipped, pre-remounted sample angles: {ppu.round_correct(-offset_init_first_part, ndec = 3)}')
                     
                 for theta_idx in range(len(theta_array_first_part)):
-                    aligned_proj[theta_idx] = ndi.shift(cropped_opt_dens_proj_img_array[theta_idx], shift = (0, -offset_init_first_part))
-
-                net_x_shifts_pcc[0, :zero_deg_idx_array[1]] -= offset_init_first_part
+                    if edge_info is not None:
+                        for slice_idx in range(start_slice, end_slice):
+                            aligned_proj[theta_idx, slice_idx] = ndi.shift(cropped_proj_img_array_element_to_align_with[theta_idx, slice_idx], shift = -offset_init_first_part)
+                            
+                            net_x_shifts_pcc[0, theta_idx, slice_idx] -= offset_init_first_part
+                    else:
+                        aligned_proj[theta_idx] = ndi.shift(cropped_proj_img_array_element_to_align_with[theta_idx], shift = (0, -offset_init_first_part))
+                        
+                        net_x_shifts_pcc[0, theta_idx] -= offset_init_first_part
+                
 
                 print(f'Applying initial COR correction to post-flipped, post-remounted sample angles: {ppu.round_correct(-offset_init_second_part, ndec = 3)}')
                     
                 for theta_idx in range(len(theta_array_second_part)):
-                    aligned_proj[theta_idx] = ndi.shift(cropped_opt_dens_proj_img_array[theta_idx], shift = (0, -offset_init_second_part))
+                    if edge_info is not None:
+                        for slice_idx in range(start_slice, end_slice):
+                            aligned_proj[theta_idx, slice_idx] = ndi.shift(cropped_proj_img_array_element_to_align_with[theta_idx, slice_idx], shift = -offset_init_second_part)
+                            
+                            net_x_shifts_pcc[0, theta_idx, slice_idx] -= offset_init_second_part
+                    else:
+                        aligned_proj[theta_idx] = ndi.shift(cropped_proj_img_array_element_to_align_with[theta_idx], shift = (0, -offset_init_second_part))
+                        
+                        net_x_shifts_pcc[0, theta_idx] -= offset_init_second_part
 
-                center_of_rotation_avg_first_part, center_geom, offset_first_part = rot_center_avg(aligned_proj[:zero_deg_idx_array[1]], 
+                center_of_rotation_avg_first_part, center_geom, offset_first_part = rot_center_avg(aligned_proj[:zero_deg_idx_array[1], start_slice:end_slice], 
                                                                                                    theta_idx_pairs_first_part, 
                                                                                                    theta_array_first_part)
                 
-                center_of_rotation_avg_second_part, _, offset_second_part = rot_center_avg(aligned_proj[zero_deg_idx_array[1]:], 
+                center_of_rotation_avg_second_part, _, offset_second_part = rot_center_avg(aligned_proj[zero_deg_idx_array[1]:, start_slice:end_slice], 
                                                                                            theta_idx_pairs_second_part, 
                                                                                            theta_array_second_part)
 
@@ -505,8 +549,8 @@ def realign_proj(cor_correction_only,
 
                 net_x_shifts_pcc[0, zero_deg_idx_array[1]:] -= offset_init_second_part
 
-                shifts, _, _ = phase_xcorr_manual(aligned_proj[zero_deg_idx_array[0]], 
-                                                  aligned_proj[zero_deg_idx_array[1]], 
+                shifts, _, _ = phase_xcorr_manual(aligned_proj[zero_deg_idx_array[0], start_slice:end_slice], 
+                                                  aligned_proj[zero_deg_idx_array[1], start_slice:end_slice], 
                                                   sigma, 
                                                   alpha, 
                                                   pixel_rad_cor_correction)
