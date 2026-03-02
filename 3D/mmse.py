@@ -26,7 +26,7 @@ def create_mmse_plot(mmse_arrays):
         axs.set_ylabel('MMSE')
         axs.minorticks_on()
     
-    axs.set_xlim(0, len(mmse_array[0]))
+    axs.set_xlim(0, len(mmse_arrays[0]))
     axs.legend(frameon = False)
     
     return fig, axs
