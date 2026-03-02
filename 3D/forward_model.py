@@ -106,9 +106,11 @@ class PPM(nn.Module):
 
             voxel_idx_offset = self.p*self.n_voxel_minibatch
             
-            # clamp the index after subtracting the offset, so that all 0 indices remains 0 (becomes negative if without clamping, and cause errors)
+            # clamp both indices to valid ranges to avoid CUDA index-out-of-bounds:
+            # - dim 2 (FL source): [0, n_voxel_minibatch-1] after offset
+            # - dim 3 (intersecting voxel): [0, n_voxel-1]
             att_exponent = tc.stack([self.lac[:, :, tc.clamp((self.P_minibatch[m, 0] - voxel_idx_offset), 0, self.n_voxel_minibatch - 1).to(dtype = tc.long), \
-                                              self.P_minibatch[m, 1].to(dtype=tc.long)] \
+                                              tc.clamp(self.P_minibatch[m, 1].to(dtype=tc.long), 0, self.n_voxel - 1)] \
                                               *self.P_minibatch[m, 2].repeat(self.n_element, self.n_lines, 1) for m in range(self.n_det)])
             
             # lac, dim = [n_element, n_lines, n_voxel_minibatch, n_voxel]
