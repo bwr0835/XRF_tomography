@@ -26,7 +26,9 @@ def create_mmse_plot(mmse_arrays):
         axs.set_ylabel('MMSE')
         axs.minorticks_on()
     
+    axs.set_xlim(0, len(mmse_array[0]))
     axs.legend(frameon = False)
+    
     return fig, axs
 
 def create_recon_gif(dir_path, recon_array, desired_elements, element_array, fps):
@@ -89,7 +91,7 @@ mmse_array2 = np.loadtxt(file_name2, delimiter = ',')
 mmse_array3 = np.loadtxt(file_name3, delimiter = ',')
 mmse_array4 = np.loadtxt(file_name4, delimiter = ',')
 
-mmse_arrays = [mmse_array1[:, 1][:mmse_array4[:, 1].max()], mmse_array2[:, 1][:mmse_array4[:, 1].max()], mmse_array3[:, 1][:mmse_array4[:, 1].max()], mmse_array4[:, 1]]
+mmse_arrays = [mmse_array1[:, 1], mmse_array2[:, 1], mmse_array3[:, 1], mmse_array4[:, 1]]
 # densities, elements = futil.extract_h5_post_recon_data_non_mpi(recon_file_name)
 
 desired_elements = ['Si', 'Fe', 'Ba']
