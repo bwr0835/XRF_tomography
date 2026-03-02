@@ -18,7 +18,7 @@ def create_mmse_plot(mmse_arrays):
     fig, axs = plt.subplots()
     
     colors = ['k', 'r', 'b', 'g', 'y', 'c', 'm']
-    lambdas = [0.01, 1, 100, 1000]
+    lambdas = [0.01, 1, 100, 10000]
 
     for idx, mmse_array in enumerate(mmse_arrays):
         axs.semilogy(np.arange(len(mmse_array)) + 1, mmse_array, colors[idx], label = r'$\lambda = {0}$'.format(lambdas[idx]))
@@ -89,7 +89,7 @@ mmse_array2 = np.loadtxt(file_name2, delimiter = ',')
 mmse_array3 = np.loadtxt(file_name3, delimiter = ',')
 mmse_array4 = np.loadtxt(file_name4, delimiter = ',')
 
-mmse_arrays = [mmse_array1[:, 1], mmse_array2[:, 1], mmse_array3[:, 1], mmse_array4[:, 1]]
+mmse_arrays = [mmse_array1[:, 1][:mmse_array4[:, 1].max()], mmse_array2[:, 1][:mmse_array4[:, 1].max()], mmse_array3[:, 1][:mmse_array4[:, 1].max()], mmse_array4[:, 1]]
 # densities, elements = futil.extract_h5_post_recon_data_non_mpi(recon_file_name)
 
 desired_elements = ['Si', 'Fe', 'Ba']
