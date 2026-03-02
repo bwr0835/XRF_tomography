@@ -656,8 +656,8 @@ def reconstruct_jXRFT_tomography(sample_size_n = None,
                     XRT_loss_n_batch = tc.zeros(n_batch)
                     total_loss_n_batch = tc.zeros(n_batch)
                 
-                if rank == 0:
-                    print_flush_root(rank, theta, save_stdout = False, print_terminal = True)
+                # if rank == 0:
+                    # print_flush_root(rank, theta, save_stdout = False, print_terminal = True)
                     
                 for m in range(n_batch):                    
                     minibatch_ls = n_ranks*m + minibatch_ls_0  #dev, e.g. [5,6,7,8]
