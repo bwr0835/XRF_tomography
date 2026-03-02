@@ -69,15 +69,20 @@ def create_recon_gif(dir_path, recon_array, desired_elements, element_array, fps
     
     return
 
-# file_name = '/Users/bwr0835/Documents/2_ide_realigned_data_02_12_2026_iter_reproj_cor_correction_only_reg_100/2_ide_realigned_data_02_12_2026_iter_reproj_cor_correction_only_reg_100/model_change_mse_epoch.csv'
-# file_name = '/home/bwr0835/2_ide_realigned_data_02_12_2026_iter_reproj_cor_correction_only/model_change_mse_epoch.csv'
+# file_name1 = '/Users/bwr0835/Documents/2_ide_realigned_data_02_12_2026_iter_reproj_cor_correction_only_reg_100/2_ide_realigned_data_02_12_2026_iter_reproj_cor_correction_only_reg_100/model_change_mse_epoch.csv'
+file_name1 = '/home/bwr0835/2_ide_realigned_data_02_12_2026_iter_reproj_cor_correction_only_reg_0_01/model_change_mse_epoch.csv'
+file_name2 = '/home/bwr0835/2_ide_realigned_data_02_12_2026_iter_reproj_cor_correction_only_reg_1/model_change_mse_epoch.csv'
+file_name2 = '/home/bwr0835/2_ide_realigned_data_02_12_2026_iter_reproj_cor_correction_only_reg_100/model_change_mse_epoch.csv'
+file_name3 = '/home/bwr0835/2_ide_realigned_data_02_12_2026_iter_reproj_cor_correction_only/model_change_mse_epoch.csv'
+
+
 # recon_file_name = '/home/bwr0835/2_ide_realigned_data_02_12_2026_iter_reproj_cor_correction_only/grid_concentration.h5'
-file_name = '/Users/bwr0835/Documents/2_ide_realigned_data_02_12_2026_iter_reproj_cor_only_reg_1_mmse.csv'
-file_name2 = '/Users/bwr0835/Documents/2_ide_realigned_data_02_12_2026_iter_reproj_cor_correction_only_reg_100/2_ide_realigned_data_02_12_2026_iter_reproj_cor_correction_only_reg_100/model_change_mse_epoch.csv'
+# file_name = '/Users/bwr0835/Documents/2_ide_realigned_data_02_12_2026_iter_reproj_cor_only_reg_1_mmse.csv'
+# file_name2 = '/Users/bwr0835/Documents/2_ide_realigned_data_02_12_2026_iter_reproj_cor_correction_only_reg_100/2_ide_realigned_data_02_12_2026_iter_reproj_cor_correction_only_reg_100/model_change_mse_epoch.csv'
 
 dir_path = '/home/bwr0835/2_ide_realigned_data_02_12_2026_iter_reproj_cor_correction_only'
 
-mmse_array1 = np.loadtxt(file_name, delimiter = ',')
+mmse_array1 = np.loadtxt(file_name1, delimiter = ',')
 mmse_array2 = np.loadtxt(file_name2, delimiter = ',')
 
 mmse_arrays = [mmse_array1[:, 1], mmse_array2[:, 1]]
