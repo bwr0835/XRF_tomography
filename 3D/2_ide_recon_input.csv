@@ -1,14 +1,14 @@
 f_recon_parameters = 'recon_parameters.txt'
 dev =
 probe_intensity = 730712.208647
-selfAb = False
+selfAb = True
 noise_model = gaussian
 cont_from_check_point = False
 use_saved_initial_guess = False
 ini_kind = rand
 init_const = 0
 ini_rand_amp = 0.1
-recon_path = /home/bwr0835/2_ide_realigned_data_02_12_2026_iter_reproj_cor_correction_only_reg_0_01
+recon_path = /home/bwr0835/2_ide_realigned_data_02_12_2026_iter_reproj_cor_correction_only_reg_0_01_selfab
 f_initial_guess = initialized_grid_concentration
 f_recon_grid = grid_concentration
 f_XRF_XRT_data = /home/bwr0835/2_ide_realigned_data_02_12_2026_iter_reproj_cor_correction_only/xrt_od_xrf_realignment/aligned_data/aligned_aggregate_xrf_xrt.h5
