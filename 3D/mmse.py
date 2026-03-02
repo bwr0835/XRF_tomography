@@ -66,17 +66,18 @@ def create_recon_gif(dir_path, recon_array, desired_elements, element_array, fps
     
     return
 
-file_name = '/home/bwr0835/2_ide_realigned_data_02_12_2026_iter_reproj_cor_correction_only/model_change_mse_epoch.csv'
-recon_file_name = '/home/bwr0835/2_ide_realigned_data_02_12_2026_iter_reproj_cor_correction_only/grid_concentration.h5'
+file_name = '/Users/bwr0835/Documents/2_ide_realigned_data_02_12_2026_iter_reproj_cor_correction_only_reg_100/2_ide_realigned_data_02_12_2026_iter_reproj_cor_correction_only_reg_100/model_change_mse_epoch.csv'
+# file_name = '/home/bwr0835/2_ide_realigned_data_02_12_2026_iter_reproj_cor_correction_only/model_change_mse_epoch.csv'
+# recon_file_name = '/home/bwr0835/2_ide_realigned_data_02_12_2026_iter_reproj_cor_correction_only/grid_concentration.h5'
 
 dir_path = '/home/bwr0835/2_ide_realigned_data_02_12_2026_iter_reproj_cor_correction_only'
 
 mmse_array = np.loadtxt(file_name, delimiter = ',')
-densities, elements = futil.extract_h5_post_recon_data_non_mpi(recon_file_name)
+# densities, elements = futil.extract_h5_post_recon_data_non_mpi(recon_file_name)
 
 desired_elements = ['Si', 'Fe', 'Ba']
 
-create_recon_gif(dir_path, densities, desired_elements, list(elements), fps = 10)
+# create_recon_gif(dir_path, densities, desired_elements, list(elements), fps = 10)
 
 fig, axs = create_mmse_plot(mmse_array[:, 1])
 
