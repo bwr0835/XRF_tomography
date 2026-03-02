@@ -72,8 +72,8 @@ def create_recon_gif(dir_path, recon_array, desired_elements, element_array, fps
 # file_name1 = '/Users/bwr0835/Documents/2_ide_realigned_data_02_12_2026_iter_reproj_cor_correction_only_reg_100/2_ide_realigned_data_02_12_2026_iter_reproj_cor_correction_only_reg_100/model_change_mse_epoch.csv'
 file_name1 = '/home/bwr0835/2_ide_realigned_data_02_12_2026_iter_reproj_cor_correction_only_reg_0_01/model_change_mse_epoch.csv'
 file_name2 = '/home/bwr0835/2_ide_realigned_data_02_12_2026_iter_reproj_cor_correction_only_reg_1/model_change_mse_epoch.csv'
-file_name2 = '/home/bwr0835/2_ide_realigned_data_02_12_2026_iter_reproj_cor_correction_only_reg_100/model_change_mse_epoch.csv'
-file_name3 = '/home/bwr0835/2_ide_realigned_data_02_12_2026_iter_reproj_cor_correction_only/model_change_mse_epoch.csv'
+file_name3 = '/home/bwr0835/2_ide_realigned_data_02_12_2026_iter_reproj_cor_correction_only_reg_100/model_change_mse_epoch.csv'
+file_name4 = '/home/bwr0835/2_ide_realigned_data_02_12_2026_iter_reproj_cor_correction_only/model_change_mse_epoch.csv'
 
 
 # recon_file_name = '/home/bwr0835/2_ide_realigned_data_02_12_2026_iter_reproj_cor_correction_only/grid_concentration.h5'
@@ -84,8 +84,10 @@ dir_path = '/home/bwr0835/2_ide_realigned_data_02_12_2026_iter_reproj_cor_correc
 
 mmse_array1 = np.loadtxt(file_name1, delimiter = ',')
 mmse_array2 = np.loadtxt(file_name2, delimiter = ',')
+mmse_array3 = np.loadtxt(file_name3, delimiter = ',')
+mmse_array4 = np.loadtxt(file_name4, delimiter = ',')
 
-mmse_arrays = [mmse_array1[:, 1], mmse_array2[:, 1]]
+mmse_arrays = [mmse_array1[:, 1], mmse_array2[:, 1], mmse_array3[:, 1], mmse_array4[:, 1]]
 # densities, elements = futil.extract_h5_post_recon_data_non_mpi(recon_file_name)
 
 desired_elements = ['Si', 'Fe', 'Ba']
