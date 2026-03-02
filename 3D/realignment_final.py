@@ -13,7 +13,8 @@ def phase_xcorr_manual(ref_img,
                        mov_img, 
                        sigma, 
                        alpha, 
-                       pixel_rad):
+                       pixel_rad,
+                       theta):
     
     n_slices = ref_img.shape[0]
     n_columns = ref_img.shape[1]
@@ -51,9 +52,7 @@ def phase_xcorr_manual(ref_img,
         pcc_0 = phase_xcorr_truncated[pcc_max_idx[0], pcc_max_idx[1]]
         pcc_n = phase_xcorr_truncated[pcc_max_idx[0] - 1, pcc_max_idx[1]]
         
-        denom = pcc_p + pcc_n - 2*pcc_0
-        
-        subpix_shift_y = -0.5*(pcc_p - pcc_n)/denom
+        subpix_shift_y = -0.5*(pcc_p - pcc_n)/(pcc_p + pcc_n - 2*pcc_0)
 
         if not np.isfinite(subpix_shift_y):
             print('Warning: Subpixel shift is not finite. Returning 0 for subpixel shift.')
@@ -61,6 +60,8 @@ def phase_xcorr_manual(ref_img,
             subpix_shift_y = 0
    
     else:
+        print('Warning: Vertical parabolic fit failed (The peak is at an edge or corner of the truncated region) for theta = {0} and {1} degrees. Returning 0 for subpixel shift.'.format(theta[0], theta[1]))
+        
         subpix_shift_y = 0
     
     if pcc_max_idx[1] + 1 < n_columns_truncated and pcc_max_idx[1] - 1 >= 0:
@@ -76,16 +77,19 @@ def phase_xcorr_manual(ref_img,
             subpix_shift_x = 0
 
     else:
+        print('Warning: Horizontal parabolic fit failed (The peak is at an edge or corner of the truncated region) for theta = {0} and {1} degrees. Returning 0 for subpixel shift.'.format(theta[0], theta[1]))
+        
         subpix_shift_x = 0
     
     return np.array([subpix_shift_y, subpix_shift_x]), phase_xcorr, phase_xcorr_truncated
 
-def correct_adjacent_angle_jitter_pre_cor_correction(init_proj_array,
-                                  net_shift_array,
-                                  sigma,
-                                  alpha,
-                                  pixel_rad,
-                                  return_aux_data):
+def correct_adjacent_angle_vertical_jitter_pre_cor_correction(init_proj_array,
+                                                              net_shift_array,
+                                                              sigma,
+                                                              alpha,
+                                                              pixel_rad,
+                                                              theta,
+                                                              return_aux_data):
 
     n_theta, n_slices, n_columns = init_proj_array.shape
 
@@ -93,6 +97,8 @@ def correct_adjacent_angle_jitter_pre_cor_correction(init_proj_array,
     shifted_proj_array[0] = init_proj_array[0].copy()
 
     phase_xcorr_2d_aggregate = np.zeros((n_theta - 1, n_slices, n_columns))
+
+    net_shift_cumsum_temp = np.zeros(n_theta - 1)
     
     if pixel_rad is None:
         print('Warning: \'pixel_rad\' not detected. Performing peak search without truncation...')
@@ -118,6 +124,8 @@ def correct_adjacent_angle_jitter_pre_cor_correction(init_proj_array,
             sys.exit()
         
         if np.any(pixel_rad == 0):
+            print('Warning: \'pixel_rad\' is 0. Performing peak search without truncation...')
+
             phase_xcorr_2d_truncated_aggregate = np.zeros((n_theta - 1, n_slices, n_columns))
 
         else:
@@ -128,13 +136,14 @@ def correct_adjacent_angle_jitter_pre_cor_correction(init_proj_array,
                                                                               init_proj_array[theta_idx + 1], 
                                                                               sigma, 
                                                                               alpha, 
-                                                                              pixel_rad)
+                                                                              pixel_rad,
+                                                                              theta[[theta_idx, theta_idx + 1]])
 
-        phase_xcorr_2d
+        net_shift_cumsum_temp[theta_idx] = shifts[0]
 
-        net_shift_array[0, theta_idx] += shifts[0]
+        # net_shift_array[0, theta_idx] += shifts[0]
         
-        shifted_proj_array[theta_idx] = ndi.shift(init_proj_array[theta_idx], shift = (net_shift_array[0, theta_idx], 0))
+        # shifted_proj_array[theta_idx] = ndi.shift(init_proj_array[theta_idx], shift = (net_shift_array[0, theta_idx], 0))
 
         if pixel_rad is not None:
             phase_xcorr_2d_truncated_aggregate_midpt_idy, \
@@ -154,10 +163,35 @@ def correct_adjacent_angle_jitter_pre_cor_correction(init_proj_array,
         
         phase_xcorr_2d_aggregate[theta_idx] = phase_xcorr_2d
 
+    net_shift_cumsum = np.cumsum(net_shift_cumsum_temp) # Cumulative sum of net shifts (registering one angle to the previous angle still has residual error due to previous angles)
+
+    net_shift_array[0, 1:] += net_shift_cumsum
+
+    # Compute common field of view (FOV)
+
+    start_slice = int(np.clip(np.ceil(np.nanmax(net_shift_array[0])), 0, n_slices)) # Get maximum net shift and set to either 0 or n_slices if below or above, respectively
+    end_slice = int(np.clip(n_slices + np.floor(np.nanmin(net_shift_array[0])), 0, n_slices)) # Get minimum net shift, sum with n_slices, and set to either 0 or n_slices if below or above, respectively. This index is exclusive (i.e. not included in common field of view indexing)
+
+    if end_slice <= start_slice:
+        print('Error: Empty field of view detected - net shifts exceed the number of slices. Exiting program...')
+
+        sys.exit()
+
     if return_aux_data:
-        return net_shift_array, phase_xcorr_2d_aggregate, phase_xcorr_2d_truncated_aggregate
+        shifted_proj = np.zeros_like(init_proj_array)
+        shifted_proj[0] = init_proj_array[0].copy()
+        
+        shifted_proj_final = np.zeros((n_theta, end_slice - start_slice, n_columns))
+        
+        shifted_proj_final[0] = shifted_proj[0, start_slice:end_slice]
+
+        for theta_idx in range(n_theta - 1):
+            shifted_proj[theta_idx + 1] = ndi.shift(init_proj_array[theta_idx + 1], shift = (net_shift_array[0, theta_idx + 1], 0))
+            shifted_proj_final[theta_idx + 1] = shifted_proj[theta_idx + 1, start_slice:end_slice]
+        
+        return net_shift_array, start_slice, end_slice, phase_xcorr_2d_aggregate, phase_xcorr_2d_truncated_aggregate, shifted_proj_final
     
-    return net_shift_array, None, None
+    return net_shift_array,start_slice, end_slice, None, None, None
 
 def rot_center(theta_sum):
     """

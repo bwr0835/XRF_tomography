@@ -33,7 +33,7 @@ def preprocess_xrf_xrt_data(synchrotron,
                             I0_cts_per_s,
                             t_dwell_s,
                             aligning_element,
-                            pre_cor_correction_vert_jitter_correction_only_enabled,
+                            pre_cor_correction_vert_jitter_correction_enabled,
                             init_edge_crop_enabled,
                             init_edge_pixel_lengths_to_crop,
                             realignment_enabled,
@@ -237,11 +237,11 @@ def preprocess_xrf_xrt_data(synchrotron,
     os.makedirs(xrt_od_xrf_realignment_subdir_path, exist_ok = True)
 
     if realignment_enabled:
-        if pre_cor_correction_vert_jitter_correction_only_enabled:
+        if pre_cor_correction_vert_jitter_correction_enabled:
             print('Calculating required shifts for vertical jitter correction pre-center of rotation error correction...')
             
             if aligning_element == 'opt_dens':
-                net_y_shifts_pcc_aux, _ = realign.correct_adjacent_angle_jitter(opt_dens_norm, net_y_shifts_pcc, sigma, alpha, pixel_rad = None, return_aux_data = True)
+                net_y_shifts_pcc_aux, _ = realign.correct_adjacent_angle_vertical_jitter_pre_cor_correction(opt_dens_norm, net_y_shifts_pcc, sigma, alpha, pixel_rad, return_aux_data_enabled)
 
         if init_edge_crop_enabled:
             print('Creating auxilliary cropped XRF, optical density projection images...')

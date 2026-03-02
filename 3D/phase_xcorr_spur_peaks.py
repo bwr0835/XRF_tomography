@@ -288,6 +288,62 @@ def create_shifted_img_fig(dir_path,
 
     return
 
+def create_common_fov_fig(dir_path,
+                          counts_xrf,
+                          counts_opt_dens,
+                          shifted_counts_xrf,
+                          shifted_opt_dens,
+                          desired_element_array,
+                          theta_array,
+                          sigma,
+                          alpha,
+                          fps):
+    
+    fig, axs = plt.subplots(3, 1)
+
+    n_theta, n_slices, n_columns = counts_opt_dens.shape
+
+    im1_1 = axs[0].imshow(shifted_opt_dens[0], vmin = counts_opt_dens.min(), vmax = counts_opt_dens.max())
+    im1_2 = axs[1].imshow(shifted_counts_xrf[0][0], vmin = counts_xrf[0].min(), vmax = counts_xrf[0].max())
+    im1_3 = axs[2].imshow(shifted_counts_xrf[1][0], vmin = counts_xrf[1].min(), vmax = counts_xrf[1].max())
+
+    for ax in fig.axes:
+        ax.axis('off')
+        ax.axvline(x = n_columns//2, color = 'red', linewidth = 2)
+        ax.axhline(y = n_slices//2, color = 'red', linewidth = 2)
+
+    axs[0].set_title(r'Opt. Dens.', fontsize = 14)
+    axs[1].set_title(r'XRF ({0})'.format(desired_element_array[0]), fontsize = 14)
+    axs[2].set_title(r'XRF ({0})'.format(desired_element_array[1]), fontsize = 14)
+
+    text_1 = axs[1].text(0.02, 0.02, r'$\theta$ = {0}$\textdegree'.format(theta_array[0]), transform = axs[1].transAxes, color = 'white')
+    
+    theta_frames = []
+    
+    for theta_idx in range(n_theta):
+        if np.any(counts_opt_dens[theta_idx] < 0):
+            print('Negative values detected in opt. dens. for theta = {0}...'.format(theta_array[theta_idx]))
+
+        im1_1.set_data(shifted_opt_dens[theta_idx])
+        im1_2.set_data(shifted_counts_xrf[0][theta_idx])
+        im1_3.set_data(shifted_counts_xrf[1][theta_idx])
+
+        text_1.set_text(r'$\theta = {0}$\textdegree'.format(theta_array[theta_idx]))
+
+        fig.canvas.draw()
+
+        frame1 = np.array(fig.canvas.renderer.buffer_rgba())[:, :, :3]
+
+        theta_frames.append(frame1)
+
+    plt.close(fig)
+
+    gif_filename = os.path.join(dir_path, f'common_fov_comp_sigma_{sigma}_alpha_{alpha}.gif')
+
+    iio2.mimsave(gif_filename, theta_frames, fps = fps)
+
+    return
+
 def create_sinogram_fig(dir_path,
                         counts_xrf,
                         counts_opt_dens,
@@ -497,20 +553,66 @@ for theta_idx in range(1, n_theta):
 shifted_counts_xrf_norm_array = np.zeros((len(desired_elements_xrf), n_theta, n_slices, n_columns))
 shifted_opt_dens = np.zeros((n_theta, n_slices, n_columns))
 
-shifted_counts_xrf_norm_array[:, 0] = counts_xrf_norm_array[:, 0].copy()
-shifted_opt_dens[0] = opt_dens[0].copy()
+shifted_counts_xrf_norm_array[:, 0] = counts_xrf_norm_array[:, 0]
+shifted_opt_dens[0] = opt_dens[0]
+
+start_array_xrf = np.zeros((len(desired_elements_xrf), n_theta), dtype = int)
+end_array_xrf = np.zeros((len(desired_elements_xrf), n_theta), dtype = int)
+
+start_array_opt_dens = np.zeros(n_theta, dtype = int)
+end_array_opt_dens = np.zeros(n_theta, dtype = int)
+
+start_slice_xrf = np.zeros(len(desired_elements_xrf), dtype = int)
+end_slice_xrf = np.zeros(len(desired_elements_xrf), dtype = int)
+
+dy_xrf_cum = dy_xrf_array.copy()
+dy_xrf_cum[:, 0] = 0
+dy_xrf_cum[:, 1:] = np.cumsum(dy_xrf_array[:, 1:], axis=1)
+
+dy_opt_dens_cum = dy_opt_dens_array.copy()
+dy_opt_dens_cum[0] = 0
+dy_opt_dens_cum[1:] = np.cumsum(dy_opt_dens_array[1:])
 
 for element_idx in range(len(desired_elements_xrf)):
     for theta_idx in range(1, n_theta):
-        shifted_counts_xrf_norm_array[element_idx, theta_idx] = ndi.shift(counts_xrf_norm_array[element_idx, theta_idx], shift = (dy_xrf_array[element_idx, theta_idx], 0))
+        # shifted_counts_xrf_norm_array[element_idx, theta_idx] = ndi.shift(counts_xrf_norm_array[element_idx, theta_idx], shift = (dy_xrf_array[element_idx, theta_idx], 0))
+
+        shifted_counts_xrf_norm_array[element_idx, theta_idx] = ndi.shift(counts_xrf_norm_array[element_idx, theta_idx], shift = (dy_xrf_cum[element_idx, theta_idx], 0))
 
 for theta_idx in range(1, n_theta):
-    shifted_opt_dens[theta_idx] = ndi.shift(opt_dens[theta_idx], shift = (dy_opt_dens_array[theta_idx], 0))
+    # shifted_opt_dens[theta_idx] = ndi.shift(opt_dens[theta_idx], shift = (dy_opt_dens_array[theta_idx], 0))
+
+    shifted_opt_dens[theta_idx] = ndi.shift(opt_dens[theta_idx], shift = (dy_opt_dens_cum[theta_idx], 0))
+
+per_element_crops = []
+per_element_bounds = []
+
+H = n_slices
+
+for element_idx in range(len(desired_elements_xrf)):
+    # dy_e = dy_xrf_array[element_idx]
+    dy_e = dy_xrf_cum[element_idx]
+    dy_min_e = float(np.nanmin(dy_e))
+    dy_max_e = float(np.nanmax(dy_e))
+    start_elem = int(np.clip(np.ceil(dy_max_e), 0, n_slices))
+    end_elem   = int(np.clip(n_slices + np.floor(dy_min_e), 0, n_slices))
+
+    crop_e = shifted_counts_xrf_norm_array[element_idx, :, start_elem:end_elem, :]
+    per_element_crops.append(crop_e)          # shape: (n_theta, H_elem, n_columns)    per_element_bounds.append((start_elem, end_elem))
+
+
+dy_min_opt = float(np.nanmin(dy_opt_dens_array))
+dy_max_opt = float(np.nanmax(dy_opt_dens_array))
+start_opt = int(np.clip(np.ceil(dy_max_opt), 0, H))
+end_opt   = int(np.clip(H + np.floor(dy_min_opt), 0, H))  # exclusive
+
+shifted_opt_dens_common_fov = shifted_opt_dens[:, start_opt:end_opt, :]
 
 fps = 10
 
-# create_raw_img_fig(dir_path, opt_dens, counts_xrf_norm_array, theta, desired_element_array, sigma, alpha, fps)
+create_raw_img_fig(dir_path, opt_dens, counts_xrf_norm_array, theta, desired_element_array, sigma, alpha, fps)
 # create_phase_xcorr_fig(dir_path, phase_xcorr_array_xrf, phase_xcorr_array_xrf_truncated_list, phase_xcorr_array_opt_dens, phase_xcorr_array_opt_dens_truncated_list, desired_element_array, theta, sigma, alpha, fps)
 # create_shifted_img_fig(dir_path, counts_xrf_norm_array, opt_dens, shifted_counts_xrf_norm_array, shifted_opt_dens, desired_element_array, theta, sigma, alpha, fps)
-create_sinogram_fig(dir_path, counts_xrf_norm_array, opt_dens, shifted_counts_xrf_norm_array, shifted_opt_dens, desired_element_array, sigma, alpha, fps)
+# create_sinogram_fig(dir_path, counts_xrf_norm_array, opt_dens, shifted_counts_xrf_norm_array, shifted_opt_dens, desired_element_array, sigma, alpha, fps)
+create_common_fov_fig(dir_path, counts_xrf_norm_array, opt_dens, per_element_crops, shifted_opt_dens_common_fov, desired_element_array, theta, sigma, alpha, fps)
 # plt.show()
