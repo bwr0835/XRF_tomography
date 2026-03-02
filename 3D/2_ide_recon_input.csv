@@ -1,7 +1,7 @@
 f_recon_parameters = 'recon_parameters.txt'
 dev =
 probe_intensity = 730712.208647
-selfAb = True
+selfAb = False
 noise_model = gaussian
 cont_from_check_point = False
 use_saved_initial_guess = False
