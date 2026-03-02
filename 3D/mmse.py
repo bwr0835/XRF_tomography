@@ -18,13 +18,15 @@ def create_mmse_plot(mmse_arrays):
     fig, axs = plt.subplots()
     
     colors = ['k', 'r', 'b', 'g', 'y', 'c', 'm']
+    lambdas = [0.01, 1, 100, 1000]
 
     for idx, mmse_array in enumerate(mmse_arrays):
-        axs.semilogy(np.arange(len(mmse_array)) + 1, mmse_array, colors[idx])
+        axs.semilogy(np.arange(len(mmse_array)) + 1, mmse_array, colors[idx], label = r'$\lambda = {0}$'.format(lambdas[idx]))
         axs.set_xlabel('Epoch')
         axs.set_ylabel('MMSE')
         axs.minorticks_on()
-
+    
+    axs.legend(frameon = False)
     return fig, axs
 
 def create_recon_gif(dir_path, recon_array, desired_elements, element_array, fps):
