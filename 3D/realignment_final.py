@@ -81,7 +81,16 @@ def phase_xcorr_manual(ref_img,
         
         subpix_shift_x = 0
     
-    return np.array([subpix_shift_y, subpix_shift_x]), phase_xcorr, phase_xcorr_truncated
+    # Include integer peak offset: shift = (peak_position - center) + subpixel_refinement
+    if pixel_rad > 0:
+        center_truncated = pixel_rad
+        shift_y = (pcc_max_idx[0] - center_truncated) + subpix_shift_y
+        shift_x = (pcc_max_idx[1] - center_truncated) + subpix_shift_x
+    else:
+        shift_y = (pcc_max_idx[0] - center_slice_idx) + subpix_shift_y
+        shift_x = (pcc_max_idx[1] - center_column_idx) + subpix_shift_x
+    
+    return np.array([shift_y, shift_x]), phase_xcorr, phase_xcorr_truncated
 
 # def correct_adjacent_angle_jitter_pre_cor_correction(init_proj_array,
 #                                                      net_x_shift_array,
@@ -147,8 +156,8 @@ def correct_adjacent_angle_jitter_pre_cor_correction(init_proj_array,
                                                                               pixel_rad[theta_idx],
                                                                               theta[[theta_idx, theta_idx + 1]])
 
-        net_x_shift_cumsum_temp[theta_idx] = shifts[0]
-        net_y_shift_cumsum_temp[theta_idx] = shifts[1]
+        net_x_shift_cumsum_temp[theta_idx] = shifts[1]  # shifts[0]=y (row), shifts[1]=x (col)
+        net_y_shift_cumsum_temp[theta_idx] = shifts[0]
 
         if pixel_rad is not None and pixel_rad[theta_idx] > 0:
             phase_xcorr_2d_truncated_aggregate_midpt_idy, \
@@ -179,7 +188,7 @@ def correct_adjacent_angle_jitter_pre_cor_correction(init_proj_array,
 
         for theta_idx in range(n_theta):
             # shifted_proj[theta_idx + 1] = ndi.shift(init_proj_array[theta_idx + 1], shift = (net_y_shift_array[0, theta_idx + 1], net_x_shift_array[0, theta_idx + 1]))
-            shifted_proj[theta_idx] = ndi.shift(init_proj_array[theta_idx], shift = (net_y_shift_array[theta_idx]))
+            shifted_proj[theta_idx] = ndi.shift(init_proj_array[theta_idx], shift = (net_y_shift_array[theta_idx], 0))
     
     # Compute common field of view (FOV)
     
