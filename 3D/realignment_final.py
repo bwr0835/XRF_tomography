@@ -610,7 +610,6 @@ def realign_proj(cor_correction_only,
                     if edge_info is not None:                        
                         net_x_shifts_pcc[0, theta_idx, start_slice:end_slice] -= offset_init_first_part
                         
-                        # aligned_proj[theta_idx] = warp_rowwise_dx(proj_img_array_element_to_align_with[theta_idx], net_x_shifts_pcc[0, theta_idx], net_y_shifts_pcc[0, theta_idx], cval = cval)
                         aligned_proj[theta_idx] = warp_rowwise_dx(proj_img_array_element_to_align_with[theta_idx], net_x_shifts_pcc[0, theta_idx], net_y_shifts_pcc[theta_idx], cval = cval)
 
                     else:
@@ -622,17 +621,19 @@ def realign_proj(cor_correction_only,
                 print(f'Applying initial COR correction to post-flipped, post-remounted sample angles: {ppu.round_correct(-offset_init_second_part, ndec = 3)}')
                     
                 for theta_idx in range(len(theta_array_second_part)):
+                    theta_idx_aux = theta_idx + len(theta_array_first_part)
+                    
                     if edge_info is not None:                        
-                        net_x_shifts_pcc[0, theta_idx, start_slice:end_slice] -= offset_init_second_part
+                        net_x_shifts_pcc[0, theta_idx_aux, start_slice:end_slice] -= offset_init_second_part
                         
-                        # aligned_proj[theta_idx] = warp_rowwise_dx(proj_img_array_element_to_align_with[theta_idx], net_x_shifts_pcc[0, theta_idx], 0, cval = cval)
-                        aligned_proj[theta_idx] = warp_rowwise_dx(proj_img_array_element_to_align_with[theta_idx], net_x_shifts_pcc[0, theta_idx], net_y_shifts_pcc[theta_idx], cval = cval)
+                        # aligned_proj[theta_idx_aux] = warp_rowwise_dx(proj_img_array_element_to_align_with[theta_idx_aux], net_x_shifts_pcc[0, theta_idx_aux], 0, cval = cval)
+                        aligned_proj[theta_idx_aux] = warp_rowwise_dx(proj_img_array_element_to_align_with[theta_idx_aux], net_x_shifts_pcc[0, theta_idx_aux], net_y_shifts_pcc[theta_idx_aux], cval = cval)
                         
                     else:
-                        net_x_shifts_pcc[0, theta_idx] -= offset_init_second_part
+                        net_x_shifts_pcc[0, theta_idx_aux] -= offset_init_second_part
                         
-                        # aligned_proj[theta_idx] = ndi.shift(proj_img_array_element_to_align_with[theta_idx], shift = (net_y_shifts_pcc[0, theta_idx], net_x_shifts_pcc[0, theta_idx]), cval = cval)
-                        aligned_proj[theta_idx] = ndi.shift(proj_img_array_element_to_align_with[theta_idx], shift = (net_y_shifts_pcc[theta_idx], net_x_shifts_pcc[0, theta_idx]), cval = cval)
+                        # aligned_proj[theta_idx_aux] = ndi.shift(proj_img_array_element_to_align_with[theta_idx_aux], shift = (net_y_shifts_pcc[0, theta_idx_aux], net_x_shifts_pcc[0, theta_idx_aux]), cval = cval)
+                        aligned_proj[theta_idx_aux] = ndi.shift(proj_img_array_element_to_align_with[theta_idx_aux], shift = (net_y_shifts_pcc[0, theta_idx_aux], net_x_shifts_pcc[0, theta_idx_aux]), cval = cval)
 
                 if edge_info is not None:
                     center_of_rotation_avg_first_part, center_geom, offset_first_part = rot_center_avg(aligned_proj[:zero_deg_idx_array[1], start_slice:end_slice], 
@@ -668,14 +669,16 @@ def realign_proj(cor_correction_only,
                                                       aligned_proj[zero_deg_idx_array[1], start_slice:end_slice], 
                                                       sigma, 
                                                       alpha, 
-                                                      pixel_rad_cor_correction)
+                                                      pixel_rad_cor_correction,
+                                                      theta = np.array([0, 0]))
                 
                 else:
                     shifts, _, _ = phase_xcorr_manual(aligned_proj[zero_deg_idx_array[0]], 
                                                       aligned_proj[zero_deg_idx_array[1]], 
                                                       sigma, 
                                                       alpha, 
-                                                      pixel_rad_cor_correction)
+                                                      pixel_rad_cor_correction,
+                                                      theta = np.array([0, 0]))
                 
                 dx = shifts[1]
                 
@@ -893,7 +896,8 @@ def realign_proj(cor_correction_only,
                                                       aligned_proj[zero_deg_idx_array[1], start_slice:end_slice], 
                                                       sigma, 
                                                       alpha, 
-                                                      pixel_rad_cor_correction)
+                                                      pixel_rad_cor_correction,
+                                                      theta = np.array([0, 0]))
 
                     print(f'Experimental center of rotation after horizontal jitter correction (before flipping sample): {center_of_rotation_avg_first_part}')
                     print(f'Experimental center of rotation after horizontal jitter correction (after flipping sample): {center_of_rotation_avg_second_part}\n')
@@ -925,7 +929,8 @@ def realign_proj(cor_correction_only,
                                                       aligned_proj[zero_deg_idx_array[1], start_slice:end_slice], 
                                                       sigma, 
                                                       alpha,
-                                                      pixel_rad_cor_correction)
+                                                      pixel_rad_cor_correction,
+                                                      theta = np.array([0, 0]))
 
                     print(f'Experimental center of rotation after horizontal jitter correction (before flipping sample): {center_of_rotation_avg_first_part}')
                     print(f'Experimental center of rotation after horizontal jitter correction (after flipping sample): {center_of_rotation_avg_second_part}\n')
@@ -966,14 +971,16 @@ def realign_proj(cor_correction_only,
                                                   aligned_proj[theta_idx], 
                                                   sigma, 
                                                   alpha, 
-                                                  pixel_rad_iter_reproj)
+                                                  pixel_rad_iter_reproj,
+                                                  theta = np.array([theta_array[theta_idx], theta_array[theta_idx]]))
             
             else:
                 shifts, phase_xcorr_2d, phase_xcorr_2d_truncated = phase_xcorr_manual(synth_proj[theta_idx], 
                                                                                       aligned_proj[theta_idx], 
                                                                                       sigma, 
                                                                                       alpha, 
-                                                                                      pixel_rad_iter_reproj)
+                                                                                      pixel_rad_iter_reproj,
+                                                                                      theta = np.array([theta_array[theta_idx], theta_array[theta_idx]]))
                 
                 pcc_2d_array[i, theta_idx] = phase_xcorr_2d
 
@@ -1040,7 +1047,8 @@ def realign_proj(cor_correction_only,
                                                   synth_proj[zero_deg_idx_array[1], start_slice:end_slice], 
                                                   sigma, 
                                                   alpha, 
-                                                  pixel_rad_cor_correction)
+                                                  pixel_rad_cor_correction,
+                                                  theta = np.array([0, 0]))
             
             else:
                 center_of_rotation_avg_first_part, center_geom, offset_first_part = rot_center_avg(aligned_proj[:zero_deg_idx_array[1]], 
@@ -1055,7 +1063,8 @@ def realign_proj(cor_correction_only,
                                                   synth_proj[zero_deg_idx_array[1]], 
                                                   sigma, 
                                                   alpha, 
-                                                  pixel_rad_cor_correction)
+                                                  pixel_rad_cor_correction,
+                                                  theta = np.array([0, 0]))
 
             print(f'Synthetic center of rotation after jitter correction (before flipping sample): {center_of_rotation_avg_first_part}')
             print(f'Synthetic center of rotation after jitter correction (after flipping sample): {center_of_rotation_avg_second_part}\n')
