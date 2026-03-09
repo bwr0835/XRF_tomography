@@ -1411,7 +1411,7 @@ def create_adjacent_angle_jitter_corrected_norm_proj_data_gif(dir_path,
                                                               theta_array,
                                                               fps):
 
-    n_theta, n_slices, n_columns = counts_ref_element.shape[1:]
+    n_theta, n_slices, n_columns = counts_ref_element.shape
     
     vmin = np.min([counts_ref_element, shifted_counts_ref_element])
     vmax = np.max([counts_ref_element, shifted_counts_ref_element])
