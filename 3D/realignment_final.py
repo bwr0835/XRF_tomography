@@ -83,12 +83,12 @@ def phase_xcorr_manual(ref_img,
     
     # Include integer peak offset: shift = (peak_position - center) + subpixel_refinement
     if pixel_rad > 0:
-        center_truncated = pixel_rad
-        shift_y = (pcc_max_idx[0] - center_truncated) + subpix_shift_y
-        shift_x = (pcc_max_idx[1] - center_truncated) + subpix_shift_x
+        shift_y = pcc_max_idx[0] - pixel_rad + subpix_shift_y
+        shift_x = pcc_max_idx[1] - pixel_rad + subpix_shift_x
+    
     else:
-        shift_y = (pcc_max_idx[0] - center_slice_idx) + subpix_shift_y
-        shift_x = (pcc_max_idx[1] - center_column_idx) + subpix_shift_x
+        shift_y = pcc_max_idx[0] - center_slice_idx + subpix_shift_y
+        shift_x = pcc_max_idx[1] - center_column_idx + subpix_shift_x
     
     return np.array([shift_y, shift_x]), phase_xcorr, phase_xcorr_truncated
 
