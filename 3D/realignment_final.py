@@ -494,7 +494,7 @@ def realign_proj(cor_correction_only,
             start_slice = edge_info['top'] # Second term is initial common field of view index
             end_slice = edge_info['bottom'] # First term is final common field of view index
 
-            if start_slice + end_slice >= n_slices:
+            if start_slice >= end_slice:
                 print('Error: Overlapping edge, field-of-view crops in y. Exiting program...')
 
                 sys.exit()
