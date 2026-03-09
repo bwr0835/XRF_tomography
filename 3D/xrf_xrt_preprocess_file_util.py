@@ -1471,8 +1471,8 @@ def create_adjacent_angle_jitter_corrected_norm_proj_data_gif(dir_path,
         axs.set_ylabel(r'$\theta$ (\textdegree)', fontsize = 14)
 
     for slice_idx in range(n_slices):
-        im2_1.set_data(shifted_counts_ref_element[:, slice_idx])
-        im2_2.set_data(counts_ref_element[:, slice_idx])
+        im2_1.set_data(counts_ref_element[:, slice_idx])
+        im2_2.set_data(shifted_counts_ref_element[:, slice_idx])
 
         text_2.set_text(r'Slice index {0}/{1}'.format(slice_idx, n_slices - 1))
 

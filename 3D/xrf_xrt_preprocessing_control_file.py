@@ -344,9 +344,10 @@ def preprocess_xrf_xrt_data(synchrotron,
                                                                                 sigma,
                                                                                 alpha)
                 
+                proj_cropped_to_common_fov = proj_img_array_element_to_align_with[:, start_slice_aux:end_slice_aux, :]
                 futil.create_adjacent_angle_jitter_corrected_norm_proj_data_gif(xrt_od_xrf_realignment_subdir_path,
                                                                                 aligning_element,
-                                                                                proj_img_array_element_to_align_with,
+                                                                                proj_cropped_to_common_fov,
                                                                                 adj_angle_jitter_corrected_proj_element_to_align_with_aux,
                                                                                 sigma,
                                                                                 alpha,
