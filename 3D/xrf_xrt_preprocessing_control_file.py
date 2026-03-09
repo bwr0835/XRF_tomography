@@ -198,6 +198,7 @@ def preprocess_xrf_xrt_data(synchrotron,
             init_y_shift_array = np.zeros(n_theta)
             
             pixel_rad_adjacent_angle_jitter = None
+            pixel_rad_cor_correction = None
             pixel_rad_iter_reproj = None
             
             if norm_enabled:
