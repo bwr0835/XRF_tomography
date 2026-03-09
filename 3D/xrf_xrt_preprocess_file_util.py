@@ -977,7 +977,6 @@ def create_csv_raw_input_data(dir_path,
     file_path = os.path.join(dir_path, 'raw_input_data.csv')
 
     pixel_rad_pre_cor_jitter_array = np.append(np.nan, pixel_rad_pre_cor_jitter)
-    pixel_rad_cor_array = np.append(np.nan, pixel_rad_cor)
     pixel_rad_iter_reproj_array = np.append(np.nan, pixel_rad_iter_reproj)
 
     df = pd.DataFrame({'theta_deg': theta_array,
@@ -985,7 +984,7 @@ def create_csv_raw_input_data(dir_path,
                        'init_x_shifts': init_x_shifts,
                        'init_y_shifts': init_y_shifts,
                        'pixel_rad_pre_cor_jitter': pixel_rad_pre_cor_jitter_array,
-                       'pixel_rad_cor': pixel_rad_cor_array,
+                       'pixel_rad_cor': pixel_rad_cor,
                        'pixel_rad_iter_reproj': pixel_rad_iter_reproj_array,
                        'I0_cts': I0_cts})
     
