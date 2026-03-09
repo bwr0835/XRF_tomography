@@ -111,8 +111,6 @@ def correct_adjacent_angle_jitter_pre_cor_correction(init_proj_array,
     if pixel_rad is None:
         print('Warning: \'pixel_rad\' not detected. Performing peak search without truncation...')
 
-        pixel_rad = 0
-
         phase_xcorr_2d_truncated_aggregate = np.zeros_like(init_proj_array)
     
     else:
