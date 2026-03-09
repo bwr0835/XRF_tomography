@@ -1,4 +1,4 @@
-import numpy as np, sys
+import numpy as np, tomopy as tomo, xraylib as xrl, sys
 
 from scipy import ndimage as ndi
 from itertools import combinations as combos
@@ -92,7 +92,6 @@ def pad_col(array, dataset_type):
     return array
 
 def pad_row(array, dataset_type):
-
     if dataset_type == '' or array.ndim != 4:
         print('Error: No dataset type specified or number of array dimesions ≠ 4. Exiting...')
 
@@ -105,7 +104,6 @@ def pad_row(array, dataset_type):
             for theta_idx in range(n_theta):
                 array_avg = array[element_idx, theta_idx].mean()
                 
-                # final_row = array[element_idx, theta_idx, -1, :]
                 final_row = array_avg*np.ones(n_columns)
 
                 array[element_idx, theta_idx] = np.vstack((array[element_idx, theta_idx], final_row))
@@ -115,7 +113,6 @@ def pad_row(array, dataset_type):
             for theta_idx in range(n_theta):
                 array_avg = array[element_idx, theta_idx].mean()
                 
-                # final_row = array[element_idx, theta_idx, -1, :]
                 final_row = array_avg*np.zeros(n_columns)
 
                 array[element_idx, theta_idx] = np.vstack((array[element_idx, theta_idx], final_row))
@@ -345,32 +342,32 @@ def crop_array(xrf_array, xrt_array, opt_dens_array, edge_dict):
 
     return cropped_xrf_array, cropped_xrt_array, cropped_opt_dens_array
 
-def remove_zero_deg_proj_no_realignment(xrf_array, xrt_array, opt_dens_array, zero_idx_to_discard, theta_array):
-    if zero_idx_to_discard != 'first' or zero_idx_to_discard != 'second' or zero_idx_to_discard is None:
-        print('Error: \'zero_idx_to_discard\' must be \'first\' or \'second\'. Exiting program...')
+def create_gridrec_density_maps(xrf_proj_array, elements_xrf, theta_array):
+    if xrf_proj_array.ndim != 4:
+        print('Error: XRF projection array must be 4D. Exiting program...')
 
         sys.exit()
 
-    if np.count_nonzero(theta_array == 0) != 2:
-        print('Error: Must have two 0° angles. Exiting program...')
+    if elements_xrf is None:
+        print('Error: Elements XRF must be provided. Exiting program...')
 
         sys.exit()
     
-    n_theta = len(theta_array)
+    n_elements_xrf, _, n_slices, n_columns = xrf_proj_array.shape
 
-    first_zero_deg_idx, second_zero_deg_idx = np.where(theta_array == 0)[0]
+    rho = np.zeros((n_elements_xrf, n_slices, n_columns, n_columns))
 
-    theta_idx_array = np.arange(n_theta)
+    for element_idx, element in enumerate(elements_xrf):
+        if '_' in element:
+            element = element.split('_')[0]
+        
+        xrf_recon = tomo.recon(xrf_proj_array[element_idx], theta_array*np.pi/180, algorithm = 'gridrec', filter_name = 'ramlak')
 
-    if zero_idx_to_discard == 'first':
-        mask = theta_idx_array != first_zero_deg_idx
-    
-    else:
-        mask = theta_idx_array != second_zero_deg_idx
-    
-    xrf_array_final = xrf_array[mask]
-    xrt_array_final = xrt_array[mask]
-    opt_dens_array_final = opt_dens_array[mask]
-    theta_array_final = theta_array[mask]
+        vmin = xrf_recon.min()
+        vmax = xrf_recon.max()
+        
+        rho[element_idx] = xrl.ElementDensity(xrl.SymbolToAtomicNumber(element))*(xrf_recon - vmin)/(vmax - vmin) # Initial guess of density based on 0-100% concentration of each element
 
-    return xrf_array_final, xrt_array_final, opt_dens_array_final, theta_array_final
+    return rho
+
+        

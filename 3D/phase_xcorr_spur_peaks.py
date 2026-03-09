@@ -299,18 +299,31 @@ def create_common_fov_fig(dir_path,
                           alpha,
                           fps):
     
-    fig, axs = plt.subplots(3, 1)
+    n_theta, _, n_columns = counts_opt_dens.shape
+    h_opt = shifted_opt_dens.shape[1]
+    h_xrf = [shifted_counts_xrf[i].shape[1] for i in range(len(shifted_counts_xrf))]
+    h_common = max(h_opt, *h_xrf)
 
-    n_theta, n_slices, n_columns = counts_opt_dens.shape
+    def pad_to_common_height(arr, h):
+        if h == h_common:
+            return arr
+        pad_top = (h_common - h) // 2
+        pad_bottom = h_common - h - pad_top
+        return np.pad(arr, ((0, 0), (pad_top, pad_bottom), (0, 0)), mode='constant', constant_values=0)
 
-    im1_1 = axs[0].imshow(shifted_opt_dens[0], vmin = counts_opt_dens.min(), vmax = counts_opt_dens.max())
-    im1_2 = axs[1].imshow(shifted_counts_xrf[0][0], vmin = counts_xrf[0].min(), vmax = counts_xrf[0].max())
-    im1_3 = axs[2].imshow(shifted_counts_xrf[1][0], vmin = counts_xrf[1].min(), vmax = counts_xrf[1].max())
+    shifted_opt_dens_pad = pad_to_common_height(shifted_opt_dens, h_opt)
+    shifted_counts_xrf_pad = [pad_to_common_height(shifted_counts_xrf[i], h_xrf[i]) for i in range(len(shifted_counts_xrf))]
+
+    fig, axs = plt.subplots(3, 1, subplot_kw={'aspect': 'equal'})
+
+    im1_1 = axs[0].imshow(shifted_opt_dens_pad[0], vmin = counts_opt_dens.min(), vmax = counts_opt_dens.max())
+    im1_2 = axs[1].imshow(shifted_counts_xrf_pad[0][0], vmin = counts_xrf[0].min(), vmax = counts_xrf[0].max())
+    im1_3 = axs[2].imshow(shifted_counts_xrf_pad[1][0], vmin = counts_xrf[1].min(), vmax = counts_xrf[1].max())
 
     for ax in fig.axes:
         ax.axis('off')
         ax.axvline(x = n_columns//2, color = 'red', linewidth = 2)
-        ax.axhline(y = n_slices//2, color = 'red', linewidth = 2)
+        ax.axhline(y = h_common//2, color = 'red', linewidth = 2)
 
     axs[0].set_title(r'Opt. Dens.', fontsize = 14)
     axs[1].set_title(r'XRF ({0})'.format(desired_element_array[0]), fontsize = 14)
@@ -324,9 +337,9 @@ def create_common_fov_fig(dir_path,
         if np.any(counts_opt_dens[theta_idx] < 0):
             print('Negative values detected in opt. dens. for theta = {0}...'.format(theta_array[theta_idx]))
 
-        im1_1.set_data(shifted_opt_dens[theta_idx])
-        im1_2.set_data(shifted_counts_xrf[0][theta_idx])
-        im1_3.set_data(shifted_counts_xrf[1][theta_idx])
+        im1_1.set_data(shifted_opt_dens_pad[theta_idx])
+        im1_2.set_data(shifted_counts_xrf_pad[0][theta_idx])
+        im1_3.set_data(shifted_counts_xrf_pad[1][theta_idx])
 
         text_1.set_text(r'$\theta = {0}$\textdegree'.format(theta_array[theta_idx]))
 
@@ -601,8 +614,8 @@ for element_idx in range(len(desired_elements_xrf)):
     per_element_crops.append(crop_e)          # shape: (n_theta, H_elem, n_columns)    per_element_bounds.append((start_elem, end_elem))
 
 
-dy_min_opt = float(np.nanmin(dy_opt_dens_array))
-dy_max_opt = float(np.nanmax(dy_opt_dens_array))
+dy_min_opt = float(np.nanmin(dy_opt_dens_cum))
+dy_max_opt = float(np.nanmax(dy_opt_dens_cum))
 start_opt = int(np.clip(np.ceil(dy_max_opt), 0, H))
 end_opt   = int(np.clip(H + np.floor(dy_min_opt), 0, H))  # exclusive
 
@@ -610,7 +623,7 @@ shifted_opt_dens_common_fov = shifted_opt_dens[:, start_opt:end_opt, :]
 
 fps = 10
 
-create_raw_img_fig(dir_path, opt_dens, counts_xrf_norm_array, theta, desired_element_array, sigma, alpha, fps)
+# create_raw_img_fig(dir_path, opt_dens, counts_xrf_norm_array, theta, desired_element_array, sigma, alpha, fps)
 # create_phase_xcorr_fig(dir_path, phase_xcorr_array_xrf, phase_xcorr_array_xrf_truncated_list, phase_xcorr_array_opt_dens, phase_xcorr_array_opt_dens_truncated_list, desired_element_array, theta, sigma, alpha, fps)
 # create_shifted_img_fig(dir_path, counts_xrf_norm_array, opt_dens, shifted_counts_xrf_norm_array, shifted_opt_dens, desired_element_array, theta, sigma, alpha, fps)
 # create_sinogram_fig(dir_path, counts_xrf_norm_array, opt_dens, shifted_counts_xrf_norm_array, shifted_opt_dens, desired_element_array, sigma, alpha, fps)

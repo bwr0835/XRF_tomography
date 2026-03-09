@@ -263,7 +263,7 @@ def extract_h5_post_recon_data_non_mpi(file_path):
             sample = h5['sample']
         
             densities = sample['densities'][()]
-            elements = sample['elements'].asstr()[:]
+            elements = list(sample['elements'].asstr()[:])
     
     except KeyboardInterrupt:
         print('Keyboard interrupt. Exiting program...')

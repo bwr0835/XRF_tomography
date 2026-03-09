@@ -33,7 +33,7 @@ def preprocess_xrf_xrt_data(synchrotron,
                             I0_cts_per_s,
                             t_dwell_s,
                             aligning_element,
-                            pre_cor_correction_vert_jitter_correction_enabled,
+                            pre_cor_correction_adjacent_angle_jitter_correction_enabled,
                             init_edge_crop_enabled,
                             init_edge_pixel_lengths_to_crop,
                             realignment_enabled,
@@ -44,7 +44,6 @@ def preprocess_xrf_xrt_data(synchrotron,
                             eps_cor_correction,
                             sigma,
                             alpha,
-                            upsample_factor,
                             eps_iter_reproj,
                             final_edge_crop_enabled,
                             final_edge_pixel_lengths_to_crop,
@@ -179,12 +178,15 @@ def preprocess_xrf_xrt_data(synchrotron,
         counts_xrt_sig = counts_xrt[counts_xrt_sig_idx]
 
         if pre_existing_align_norm_file_enabled:
-            print('Extracting pre-existing normalizations, net x pixel shifts, net y pixel shifts, and incident intensity...')
+            print('Extracting pre-existing normalizations, net x pixel shifts, net y pixel shifts, pixel radii for adjacent angle jitter correction and iterative reprojection, and incident intensity from CSV file...')
 
             norm_array, \
-            net_x_shift_array, \
-            net_y_shift_array, \
-            I0_cts = futil.extract_csv_norm_net_shift_data(pre_existing_align_norm_file_path, theta)
+            init_x_shift_array, \
+            init_y_shift_array, \
+            pixel_rad_adjacent_angle_jitter, \
+            pixel_rad_cor_correction, \
+            pixel_rad_iter_reproj, \
+            I0_cts = futil.extract_csv_raw_input_data(pre_existing_align_norm_file_path, theta)
 
             print('Applying pre-existing per-projection normalizations to XRF, XRT arrays...')
 
@@ -192,8 +194,11 @@ def preprocess_xrf_xrt_data(synchrotron,
             counts_xrt_norm = counts_xrt_sig*norm_array[:, None, None]
 
         else:
-            net_x_shift_array = np.zeros(n_theta)
-            net_y_shift_array = np.zeros(n_theta)
+            init_x_shift_array = np.zeros(n_theta)
+            init_y_shift_array = np.zeros(n_theta)
+            
+            pixel_rad_adjacent_angle_jitter = None
+            pixel_rad_iter_reproj = None
             
             if norm_enabled:
                 print('Normalizing XRF, XRT data via per-projection XRT masks...')
@@ -237,176 +242,165 @@ def preprocess_xrf_xrt_data(synchrotron,
     os.makedirs(xrt_od_xrf_realignment_subdir_path, exist_ok = True)
 
     if realignment_enabled:
-        if pre_cor_correction_vert_jitter_correction_enabled:
+        if pre_cor_correction_adjacent_angle_jitter_correction_enabled:
             print('Calculating required shifts for vertical jitter correction pre-center of rotation error correction...')
             
             if aligning_element == 'opt_dens':
-                net_y_shifts_pcc_aux, _ = realign.correct_adjacent_angle_vertical_jitter_pre_cor_correction(opt_dens_norm, net_y_shifts_pcc, sigma, alpha, pixel_rad, return_aux_data_enabled)
-
-        if init_edge_crop_enabled:
-            print('Creating auxilliary cropped XRF, optical density projection images...')
-
-            if init_edge_pixel_lengths_to_crop is None:
-                print("Error: Empty field for 'init_edge_pixel_lengths_to_crop'. Exiting program...")
+                proj_img_array_element_to_align_with = opt_dens_norm
+            
+            elif aligning_element in elements_xrf:
+                proj_img_array_element_to_align_with = counts_xrf_norm[elements_xrf.index(aligning_element)]
+            
+            elif aligning_element == 'xrt':
+                proj_img_array_element_to_align_with = counts_xrt_norm
+            
+            else:
+                print('Error: \'aligning_element\' must be in \'elements_xrf\' or \'opt_dens\'. Exiting program...')
 
                 sys.exit()
+
+            init_y_shift_array, \
+            start_slice_aux, \
+            end_slice_aux, \
+            phase_xcorr_2d_aggregate_aux, \
+            phase_xcorr_2d_truncated_aggregate_aux, \
+            adj_angle_jitter_corrected_proj_element_to_align_with_aux = realign.correct_adjacent_angle_jitter_pre_cor_correction(proj_img_array_element_to_align_with, 
+                                                                                                                                 init_y_shift_array,
+                                                                                                                                 sigma,
+                                                                                                                                 alpha,
+                                                                                                                                 pixel_rad_adjacent_angle_jitter,
+                                                                                                                                 theta,
+                                                                                                                                 common_field_of_view_axes = 'y',
+                                                                                                                                 return_aux_data = return_aux_data)
             
-            init_cropped_xrf_array, init_cropped_xrt_array, init_cropped_opt_dens_array = ppu.crop_array(counts_xrf_norm, counts_xrt_norm, opt_dens_norm, init_edge_pixel_lengths_to_crop)
-        
-        else:
-            init_cropped_xrf_array = None
-            init_cropped_xrt_array = None
-            init_cropped_opt_dens_array = None
+            if not init_edge_crop_enabled:
+                start_slice = start_slice_aux
+                end_slice = end_slice_aux
+                # start_column = start_column_aux
+                # end_column = end_column_aux
             
-            if init_edge_pixel_lengths_to_crop is not None:
-                print("Warning: Non-empty 'init_edge_pixel_lengths_to_crop' dictionary detected. Removing items from 'init_edge_pixel_lengths_to_crop'...")
+            else:
+                if init_edge_pixel_lengths_to_crop is not None:
+                    start_slice = init_edge_pixel_lengths_to_crop['top'] + start_slice_aux
+                    end_slice = end_slice_aux - init_edge_pixel_lengths_to_crop['bottom']
+                    
+                    # start_column = init_edge_pixel_lengths_to_crop['left'] + start_column_aux
+                    # end_column = end_column_aux - init_edge_pixel_lengths_to_crop['right']
                 
-                init_edge_pixel_lengths_to_crop = None
+                else:
+                    print("Error: Empty field for 'init_edge_pixel_lengths_to_crop'. Exiting program...")
+
+                    sys.exit()
+            
+            # edge_info = {'top': start_slice, 'bottom': end_slice, 'left': start_column, 'right': end_column}
+            edge_info = {'top': start_slice, 'bottom': end_slice}
+
+            if pre_existing_align_norm_file_enabled:
+                print('Updating input normalization, net y shift, and incident intensity CSV file...')
+
+                futil.create_csv_raw_input_data(xrt_od_xrf_realignment_subdir_path,
+                                                theta,
+                                                norm_array,
+                                                init_x_shift_array,
+                                                init_y_shift_array,
+                                                pixel_rad_adjacent_angle_jitter,
+                                                pixel_rad_cor_correction,
+                                                pixel_rad_iter_reproj,
+                                                I0_cts)
+
+            else:
+                print('Creating input normalization, net y shift, and incident intensity CSV file...')
+
+                futil.create_csv_raw_input_data(xrt_od_xrf_realignment_subdir_path,
+                                                theta,
+                                                norm_array,
+                                                init_x_shift_array,
+                                                init_y_shift_array,
+                                                pixel_rad_adjacent_angle_jitter = np.zeros(proj_img_array_element_to_align_with.shape[0] - 1),
+                                                pixel_rad_cor_correction = 0,
+                                                pixel_rad_iter_reproj = np.zeros(proj_img_array_element_to_align_with.shape[0] - 1),
+                                                I0_cts = I0_cts)
+
+            if return_aux_data:
+                print('Writing the following auxiliary, pre-COR-corrected, adjacent angle jitter-corrected, cropped per-projection data to NumPy (.npy) files (NOTE: Python is needed to view these!) and .gif files:')
+                print('     -Phase cross-correlation data')
+                print('     -Phase cross-correlation data (truncated)')
+                print('     -Shifted, pre-COR-corrected, adjacent angle, vertical jitter-corrected, cropped projection data')
+                
+                # if common_field_of_view_axes == 'both':
+                #     print('     -Shifted, pre-COR-corrected, adjacent angle jitter-corrected, cropped projection data')
+                
+                # elif common_field_of_view_axes == 'x':
+                #     print('     -Shifted, pre-COR-corrected, adjacent angle jitter-corrected (horizontal), cropped projection data')
+                
+                # elif common_field_of_view_axes == 'y':
+                #     print('     -Shifted, pre-COR-corrected, adjacent angle jitter-corrected (vertical), cropped projection data')
+            
+                futil.create_adjacent_angle_jitter_corrected_norm_proj_data_npy(xrt_od_xrf_realignment_subdir_path,
+                                                                                adj_angle_jitter_corrected_proj_element_to_align_with_aux,
+                                                                                phase_xcorr_2d_aggregate_aux,
+                                                                                phase_xcorr_2d_truncated_aggregate_aux,
+                                                                                aligning_element,
+                                                                                sigma,
+                                                                                alpha)
+                
+                futil.create_adjacent_angle_jitter_corrected_norm_proj_data_gif(xrt_od_xrf_realignment_subdir_path,
+                                                                                aligning_element,
+                                                                                proj_img_array_element_to_align_with,
+                                                                                adj_angle_jitter_corrected_proj_element_to_align_with_aux,
+                                                                                sigma,
+                                                                                alpha,
+                                                                                theta,
+                                                                                fps)
+
+        aligned_proj_final_xrt_sig, \
+        aligned_proj_final_opt_dens, \
+        aligned_proj_final_xrf, \
+        net_x_shifts_pcc_final, \
+        net_y_shifts_pcc_final, \
+        recon_array, \
+        aligned_exp_proj_array, \
+        synth_proj_array, \
+        pcc_2d_array_iter_reproj, \
+        pcc_2d_array_iter_reproj_truncated, \
+        dx_array_pcc, \
+        dy_array_pcc = realign.realign_proj(cor_correction_only,
+                                            aligning_element,
+                                            elements_xrf,
+                                            counts_xrt_norm,
+                                            opt_dens_norm,
+                                            counts_xrf_norm,
+                                            theta,
+                                            sample_flipped_remounted_mid_experiment,
+                                            n_iterations_cor_correction,
+                                            eps_cor_correction,
+                                            I0_cts,
+                                            n_iter_iter_reproj,
+                                            init_x_shift_array,
+                                            init_y_shift_array,
+                                            sigma,
+                                            alpha,
+                                            pixel_rad_iter_reproj,
+                                            eps_iter_reproj,
+                                            edge_info,
+                                            return_aux_data)
+        
+        print('Creating gridrec-based density maps from aligned XRF data...')
         
         if return_aux_data:
-            if init_edge_crop_enabled:
-                aligned_proj_final_xrt_sig, \
-                aligned_proj_final_opt_dens, \
-                aligned_proj_final_xrf, \
-                net_x_shifts_pcc_final, \
-                net_y_shifts_pcc_final, \
-                aligned_exp_proj_array, \
-                cropped_aligned_exp_proj_array, \
-                synth_proj_array, \
-                pcc_2d_array, \
-                recon_array, \
-                net_x_shifts_pcc_array, \
-                net_y_shifts_pcc_array, \
-                dx_pcc_array, \
-                dy_pcc_array = realign.realign_proj(cor_correction_only,
-                                                    counts_xrt_norm,
-                                                    init_cropped_xrt_array,
-                                                    opt_dens_norm,
-                                                    init_cropped_opt_dens_array,
-                                                    counts_xrf_norm,
-                                                    init_cropped_xrf_array,
-                                                    theta,
-                                                    #    zero_idx_to_discard,
-                                                    sample_flipped_remounted_mid_experiment,
-                                                    n_iterations_cor_correction,
-                                                    eps_cor_correction,
-                                                    I0_cts,
-                                                    n_iter_iter_reproj,
-                                                    net_x_shift_array,
-                                                    net_y_shift_array,
-                                                    sigma,
-                                                    alpha,
-                                                    upsample_factor,
-                                                    eps_iter_reproj,
-                                                    init_edge_pixel_lengths_to_crop,
-                                                    return_aux_data = True)
-            
-            else:
-                aligned_proj_final_xrt_sig, \
-                aligned_proj_final_opt_dens, \
-                aligned_proj_final_xrf, \
-                net_x_shifts_pcc_final, \
-                net_y_shifts_pcc_final, \
-                aligned_exp_proj_array, \
-                synth_proj_array, \
-                pcc_2d_array, \
-                recon_array, \
-                net_x_shifts_pcc_array, \
-                net_y_shifts_pcc_array, \
-                dx_pcc_array, \
-                dy_pcc_array = realign.realign_proj(cor_correction_only,
-                                                    counts_xrt_norm,
-                                                    init_cropped_xrt_array,
-                                                    opt_dens_norm,
-                                                    init_cropped_opt_dens_array,
-                                                    counts_xrf_norm,
-                                                    init_cropped_xrf_array,
-                                                    theta,
-                                                    #    zero_idx_to_discard,
-                                                    sample_flipped_remounted_mid_experiment,
-                                                    n_iterations_cor_correction,
-                                                    eps_cor_correction,
-                                                    I0_cts,
-                                                    n_iter_iter_reproj,
-                                                    net_x_shift_array,
-                                                    net_y_shift_array,
-                                                    sigma,
-                                                    alpha,
-                                                    upsample_factor,
-                                                    eps_iter_reproj,
-                                                    init_edge_pixel_lengths_to_crop,
-                                                    return_aux_data = True)
+            print('Writing per-iteration auxiliary data to NumPy (.npy) files (NOTE: Python is needed to view these!)...')
 
-            print('Writing the following auxiliary, per-iteration data to NumPy (.npy) files (NOTE: Python is needed to view these!):')
-
-            if init_edge_crop_enabled:
-                print('     -Remapped experimental optical density projection data')
-                print('     -Cropped experimental optical density projection data')
-            
-            else:
-                print('     -Experimental optical density projection data')
-            
-            print('     -Reconstructed optical density data')
-            print('     -Reprojected optical density data')
-            
-            if not cor_correction_only:
-                print('     -2D phase cross-correlation data')
-                print('     -Incremental x shifts')
-                print('     -Incremental y shifts')
-            
-            print('     -Net x shifts')
-            print('     -Net y shifts')
-
-            if init_edge_crop_enabled:
-                futil.create_aux_opt_dens_data_npy(xrt_od_xrf_realignment_subdir_path,
-                                                   cor_correction_only,
-                                                   aligned_exp_proj_array,
-                                                   recon_array,
-                                                   synth_proj_array,
-                                                   pcc_2d_array,
-                                                   dx_pcc_array,
-                                                   dy_pcc_array,
-                                                   net_x_shifts_pcc_array,
-                                                   net_y_shifts_pcc_array,
-                                                   cropped_aligned_exp_proj_iter_array = cropped_aligned_exp_proj_array)
-            
-            else:
-                futil.create_aux_opt_dens_data_npy(xrt_od_xrf_realignment_subdir_path,
-                                                   cor_correction_only,
-                                                   aligned_exp_proj_array,
-                                                   recon_array,
-                                                   synth_proj_array,
-                                                   pcc_2d_array,
-                                                   dx_pcc_array,
-                                                   dy_pcc_array,
-                                                   net_x_shifts_pcc_array,
-                                                   net_y_shifts_pcc_array)
-
-        else:
-            aligned_proj_final_xrt_sig, \
-            aligned_proj_final_opt_dens, \
-            aligned_proj_final_xrf, \
-            net_x_shifts_pcc_final, \
-            net_y_shifts_pcc_final = realign.realign_proj(cor_correction_only,
-                                                          counts_xrt_norm,
-                                                          init_cropped_xrt_array,
-                                                          opt_dens_norm,
-                                                          init_cropped_opt_dens_array,
-                                                          counts_xrf_norm,
-                                                          init_cropped_xrf_array,
-                                                          theta,
-                                                         #  zero_idx_to_discard,
-                                                          sample_flipped_remounted_mid_experiment,
-                                                          n_iterations_cor_correction,
-                                                          eps_cor_correction,
-                                                          I0_cts,
-                                                          n_iter_iter_reproj,
-                                                          net_x_shift_array,
-                                                          net_y_shift_array,
-                                                          sigma,
-                                                          alpha,
-                                                          upsample_factor,
-                                                          eps_iter_reproj)
+            futil.create_post_iter_reproj_aux_data_npy(xrt_od_xrf_realignment_subdir_path,
+                                                       cor_correction_only,
+                                                       aligned_exp_proj_array,
+                                                       recon_array,
+                                                       synth_proj_array,
+                                                       pcc_2d_array_iter_reproj,
+                                                       pcc_2d_array_iter_reproj_truncated,
+                                                       dx_array_pcc,
+                                                       dy_array_pcc,
+                                                       net_x_shifts_pcc_final,
+                                                       net_y_shifts_pcc_final)
 
         if final_edge_crop_enabled:
             if final_edge_pixel_lengths_to_crop is None:
@@ -432,7 +426,19 @@ def preprocess_xrf_xrt_data(synchrotron,
                 print("Warning: Non-empty 'init_edge_pixel_lengths_to_crop' dictionary detected. Removing items from 'final_edge_pixel_lengths_to_crop'...")
 
             final_edge_pixel_lengths_to_crop = None
-
+        
+        print('Creating gridrec-based density maps from aligned and cropped XRF data...')
+        
+        gridrec_density_maps = ppu.create_gridrec_density_maps(aligned_proj_final_xrf_cropped,
+                                                               elements_xrf,
+                                                               theta)
+        
+        print('Writing gridrec-based density map data to HDF5 file...')
+        
+        futil.create_gridrec_density_maps_h5(xrt_od_xrf_realignment_subdir_path,
+                                             gridrec_density_maps,
+                                             elements_xrf)
+        
         print('Writing final aligned XRF, XRT, and optical density projection data to HDF5 file...')
             
         futil.create_h5_aligned_aggregate_xrf_xrt(xrt_od_xrf_realignment_subdir_path,
@@ -440,21 +446,17 @@ def preprocess_xrf_xrt_data(synchrotron,
                                                   aligned_proj_final_xrf_cropped, 
                                                   aligned_proj_final_xrt_sig_cropped,
                                                   aligned_proj_final_opt_dens_cropped,
-                                                #   theta_final,
                                                   theta,
-                                                #   zero_idx_to_discard,
                                                   init_edge_pixel_lengths_to_crop,
                                                   final_edge_pixel_lengths_to_crop)
             
         print('Writing per-projection normalization, final net x and y shifts, and incident intensity to CSV file...')
 
-        futil.create_csv_norm_net_shift_data(xrt_od_xrf_realignment_subdir_path,
-                                            #  theta_final,
-                                             theta,
-                                             norm_array,
-                                             net_x_shifts_pcc_final,
-                                             net_y_shifts_pcc_final,
-                                             I0_cts)
+        futil.create_csv_output_data(xrt_od_xrf_realignment_subdir_path,
+                                     theta,
+                                     net_x_shifts_pcc_final,
+                                     net_y_shifts_pcc_final,
+                                     I0_cts)
             
         print('Done')
 
@@ -510,22 +512,10 @@ def preprocess_xrf_xrt_data(synchrotron,
                                                                        norm_enabled = norm_enabled,
                                                                        theta_array = theta,
                                                                        fps = fps)
-        
-        # if zero_idx_to_discard is not None:
-        #     final_xrf, \
-        #     final_xrt, \
-        #     final_opt_dens, \
-        #     theta_final = ppu.remove_zero_deg_proj_no_realignment(counts_xrf_norm,
-        #                                                           counts_xrt_norm,
-        #                                                           opt_dens,
-        #                                                           zero_idx_to_discard,
-        #                                                           theta)
-
-        # else:
+                                                                       
             final_xrf = counts_xrf_norm
             final_xrt = counts_xrt_norm
             final_opt_dens = opt_dens_norm
-            theta_final = theta
 
         if final_edge_crop_enabled:
             if final_edge_pixel_lengths_to_crop is None:
@@ -556,19 +546,17 @@ def preprocess_xrf_xrt_data(synchrotron,
                                                   final_xrf_cropped, 
                                                   final_xrt_sig_cropped,
                                                   final_opt_dens_cropped, 
-                                                  theta_final,
-                                                #   zero_idx_to_discard,
+                                                  theta,
                                                   init_edge_pixel_lengths_to_crop,
                                                   final_edge_pixel_lengths_to_crop)
 
         print('Writing per-projection normalization, final net x and y shifts, and incident intensity to CSV file...')
 
-        futil.create_csv_norm_net_shift_data(xrt_od_xrf_realignment_subdir_path,
-                                             theta_final,
-                                             norm_array,
-                                             net_x_shift_array,
-                                             net_y_shift_array,
-                                             I0_cts)
+        futil.create_csv_output_data(xrt_od_xrf_realignment_subdir_path,
+                                     theta,
+                                     net_x_shift_array = np.zeros(final_xrt_sig_cropped.shape[0] - 1),
+                                     net_y_shift_array = np.zeros(final_xrt_sig_cropped.shape[0] - 1),
+                                     I0_cts = I0_cts)
             
         print('Done')
     

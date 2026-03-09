@@ -2,6 +2,7 @@ import numpy as np, h5py, xrf_xrt_jxrft_file_util as futil, pandas as pd, xrayli
 
 from matplotlib import pyplot as plt
 from itertools import combinations as combos
+from scipy import ndimage as ndi
 
 # mda_array = ['0116', '0117', '0118', '0119', '0120', '0121', '0122', '0123', '0124', '0125', '0126']
 # mda_array = ['0124', '0125', '0126']
@@ -169,5 +170,10 @@ from itertools import combinations as combos
 
 # E = np.array([10., 11.])
 # print(xrl_np.CS_Total_Kissel(np.array([4]), E).squeeze())
-a = np.array([1, 2, 3, 4, 5])
-print(np.cumsum(a))
+
+def add(a, b):
+    return a + b
+c = 5
+d = add(1, c)
+print(c)
+print(d)

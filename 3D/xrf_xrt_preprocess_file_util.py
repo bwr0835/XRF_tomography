@@ -60,28 +60,25 @@ def extract_h5_xrf_data(file_path, synchrotron, **kwargs):
 
         sys.exit()
 
-    h5 = h5py.File(file_path, 'r')
-    
     if synchrotron == 'aps':
         try:
-            if "MAPS/XRF_Analyzed/NNLS" in h5.keys():
-                counts_h5 = h5['MAPS/XRF_Analyzed/NNLS/Counts_Per_Sec']
-                elements_h5 = h5['MAPS/XRF_Analyzed/NNLS/Channel_Names']
+            with h5py.File(file_path, 'r') as h5:
+                if "MAPS/XRF_Analyzed/NNLS" in h5.keys():
+                    counts_h5 = h5['MAPS/XRF_Analyzed/NNLS/Counts_Per_Sec']
+                    elements_h5 = h5['MAPS/XRF_Analyzed/NNLS/Channel_Names']
             
-            extra_pvs_h5 = h5['MAPS/Scan/Extra_PVs']
+                extra_pvs_h5 = h5['MAPS/Scan/Extra_PVs']
             
-            nx_h5 = h5['MAPS/Scan/x_axis']
-            ny_h5 = h5['MAPS/Scan/y_axis']
+                nx_h5 = h5['MAPS/Scan/x_axis']
+                ny_h5 = h5['MAPS/Scan/y_axis']
                 
-            counts = counts_h5[()]
-            elements = elements_h5[()]
-            extra_pvs_names = extra_pvs_h5['Names'][()]
-            extra_pvs_values = extra_pvs_h5['Values'][()]
+                counts = counts_h5[()]
+                elements = elements_h5[()]
+                extra_pvs_names = extra_pvs_h5['Names'][()]
+                extra_pvs_values = extra_pvs_h5['Values'][()]
 
-            nx_conv = ny_h5[()] # Width and height are reversed in the actual HDF5 data structure
-            ny_conv = nx_h5[()] # Width and height are reversed in the actual HDF5 data structure
-
-            h5.close()
+                nx_conv = ny_h5[()] # Width and height are reversed in the actual HDF5 data structure
+                ny_conv = nx_h5[()] # Width and height are reversed in the actual HDF5 data structure
 
         except KeyboardInterrupt:
             print('\n\nKeyboardInterrupt occurred. Exiting program...')
@@ -213,19 +210,21 @@ def extract_h5_xrt_data(file_path, synchrotron, **kwargs):
 
         sys.exit()
     
-    h5 = h5py.File(file_path, 'r')
-
     if synchrotron == 'aps':
         try:
-            scalers_h5 = h5['MAPS/Scalers']
-            extra_pvs_h5 = h5['MAPS/Scan/Extra_PVs']
-            nx_h5 = h5['MAPS/Scan/x_axis']
-            ny_h5 = h5['MAPS/Scan/y_axis']
+            with h5py.File(file_path, 'r') as h5:
+                scalers_h5 = h5['MAPS/Scalers']
+                extra_pvs_h5 = h5['MAPS/Scan/Extra_PVs']
+                nx_h5 = h5['MAPS/Scan/x_axis']
+                ny_h5 = h5['MAPS/Scan/y_axis']
         
-            scaler_names = scalers_h5['Names'][()]
-            scaler_values = scalers_h5['Values'][()]
-            extra_pvs_names = extra_pvs_h5['Names'][()]
-            extra_pvs_values = extra_pvs_h5['Values'][()]
+                scaler_names = scalers_h5['Names'][()]
+                scaler_values = scalers_h5['Values'][()]
+                extra_pvs_names = extra_pvs_h5['Names'][()]
+                extra_pvs_values = extra_pvs_h5['Values'][()]
+
+                nx_conv = ny_h5[()] # Width and height are reversed in the actual HDF5 data structure
+                ny_conv = nx_h5[()] # Width and height are reversed in the actual HDF5 data structure
         
         except KeyboardInterrupt:
             print('\n\nKeyboardInterrupt occurred. Exiting program...')
@@ -233,14 +232,9 @@ def extract_h5_xrt_data(file_path, synchrotron, **kwargs):
             sys.exit()
 
         except:
-            print('Error: Incompatible HDF5 file structure. Exiting program...')
+            print('Error: Incompatible XRF/XRT HDF5 file structure. Exiting program...')
 
             sys.exit()
-        
-        nx_conv = ny_h5[()] # Width and height are reversed in the actual HDF5 data structure
-        ny_conv = nx_h5[()] # Width and height are reversed in the actual HDF5 data structure
-        
-        h5.close()
 
         # elements = ['empty', 'us_ic', 'ds_ic', 'abs_ic']
         elements = ['empty', 'us_ic', 'xrt_sig', 'empty']
@@ -252,7 +246,6 @@ def extract_h5_xrt_data(file_path, synchrotron, **kwargs):
         try:
             us_ic_idx = np.where(scaler_names == b'US_IC')[0][0] # The second [0] converts the 1-element array into a scalar
             ds_ic_idx = np.where(scaler_names == b'DS_IC')[0][0]
-            # abs_ic_idx = np.where(scaler_names == b'abs_ic')[0][0]
             theta_idx = np.where(extra_pvs_names == b'2xfm:m58.VAL')[0]
         
         except KeyboardInterrupt:
@@ -261,7 +254,7 @@ def extract_h5_xrt_data(file_path, synchrotron, **kwargs):
             sys.exit()
 
         except:
-            print('Error: Incompatible HDF5 file structure. Exiting program...')
+            print('Error: Incompatible XRF/XRT HDF5 file structure. Exiting program...')
 
             sys.exit()
 
@@ -285,12 +278,11 @@ def extract_h5_xrt_data(file_path, synchrotron, **kwargs):
     elif synchrotron == 'nsls-ii':
         # STXM calculations adapted from X. Huang, Brookhaven National Laboratory
         try:
-            diffract_map_intensity = h5['diffamp'][()]
-            theta = h5['angle'][()]
+            with h5py.File(file_path, 'r') as h5:
+                diffract_map_intensity = h5['diffamp'][()]
+                theta = h5['angle'][()]
 
-            dx_cm, dy_cm = h5['dr_x'][()], h5['dr_y'][()] # These are supposed to be different than for XRF due to ptychography requiring overlapping positions
-
-            h5.close()
+                dx_cm, dy_cm = h5['dr_x'][()], h5['dr_y'][()] # These are supposed to be different than for XRF due to ptychography requiring overlapping positions
 
         except KeyboardInterrupt:
             print('\n\nKeyboardInterrupt occurred. Exiting program...')
@@ -526,45 +518,38 @@ def extract_h5_aggregate_xrf_data(file_path, **kwargs):
 
         sys.exit()
     
-    h5 = h5py.File(file_path, 'r')
+    try:
+        with h5py.File(file_path, 'r') as h5:
+            counts_h5 = h5['exchange/data']
+            theta_h5 = h5['exchange/theta']
+            elements_h5 = h5['exchange/elements']
+
+            counts = counts_h5[()]
+            theta = theta_h5[()]
+            elements = elements_h5.asstr()[:]
+
+            if kwargs.get('filename_array') == True:
+                filenames_h5 = h5['filenames']
+
+                filenames = filenames_h5.asstr()[:]
+
+            dataset_type = counts_h5.attrs['dataset_type']
+            raw_spectrum_fitting_method = h5['exchange'].attrs['raw_spectrum_fitting_method']
     
-    # try:
-    counts_h5 = h5['exchange/data']
-    theta_h5 = h5['exchange/theta']
-    elements_h5 = h5['exchange/elements']
-
-    if kwargs.get('filename_array') == True:
-        filenames_h5 = h5['filenames']
-
-        filenames = filenames_h5[()]
-
-    dataset_type = counts_h5.attrs['dataset_type']
-    raw_spectrum_fitting_method = h5['exchange'].attrs['raw_spectrum_fitting_method']
-    
-    # except KeyboardInterrupt:
-    #     print('\n\nKeyboardInterrupt occurred. Exiting program...')
+    except KeyboardInterrupt:
+        print('\n\nKeyboardInterrupt occurred. Exiting program...')
             
-    #     sys.exit()
+        sys.exit()
 
-    # except:
-    #     print('Error: Incompatible XRF HDF5 file structure. Exiting program...')
+    except:
+        print('Error: Incompatible XRF HDF5 file structure. Exiting program...')
 
-    #     sys.exit()
-
-    counts = counts_h5[()]
-    theta = theta_h5[()]
-    elements = elements_h5[()]
-        
-    h5.close()
-
-    elements_string = [element.decode() for element in elements]
+        sys.exit()
     
     if kwargs.get('filename_array') == True:
-        filename_array = [filename.decode() for filename in filenames]
-
-        return elements_string, counts, theta, raw_spectrum_fitting_method, dataset_type, filename_array
+        return elements, counts, theta, raw_spectrum_fitting_method, dataset_type, filenames
     
-    return elements_string, counts, theta, raw_spectrum_fitting_method, dataset_type
+    return elements, counts, theta, raw_spectrum_fitting_method, dataset_type
 
 def extract_h5_aggregate_xrt_data(file_path, **kwargs):
     if not os.path.isfile(file_path):
@@ -577,20 +562,23 @@ def extract_h5_aggregate_xrt_data(file_path, **kwargs):
 
         sys.exit()
     
-    h5 = h5py.File(file_path, 'r')
-    
     try:
-        counts_h5 = h5['exchange/data']
-        theta_h5 = h5['exchange/theta']
-        elements_h5 = h5['exchange/elements']
+        with h5py.File(file_path, 'r') as h5:
+            counts_h5 = h5['exchange/data']
+            theta_h5 = h5['exchange/theta']
+            elements_h5 = h5['exchange/elements']
 
-        if kwargs.get('filename_array') == True:
-            filenames_h5 = h5['filenames']
+            counts = counts_h5[()]
+            theta = theta_h5[()]
+            elements = elements_h5.asstr()[:]
 
-            filenames = filenames_h5[()]
+            if kwargs.get('filename_array') == True:
+                filenames_h5 = h5['filenames']
 
-        dataset_type = counts_h5.attrs['dataset_type']
-        us_ic_scaler_name = counts_h5.attrs['us_ic_scaler_name']
+                filenames = filenames_h5.asstr()[:]
+
+            dataset_type = counts_h5.attrs['dataset_type']
+            us_ic_scaler_name = counts_h5.attrs['us_ic_scaler_name']
     
     except KeyboardInterrupt:
         print('\n\nKeyboardInterrupt occurred. Exiting program...')
@@ -602,20 +590,10 @@ def extract_h5_aggregate_xrt_data(file_path, **kwargs):
 
         sys.exit()
 
-    counts = counts_h5[()]
-    theta = theta_h5[()]
-    elements = elements_h5[()]
-    
-    h5.close()
-
-    elements_string = [element.decode() for element in elements]
-
     if kwargs.get('filename_array') == True:
-        filename_array = [filename.decode() for filename in filenames]
-
-        return elements_string, counts, theta, us_ic_scaler_name, dataset_type, filename_array
+        return elements, counts, theta, us_ic_scaler_name, dataset_type, filenames
     
-    return elements_string, counts, theta, us_ic_scaler_name, dataset_type
+    return elements, counts, theta, us_ic_scaler_name, dataset_type
 
 def extract_csv_norm_net_shift_data(file_path, theta_array):
     if not os.path.isfile(file_path):
@@ -639,7 +617,7 @@ def extract_csv_norm_net_shift_data(file_path, theta_array):
         sys.exit()
 
     except:
-        print('Error: Incorrect CSV file structure. Exiting program...')
+        print('Error: Incorrect CSV file structure for normalization and net shift data. Exiting program...')
 
         sys.exit()
 
@@ -661,7 +639,6 @@ def create_h5_aligned_aggregate_xrf_xrt(dir_path,
                                         xrt_array,
                                         opt_dens_array, 
                                         theta_array,
-                                        # zero_idx_discarded,
                                         init_edge_info,
                                         final_edge_info):
 
@@ -702,9 +679,6 @@ def create_h5_aligned_aggregate_xrf_xrt(dir_path,
             exchange['data'].attrs['right_edge_cropped_final'] = final_edge_info['right']
             exchange['data'].attrs['top_edge_cropped_final'] = final_edge_info['top']
             exchange['data'].attrs['bottom_edge_cropped_final'] = final_edge_info['bottom']
-
-        # if zero_idx_discarded is not None:
-            # exchange['theta'].attrs['zero_deg_idx_discarded'] = zero_idx_discarded
 
     return
 
@@ -766,6 +740,8 @@ def extract_csv_preprocessing_input_params(file_path):
         else:
             print('Error: The following input parameters should be removed:\n')
             print(*(["'{}'".format(s) for s in extra_data]), sep = '\n')
+        
+        print('\n\rExiting program...')
 
         sys.exit()
 
@@ -822,13 +798,9 @@ def extract_csv_preprocessing_input_params(file_path):
     input_param_dict = dict(zip(input_params, values)) # zip() creates tuples; dict() converts the tuples to a dictionary
 
     if not all(isinstance(input_param_dict[param], bool) for param in bool_params):
-        print('Error: The following input parameters must all be set to True or False:\n', \
-              '     \'create_aggregate_xrf_xrt_files_enabled\'\n', \
-              '     \'pre_existing_aggregate_xrf_xrt_file_lists_enabled\'\n', \
-              '     \'pre_existing_align_norm_file_enabled\'\n', \
-              '     \'norm_enabled\'\n', \
-              '     \'realignment_enabled\'\n\n', \
-              '\rExiting program...')
+        print('Error: The following input parameters must all be set to True or False:\n')
+        print(*(["'{}'".format(s) for s in bool_params]), sep = '\n')
+        print('\n\rExiting program...')
 
         sys.exit()
 
@@ -960,17 +932,17 @@ def create_aux_conv_mag_data_npy(dir_path, array):
 
     return
 
-def create_aux_opt_dens_data_npy(dir_path,
-                                 cor_correction_only,
-                                 aligned_exp_proj_array,
-                                 recon_array,
-                                 synth_proj_array,
-                                 pcc_2d_array,
-                                 dx_array,
-                                 dy_array,
-                                 net_x_shifts_pcc_array,
-                                 net_y_shifts_pcc_array,
-                                 **kwargs):
+def create_post_iter_reproj_aux_data_npy(dir_path,
+                                         cor_correction_only,
+                                         aligned_exp_proj_array,
+                                         recon_array,
+                                         synth_proj_array,
+                                         pcc_2d_array,
+                                         dx_array,
+                                         dy_array,
+                                         net_x_shifts_pcc_array,
+                                         net_y_shifts_pcc_array,
+                                         **kwargs):
     
     subdir_path = os.path.join(dir_path, 'aux_data')
 
@@ -992,20 +964,96 @@ def create_aux_opt_dens_data_npy(dir_path,
 
     return
 
-def create_csv_norm_net_shift_data(dir_path,
-                                   theta_array,
-                                   norm_array,
-                                   net_x_shifts,
-                                   net_y_shifts,
-                                   I0):
+def create_csv_raw_input_data(dir_path,
+                              theta_array,
+                              norm_factor,
+                              init_x_shifts,
+                              init_y_shifts,
+                              pixel_rad_pre_cor_jitter,
+                              pixel_rad_cor,
+                              pixel_rad_iter_reproj,
+                              I0_cts):
+    
+    file_path = os.path.join(dir_path, 'raw_input_data.csv')
+
+    pixel_rad_pre_cor_jitter_array = np.append(np.nan, pixel_rad_pre_cor_jitter)
+    pixel_rad_cor_array = np.append(np.nan, pixel_rad_cor)
+    pixel_rad_iter_reproj_array = np.append(np.nan, pixel_rad_iter_reproj)
+
+    df = pd.DataFrame({'theta_deg': theta_array,
+                       'norm_factor': norm_factor,
+                       'init_x_shifts': init_x_shifts,
+                       'init_y_shifts': init_y_shifts,
+                       'pixel_rad_pre_cor_jitter': pixel_rad_pre_cor_jitter_array,
+                       'pixel_rad_cor': pixel_rad_cor_array,
+                       'pixel_rad_iter_reproj': pixel_rad_iter_reproj_array,
+                       'I0_cts': I0_cts})
+    
+    df.loc[1:, 'I0_cts'] = np.nan # To make sure no errors arise from not having unequal column lengths
+    df.loc[1:, 'pixel_rad_cor'] = np.nan
+
+    df.to_csv(file_path, index = False)
+
+    return
+
+def extract_csv_raw_input_data(file_path):
+    if not os.path.isfile(file_path):
+        print('Error: Input data CSV file path cannot be found. Exiting program...')
+
+        sys.exit()
+    
+    if not file_path.endswith('.csv'):
+        print('Error: Input data file must be CSV. Exiting program...')
+
+        sys.exit()
+    
+    try:
+        df = pd.read_csv(file_path)
+    
+    except KeyboardInterrupt:
+        print('\n\nKeyboardInterrupt occurred. Exiting program...')
+
+        sys.exit()
+
+    except:
+        print('Error: Unable to read in input data CSV file. Exiting program...')
+
+        sys.exit()
+
+    norm_factor = df['norm_factor'].to_numpy().astype(float)
+    init_x_shifts = df['init_x_shifts'].to_numpy().astype(float)
+    init_y_shifts = df['init_y_shifts'].to_numpy().astype(float)
+    pixel_rad_pre_cor_jitter = df['pixel_rad_pre_cor_jitter'].to_numpy().astype(float)
+    pixel_rad_cor = df['pixel_rad_cor'].to_numpy().astype(float)
+    pixel_rad_iter_reproj = df['pixel_rad_iter_reproj'].to_numpy().astype(float)
+    I0_cts = df['I0_cts'].to_numpy().astype(float)    
+
+    return norm_factor, \
+           init_x_shifts, \
+           init_y_shifts, \
+           pixel_rad_pre_cor_jitter, \
+           pixel_rad_cor, \
+           pixel_rad_iter_reproj, \
+           I0_cts
+
+def create_csv_output_data(dir_path,
+                           theta_array,
+                           net_x_shifts,
+                           net_y_shifts,
+                           I0_cts):
 
     file_path = os.path.join(dir_path, 'norm_net_shift_data.csv')
 
     df = pd.DataFrame({'theta_deg': theta_array,
-                       'norm_factor': norm_array,
                        'net_x_pixel_shift': net_x_shifts,
                        'net_y_pixel_shift': net_y_shifts,
-                       'I0_cts': I0})
+                       'I0_cts': I0_cts})
+
+    if net_x_shifts.ndim == 2:
+        theta_array = np.repeat(theta_array, net_x_shifts.shape[1])
+        
+        net_x_shifts = net_x_shifts.ravel()
+        net_y_shifts = np.repeat(net_y_shifts, net_x_shifts.shape[1])
 
     df.loc[1:, 'I0_cts'] = np.nan # To make sure no errors arise from not having unequal column lengths
 
@@ -1216,7 +1264,6 @@ def create_nonaligned_norm_non_cropped_proj_data_gif(dir_path,
         axs3[2].set_title(r'XRF ({0})'.format(desired_xrf_element), fontsize = 14)
 
         for axs in fig3.axes:
-        #     axs.axis('off')
             axs.set_xlabel(r'Pixel index', fontsize = 14)
             axs.set_ylabel(r'$\theta$ (\textdegree)', fontsize = 14)
 
@@ -1322,70 +1369,77 @@ def create_nonaligned_norm_non_cropped_proj_data_gif(dir_path,
         
     return
 
-def create_vert_jitter_corrected_norm_non_cropped_proj_data_gif_v1(dir_path,
-                                                                   desired_xrf_elements,
-                                                                   xrf_element_array,
-                                                                   counts_xrf,
-                                                                   opt_dens,
-                                                                   shifted_counts_xrf,
-                                                                   shifted_opt_dens,
-                                                                   sigma,
-                                                                   alpha,
-                                                                   theta_array,
-                                                                   fps):
-
-    n_theta, n_slices, n_columns = counts_xrf.shape[1:]
+def create_adjacent_angle_jitter_corrected_norm_proj_data_npy(dir_path,
+                                                              shifted_counts_ref_element,
+                                                              phase_xcorr_2d_adjacent_angle_jitter,
+                                                              phase_xcorr_2d_adjacent_angle_jitter_truncated,
+                                                              ref_element,
+                                                              sigma,
+                                                              alpha):
     
-    ref_element_idx_xrf_1 = xrf_element_array.index(desired_xrf_elements[0])
-    ref_element_idx_xrf_2 = xrf_element_array.index(desired_xrf_elements[1])
+    subdir_path = os.path.join(dir_path, 'aux_data')
 
-    counts_xrf_ref_element_1 = counts_xrf[ref_element_idx_xrf_1]
-    counts_xrf_ref_element_2 = counts_xrf[ref_element_idx_xrf_2]
+    os.makedirs(subdir_path, exist_ok = True)
 
-    shifted_counts_xrf_ref_element_1 = shifted_counts_xrf[ref_element_idx_xrf_1]
-    shifted_counts_xrf_ref_element_2 = shifted_counts_xrf[ref_element_idx_xrf_2]
+    np.save(os.path.join(subdir_path, f'phase_xcorr_2d_adjacent_angle_jitter_{ref_element}_sigma_{sigma}_alpha_{alpha}.npy'), phase_xcorr_2d_adjacent_angle_jitter)
+    np.save(os.path.join(subdir_path, f'phase_xcorr_2d_adjacent_angle_jitter_truncated_{ref_element}_sigma_{sigma}_alpha_{alpha}.npy'), phase_xcorr_2d_adjacent_angle_jitter_truncated)
+    np.save(os.path.join(subdir_path, f'adj_angle_jitter_corrected_proj_element_to_align_with_{ref_element}_sigma_{sigma}_alpha_{alpha}.npy'), shifted_counts_ref_element)
+
+    return
+
+def create_gridrec_density_maps_h5(dir_path,
+                                   gridrec_density_maps,
+                                   elements_xrf):
     
-    vmin_xrf_1 = np.min([counts_xrf_ref_element_1.min(), shifted_counts_xrf_ref_element_1.min()])
-    vmax_xrf_1 = np.max([counts_xrf_ref_element_1.max(), shifted_counts_xrf_ref_element_1.max()])
+    file_name = os.path.join(dir_path, 'gridrec_density_maps')
 
-    vmin_xrf_2 = np.min([counts_xrf_ref_element_2.min(), shifted_counts_xrf_ref_element_2.min()])
-    vmax_xrf_2 = np.max([counts_xrf_ref_element_2.max(), shifted_counts_xrf_ref_element_2.max()])
+    for element_idx, element in enumerate(elements_xrf):
+        if '_' in element:
+            elements_xrf[element_idx] = element.split('_')[0]
+    
+    with h5py.File(file_name, 'w') as f:
+        sample = f.create_group('sample')
+        
+        sample.create_dataset("densities", data = gridrec_density_maps.astype('f4'))
+        sample.create_dataset("elements", data = elements_xrf.astype('S5'))
 
-    vmin_opt_dens = np.min([opt_dens.min(), shifted_opt_dens.min()])
-    vmax_opt_dens = np.max([opt_dens.max(), shifted_opt_dens.max()])
+    return
+
+def create_adjacent_angle_jitter_corrected_norm_proj_data_gif(dir_path,
+                                                              ref_element,
+                                                              counts_ref_element,
+                                                              shifted_counts_ref_element,
+                                                              sigma,
+                                                              alpha,
+                                                              theta_array,
+                                                              fps):
+
+    n_theta, n_slices, n_columns = counts_ref_element.shape[1:]
+    
+    vmin = np.min([counts_ref_element, shifted_counts_ref_element])
+    vmax = np.max([counts_ref_element, shifted_counts_ref_element])
 
     theta_frames1 = []
-    theta_frames2 = []
+    slice_frames = []
 
-    fig1, axs1 = plt.subplots(3, 2)
+    fig1, axs1 = plt.subplots(1, 2)
 
-    im1_1 = axs1[0, 0].imshow(opt_dens[0], vmin = vmin_opt_dens, vmax = vmax_opt_dens)
-    im1_2 = axs1[0, 1].imshow(shifted_opt_dens[0], vmin = vmin_opt_dens, vmax = vmax_opt_dens)
-    im1_3 = axs1[1, 0].imshow(counts_xrf_ref_element_1[0], vmin = vmin_xrf_1, vmax = vmax_xrf_1)
-    im1_4 = axs1[1, 1].imshow(shifted_counts_xrf_ref_element_1[0], vmin = vmin_xrf_1, vmax = vmax_xrf_1)
-    im1_5 = axs1[2, 0].imshow(counts_xrf_ref_element_2[0], vmin = vmin_xrf_2, vmax = vmax_xrf_2)
-    im1_6 = axs1[2, 1].imshow(shifted_counts_xrf_ref_element_2[0], vmin = vmin_xrf_2, vmax = vmax_xrf_2)
+    im1_1 = axs1[0].imshow(counts_ref_element[0], vmin = vmin, vmax = vmax)
+    im1_2 = axs1[1].imshow(shifted_counts_ref_element[0], vmin = vmin, vmax = vmax)
 
-    text_1 = axs1[2, 0].text(0.02, 0.02, r'$\theta = {0}$\textdegree'.format(theta_array[0]), transform = axs1[2, 0].transAxes, color = 'white')
+    text_1 = axs1[0].text(0.02, 0.02, r'$\theta = {0}$\textdegree'.format(theta_array[0]), transform = axs1[0].transAxes, color = 'white')
 
-    axs1[0, 0].set_title(r'Opt. Dens.', fontsize = 14)
-    axs1[0, 1].set_title(r'Sh. Opt. Dens.', fontsize = 14)
-    axs1[1, 0].set_title(r'XRF ({0})'.format(desired_xrf_elements[0]), fontsize = 14)
-    axs1[1, 1].set_title(r'Sh. XRF ({0})'.format(desired_xrf_elements[0]), fontsize = 14)
-    axs1[2, 0].set_title(r'XRF ({0})'.format(desired_xrf_elements[1]), fontsize = 14)
-    axs1[2, 1].set_title(r'Sh. XRF ({0})'.format(desired_xrf_elements[1]), fontsize = 14)
+    axs1[0].set_title(r'{0}'.format(ref_element), fontsize = 14)
+    axs1[1].set_title(r'{0} (adjacent angle jitter-corrected, cropped)'.format(ref_element), fontsize = 14)
 
     for axs in fig1.axes:
         axs.axis('off')
         axs.axvline(x = n_columns//2, color = 'red', linewidth = 2)
+        axs.axhline(y = n_slices//2, color = 'red', linewidth = 2)
 
     for theta_idx in range(n_theta):
-        im1_1.set_data(opt_dens[theta_idx])
-        im1_2.set_data(shifted_opt_dens[theta_idx])
-        im1_3.set_data(counts_xrf_ref_element_1[theta_idx])
-        im1_4.set_data(shifted_counts_xrf_ref_element_1[theta_idx])
-        im1_5.set_data(counts_xrf_ref_element_2[theta_idx])
-        im1_6.set_data(shifted_counts_xrf_ref_element_2[theta_idx])
+        im1_1.set_data(counts_ref_element[theta_idx])
+        im1_2.set_data(shifted_counts_ref_element[theta_idx])
 
         text_1.set_text(r'$\theta = {0}$\textdegree'.format(theta_array[theta_idx]))
 
@@ -1397,32 +1451,31 @@ def create_vert_jitter_corrected_norm_non_cropped_proj_data_gif_v1(dir_path,
 
     plt.close(fig1)
 
-    gif_filename = os.path.join(dir_path, f'vert_jitter_corrected_non_cropped_proj_data_sigma_{sigma}_alpha_{alpha}.gif')
+    gif_filename = os.path.join(dir_path, f'adjacent_angle_jitter_corrected_proj_comp_sigma_{sigma}_alpha_{alpha}.gif')
 
     print('Saving projection data to GIF...')
 
     iio2.mimsave(gif_filename, theta_frames1, fps = fps)
 
-    fig2, axs2 = plt.subplots(1, 3, figsize = (11, 6))
+    print(f'Plotting common field of view original, adjacent angle jitter-corrected, cropped {ref_element} sinograms...')
 
-    im2_1 = axs2[0].imshow(shifted_opt_dens[:, 0], vmin = vmin_opt_dens, vmax = vmax_opt_dens, origin = 'lower', aspect = 10)
-    im2_2 = axs2[1].imshow(shifted_counts_xrf_ref_element_1[:, 0], vmin = vmin_xrf_1, vmax = vmax_xrf_1, origin = 'lower', aspect = 10)
-    im2_3 = axs2[2].imshow(shifted_counts_xrf_ref_element_2[:, 0], vmin = vmin_xrf_2, vmax = vmax_xrf_2, origin = 'lower', aspect = 10)
+    fig2, axs2 = plt.subplots(1, 2, figsize = (11, 6))
 
-    text_2 = axs2[2].text(0.02, 0.02, r'Slice index 0/{0}'.format(n_slices - 1), transform = axs2[2].transAxes, color = 'white')
+    im2_1 = axs2[0].imshow(counts_ref_element[:, 0], vmin = vmin, vmax = vmax, origin = 'lower', extent = [0, n_slices - 1, -180, 180], aspect = 10)
+    im2_2 = axs2[1].imshow(shifted_counts_ref_element[:, 0], vmin = vmin, vmax = vmax, origin = 'lower', extent = [0, n_slices - 1, -180, 180], aspect = 10)
+
+    text_2 = axs2[0].text(0.02, 0.02, r'Slice index 0/{0}'.format(n_slices - 1), transform = axs2[0].transAxes, color = 'white')
     
-    axs2[0].set_title(r'Sh. Opt. Dens.', fontsize = 14)
-    axs2[1].set_title(r'Sh. XRF ({0})'.format(desired_xrf_elements[0]), fontsize = 14)
-    axs2[2].set_title(r'Sh. XRF ({0})'.format(desired_xrf_elements[1]), fontsize = 14)
+    axs2[0].set_title(r'{0}'.format(ref_element), fontsize = 14)
+    axs2[1].set_title(r'{0} (vert. jitter-corrected, cropped)'.format(ref_element), fontsize = 14)
 
     for axs in fig2.axes:
         axs.set_xlabel(r'Pixel index', fontsize = 14)
         axs.set_ylabel(r'$\theta$ (\textdegree)', fontsize = 14)
 
     for slice_idx in range(n_slices):
-        im2_1.set_data(shifted_opt_dens[:, slice_idx])
-        im2_2.set_data(shifted_counts_xrf_ref_element_1[:, slice_idx])
-        im2_3.set_data(shifted_counts_xrf_ref_element_2[:, slice_idx])
+        im2_1.set_data(shifted_counts_ref_element[:, slice_idx])
+        im2_2.set_data(counts_ref_element[:, slice_idx])
 
         text_2.set_text(r'Slice index {0}/{1}'.format(slice_idx, n_slices - 1))
 
@@ -1430,320 +1483,14 @@ def create_vert_jitter_corrected_norm_non_cropped_proj_data_gif_v1(dir_path,
         
         frame2 = np.array(fig2.canvas.renderer.buffer_rgba())[:, :, :3]
         
-        theta_frames2.append(frame2)
+        slice_frames.append(frame2)
 
     plt.close(fig2)
 
-    gif_filename = os.path.join(dir_path, f'vert_jitter_corrected_non_cropped_sinogram_data_sigma_{sigma}_alpha_{alpha}.gif')
+    gif_filename = os.path.join(dir_path, f'vert_jitter_corrected_sinogram_comp_sigma_{sigma}_alpha_{alpha}.gif')
 
     print('Saving sinogram data to GIF...')
 
-    iio2.mimsave(gif_filename, theta_frames2, fps = fps)
+    iio2.mimsave(gif_filename, slice_frames, fps = fps)
     
     return
-
-# def create_vert_jitter_corrected_norm_non_cropped_proj_data_gif_v2(dir_path,
-#                                                                 xrf_element_array,
-#                                                                 desired_xrf_elements,
-#                                                                 counts_xrf,
-#                                                                 opt_dens = None,
-#                                                                 convolution_mag_array = None,
-#                                                                 norm_enabled = False,
-#                                                                 data_percentile = None,
-#                                                                 theta_array = None,
-#                                                                 fps = None):
-
-#     n_theta, n_slices, n_columns = counts_xrf.shape[1:]
-
-#     if desired_xrf_element is None:
-#         print('Error: \'desired_xrf_element\' field empty. Exiting program...')
-
-#         sys.exit()
-    
-#     if desired_xrf_element not in xrf_element_array:
-#         print(f'Error: Desired XRF element not an XRF element channel. Exiting program...')
-
-#         sys.exit()
-    
-#     if fps is None or fps <= 0:
-#         print('Error: \'fps\' (frames per second) must be a positive number. Exiting program...')
-
-#         sys.exit()
-    
-#     ref_element_idx_xrf = xrf_element_array.index(desired_xrf_element)
-
-#     counts_xrf_ref_element = counts_xrf[ref_element_idx_xrf]
-#     counts_xrf_ref_element_norm = counts_xrf_norm[ref_element_idx_xrf]
-    
-#     vmin_xrf = counts_xrf_ref_element.min()
-#     vmax_xrf = counts_xrf_ref_element.max()
-
-#     vmin_xrt = counts_xrt.min()
-#     vmax_xrt = counts_xrt.max()
-
-#     vmin_opt_dens = opt_dens.min()
-#     vmax_opt_dens = opt_dens.max()
-
-#     theta_frames1 = []
-#     theta_frames3 = []
-
-#     if norm_enabled:
-#         print('Plotting non-aligned, non-cropped, normalized XRT, optical density, and convolution magnitude projection data...')
-    
-#         vmin_xrt_norm = counts_xrt_norm.min()
-#         vmax_xrt_norm = counts_xrt_norm.max()
-
-#         vmin_xrf_norm = counts_xrf_ref_element_norm.min()
-#         vmax_xrf_norm = counts_xrf_ref_element_norm.max()
-
-#         if convolution_mag_array is not None:
-#             fig1, axs1 = plt.subplots(3, 2)
-
-#             vmin_conv = convolution_mag_array.min()
-#             vmax_conv = convolution_mag_array.max()
-
-#             threshold = np.percentile(convolution_mag_array[0], data_percentile)
-
-#             conv_mask = np.where(convolution_mag_array[0] >= threshold, convolution_mag_array[0], 0)
-
-#             im1_1 = axs1[0, 0].imshow(convolution_mag_array[0], vmin = vmin_conv, vmax = vmax_conv)
-#             im1_2 = axs1[0, 1].imshow(conv_mask, vmin = vmin_conv, vmax = vmax_conv)
-#             im1_3 = axs1[1, 0].imshow(counts_xrt[0], vmin = vmin_xrt, vmax = vmax_xrt)
-#             im1_4 = axs1[1, 1].imshow(counts_xrt_norm[0], vmin = vmin_xrt_norm, vmax = vmax_xrt_norm)
-#             im1_5 = axs1[2, 0].imshow(counts_xrf_ref_element[0], vmin = vmin_xrf, vmax = vmax_xrf)
-#             im1_6 = axs1[2, 1].imshow(counts_xrf_ref_element_norm[0], vmin = vmin_xrf_norm, vmax = vmax_xrf_norm)
-
-#             axs1[0, 0].set_title(r'XRT conv.', fontsize = 14)
-#             axs1[0, 1].set_title(r'XRT conv. mask', fontsize = 14)
-#             axs1[1, 0].set_title(r'XRT data', fontsize = 14)
-#             axs1[1, 1].set_title(r'Norm. XRT data', fontsize = 14)
-#             axs1[2, 0].set_title(r'XRF data ({0})'.format(desired_xrf_element), fontsize = 14)
-#             axs1[2, 1].set_title(r'Norm. XRF data ({0})'.format(desired_xrf_element), fontsize = 14)
-
-#             text_1 = axs1[0, 0].text(0.02, 0.02, r'$\theta = {0}$\textdegree'.format(theta_array[0]), transform = axs1[0, 0].transAxes, color = 'white')
-
-#             for axs in fig1.axes:
-#                 axs.axis('off')
-#                 axs.axvline(x = n_columns//2, color = 'red', linewidth = 2)
-
-#             for theta_idx in range(n_theta):
-#                 threshold = np.percentile(convolution_mag_array[theta_idx], data_percentile)
-            
-#                 conv_mask = np.where(convolution_mag_array[theta_idx] >= threshold, convolution_mag_array[theta_idx], 0)
-
-#                 im1_1.set_data(convolution_mag_array[theta_idx])
-#                 im1_2.set_data(conv_mask)
-#                 im1_3.set_data(counts_xrt[theta_idx])
-#                 im1_4.set_data(counts_xrt_norm[theta_idx])
-#                 im1_5.set_data(counts_xrf_ref_element[theta_idx])
-#                 im1_6.set_data(counts_xrf_ref_element_norm[theta_idx])
-
-#                 text_1.set_text(r'$\theta = {0}$\textdegree'.format(theta_array[theta_idx]))
-
-#                 fig1.canvas.draw()
-
-#                 frame1 = np.array(fig1.canvas.renderer.buffer_rgba())[:, :, :3]
-
-#                 theta_frames1.append(frame1)
-        
-#         else:
-#             fig1, axs1 = plt.subplots(2, 2)
-
-#             im1_1 = axs1[0, 0].imshow(counts_xrt[0], vmin = vmin_xrt, vmax = vmax_xrt)
-#             im1_2 = axs1[0, 1].imshow(counts_xrt_norm[0], vmin = vmin_xrt_norm, vmax = vmax_xrt_norm)
-#             im1_3 = axs1[1, 0].imshow(counts_xrf_ref_element[0], vmin = vmin_xrf, vmax = vmax_xrf)
-#             im1_4 = axs1[1, 1].imshow(counts_xrf_ref_element_norm[0], vmin = vmin_xrf_norm, vmax = vmax_xrf_norm)
-
-#             axs1[0, 0].set_title(r'XRT data', fontsize = 14)
-#             axs1[0, 1].set_title(r'Norm. XRT data', fontsize = 14)
-#             axs1[1, 0].set_title(r'XRF data ({0})'.format(desired_xrf_element), fontsize = 14)
-#             axs1[1, 1].set_title(r'Norm. XRF data ({0})'.format(desired_xrf_element), fontsize = 14)
-
-#             text_1 = axs1[0, 0].text(0.02, 0.02, r'$\theta = {0}$\textdegree'.format(theta_array[0]), transform = axs1[0, 0].transAxes, color = 'white')
-
-#             for axs in fig1.axes:
-#                 axs.axis('off')
-#                 axs.axvline(x = n_columns//2, color = 'red', linewidth = 2)
-
-#             for theta_idx in range(n_theta):
-#                 im1_1.set_data(counts_xrt[theta_idx])
-#                 im1_2.set_data(counts_xrt_norm[theta_idx])
-#                 im1_3.set_data(counts_xrf_ref_element[theta_idx])
-#                 im1_4.set_data(counts_xrf_ref_element_norm[theta_idx])
-
-#                 text_1.set_text(r'$\theta = {0}$\textdegree'.format(theta_array[theta_idx]))
-
-#                 fig1.canvas.draw()
-
-#                 frame1 = np.array(fig1.canvas.renderer.buffer_rgba())[:, :, :3]
-
-#                 theta_frames1.append(frame1)
-
-#         plt.close(fig1)
-
-#         gif_filename = os.path.join(dir_path, 'normalized_prealigned_conv_xrt_od_proj_data.gif')
-
-#         print('Saving data to GIF...')
-
-#         iio2.mimsave(gif_filename, theta_frames1, fps = fps)
-
-#         print('Plotting non-aligned, non-cropped, normalized XRT, optical density, XRF projection data...')
-
-#         fig2, axs2 = plt.subplots(3, 1)
-
-#         theta_frames2 = []
-
-#         im2_1 = axs2[0].imshow(counts_xrt_norm[0], vmin = vmin_xrt_norm, vmax = vmax_xrt_norm)
-#         im2_2 = axs2[1].imshow(opt_dens[0], vmin = vmin_opt_dens, vmax = vmax_opt_dens)
-#         im2_3 = axs2[2].imshow(counts_xrf_ref_element_norm[0], vmin = vmin_xrf_norm, vmax = vmax_xrf_norm)
-        
-#         text_2 = axs2[0].text(0.02, 0.02, r'$\theta = {0}$\textdegree'.format(theta_array[0]), transform = axs2[0].transAxes, color = 'white')
-        
-#         axs2[0].set_title(r'Norm. XRT', fontsize = 14)
-#         axs2[1].set_title(r'Norm. Opt. Dens.', fontsize = 14)
-#         axs2[2].set_title(r'Norm. XRF ({0})'.format(desired_xrf_element), fontsize = 14)
-
-#         for axs in fig2.axes:
-#             axs.axis('off')
-
-#         for theta_idx in range(n_theta):
-#             im2_1.set_data(counts_xrt_norm[theta_idx])
-#             im2_2.set_data(opt_dens[theta_idx])
-#             im2_3.set_data(counts_xrf_ref_element_norm[theta_idx])
-
-#             text_2.set_text(r'$\theta = {0}$\textdegree'.format(theta_array[theta_idx]))
-
-#             fig2.canvas.draw()
-
-#             frame2 = np.array(fig2.canvas.renderer.buffer_rgba())[:, :, :3]
-
-#             theta_frames2.append(frame2)
-        
-#         plt.close(fig2)
-
-#         print('Saving data to GIF...')
-
-#         gif_filename = os.path.join(dir_path, 'normalized_prealigned_xrt_od_xrf_proj_data_comp.gif')
-
-#         iio2.mimsave(gif_filename, theta_frames2, fps = fps)
-
-#         print('Plotting non-aligned, non-cropped, normalized XRT, optical density, XRF sinograms...')
-
-#         fig3, axs3 = plt.subplots(1, 3, figsize = (11, 6))
-
-#         im3_1 = axs3[0].imshow(counts_xrt_norm[:, 0], vmin = vmin_xrt_norm, vmax = vmax_xrt_norm, origin = 'lower', extent = [0, n_slices - 1, -180, 180], aspect = 1.5)
-#         im3_2 = axs3[1].imshow(opt_dens[:, 0], vmin = vmin_opt_dens, vmax = vmax_opt_dens, origin = 'lower', extent = [0, n_slices - 1, -180, 180], aspect = 1.5)
-#         im3_3 = axs3[2].imshow(counts_xrf_ref_element_norm[:, 0], vmin = vmin_xrf_norm, origin = 'lower', extent = [0, n_slices - 1, -180, 180], vmax = vmax_xrf_norm, aspect = 1.5)
-
-#         text_3 = axs3[0].text(0.02, 0.02, r'Slice index 0/{0}'.format(n_slices - 1), transform = axs3[0].transAxes, color = 'white')
-        
-#         axs3[0].set_title(r'XRT', fontsize = 14)
-#         axs3[1].set_title(r'Opt. Dens.', fontsize = 14)
-#         axs3[2].set_title(r'XRF ({0})'.format(desired_xrf_element), fontsize = 14)
-
-#         for axs in fig3.axes:
-#         #     axs.axis('off')
-#             axs.set_xlabel(r'Pixel index', fontsize = 14)
-#             axs.set_ylabel(r'$\theta$ (\textdegree)', fontsize = 14)
-
-#         for slice_idx in range(n_slices):
-#             im3_1.set_data(counts_xrt_norm[:, slice_idx])
-#             im3_2.set_data(opt_dens[:, slice_idx])
-#             im3_3.set_data(counts_xrf_ref_element_norm[:, slice_idx])
-
-#             text_3.set_text(r'Slice index {0}/{1}'.format(slice_idx, n_slices - 1))
-
-#             fig3.canvas.draw()
-
-#             frame3 = np.array(fig3.canvas.renderer.buffer_rgba())[:, :, :3]
-
-#             theta_frames3.append(frame3)
-        
-#         plt.close(fig3)
-
-#         print('Saving data to GIF...')
-
-#         gif_filename = os.path.join(dir_path, 'normalized_prealigned_xrt_od_xrf_sinogram_data_comp.gif')
-        
-#         iio2.mimsave(gif_filename, theta_frames3, fps = fps)
-
-#     else:
-#         print('Plotting non-aligned, non-cropped, non-normalized XRT, optical density, XRF projection data...')
-        
-#         fig1, axs1 = plt.subplots(3, 1)
-
-#         im1_1 = axs1[0].imshow(counts_xrt[0], vmin = vmin_xrt, vmax = vmax_xrt)
-#         im1_2 = axs1[1].imshow(opt_dens[0], vmin = vmin_opt_dens, vmax = vmax_opt_dens)
-#         im1_3 = axs1[2].imshow(counts_xrf_ref_element[0], vmin = vmin_xrf, vmax = vmax_xrf)
-
-#         text_1 = axs1[0].text(0.02, 0.02, r'$\theta = {0}$\textdegree'.format(theta_array[0]), transform = axs1[0].transAxes, color = 'white')
-
-#         axs1[0].set_title(r'XRT', fontsize = 14)
-#         axs1[1].set_title(r'Opt. Dens.', fontsize = 14)
-#         axs1[2].set_title(r'XRF', fontsize = 14)
-
-#         for axs in fig1.axes:
-#             axs.axis('off')
-
-#         for theta_idx in range(n_theta):
-#             im1_1.set_data(counts_xrt[theta_idx])
-#             im1_2.set_data(opt_dens[theta_idx])
-#             im1_3.set_data(counts_xrf_ref_element[theta_idx])
-
-#             text_1.set_text(r'$\theta = {0}$\textdegree'.format(theta_array[theta_idx]))
-
-#             fig1.canvas.draw()
-
-#             frame1 = np.array(fig1.canvas.renderer.buffer_rgba())[:, :, :3]
-
-#             theta_frames1.append(frame1)
-        
-#         plt.close(fig1)
-
-#         print('Saving data to GIF...')
-
-#         gif_filename = os.path.join(dir_path, 'nonnormalized_prealigned_xrt_od_xrf_proj_data.gif')
-        
-#         iio2.mimsave(gif_filename, theta_frames1, fps = fps)
-
-#         print('Plotting non-aligned, non-cropped, non-normalized XRT, optical density, XRF sinograms...')
-
-#         fig2, axs2 = plt.subplots(3, 1)
-
-#         im2_1 = axs2[0].imshow(counts_xrt[:, 0], vmin = vmin_xrt, vmax = vmax_xrt, origin = 'lower', extent = [0, n_slices - 1, -180, 180], aspect = 20)
-#         im2_2 = axs2[1].imshow(opt_dens[:, 0], vmin = vmin_opt_dens, vmax = vmax_opt_dens, origin = 'lower', extent = [0, n_slices - 1, -180, 180], aspect = 20)
-#         im2_3 = axs2[2].imshow(counts_xrf_ref_element[:, 0], vmin = vmin_xrf, vmax = vmax_xrf, origin = 'lower', extent = [0, n_slices - 1, -180, 180], aspect = 20)
-
-#         text_2 = axs2[0].text(0.02, 0.02, r'Slice index 0/{0}'.format(n_slices - 1), transform = axs2[0].transAxes, color = 'white')
-        
-#         axs2[0].set_title(r'XRT', fontsize = 14)
-#         axs2[1].set_title(r'Opt. Dens.', fontsize = 14)
-#         axs2[2].set_title(r'XRF', fontsize = 14)
-
-#         for axs in fig2.axes:
-#             # axs.axis('off')
-#             axs.set_xlabel(r'Pixel index', fontsize = 14)
-#             axs.set_ylabel(r'$\theta$ (\textdegree)', fontsize = 14)
-
-#         for slice_idx in range(n_slices):
-#             im2_1.set_data(counts_xrt[:, slice_idx])
-#             im2_2.set_data(opt_dens[:, slice_idx])
-#             im2_3.set_data(counts_xrf_ref_element[:, slice_idx])
-
-#             text_2.set_text(r'Slice index {0}/{1}'.format(slice_idx, n_slices - 1))
-
-#             fig2.canvas.draw()
-
-#             frame2 = np.array(fig2.canvas.renderer.buffer_rgba())[:, :, :3]
-
-#             theta_frames2.append(frame2)
-        
-#         plt.close(fig2)
-
-#         print('Saving data to GIF...')
-
-#         gif_filename = os.path.join(dir_path, 'nonnormalized_prealigned_xrt_od_xrf_sinogram_data.gif')
-        
-#         iio2.mimsave(gif_filename, theta_frames2, fps = fps)
-        
-#     return
