@@ -172,7 +172,7 @@ def correct_adjacent_angle_jitter_pre_cor_correction(init_proj_array,
     net_y_shift_cumsum = np.cumsum(net_y_shift_cumsum_temp) # Cumulative sum of net y shifts (registering one angle to the previous angle still has residual error due to previous angles)
 
     # net_x_shift_array[0, 1:] += net_x_shift_cumsum
-    net_y_shift_array[0, 1:] += net_y_shift_cumsum
+    net_y_shift_array[1:] += net_y_shift_cumsum
 
     if return_aux_data:
         shifted_proj = np.zeros_like(init_proj_array)
