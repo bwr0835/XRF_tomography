@@ -214,8 +214,8 @@ def correct_adjacent_angle_jitter_pre_cor_correction(init_proj_array,
     #         shifted_proj_final = shifted_proj[:, :, start_column:end_column]
 
     if common_field_of_view_axes == 'y':
-        start_slice = int(np.clip(np.ceil(np.max(net_y_shift_array[0])), 0, n_slices)) # Get maximum net x shift and set to either 0 or n_slices if below or above, respectively
-        end_slice = int(np.clip(n_slices + np.floor(np.min(net_y_shift_array[0])), 0, n_slices)) # Get minimum net x shift, sum with n_slices, and set to either 0 or n_slices if below or above, respectively. This index is exclusive (i.e. not included in common field of view indexing)
+        start_slice = int(np.clip(np.ceil(np.max(net_y_shift_array)), 0, n_slices)) # Crop top: exclude rows where positive shifts pushed content out
+        end_slice = int(np.clip(n_slices + np.floor(np.min(net_y_shift_array)), 0, n_slices)) # Crop bottom: exclude rows where negative shifts pushed content out. This index is exclusive.
         
         # start_column = 0
         # end_column = n_columns
