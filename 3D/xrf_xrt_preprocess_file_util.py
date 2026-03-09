@@ -1393,15 +1393,13 @@ def create_gridrec_density_maps_h5(dir_path,
     
     file_name = os.path.join(dir_path, 'gridrec_density_maps')
 
-    for element_idx, element in enumerate(elements_xrf):
-        if '_' in element:
-            elements_xrf[element_idx] = element.split('_')[0]
+    elements_xrf_new = [element.split('_')[0] for element in elements_xrf]
     
     with h5py.File(file_name, 'w') as f:
         sample = f.create_group('sample')
         
         sample.create_dataset("densities", data = gridrec_density_maps.astype('f4'))
-        sample.create_dataset("elements", data = elements_xrf.astype('S5'))
+        sample.create_dataset("elements", data = elements_xrf_new.astype('S5'))
 
     return
 
@@ -1493,4 +1491,49 @@ def create_adjacent_angle_jitter_corrected_norm_proj_data_gif(dir_path,
 
     iio2.mimsave(gif_filename, slice_frames, fps = fps)
     
+    return
+
+def create_gridrec_density_map_gif(dir_path,
+                                   gridrec_density_maps, 
+                                   desired_element, 
+                                   elements_xrf, 
+                                   fps):    
+
+    desired_element_idx = elements_xrf.index(desired_element)
+    
+    density_map = gridrec_density_maps[desired_element_idx]
+
+    n_slices = density_map.shape[0]
+
+    vmin = density_map.min()
+    vmax = density_map.max()
+
+    fig, axs = plt.subplots()
+
+    img = axs.imshow(density_map[0], vmin = vmin, vmax = vmax)
+    
+    text = axs.text(0.02, 0.02, r'Slice index 0/{0}'.format(n_slices - 1), transform = axs.transAxes, color = 'white')
+    
+    axs.axis('off')
+    axs.set_title(r'{0}'.format(desired_element), fontsize = 14)
+    axs.colorbar()
+
+    slice_frames = []
+
+    for slice_idx in range(n_slices):
+        img.set_data(density_map[slice_idx])
+        text.set_text(r'Slice index {0}/{1}'.format(slice_idx, n_slices - 1))
+
+        fig.canvas.draw()
+        
+        frame = np.array(fig.canvas.renderer.buffer_rgba())[:, :, :3]
+
+        slice_frames.append(frame)
+
+    plt.close(fig)
+
+    gif_filename = os.path.join(dir_path, f'gridrec_density_map_{desired_element}.gif')
+
+    iio2.mimsave(gif_filename, slice_frames, fps = fps)
+
     return

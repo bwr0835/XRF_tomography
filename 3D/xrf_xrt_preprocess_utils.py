@@ -368,6 +368,4 @@ def create_gridrec_density_maps(xrf_proj_array, elements_xrf, theta_array):
         
         rho[element_idx] = xrl.ElementDensity(xrl.SymbolToAtomicNumber(element))*(xrf_recon - vmin)/(vmax - vmin) # Initial guess of density based on 0-100% concentration of each element
 
-    return rho
-
-        
+    return rho       
