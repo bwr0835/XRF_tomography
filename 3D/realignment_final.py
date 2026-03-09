@@ -689,7 +689,7 @@ def realign_proj(cor_correction_only,
                     
                 print(f'Applying additional COR correction to flipped, remounted sample angles: {ppu.round_correct(dx, ndec = 3)}')
 
-                if net_x_shifts_pcc[0].ndim == 3:
+                if net_x_shifts_pcc.ndim == 3:
                     net_x_shifts_pcc[0, zero_deg_idx_array[1]:, start_slice:end_slice] -= dx
 
                     for theta_idx in range(len(theta_array_second_part)):
@@ -747,7 +747,7 @@ def realign_proj(cor_correction_only,
 
         print('Shifting all elements in cropped XRT, optical density aggregate projection arrays by current net shifts...')
 
-        if net_x_shifts_pcc[0].ndim == 3:
+        if net_x_shifts_pcc.ndim == 3:
             for theta_idx in range(n_theta):
                 net_x_shift = net_x_shifts_pcc[0, theta_idx]
                 net_y_shift = net_y_shifts_pcc[theta_idx]
@@ -765,7 +765,7 @@ def realign_proj(cor_correction_only,
 
         print('Shifting all elements in cropped XRF aggregate projection array by current net shifts...')
         
-        if net_x_shifts_pcc[0].ndim == 3:
+        if net_x_shifts_pcc.ndim == 3:
             for element_idx in range(n_elements_xrf):
                 print(f'\rElement {element_idx + 1}/{n_elements_xrf}', end = '', flush = True)
                 
@@ -785,7 +785,7 @@ def realign_proj(cor_correction_only,
 
                     aligned_proj_total_xrf[element_idx, theta_idx] = ndi.shift(xrf_proj_img_array[element_idx, theta_idx], shift = (net_y_shift, net_x_shift))
 
-        if net_x_shifts_pcc[0].ndim == 3:
+        if net_x_shifts_pcc.ndim == 3:
             print('Truncating projection images in y so object is in every projection image\'s field of view...')
 
             aligned_proj_total_xrf = aligned_proj_total_xrf[:, :, start_slice:end_slice]
@@ -871,7 +871,7 @@ def realign_proj(cor_correction_only,
     synth_proj = np.zeros((n_theta, n_slices, n_columns))
     dx_array_pcc = np.zeros((n_iterations_iter_reproj, n_theta))
     
-    if net_x_shifts_pcc[0].ndim != 3:
+    if net_x_shifts_pcc.ndim != 3:
         dy_array_pcc = np.zeros((n_iterations_iter_reproj, n_theta))
 
     rms_net_shift_prev = 0
@@ -880,7 +880,7 @@ def realign_proj(cor_correction_only,
         print(f'Iteration {i + 1}/{n_iterations_iter_reproj}')
         
         if i > 0:
-            if net_x_shifts_pcc[0].ndim == 3:
+            if net_x_shifts_pcc.ndim == 3:
                 for theta_idx in range(n_theta):
                     net_x_shift = net_x_shifts_pcc[i - 1, theta_idx]
                     net_y_shift = net_y_shifts_pcc[theta_idx]
@@ -992,7 +992,7 @@ def realign_proj(cor_correction_only,
 
                 pcc_2d_truncated_array[i, theta_idx, start_y:end_y, start_x:end_x] = phase_xcorr_2d_truncated
 
-            if net_x_shifts_pcc[i].ndim == 3:
+            if net_x_shifts_pcc.ndim == 3:
                 dy = shifts[0]
 
                 dy_array_pcc[i, theta_idx] = dy
@@ -1023,7 +1023,7 @@ def realign_proj(cor_correction_only,
                 # print(f'Current y-shift: {ppu.round_correct(dy, ndec = 3)}')
 
         if not sample_flipped_remounted_mid_experiment:
-            if net_x_shifts_pcc[i].ndim == 3:
+            if net_x_shifts_pcc.ndim == 3:
                 center_of_rotation_avg_synth, _, offset_synth = rot_center_avg(synth_proj[:, start_slice:end_slice], theta_idx_pairs, theta_array)
             
             else:
@@ -1034,7 +1034,7 @@ def realign_proj(cor_correction_only,
             print(f'Center of rotation error: {ppu.round_correct(offset_synth, ndec = 3)}')
         
         else:
-            if net_x_shifts_pcc[i].ndim == 3:                
+            if net_x_shifts_pcc.ndim == 3:                
                 center_of_rotation_avg_first_part, center_geom, offset_first_part = rot_center_avg(aligned_proj[:zero_deg_idx_array[1], start_slice:end_slice], 
                                                                                                    theta_idx_pairs_first_part, 
                                                                                                    theta_array_first_part)
@@ -1076,7 +1076,7 @@ def realign_proj(cor_correction_only,
         if i > (n_iter_converge - 1):
             rms_net_x_shift = np.sqrt((dx_array_pcc[i]**2).mean())
             
-            if net_x_shifts_pcc[0].ndim == 3:
+            if net_x_shifts_pcc.ndim == 3:
                 rms_net_y_shift = np.sqrt((dy_array_pcc[i]**2).mean())
                 
                 rms_net_shift = np.sqrt(rms_net_x_shift**2 + rms_net_y_shift**2)
@@ -1094,7 +1094,7 @@ def realign_proj(cor_correction_only,
                     aligned_exp_proj_array = aligned_exp_proj_array[:(i + 1)]
                     synth_proj_array = synth_proj_array[:(i + 1)]
 
-                    if net_x_shifts_pcc[0].ndim != 3:
+                    if net_x_shifts_pcc.ndim != 3:
                         net_y_shifts_pcc = net_y_shifts_pcc[:(i + 1)]
                         dy_array_pcc = dy_array_pcc[:(i + 1)]
                     
@@ -1105,7 +1105,7 @@ def realign_proj(cor_correction_only,
                 print(f'Number of iterations taken: {i + 1}')
                 print('Shifting all elements in cropped XRT, optical density aggregate projection arrays by current net shifts...')
 
-                if net_x_shifts_pcc[i].ndim == 3:
+                if net_x_shifts_pcc.ndim == 3:
                     for theta_idx in range(n_theta):
                         net_x_shift = net_x_shifts_pcc[i, theta_idx]
                         net_y_shift = net_y_shifts_pcc[theta_idx]
@@ -1171,7 +1171,7 @@ def realign_proj(cor_correction_only,
         if i == n_iterations_iter_reproj - 1:
             print('Iterative reprojection complete. Shifting XRT intensities and optical densities by current net shifts...')
             
-            if net_x_shifts_pcc[i].ndim == 3:
+            if net_x_shifts_pcc.ndim == 3:
                 for theta_idx in range(n_theta):
                     net_x_shift = net_x_shifts_pcc[i, theta_idx]
                     net_y_shift = net_y_shifts_pcc[theta_idx]
@@ -1239,7 +1239,7 @@ def realign_proj(cor_correction_only,
         rms_net_shift_prev = rms_net_shift
 
     if return_aux_data:
-        if net_x_shifts_pcc[i].ndim == 3:
+        if net_x_shifts_pcc.ndim == 3:
             return aligned_proj_total_xrt, \
                    aligned_proj_total_opt_dens, \
                    aligned_proj_total_xrf, \
