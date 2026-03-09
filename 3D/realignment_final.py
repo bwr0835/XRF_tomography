@@ -176,11 +176,10 @@ def correct_adjacent_angle_jitter_pre_cor_correction(init_proj_array,
 
     if return_aux_data:
         shifted_proj = np.zeros_like(init_proj_array)
-        shifted_proj[0] = init_proj_array[0].copy()
 
-        for theta_idx in range(n_theta - 1):
+        for theta_idx in range(n_theta):
             # shifted_proj[theta_idx + 1] = ndi.shift(init_proj_array[theta_idx + 1], shift = (net_y_shift_array[0, theta_idx + 1], net_x_shift_array[0, theta_idx + 1]))
-            shifted_proj[theta_idx + 1] = ndi.shift(init_proj_array[theta_idx + 1], shift = (net_y_shift_array[0, theta_idx + 1], 0))
+            shifted_proj[theta_idx] = ndi.shift(init_proj_array[theta_idx], shift = (net_y_shift_array[theta_idx]))
     
     # Compute common field of view (FOV)
     
