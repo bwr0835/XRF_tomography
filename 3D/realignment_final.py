@@ -519,7 +519,7 @@ def realign_proj(cor_correction_only,
             # net_y_shifts_pcc[0] += init_y_shift
             net_y_shifts_pcc += init_y_shift
 
-            if net_x_shifts_pcc[0].ndim == 3:
+            if net_x_shifts_pcc.ndim == 3:
                 for theta_idx in range(n_theta):
                     aligned_proj[theta_idx] = ndi.shift(proj_img_array_element_to_align_with[theta_idx], shift = (init_y_shift[theta_idx], init_x_shift[theta_idx]))
 
@@ -666,16 +666,16 @@ def realign_proj(cor_correction_only,
 
                 if net_x_shifts_pcc.ndim == 3:
                     shifts, pcc, pcc_truncated = phase_xcorr_manual(aligned_proj[zero_deg_idx_array[0], start_slice:end_slice], 
-                                                      aligned_proj[zero_deg_idx_array[1], start_slice:end_slice], 
-                                                      sigma, 
-                                                      alpha, 
-                                                      pixel_rad_cor_correction,
-                                                      theta = np.array([0, 0]))
-                    
-                    fig, axs = plt.subplots(2, 1)
-                    axs[0].imshow(pcc, vmin = pcc.min(), vmax = pcc.max())
-                    axs[1].imshow(pcc_truncated, vmin = pcc_truncated.min(), vmax = pcc_truncated.max())
-                    plt.show()
+                                                                    aligned_proj[zero_deg_idx_array[1], start_slice:end_slice], 
+                                                                    sigma, 
+                                                                    alpha, 
+                                                                    pixel_rad_cor_correction,
+                                                                    theta = np.array([0, 0]))
+                    print(shifts)
+                    # fig, axs = plt.subplots(2, 1)
+                    # axs[0].imshow(pcc, vmin = pcc.min(), vmax = pcc.max())
+                    # axs[1].imshow(pcc_truncated, vmin = pcc_truncated.min(), vmax = pcc_truncated.max())
+                    # plt.show()
                 
                 else:
                     shifts, _, _ = phase_xcorr_manual(aligned_proj[zero_deg_idx_array[0]], 
@@ -722,7 +722,7 @@ def realign_proj(cor_correction_only,
         print(f'Center of rotation error: {ppu.round_correct(offset_init, ndec = 3)}')
         print(f'Applying initial center of rotation correction: {ppu.round_correct(-offset_init, ndec = 3)}')
         
-        if net_x_shifts_pcc[0].ndim == 3:
+        if net_x_shifts_pcc.ndim == 3:
             for theta_idx in range(n_theta):
                 net_x_shifts_pcc[0, theta_idx, start_slice:end_slice] -= offset_init
                     
@@ -733,7 +733,7 @@ def realign_proj(cor_correction_only,
                 
                 aligned_proj[theta_idx] = ndi.shift(proj_img_array_element_to_align_with[theta_idx], shift = (net_y_shifts_pcc[0, theta_idx], net_x_shifts_pcc[0, theta_idx]), cval = cval)
         
-        if net_x_shifts_pcc[0].ndim == 3:
+        if net_x_shifts_pcc.ndim == 3:
             center_of_rotation_avg, _, _ = rot_center_avg(aligned_proj[:, start_slice:end_slice], theta_idx_pairs, theta_array)
        
         else:
