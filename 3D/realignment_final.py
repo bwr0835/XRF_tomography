@@ -144,7 +144,7 @@ def correct_adjacent_angle_jitter_pre_cor_correction(init_proj_array,
                                                                               init_proj_array[theta_idx + 1], 
                                                                               sigma, 
                                                                               alpha, 
-                                                                              pixel_rad,
+                                                                              pixel_rad[theta_idx],
                                                                               theta[[theta_idx, theta_idx + 1]])
 
         net_x_shift_cumsum_temp[theta_idx] = shifts[0]
