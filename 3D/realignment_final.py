@@ -150,7 +150,7 @@ def correct_adjacent_angle_jitter_pre_cor_correction(init_proj_array,
         net_x_shift_cumsum_temp[theta_idx] = shifts[0]
         net_y_shift_cumsum_temp[theta_idx] = shifts[1]
 
-        if pixel_rad is not None or not np.any(pixel_rad == 0):
+        if pixel_rad is not None and pixel_rad[theta_idx] > 0:
             phase_xcorr_2d_truncated_aggregate_midpt_idy, \
             phase_xcorr_2d_truncated_aggregate_midpt_idx = phase_xcorr_2d_truncated_aggregate.shape[0]//2, \
                                                            phase_xcorr_2d_truncated_aggregate.shape[1]//2
