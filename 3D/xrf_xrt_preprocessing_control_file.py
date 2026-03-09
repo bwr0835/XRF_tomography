@@ -337,23 +337,23 @@ def preprocess_xrf_xrt_data(synchrotron,
                 # elif common_field_of_view_axes == 'y':
                 #     print('     -Shifted, pre-COR-corrected, adjacent angle jitter-corrected (vertical), cropped projection data')
             
-                futil.create_adjacent_angle_jitter_corrected_norm_proj_data_npy(xrt_od_xrf_realignment_subdir_path,
-                                                                                adj_angle_jitter_corrected_proj_element_to_align_with_aux,
-                                                                                phase_xcorr_2d_aggregate_aux,
-                                                                                phase_xcorr_2d_truncated_aggregate_aux,
-                                                                                aligning_element,
-                                                                                sigma,
-                                                                                alpha)
+                # futil.create_adjacent_angle_jitter_corrected_norm_proj_data_npy(xrt_od_xrf_realignment_subdir_path,
+                #                                                                 adj_angle_jitter_corrected_proj_element_to_align_with_aux,
+                #                                                                 phase_xcorr_2d_aggregate_aux,
+                #                                                                 phase_xcorr_2d_truncated_aggregate_aux,
+                #                                                                 aligning_element,
+                #                                                                 sigma,
+                #                                                                 alpha)
                 
-                proj_cropped_to_common_fov = proj_img_array_element_to_align_with[:, start_slice_aux:end_slice_aux, :]
-                futil.create_adjacent_angle_jitter_corrected_norm_proj_data_gif(xrt_od_xrf_realignment_subdir_path,
-                                                                                aligning_element,
-                                                                                proj_cropped_to_common_fov,
-                                                                                adj_angle_jitter_corrected_proj_element_to_align_with_aux,
-                                                                                sigma,
-                                                                                alpha,
-                                                                                theta,
-                                                                                fps)
+                # proj_cropped_to_common_fov = proj_img_array_element_to_align_with[:, start_slice_aux:end_slice_aux, :]
+                # futil.create_adjacent_angle_jitter_corrected_norm_proj_data_gif(xrt_od_xrf_realignment_subdir_path,
+                #                                                                 aligning_element,
+                #                                                                 proj_cropped_to_common_fov,
+                #                                                                 adj_angle_jitter_corrected_proj_element_to_align_with_aux,
+                #                                                                 sigma,
+                #                                                                 alpha,
+                #                                                                 theta,
+                #                                                                 fps)
 
         aligned_proj_final_xrt_sig, \
         aligned_proj_final_opt_dens, \
