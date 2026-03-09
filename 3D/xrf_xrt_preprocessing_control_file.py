@@ -173,7 +173,7 @@ def preprocess_xrf_xrt_data(synchrotron,
                 counts_xrf = ppu.pad_col(counts_xrf, dataset_type)
 
                 n_columns += 1
-
+        print(elements_xrt)
         counts_xrt_sig_idx = elements_xrt.index('xrt_sig')
         counts_xrt_sig = counts_xrt[counts_xrt_sig_idx]
 
