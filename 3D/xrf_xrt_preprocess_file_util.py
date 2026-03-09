@@ -526,7 +526,7 @@ def extract_h5_aggregate_xrf_data(file_path, **kwargs):
 
             counts = counts_h5[()]
             theta = theta_h5[()]
-            elements = elements_h5.asstr()[:]
+            elements = list(elements_h5.asstr()[:])
 
             if kwargs.get('filename_array') == True:
                 filenames_h5 = h5['filenames']
@@ -570,7 +570,7 @@ def extract_h5_aggregate_xrt_data(file_path, **kwargs):
 
             counts = counts_h5[()]
             theta = theta_h5[()]
-            elements = elements_h5.asstr()[:]
+            elements = list(elements_h5.asstr()[:])
 
             if kwargs.get('filename_array') == True:
                 filenames_h5 = h5['filenames']
