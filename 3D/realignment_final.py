@@ -665,12 +665,17 @@ def realign_proj(cor_correction_only,
                     pixel_rad_cor_correction = 0
 
                 if net_x_shifts_pcc[0].ndim == 3:
-                    shifts, _, _ = phase_xcorr_manual(aligned_proj[zero_deg_idx_array[0], start_slice:end_slice], 
+                    shifts, pcc, pcc_truncated = phase_xcorr_manual(aligned_proj[zero_deg_idx_array[0], start_slice:end_slice], 
                                                       aligned_proj[zero_deg_idx_array[1], start_slice:end_slice], 
                                                       sigma, 
                                                       alpha, 
                                                       pixel_rad_cor_correction,
                                                       theta = np.array([0, 0]))
+                    
+                    fig, axs = plt.subplots(2, 1)
+                    axs[0].imshow(pcc, vmin = pcc.min(), vmax = pcc.max())
+                    axs[1].imshow(pcc_truncated, vmin = pcc_truncated.min(), vmax = pcc_truncated.max())
+                    plt.show()
                 
                 else:
                     shifts, _, _ = phase_xcorr_manual(aligned_proj[zero_deg_idx_array[0]], 
@@ -690,7 +695,7 @@ def realign_proj(cor_correction_only,
                 print(f'Applying additional COR correction to flipped, remounted sample angles: {ppu.round_correct(dx, ndec = 3)}')
 
                 if net_x_shifts_pcc.ndim == 3:
-                    net_x_shifts_pcc[0, zero_deg_idx_array[1]:, start_slice:end_slice] -= dx
+                    net_x_shifts_pcc[0, zero_deg_idx_array[1]:, start_slice:end_slice] += dx
 
                     for theta_idx in range(len(theta_array_second_part)):
                         theta_idx_aux = theta_idx + len(theta_array_first_part)
@@ -698,14 +703,14 @@ def realign_proj(cor_correction_only,
                         aligned_proj[theta_idx_aux] = warp_rowwise_dx(proj_img_array_element_to_align_with[theta_idx_aux], net_x_shifts_pcc[0, theta_idx_aux], net_y_shifts_pcc[theta_idx_aux], cval = cval)
                 
                 else:
-                    net_x_shifts_pcc[0, zero_deg_idx_array[1]:] -= dx
+                    net_x_shifts_pcc[0, zero_deg_idx_array[1]:] += dx
 
                     for theta_idx in range(len(theta_array_second_part)):
                         theta_idx_aux = theta_idx + len(theta_array_first_part)
                         
                         aligned_proj[theta_idx_aux] = ndi.shift(proj_img_array_element_to_align_with[theta_idx_aux], shift = (net_y_shifts_pcc[0, theta_idx_aux], net_x_shifts_pcc[0, theta_idx_aux]), cval = cval)
 
-                dx_prev = -dx
+                dx_prev = dx
             
     else:
         theta_idx_pairs = ppu.find_theta_combos(theta_array)
