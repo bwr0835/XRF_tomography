@@ -264,7 +264,6 @@ def preprocess_xrf_xrt_data(synchrotron,
             end_slice_aux, \
             phase_xcorr_2d_aggregate_aux, \
             phase_xcorr_2d_truncated_aggregate_aux, \
-            pixel_rad_adjacent_angle_jitter_aux, \
             adj_angle_jitter_corrected_proj_element_to_align_with_aux = realign.correct_adjacent_angle_jitter_pre_cor_correction(proj_img_array_element_to_align_with, 
                                                                                                                                  init_y_shift_array,
                                                                                                                                  sigma,
@@ -317,8 +316,8 @@ def preprocess_xrf_xrt_data(synchrotron,
                                                 norm_array,
                                                 init_x_shift_array,
                                                 init_y_shift_array,
-                                                pixel_rad_adjacent_angle_jitter = pixel_rad_adjacent_angle_jitter_aux,
-                                                pixel_rad_cor_correction = 0,
+                                                pixel_rad_pre_cor_jitter = np.zeros(proj_img_array_element_to_align_with.shape[0] - 1),
+                                                pixel_rad_cor = 0,
                                                 pixel_rad_iter_reproj = np.zeros(proj_img_array_element_to_align_with.shape[0] - 1),
                                                 I0_cts = I0_cts)
 

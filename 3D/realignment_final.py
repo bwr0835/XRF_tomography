@@ -266,7 +266,6 @@ def correct_adjacent_angle_jitter_pre_cor_correction(init_proj_array,
                end_slice, \
                phase_xcorr_2d_aggregate, \
                phase_xcorr_2d_truncated_aggregate, \
-               pixel_rad, \
                shifted_proj_final
     
     return net_y_shift_array, \
