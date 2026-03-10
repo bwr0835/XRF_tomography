@@ -247,7 +247,6 @@ def edge_gauss_filter(image, sigma, alpha, nx, ny):
 def joint_fluct_norm(xrt_array,
                      xrf_array,
                      xrt_data_percentile,
-                     meas_inc_cts,
                      sigma_1 = 5,
                      alpha = 10,
                      sigma_2 = 10,
