@@ -563,8 +563,8 @@ def preprocess_xrf_xrt_data(synchrotron,
 
         futil.create_csv_output_data(xrt_od_xrf_realignment_subdir_path,
                                      theta,
-                                     net_x_shifts = np.zeros(final_xrt_sig_cropped.shape[0] - 1),
-                                     net_y_shifts = np.zeros(final_xrt_sig_cropped.shape[0] - 1),
+                                     net_x_shifts = np.zeros(final_xrt_sig_cropped.shape[1] - 1),
+                                     net_y_shifts = np.zeros(final_xrt_sig_cropped.shape[1] - 1),
                                      I0_cts = I0_cts)
             
         print('Done')
