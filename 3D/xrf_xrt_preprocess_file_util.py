@@ -1049,10 +1049,10 @@ def create_csv_output_data(dir_path,
                        'I0_cts': I0_cts})
 
     if net_x_shifts.ndim == 3:
-        theta_array = np.repeat(theta_array, net_x_shifts.shape[1])
+        theta_array = np.repeat(theta_array, net_x_shifts.shape[2])
         
         net_x_shifts = net_x_shifts.ravel()
-        net_y_shifts = np.repeat(net_y_shifts, net_x_shifts.shape[1])
+        net_y_shifts = np.repeat(net_y_shifts, net_x_shifts.shape[2])
 
     df.loc[1:, 'I0_cts'] = np.nan # To make sure no errors arise from not having unequal column lengths
 
