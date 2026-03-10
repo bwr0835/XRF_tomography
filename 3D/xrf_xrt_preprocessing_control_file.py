@@ -214,6 +214,10 @@ def preprocess_xrf_xrt_data(synchrotron,
                     counts_xrt_norm, counts_xrf_norm, norm_array, I0_cts = ppu.joint_fluct_norm(counts_xrt_sig,
                                                                                                 counts_xrf,
                                                                                                 xrt_data_percentile)
+                
+                for theta_idx in range(n_theta):
+                    plt.imshow(counts_xrt_norm[theta_idx], vmin = counts_xrt_norm.min(), vmax = counts_xrt_norm.max())
+                    plt.show()
 
             else:
                 if I0_cts_per_s is None or t_dwell_s is None:
@@ -354,6 +358,8 @@ def preprocess_xrf_xrt_data(synchrotron,
                 #                                                                 alpha,
                 #                                                                 theta,
                 #                                                                 fps)
+
+        counts_xrf_norm[:, np.where(theta == 0)[1]:] = np.flip(counts_xrf_norm[:, np.where(theta == 0)[1]:], axis = 0)
 
         aligned_proj_final_xrt_sig, \
         aligned_proj_final_opt_dens, \
