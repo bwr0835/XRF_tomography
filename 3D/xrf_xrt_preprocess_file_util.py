@@ -1209,7 +1209,7 @@ def create_nonaligned_norm_non_cropped_proj_data_gif(dir_path,
         iio2.mimsave(gif_filename, theta_frames1, fps = fps)
 
         print('Plotting non-aligned, non-cropped, normalized XRT, optical density, XRF projection data...')
-
+        
         fig2, axs2 = plt.subplots(3, 1)
 
         theta_frames2 = []

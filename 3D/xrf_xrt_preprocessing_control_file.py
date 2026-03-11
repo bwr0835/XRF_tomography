@@ -176,6 +176,7 @@ def preprocess_xrf_xrt_data(synchrotron,
         print(elements_xrt)
         counts_xrt_sig_idx = elements_xrt.index('xrt_sig')
         counts_xrt_sig = counts_xrt[counts_xrt_sig_idx]
+        counts_xrt_sig_orig = counts_xrt_sig.copy()
 
         if pre_existing_align_norm_file_enabled:
             print('Extracting pre-existing normalizations, net x pixel shifts, net y pixel shifts, pixel radii for adjacent angle jitter correction and iterative reprojection, and incident intensity from CSV file...')
@@ -482,9 +483,9 @@ def preprocess_xrf_xrt_data(synchrotron,
                     futil.create_nonaligned_norm_non_cropped_proj_data_gif(dir_path = xrt_od_xrf_realignment_subdir_path,
                                                                            xrf_element_array = elements_xrf,
                                                                            desired_xrf_element = desired_xrf_element,
-                                                                           counts_xrf = counts_xrf_norm,
+                                                                           counts_xrf = counts_xrf,
                                                                            counts_xrf_norm = counts_xrf_norm,
-                                                                           counts_xrt = counts_xrt_sig,
+                                                                           counts_xrt = counts_xrt_sig_orig,
                                                                            counts_xrt_norm = counts_xrt_norm,
                                                                            opt_dens = opt_dens_norm,
                                                                            convolution_mag_array = conv_mag_array,
