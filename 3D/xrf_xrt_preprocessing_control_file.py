@@ -135,7 +135,7 @@ def preprocess_xrf_xrt_data(synchrotron,
 
         elements_xrf, counts_xrf, theta, _, dataset_type = futil.extract_h5_aggregate_xrf_data(aggregate_xrf_h5_file_path)
         elements_xrt, counts_xrt, theta_xrt, _, dataset_type = futil.extract_h5_aggregate_xrt_data(aggregate_xrt_h5_file_path)
-
+        counts_xrf_orig = counts_xrf.copy()
         if not np.array_equal(theta, theta_xrt):
             print('Error: Inconsistent XRF, XRT projection angles. Exiting program...')
 
@@ -173,7 +173,7 @@ def preprocess_xrf_xrt_data(synchrotron,
                 counts_xrf = ppu.pad_col(counts_xrf, dataset_type)
 
                 n_columns += 1
-        print(elements_xrt)
+
         counts_xrt_sig_idx = elements_xrt.index('xrt_sig')
         counts_xrt_sig = counts_xrt[counts_xrt_sig_idx]
         counts_xrt_sig_orig = counts_xrt_sig.copy()
@@ -483,7 +483,7 @@ def preprocess_xrf_xrt_data(synchrotron,
                     futil.create_nonaligned_norm_non_cropped_proj_data_gif(dir_path = xrt_od_xrf_realignment_subdir_path,
                                                                            xrf_element_array = elements_xrf,
                                                                            desired_xrf_element = desired_xrf_element,
-                                                                           counts_xrf = counts_xrf,
+                                                                           counts_xrf = counts_xrf_orig,
                                                                            counts_xrf_norm = counts_xrf_norm,
                                                                            counts_xrt = counts_xrt_sig_orig,
                                                                            counts_xrt_norm = counts_xrt_norm,
