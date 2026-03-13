@@ -189,7 +189,7 @@ for theta_idx in range(n_theta):
 
     mask = convolution_mag >= threshold
 
-    flux_tot[theta_idx] = xrt_sig[theta_idx, mask].sum()
+    flux_tot[theta_idx] = xrt_sig[theta_idx, mask].mean()
 
 fig, axs = plt.subplots()
 plt.plot(theta_xrt, flux_tot)
