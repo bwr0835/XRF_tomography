@@ -1,4 +1,4 @@
-import numpy as np, h5py, xrf_xrt_jxrft_file_util as futil, pandas as pd, xraylib_np as xrl_np, xraylib as xrl, pandas as pd
+import numpy as np, h5py, xrf_xrt_jxrft_file_util as futil_jxrft, pandas as pd, xraylib_np as xrl_np, xraylib as xrl, pandas as pd, xrf_xrt_preprocess_file_util as futil_pp, xrf_xrt_preprocess_utils as ppu
 
 from matplotlib import pyplot as plt
 from itertools import combinations as combos
@@ -171,9 +171,26 @@ from scipy import ndimage as ndi
 # E = np.array([10., 11.])
 # print(xrl_np.CS_Total_Kissel(np.array([4]), E).squeeze())
 
-def add(a, b):
-    return a + b
-c = 5
-d = add(1, c)
-print(c)
-print(d)
+aggregate_xrt_h5_file_path = '/Users/bwr0835/Documents/3_id_aggregate_xrt.h5'
+elements_xrt, counts_xrt, theta_xrt, _, dataset_type = futil_pp.extract_h5_aggregate_xrt_data(aggregate_xrt_h5_file_path)
+
+xrt_sig = counts_xrt[elements_xrt.index('xrt_sig')]
+
+n_theta, n_slices, n_columns = xrt_sig.shape
+
+flux_tot = np.zeros(n_theta)
+
+for theta_idx in range(n_theta):
+    xrt_vignetted = ppu.edge_gauss_filter(xrt_sig[theta_idx], sigma = 5, alpha = 10, nx = n_columns, ny = n_slices)
+
+    convolution_mag = ndi.gaussian_filter(xrt_vignetted, sigma = 10) # Blur the entire image using Gaussian filter/convolution
+
+    threshold = np.percentile(convolution_mag, 80) # Take top 20% of intensities for masking
+
+    mask = convolution_mag >= threshold
+
+    flux_tot[theta_idx] = xrt_sig[theta_idx, mask].sum()
+
+fig, axs = plt.subplots()
+plt.plot(theta_xrt, flux_tot)
+plt.show()
