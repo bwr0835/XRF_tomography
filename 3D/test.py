@@ -201,9 +201,10 @@ for theta_idx in range(n_theta):
     mask_avg_tot += mask_avg[theta_idx]
 
 mask_avg_tot /= n_theta
-mask_avg_tot /= mask_avg
 
 xrt_sig *= mask_avg_tot
+
+mask_avg_tot /= mask_avg
 
 fig, axs = plt.subplots()
 plt.plot(theta_xrt, mask_avg)
