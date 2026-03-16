@@ -202,7 +202,8 @@ for theta_idx in range(n_theta):
 
 mask_avg_tot /= n_theta
 
-xrt_sig *= mask_avg_tot
+xrt_sig *= 8.67768e6
+# xrt_sig *= mask_avg_tot
 
 for theta_idx in range(n_theta):
     xrt_vignetted = ppu.edge_gauss_filter(xrt_sig[theta_idx], sigma = 5, alpha = 10, nx = n_columns, ny = n_slices)
