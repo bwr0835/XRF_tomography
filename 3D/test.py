@@ -191,13 +191,13 @@ for theta_idx in range(n_theta):
 
     mask = convolution_mag >= threshold
 
-    flux_tot[theta_idx] = 1/xrt_sig[theta_idx, mask].mean()
+    xrt_sig[theta_idx] /= xrt_sig[theta_idx, mask].mean()
 
     mask_avg_tot += xrt_sig[theta_idx, mask].mean()
 
 mask_avg_tot /= n_theta
 
-flux_tot *= (mask_avg_tot*8.67768e6)
+xrt_sig *= (mask_avg_tot)
 
 fig, axs = plt.subplots()
 plt.plot(theta_xrt, flux_tot)
