@@ -171,7 +171,8 @@ from scipy import ndimage as ndi
 # E = np.array([10., 11.])
 # print(xrl_np.CS_Total_Kissel(np.array([4]), E).squeeze())
 
-aggregate_xrt_h5_file_path = '/raid/users/roter/Jacobsen-nslsii/data/ptycho/h5_data/3_id_aggregate_xrt.h5'
+# aggregate_xrt_h5_file_path = '/raid/users/roter/Jacobsen-nslsii/data/ptycho/h5_data/3_id_aggregate_xrt.h5'
+aggregate_xrt_h5_file_path = '/raid/users/roter/Jacobsen/img.dat/2_ide_aggregate_xrt.h5'
 elements_xrt, counts_xrt, theta_xrt, _, dataset_type = futil_pp.extract_h5_aggregate_xrt_data(aggregate_xrt_h5_file_path)
 
 xrt_sig = counts_xrt[elements_xrt.index('xrt_sig')]
