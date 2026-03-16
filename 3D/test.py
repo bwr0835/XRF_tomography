@@ -194,22 +194,22 @@ for theta_idx in range(n_theta):
     mask = convolution_mag >= threshold
 
     xrt_sig[theta_idx] /= xrt_sig[theta_idx, mask].mean()
-
+    mask_avg[theta_idx] = xrt_sig[theta_idx, mask].mean()
     mask_avg_tot += xrt_sig[theta_idx, mask].mean()
 
-mask_avg_tot /= n_theta
+# mask_avg_tot /= n_theta
 
-xrt_sig *= mask_avg_tot
-xrt_sig_copy = xrt_sig.copy()
+# xrt_sig *= mask_avg_tot
+# xrt_sig_copy = xrt_sig.copy()
 
-for theta_idx in range(n_theta):
-    xrt_vignetted = ppu.edge_gauss_filter(xrt_sig_copy[theta_idx], sigma = 5, alpha = 10, nx = n_columns, ny = n_slices)
+# for theta_idx in range(n_theta):
+#     xrt_vignetted = ppu.edge_gauss_filter(xrt_sig_copy[theta_idx], sigma = 5, alpha = 10, nx = n_columns, ny = n_slices)
 
-    convolution_mag = ndi.gaussian_filter(xrt_vignetted, sigma = 10) # Blur the entire image using Gaussian filter/convolution
+#     convolution_mag = ndi.gaussian_filter(xrt_vignetted, sigma = 10) # Blur the entire image using Gaussian filter/convolution
 
-    threshold = np.percentile(convolution_mag, 80) # Take top 20% of intensities for masking
+#     threshold = np.percentile(convolution_mag, 80) # Take top 20% of intensities for masking
 
-    mask_avg[theta_idx] = xrt_sig_copy[theta_idx, mask].mean()
+#     mask_avg[theta_idx] = xrt_sig_copy[theta_idx, mask].mean()
 
 fig, axs = plt.subplots()
 plt.plot(theta_xrt, mask_avg)
