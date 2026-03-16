@@ -291,12 +291,12 @@ def joint_fluct_norm(xrt_array,
         convolution_mag_array[theta_idx] = convolution_mag
     
     global_xrt_mask_avg = xrt_mask_avg_sum/n_theta
-    inc_intensity = 2.3e7
+    # inc_intensity = 2.3e7
 
     norm_array *= global_xrt_mask_avg
 
-    # xrt_array *= global_xrt_mask_avg # Second part of I0' = I0(<I_theta,mask,avg>/I_theta,mask,avg)
-    xrt_array *= inc_intensity
+    xrt_array *= global_xrt_mask_avg # Second part of I0' = I0(<I_theta,mask,avg>/I_theta,mask,avg)
+    # xrt_array *= inc_intensity
     xrf_array *= global_xrt_mask_avg
     
     if return_conv_mag_array:

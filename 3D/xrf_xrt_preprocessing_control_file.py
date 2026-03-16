@@ -216,9 +216,9 @@ def preprocess_xrf_xrt_data(synchrotron,
                                                                                                 counts_xrf,
                                                                                                 xrt_data_percentile)
                 
-                # for theta_idx in range(n_theta):
-                #     plt.imshow(counts_xrt_norm[theta_idx], vmin = counts_xrt_norm.min(), vmax = counts_xrt_norm.max())
-                #     plt.show()
+                for theta_idx in range(n_theta):
+                    plt.imshow(counts_xrt_norm[theta_idx], vmin = counts_xrt_norm.min(), vmax = counts_xrt_norm.max())
+                    plt.show()
 
             else:
                 if I0_cts_per_s is None or t_dwell_s is None:
