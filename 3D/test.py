@@ -180,6 +180,8 @@ n_theta, n_slices, n_columns = xrt_sig.shape
 
 flux_tot = np.zeros(n_theta)
 
+mask_avg_tot = 0
+
 for theta_idx in range(n_theta):
     xrt_vignetted = ppu.edge_gauss_filter(xrt_sig[theta_idx], sigma = 5, alpha = 10, nx = n_columns, ny = n_slices)
 
@@ -190,6 +192,12 @@ for theta_idx in range(n_theta):
     mask = convolution_mag >= threshold
 
     flux_tot[theta_idx] = xrt_sig[theta_idx, mask].mean()
+
+    mask_avg_tot += xrt_sig[theta_idx, mask].mean()
+
+mask_avg_tot /= n_theta
+
+flux_tot *= mask_avg_tot*8.67768e6
 
 fig, axs = plt.subplots()
 plt.plot(theta_xrt, flux_tot)
