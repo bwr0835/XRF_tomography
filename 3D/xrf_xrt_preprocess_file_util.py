@@ -1054,10 +1054,10 @@ def create_csv_output_data(dir_path,
         net_x_shifts_new = net_x_shifts
         net_y_shifts_new = net_y_shifts
 
-    output_dict = pd.DataFrame({'theta_deg': theta_array_new,
-                                'net_x_pixel_shift': net_x_shifts_new,
-                                'net_y_pixel_shift': net_y_shifts_new,
-                                'I0_cts': I0_cts})
+    output_dict = {'theta_deg': theta_array_new,
+                   'net_x_pixel_shift': net_x_shifts_new,
+                   'net_y_pixel_shift': net_y_shifts_new,
+                   'I0_cts': I0_cts}
     
     df = {key: value for key, value in output_dict.items()}
 
