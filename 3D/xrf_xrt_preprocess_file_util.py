@@ -1050,16 +1050,16 @@ def create_csv_output_data(dir_path,
         net_y_shifts_new = np.repeat(net_y_shifts[-1], net_x_shifts.shape[2])
     
     else:
-        theta_array_new = theta_array[-1]
-        net_x_shifts_new = net_x_shifts[-1]
-        net_y_shifts_new = net_y_shifts[-1]
+        theta_array_new = theta_array
+        net_x_shifts_new = net_x_shifts
+        net_y_shifts_new = net_y_shifts
 
-    df = pd.DataFrame({'theta_deg': theta_array_new,
-                       'net_x_pixel_shift': net_x_shifts_new,
-                       'net_y_pixel_shift': net_y_shifts_new,
-                       'I0_cts': I0_cts})
-
-    df.loc[1:, 'I0_cts'] = np.nan # To make sure no errors arise from not having unequal column lengths
+    output_dict = pd.DataFrame({'theta_deg': theta_array_new,
+                                'net_x_pixel_shift': net_x_shifts_new,
+                                'net_y_pixel_shift': net_y_shifts_new,
+                                'I0_cts': I0_cts})
+    
+    df = {key: value for key, value in output_dict.items()}
 
     df.to_csv(file_path, index = False)
 
