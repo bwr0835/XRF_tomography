@@ -1,5 +1,6 @@
-import numpy as np, h5py, xrf_xrt_jxrft_file_util as futil_jxrft, pandas as pd, xraylib_np as xrl_np, xraylib as xrl, pandas as pd, xrf_xrt_preprocess_file_util as futil_pp, xrf_xrt_preprocess_utils as ppu
-
+import numpy as np, h5py, pandas as pd, pandas as pd, xrf_xrt_preprocess_utils as ppu, sys, os
+# import xrf_xrt_preprocess_file_util as futil_pp, xraylib_np as xrl_np, xraylib as xrl
+# import  xrf_xrt_jxrft_file_util as futil_jxrft
 from matplotlib import pyplot as plt
 from itertools import combinations as combos
 from scipy import ndimage as ndi
@@ -172,8 +173,54 @@ from scipy import ndimage as ndi
 # print(xrl_np.CS_Total_Kissel(np.array([4]), E).squeeze())
 
 # aggregate_xrt_h5_file_path = '/raid/users/roter/Jacobsen-nslsii/data/ptycho/h5_data/3_id_aggregate_xrt.h5'
-aggregate_xrt_h5_file_path = '/raid/users/roter/Jacobsen/img.dat/2_ide_aggregate_xrt.h5'
-elements_xrt, counts_xrt, theta_xrt, _, dataset_type = futil_pp.extract_h5_aggregate_xrt_data(aggregate_xrt_h5_file_path)
+def extract_h5_aggregate_xrt_data(file_path, **kwargs):
+    if not os.path.isfile(file_path):
+        print('Error: HDF5 file path cannot be found. Exiting program...')
+
+        sys.exit()
+
+    if not file_path.endswith('.h5'):
+        print('Error: File must be HDF5. Exiting program...')
+
+        sys.exit()
+    
+    try:
+        with h5py.File(file_path, 'r') as h5:
+            counts_h5 = h5['exchange/data']
+            theta_h5 = h5['exchange/theta']
+            elements_h5 = h5['exchange/elements']
+
+            counts = counts_h5[()]
+            theta = theta_h5[()]
+            elements = list(elements_h5.asstr()[:])
+
+            if kwargs.get('filename_array') == True:
+                filenames_h5 = h5['filenames']
+
+                filenames = filenames_h5.asstr()[:]
+
+            dataset_type = counts_h5.attrs['dataset_type']
+            us_ic_scaler_name = counts_h5.attrs['us_ic_scaler_name']
+    
+    except KeyboardInterrupt:
+        print('\n\nKeyboardInterrupt occurred. Exiting program...')
+            
+        sys.exit()
+
+    except:
+        print('Error: Incompatible XRT HDF5 file structure. Exiting program...')
+
+        sys.exit()
+
+    if kwargs.get('filename_array') == True:
+        return elements, counts, theta, us_ic_scaler_name, dataset_type, filenames
+    
+    return elements, counts, theta, us_ic_scaler_name, dataset_type
+
+aggregate_xrt_h5_file_path = '/Users/bwr0835/Documents/2_ide_aggregate_xrt.h5'
+# aggregate_xrt_h5_file_path = '/Users/bwr0835/Documents/3_id_aggregate_xrt.h5'
+# aggregate_xrt_h5_file_path = '/raid/users/roter/Jacobsen/img.dat/2_ide_aggregate_xrt.h5'
+elements_xrt, counts_xrt, theta_xrt, _, dataset_type = extract_h5_aggregate_xrt_data(aggregate_xrt_h5_file_path)
 
 xrt_sig = counts_xrt[elements_xrt.index('xrt_sig')]
 
@@ -182,7 +229,7 @@ n_theta, n_slices, n_columns = xrt_sig.shape
 flux_tot = np.zeros(n_theta)
 
 mask_avg_tot = 0
-
+bool_mask = np.zeros((n_theta, n_slices, n_columns), dtype = bool)
 mask_avg = np.zeros(n_theta)
 
 for theta_idx in range(n_theta):
@@ -190,12 +237,12 @@ for theta_idx in range(n_theta):
 
     convolution_mag = ndi.gaussian_filter(xrt_vignetted, sigma = 10) # Blur the entire image using Gaussian filter/convolution
 
-    threshold = np.percentile(convolution_mag, 80) # Take top 20% of intensities for masking
+    threshold = np.percentile(convolution_mag, 93) # Take top 20% of intensities for masking
 
     mask = convolution_mag >= threshold
 
-    mask_avg[theta_idx] = xrt_sig[theta_idx, mask].mean()
-
+    mask_avg[theta_idx] = np.mean(xrt_sig[theta_idx, mask])
+    bool_mask[theta_idx] = mask
     xrt_sig[theta_idx] /= mask_avg[theta_idx]
 
     mask_avg_tot += mask_avg[theta_idx]
@@ -205,17 +252,29 @@ mask_avg_tot /= n_theta
 xrt_sig *= 8.67768e6
 # xrt_sig *= mask_avg_tot
 
+print(mask_avg_tot)
+
+# for theta_idx in range(n_theta):
+#     xrt_vignetted = ppu.edge_gauss_filter(xrt_sig[theta_idx], sigma = 5, alpha = 10, nx = n_columns, ny = n_slices)
+
+#     convolution_mag = ndi.gaussian_filter(xrt_vignetted, sigma = 10) # Blur the entire image using Gaussian filter/convolution
+
+#     threshold = np.percentile(convolution_mag, 90) # Take top 20% of intensities for masking
+
+#     mask = convolution_mag >= threshold
+    
+#     bool_mask[theta_idx] = mask
+
+#     mask_avg[theta_idx] = xrt_sig[theta_idx, mask].mean()
+
+    # print(np.mean(xrt_sig[theta_idx, mask]))
+# 
 for theta_idx in range(n_theta):
-    xrt_vignetted = ppu.edge_gauss_filter(xrt_sig[theta_idx], sigma = 5, alpha = 10, nx = n_columns, ny = n_slices)
+    fig, axs = plt.subplots()
+    axs.imshow(xrt_sig[theta_idx], vmin = xrt_sig.min(), vmax = xrt_sig.max())
+    plt.show()
 
-    convolution_mag = ndi.gaussian_filter(xrt_vignetted, sigma = 10) # Blur the entire image using Gaussian filter/convolution
 
-    threshold = np.percentile(convolution_mag, 80) # Take top 20% of intensities for masking
 
-    mask = convolution_mag >= threshold
-
-    mask_avg[theta_idx] = xrt_sig[theta_idx, mask].mean()
-
-fig, axs = plt.subplots()
-plt.plot(theta_xrt, mask_avg)
-plt.show()
+# fig, axs = plt.subplots()
+# plt.plot(theta_xrt, mask_avg)
