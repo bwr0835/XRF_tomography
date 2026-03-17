@@ -1044,14 +1044,19 @@ def create_csv_output_data(dir_path,
     file_path = os.path.join(dir_path, 'norm_net_shift_data.csv')
 
     if net_x_shifts.ndim == 3:
-        theta_array = np.repeat(theta_array, net_x_shifts.shape[2])
+        theta_array_new = np.repeat(theta_array, net_x_shifts.shape[2])
         
-        net_x_shifts = net_x_shifts.ravel()
-        net_y_shifts = np.repeat(net_y_shifts, net_x_shifts.shape[2])
+        net_x_shifts_new = net_x_shifts[-1].ravel()
+        net_y_shifts_new = np.repeat(net_y_shifts[-1], net_x_shifts.shape[2])
+    
+    else:
+        theta_array_new = theta_array
+        net_x_shifts_new = net_x_shifts
+        net_y_shifts_new = net_y_shifts
 
-    df = pd.DataFrame({'theta_deg': theta_array,
-                       'net_x_pixel_shift': net_x_shifts,
-                       'net_y_pixel_shift': net_y_shifts,
+    df = pd.DataFrame({'theta_deg': theta_array_new,
+                       'net_x_pixel_shift': net_x_shifts_new,
+                       'net_y_pixel_shift': net_y_shifts_new,
                        'I0_cts': I0_cts})
 
     df.loc[1:, 'I0_cts'] = np.nan # To make sure no errors arise from not having unequal column lengths
