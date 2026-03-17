@@ -1050,9 +1050,9 @@ def create_csv_output_data(dir_path,
         net_y_shifts_new = np.repeat(net_y_shifts[-1], net_x_shifts.shape[2])
     
     else:
-        theta_array_new = theta_array
-        net_x_shifts_new = net_x_shifts
-        net_y_shifts_new = net_y_shifts
+        theta_array_new = theta_array[-1]
+        net_x_shifts_new = net_x_shifts[-1]
+        net_y_shifts_new = net_y_shifts[-1]
 
     df = pd.DataFrame({'theta_deg': theta_array_new,
                        'net_x_pixel_shift': net_x_shifts_new,
