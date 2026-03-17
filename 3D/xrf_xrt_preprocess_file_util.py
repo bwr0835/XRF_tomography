@@ -1059,9 +1059,9 @@ def create_csv_output_data(dir_path,
                    'net_y_pixel_shift': net_y_shifts_new,
                    'I0_cts': I0_cts}
     
-    df = pd.DataFrame({key: pd.Series(value) for key, value in output_dict.items()}, na_rep = '')
+    df = pd.DataFrame({key: pd.Series(value) for key, value in output_dict.items()})
 
-    df.to_csv(file_path, index = False)
+    df.to_csv(file_path, index = False, na_rep = '')
 
     return
 
