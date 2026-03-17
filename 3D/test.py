@@ -217,8 +217,8 @@ def extract_h5_aggregate_xrt_data(file_path, **kwargs):
     
     return elements, counts, theta, us_ic_scaler_name, dataset_type
 
-aggregate_xrt_h5_file_path = '/Users/bwr0835/Documents/2_ide_aggregate_xrt.h5'
-# aggregate_xrt_h5_file_path = '/Users/bwr0835/Documents/3_id_aggregate_xrt.h5'
+# aggregate_xrt_h5_file_path = '/Users/bwr0835/Documents/2_ide_aggregate_xrt.h5'
+aggregate_xrt_h5_file_path = '/Users/bwr0835/Documents/3_id_aggregate_xrt.h5'
 # aggregate_xrt_h5_file_path = '/raid/users/roter/Jacobsen/img.dat/2_ide_aggregate_xrt.h5'
 elements_xrt, counts_xrt, theta_xrt, _, dataset_type = extract_h5_aggregate_xrt_data(aggregate_xrt_h5_file_path)
 
@@ -237,41 +237,49 @@ for theta_idx in range(n_theta):
 
     convolution_mag = ndi.gaussian_filter(xrt_vignetted, sigma = 10) # Blur the entire image using Gaussian filter/convolution
 
-    threshold = np.percentile(convolution_mag, 93) # Take top 20% of intensities for masking
+    threshold = np.percentile(convolution_mag, 93)  # Top 7% (brightest/non-absorbing). Use ~20 for top 80%, but that inflates values by including absorbing pixels
 
     mask = convolution_mag >= threshold
 
     mask_avg[theta_idx] = np.mean(xrt_sig[theta_idx, mask])
-    bool_mask[theta_idx] = mask
+    bool_mask[theta_idx] = mask.copy()
     xrt_sig[theta_idx] /= mask_avg[theta_idx]
 
     mask_avg_tot += mask_avg[theta_idx]
 
 mask_avg_tot /= n_theta
 
-xrt_sig *= 8.67768e6
-# xrt_sig *= mask_avg_tot
+# xrt_sig *= 8.67768e6
+xrt_sig *= mask_avg_tot
 
-print(mask_avg_tot)
 
-# for theta_idx in range(n_theta):
-#     xrt_vignetted = ppu.edge_gauss_filter(xrt_sig[theta_idx], sigma = 5, alpha = 10, nx = n_columns, ny = n_slices)
+mask_avg_tot = 0
 
-#     convolution_mag = ndi.gaussian_filter(xrt_vignetted, sigma = 10) # Blur the entire image using Gaussian filter/convolution
+for theta_idx in range(n_theta):
+    # xrt_vignetted = ppu.edge_gauss_filter(xrt_sig[theta_idx], sigma = 5, alpha = 10, nx = n_columns, ny = n_slices)
 
-#     threshold = np.percentile(convolution_mag, 90) # Take top 20% of intensities for masking
+    # convolution_mag = ndi.gaussian_filter(xrt_vignetted, sigma = 10) # Blur the entire image using Gaussian filter/convolution
 
-#     mask = convolution_mag >= threshold
+    # threshold = np.percentile(convolution_mag, 90) # Take top 20% of intensities for masking
+
+    # mask = convolution_mag >= threshold
     
-#     bool_mask[theta_idx] = mask
+    # bool_mask[theta_idx] = mask
 
-#     mask_avg[theta_idx] = xrt_sig[theta_idx, mask].mean()
+    mask_avg_new = xrt_sig[theta_idx, bool_mask[theta_idx]].mean()
+    # print(mask_avg_new)
+
+    mask_avg_tot += mask_avg_new
 
     # print(np.mean(xrt_sig[theta_idx, mask]))
-# 
+
+print(mask_avg_tot/n_theta)
+
 for theta_idx in range(n_theta):
-    fig, axs = plt.subplots()
-    axs.imshow(xrt_sig[theta_idx], vmin = xrt_sig.min(), vmax = xrt_sig.max())
+    # print(xrt_sig[theta_idx, bool_mask[theta_idx]].mean())
+    # fig, axs = plt.subplots(2, 1)
+    # axs[0].imshow(xrt_sig[theta_idx], vmin = xrt_sig.min(), vmax = xrt_sig.max())
+    # axs[1].imshow(xrt_sig[theta_idx]*bool_mask[theta_idx], vmin = xrt_sig.min(), vmax = xrt_sig.max())
     plt.show()
 
 

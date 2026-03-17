@@ -537,7 +537,10 @@ def preprocess_xrf_xrt_data(synchrotron,
 
             final_xrf_cropped, \
             final_xrt_sig_cropped, \
-            final_opt_dens_cropped = ppu.crop_array(final_xrf, final_xrt, final_opt_dens)
+            final_opt_dens_cropped = ppu.crop_array(final_xrf, 
+                                                    final_xrt, 
+                                                    final_opt_dens,
+                                                    final_edge_pixel_lengths_to_crop)
 
         else:
             final_xrf_cropped = counts_xrf_norm
