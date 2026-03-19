@@ -353,7 +353,7 @@ def preprocess_xrf_xrt_data(synchrotron,
                 print('Creating vertical jitter-corrected, cropped per-projection data GIF...')
 
                 if aligning_element in elements_xrf:
-                    intensity_ref_element = intensity_xrf_norm[elements_xrf.index(aligning_element), start_slice:end_slice]
+                    intensity_ref_element = intensity_xrf_norm[elements_xrf.index(aligning_element), :, start_slice:end_slice]
                 
                 elif aligning_element == 'xrt':
                     intensity_ref_element = intensity_xrt_norm[:, start_slice:end_slice]
