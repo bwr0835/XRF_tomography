@@ -301,8 +301,8 @@ def joint_fluct_norm(xrt_array,
         inc_intensity = global_xrt_mask_avg
     
     else:
-        # inc_intensity = incident_photodiode_flux_photons_per_s*t_dwell_s # Incident intensity in photons (instead of, for instance, ion chamber units)
-        inc_intensity = global_xrt_mask_avg
+        inc_intensity = incident_photodiode_flux_photons_per_s*t_dwell_s # Incident intensity in photons (instead of, for instance, ion chamber units)
+        # inc_intensity = global_xrt_mask_avg
     
     xrt_array *= inc_intensity
     xrf_array *= global_xrt_mask_avg
