@@ -388,11 +388,13 @@ def realign_proj(cor_correction_only,
         
         else:
             net_x_shifts_pcc = np.zeros((n_iterations_iter_reproj, n_theta))
-            net_y_shifts_pcc = np.zeros((n_iterations_iter_reproj, n_theta))
+            # net_y_shifts_pcc = np.zeros((n_iterations_iter_reproj, n_theta))
+            net_y_shifts_pcc = np.zeros(n_theta)
     
     else:
         net_x_shifts_pcc = np.zeros((n_iterations_iter_reproj, n_theta))
-        net_y_shifts_pcc = np.zeros((n_iterations_iter_reproj, n_theta))
+        # net_y_shifts_pcc = np.zeros((n_iterations_iter_reproj, n_theta))
+        net_y_shifts_pcc = np.zeros(n_theta)
 
     aligned_proj_total_xrt = np.zeros((n_theta, n_slices, n_columns))
     aligned_proj_total_opt_dens = np.zeros((n_theta, n_slices, n_columns))
