@@ -332,7 +332,7 @@ def create_aggregate_xrf_h5(file_path_array,
 
             sys.exit()
         
-        incident_energy_keV = kwargs['incident_energy_keV']
+        incident_energy_keV = float(kwargs['incident_energy_keV'])
         
     n_elements = len(elements)
     
