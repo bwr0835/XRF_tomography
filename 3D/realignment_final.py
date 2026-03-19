@@ -28,16 +28,12 @@ def phase_xcorr_manual(ref_img,
     phase_xcorr = fft.fftshift(np.abs(fft.ifft2(ref_img_fft*mov_img_fft.conjugate()/np.abs(ref_img_fft*mov_img_fft.conjugate()))))
 
     center_slice_idx = n_slices//2
-    center_column_idx = n_columns//2
 
     if pixel_rad > 0:
         start_slice_idx = center_slice_idx - pixel_rad
         end_slice_idx = center_slice_idx + pixel_rad
 
-        start_column_idx = center_column_idx - pixel_rad
-        end_column_idx = center_column_idx + pixel_rad
-
-        phase_xcorr_truncated = phase_xcorr[start_slice_idx:end_slice_idx, start_column_idx:end_column_idx]
+        phase_xcorr_truncated = phase_xcorr[start_slice_idx:end_slice_idx]
 
     else:
         phase_xcorr_truncated = phase_xcorr
@@ -45,7 +41,6 @@ def phase_xcorr_manual(ref_img,
     pcc_max_idx = np.unravel_index(np.argmax(phase_xcorr_truncated), phase_xcorr_truncated.shape)
 
     n_rows_truncated = phase_xcorr_truncated.shape[0]
-    n_columns_truncated = phase_xcorr_truncated.shape[1]
     
     if pcc_max_idx[0] + 1 < n_rows_truncated and pcc_max_idx[0] - 1 >= 0:
         pcc_p = phase_xcorr_truncated[pcc_max_idx[0] + 1, pcc_max_idx[1]]
@@ -63,58 +58,29 @@ def phase_xcorr_manual(ref_img,
         print('Warning: Vertical parabolic fit failed (The peak is at an edge or corner of the truncated region) for theta = {0} and {1} degrees. Returning 0 for subpixel shift.'.format(theta[0], theta[1]))
         
         subpix_shift_y = 0
-    
-    if pcc_max_idx[1] + 1 < n_columns_truncated and pcc_max_idx[1] - 1 >= 0:
-        pcc_p = phase_xcorr_truncated[pcc_max_idx[0], pcc_max_idx[1] + 1]
-        pcc_0 = phase_xcorr_truncated[pcc_max_idx[0], pcc_max_idx[1]]
-        pcc_n = phase_xcorr_truncated[pcc_max_idx[0], pcc_max_idx[1] - 1]
-        
-        subpix_shift_x = -0.5*(pcc_p - pcc_n)/(pcc_p + pcc_n - 2*pcc_0)
 
-        if not np.isfinite(subpix_shift_x):
-            print('Warning: Subpixel shift is not finite. Returning 0 for subpixel shift.')
-            
-            subpix_shift_x = 0
-
-    else:
-        print('Warning: Horizontal parabolic fit failed (The peak is at an edge or corner of the truncated region) for theta = {0} and {1} degrees. Returning 0 for subpixel shift.'.format(theta[0], theta[1]))
-        
-        subpix_shift_x = 0
-    
     # Include integer peak offset: shift = (peak_position - center) + subpixel_refinement
+    
     if pixel_rad > 0:
         shift_y = pcc_max_idx[0] - pixel_rad + subpix_shift_y
-        shift_x = pcc_max_idx[1] - pixel_rad + subpix_shift_x
     
     else:
         shift_y = pcc_max_idx[0] - center_slice_idx + subpix_shift_y
-        shift_x = pcc_max_idx[1] - center_column_idx + subpix_shift_x
     
-    return np.array([shift_y, shift_x]), phase_xcorr, phase_xcorr_truncated
+    return np.array([shift_y]), phase_xcorr, phase_xcorr_truncated
 
-# def correct_adjacent_angle_jitter_pre_cor_correction(init_proj_array,
-#                                                      net_x_shift_array,
-#                                                      net_y_shift_array,
-#                                                      sigma,
-#                                                      alpha,
-#                                                      pixel_rad,
-#                                                      theta,
-#                                                      common_field_of_view_axes,
-#                                                      return_aux_data):
 def correct_adjacent_angle_jitter_pre_cor_correction(init_proj_array,
                                                      net_y_shift_array,
                                                      sigma,
                                                      alpha,
                                                      pixel_rad,
                                                      theta,
-                                                     common_field_of_view_axes,
                                                      return_aux_data):
 
     n_theta, n_slices, n_columns = init_proj_array.shape
 
     phase_xcorr_2d_aggregate = np.zeros((n_theta - 1, n_slices, n_columns))
 
-    net_x_shift_cumsum_temp = np.zeros(n_theta - 1)
     net_y_shift_cumsum_temp = np.zeros(n_theta - 1)
     
     if pixel_rad is None:
@@ -156,7 +122,6 @@ def correct_adjacent_angle_jitter_pre_cor_correction(init_proj_array,
                                                                               pixel_rad[theta_idx],
                                                                               theta[[theta_idx, theta_idx + 1]])
 
-        net_x_shift_cumsum_temp[theta_idx] = shifts[1]  # shifts[0]=y (row), shifts[1]=x (col)
         net_y_shift_cumsum_temp[theta_idx] = shifts[0]
 
         if pixel_rad is not None and pixel_rad[theta_idx] > 0:
@@ -177,98 +142,29 @@ def correct_adjacent_angle_jitter_pre_cor_correction(init_proj_array,
         
         phase_xcorr_2d_aggregate[theta_idx] = phase_xcorr_2d
 
-    # net_x_shift_cumsum = np.cumsum(net_x_shift_cumsum_temp) # Cumulative sum of net x shifts (registering one angle to the previous angle still has residual error due to previous angles)
     net_y_shift_cumsum = np.cumsum(net_y_shift_cumsum_temp) # Cumulative sum of net y shifts (registering one angle to the previous angle still has residual error due to previous angles)
 
-    # net_x_shift_array[0, 1:] += net_x_shift_cumsum
     net_y_shift_array[1:] += net_y_shift_cumsum
 
     if return_aux_data:
         shifted_proj = np.zeros_like(init_proj_array)
 
         for theta_idx in range(n_theta):
-            # shifted_proj[theta_idx + 1] = ndi.shift(init_proj_array[theta_idx + 1], shift = (net_y_shift_array[0, theta_idx + 1], net_x_shift_array[0, theta_idx + 1]))
             shifted_proj[theta_idx] = ndi.shift(init_proj_array[theta_idx], shift = (net_y_shift_array[theta_idx], 0))
     
     # Compute common field of view (FOV)
-    
-    # if common_field_of_view_axes == 'both':
-    #     start_slice = int(np.clip(np.ceil(np.max(net_y_shift_array[0])), 0, n_slices)) # Get maximum net x shift and set to either 0 or n_slices if below or above, respectively
-    #     end_slice = int(np.clip(n_slices + np.floor(np.min(net_y_shift_array[0])), 0, n_slices)) # Get minimum net x shift, sum with n_slices, and set to either 0 or n_slices if below or above, respectively. This index is exclusive (i.e. not included in common field of view indexing)
 
-    #     # start_column = int(np.clip(np.ceil(np.max(net_x_shift_array[0])), 0, n_columns)) # Get maximum net x shift and set to either 0 or n_columns if below or above, respectively
-    #     # end_column = int(np.clip(n_columns + np.floor(np.min(net_x_shift_array[0])), 0, n_columns)) # Get minimum net x shift, sum with n_columns, and set to either 0 or n_columns if below or above, respectively. This index is exclusive (i.e. not included in common field of view indexing)
+    start_slice = int(np.clip(np.ceil(np.max(net_y_shift_array)), 0, n_slices)) # Crop top: exclude rows where positive shifts pushed content out
+    end_slice = int(np.clip(n_slices + np.floor(np.min(net_y_shift_array)), 0, n_slices)) # Crop bottom: exclude rows where negative shifts pushed content out. This index is exclusive.
         
-    #     if end_slice <= start_slice or end_column <= start_column:
-    #         print('Error: Empty field of view detected - net shifts exceed the number of slices or scan positions (columns). Exiting program...')
+    if return_aux_data:
+        shifted_proj_final = shifted_proj[:, start_slice:end_slice]
 
-    #         sys.exit()
-        
-    #     if return_aux_data:
-    #         shifted_proj_final = shifted_proj[:, start_slice:end_slice, start_column:end_column]
-    
-    # elif common_field_of_view_axes == 'x':
-    #     start_slice = 0
-    #     end_slice = n_slices
+    if end_slice <= start_slice:
+        print('Error: Empty field of view detected - net shifts exceed the number of slices. Exiting program...')
 
-    #     # start_column = int(np.clip(np.ceil(np.max(net_x_shift_array[0])), 0, n_columns)) # Get maximum net x shift and set to either 0 or n_columns if below or above, respectively
-    #     # end_column = int(np.clip(n_columns + np.floor(np.min(net_x_shift_array[0])), 0, n_columns)) # Get minimum net x shift, sum with n_columns, and set to either 0 or n_columns if below or above, respectively. This index is exclusive (i.e. not included in common field of view indexing)
-        
-    #     if end_column <= start_column:
-    #         print('Error: Empty field of view detected - net shifts exceed the number of scan positions (columns). Exiting program...')
+        sys.exit()
 
-    #         sys.exit()
-        
-    #     if return_aux_data:
-    #         shifted_proj_final = shifted_proj[:, :, start_column:end_column]
-
-    if common_field_of_view_axes == 'y':
-        start_slice = int(np.clip(np.ceil(np.max(net_y_shift_array)), 0, n_slices)) # Crop top: exclude rows where positive shifts pushed content out
-        end_slice = int(np.clip(n_slices + np.floor(np.min(net_y_shift_array)), 0, n_slices)) # Crop bottom: exclude rows where negative shifts pushed content out. This index is exclusive.
-        
-        # start_column = 0
-        # end_column = n_columns
-
-        if return_aux_data:
-            shifted_proj_final = shifted_proj[:, start_slice:end_slice]
-
-        if end_slice <= start_slice:
-            print('Error: Empty field of view detected - net shifts exceed the number of slices. Exiting program...')
-
-            sys.exit()
-    
-    # elif common_field_of_view_axes == 'none':
-    #     if return_aux_data:
-    #         shifted_proj_final = shifted_proj
-        
-    #     else:
-    #         pass
-
-    # else:
-    #     print('Error: \'common_field_of_view_axes\' must be \'both\', \'x\', \'y\', or \'none\'. Exiting program...')
-
-    #     sys.exit()
-
-    # if return_aux_data:        
-    #     return net_x_shift_array, \
-    #            net_y_shift_array, \
-    #            start_slice, \
-    #            end_slice, \
-    #            start_column, \
-    #            end_column, \
-    #            phase_xcorr_2d_aggregate, \
-    #            phase_xcorr_2d_truncated_aggregate, \
-    #            shifted_proj_final
-    
-    # return net_x_shift_array, \
-    #        net_y_shift_array, \
-    #        start_slice, \
-    #        end_slice, \
-    #        start_column, \
-    #        end_column, \
-    #        None, \
-    #        None, \
-    #        None
     if return_aux_data:        
         return net_y_shift_array, \
                start_slice, \
@@ -346,55 +242,26 @@ def rot_center_avg(proj_img_array, theta_pair_array, theta_array):
 
     return center_rotation_avg, geom_center, offset
 
-# def warp_shift(img, dx, dy, cval = 0):
-#     if (dx.ndim, dy.ndim) == (0, 0):
-#         return ndi.shift(img, shift = (dy, dx), cval = cval)
+def warp_shift(img, net_x_shift, net_y_shift, cval = 0):
+    if (net_y_shift.ndim, net_x_shift.ndim) == (0, 0):
+        return ndi.shift(img, shift = (net_y_shift, net_x_shift), cval = cval)
     
-#     else:
-#         ny, nx = img.shape
-
-#         if (dy.ndim, dx.ndim) == (1, 1):
-#             # dy length ny: different horizontal shift per slice; dx length nx: different vertical shift per column
-#             rows = np.arange(ny, dtype = float)[:, None] - dx[None]
-#             cols = np.arange(nx, dtype = float)[None] - dy[:, None]
+    elif (net_y_shift.ndim, net_x_shift.ndim) == (0, 1):
+        ny, nx = img.shape
         
-#         elif (dx.ndim, dy.ndim) == (1, 0):
-#             # dx 1D length nx, dy scalar: different vertical shift per column; same horizontal shift
-#             rows = np.arange(ny, dtype = float)[:, None] - dx[None]
-#             cols = (np.arange(nx, dtype = float) - dy)[None] + np.zeros((ny, 1))
-
-#         elif (dx.ndim, dy.ndim) == (0, 1):
-#             # dx scalar, dy 1D length ny: different horizontal shift per slice; same vertical shift
-#             rows = (np.arange(ny, dtype = float) - dx)[:, None] + np.zeros(nx)
-#             cols = np.arange(nx, dtype = float)[None, :] - dy[:, None]
-
-#         else:
-#             print('Error: \'dx\' and \'dy\' must be scalars. Exiting program...')
-
-#             sys.exit()
-
-#         coords = np.stack([rows, cols], axis = 0)  # shape: (2, ny, nx)
-
-#         return ndi.map_coordinates(img, coords, cval = cval)
+        # len(dx) = nx; dy is a scalar: different vertical shift per column; same horizontal shift
         
-def warp_rowwise_dx(img, dx_vec, dy, cval):
-    ny, nx = img.shape
+        rows = np.arange(ny, dtype = float)[:, None] - net_x_shift[None]
+        cols = (np.arange(nx, dtype = float) - net_y_shift)[None] + np.zeros((ny, 1))
+
+        coords = np.stack([rows, cols], axis = 0)  # shape: (2, ny, nx)
+
+        return ndi.map_coordinates(img, coords, cval = cval)
     
-    if dy.ndim != 0:
-        print('Error: \'dy\' must be a scalar. Exiting program...')
+    else:
+        print('Error: \'dx\' must be a 1D array, and \'dy\' must be a scalar. Exiting program...')
 
         sys.exit()
-
-    # Convert dx_vec, dy to 2D arrays of shape (ny, nx)
-    
-    rows = (np.arange(ny, dtype = float) - dy)[:, None] + np.zeros((1, nx))
-    cols = np.arange(nx, dtype = float)[None, :] - dx_vec[:, None]
-
-    # Stack rows and cols to form 3D coordinate array
-    
-    coords = np.stack([rows, cols], axis = 0)  # shape: (2, ny, nx)
-
-    return ndi.map_coordinates(img, coords, cval = cval)
 
 def realign_proj(cor_correction_only,
                  aligning_element,
@@ -605,37 +472,26 @@ def realign_proj(cor_correction_only,
 
             else:
                 print(f'Applying initial COR correction to pre-flipped, pre-remounted sample angles: {ppu.round_correct(-offset_init_first_part, ndec = 3)}')
-                    
-                for theta_idx in range(len(theta_array_first_part)):
-                    if edge_info is not None:                        
-                        net_x_shifts_pcc[0, theta_idx, start_slice:end_slice] -= offset_init_first_part
-                        
-                        aligned_proj[theta_idx] = warp_rowwise_dx(proj_img_array_element_to_align_with[theta_idx], net_x_shifts_pcc[0, theta_idx], net_y_shifts_pcc[theta_idx], cval = cval)
 
-                    else:
-                        net_x_shifts_pcc[0, theta_idx] -= offset_init_first_part
-                        
-                        # aligned_proj[theta_idx] = ndi.shift(proj_img_array_element_to_align_with[theta_idx], shift = (net_y_shifts_pcc[0, theta_idx], net_x_shifts_pcc[0, theta_idx]), cval = cval)
-                        aligned_proj[theta_idx] = ndi.shift(proj_img_array_element_to_align_with[theta_idx], shift = (net_y_shifts_pcc[theta_idx], net_x_shifts_pcc[0, theta_idx]), cval = cval)
+                if net_x_shifts_pcc.ndim == 3:
+                    net_x_shifts_pcc[0, :zero_deg_idx_array[1], start_slice:end_slice] -= offset_init_first_part
+                    net_x_shifts_pcc[0, zero_deg_idx_array[1]:, start_slice:end_slice] -= offset_init_second_part
+                
+                else:
+                    net_x_shifts_pcc[0, :zero_deg_idx_array[1]] -= offset_init_first_part
+                    net_x_shifts_pcc[0, zero_deg_idx_array[1]:] -= offset_init_second_part
+
+                for theta_idx in range(len(theta_array_first_part)):
+                    aligned_proj[theta_idx] = warp_shift(proj_img_array_element_to_align_with[theta_idx], net_x_shifts_pcc[0, theta_idx], net_y_shifts_pcc[theta_idx], cval = cval)
                         
                 print(f'Applying initial COR correction to post-flipped, post-remounted sample angles: {ppu.round_correct(-offset_init_second_part, ndec = 3)}')
                     
                 for theta_idx in range(len(theta_array_second_part)):
                     theta_idx_aux = theta_idx + len(theta_array_first_part)
                     
-                    if edge_info is not None:                        
-                        net_x_shifts_pcc[0, theta_idx_aux, start_slice:end_slice] -= offset_init_second_part
-                        
-                        # aligned_proj[theta_idx_aux] = warp_rowwise_dx(proj_img_array_element_to_align_with[theta_idx_aux], net_x_shifts_pcc[0, theta_idx_aux], 0, cval = cval)
-                        aligned_proj[theta_idx_aux] = warp_rowwise_dx(proj_img_array_element_to_align_with[theta_idx_aux], net_x_shifts_pcc[0, theta_idx_aux], net_y_shifts_pcc[theta_idx_aux], cval = cval)
-                        
-                    else:
-                        net_x_shifts_pcc[0, theta_idx_aux] -= offset_init_second_part
-                        
-                        # aligned_proj[theta_idx_aux] = ndi.shift(proj_img_array_element_to_align_with[theta_idx_aux], shift = (net_y_shifts_pcc[0, theta_idx_aux], net_x_shifts_pcc[0, theta_idx_aux]), cval = cval)
-                        aligned_proj[theta_idx_aux] = ndi.shift(proj_img_array_element_to_align_with[theta_idx_aux], shift = (net_y_shifts_pcc[0, theta_idx_aux], net_x_shifts_pcc[0, theta_idx_aux]), cval = cval)
+                    aligned_proj[theta_idx_aux] = warp_shift(proj_img_array_element_to_align_with[theta_idx_aux], net_x_shifts_pcc[0, theta_idx_aux], net_y_shifts_pcc[theta_idx_aux], cval = cval)
 
-                if edge_info is not None:
+                if net_x_shifts_pcc.ndim == 3:
                     center_of_rotation_avg_first_part, center_geom, offset_first_part = rot_center_avg(aligned_proj[:zero_deg_idx_array[1], start_slice:end_slice], 
                                                                                                        theta_idx_pairs_first_part, 
                                                                                                        theta_array_first_part)
@@ -696,19 +552,14 @@ def realign_proj(cor_correction_only,
 
                 if net_x_shifts_pcc.ndim == 3:
                     net_x_shifts_pcc[0, zero_deg_idx_array[1]:, start_slice:end_slice] += dx
-
-                    for theta_idx in range(len(theta_array_second_part)):
-                        theta_idx_aux = theta_idx + len(theta_array_first_part)
-                        
-                        aligned_proj[theta_idx_aux] = warp_rowwise_dx(proj_img_array_element_to_align_with[theta_idx_aux], net_x_shifts_pcc[0, theta_idx_aux], net_y_shifts_pcc[theta_idx_aux], cval = cval)
                 
                 else:
                     net_x_shifts_pcc[0, zero_deg_idx_array[1]:] += dx
 
-                    for theta_idx in range(len(theta_array_second_part)):
-                        theta_idx_aux = theta_idx + len(theta_array_first_part)
+                for theta_idx in range(len(theta_array_second_part)):
+                    theta_idx_aux = theta_idx + len(theta_array_first_part)
                         
-                        aligned_proj[theta_idx_aux] = ndi.shift(proj_img_array_element_to_align_with[theta_idx_aux], shift = (net_y_shifts_pcc[0, theta_idx_aux], net_x_shifts_pcc[0, theta_idx_aux]), cval = cval)
+                    aligned_proj[theta_idx_aux] = warp_shift(proj_img_array_element_to_align_with[theta_idx_aux], net_x_shifts_pcc[0, theta_idx_aux], net_y_shifts_pcc[theta_idx_aux], cval = cval)
 
                 dx_prev = dx
             
@@ -723,15 +574,13 @@ def realign_proj(cor_correction_only,
         print(f'Applying initial center of rotation correction: {ppu.round_correct(-offset_init, ndec = 3)}')
         
         if net_x_shifts_pcc.ndim == 3:
-            for theta_idx in range(n_theta):
-                net_x_shifts_pcc[0, theta_idx, start_slice:end_slice] -= offset_init
-                    
-                aligned_proj[theta_idx] = warp_rowwise_dx(proj_img_array_element_to_align_with[theta_idx], net_x_shifts_pcc[0, theta_idx], net_y_shifts_pcc[theta_idx], cval = cval)
+            net_x_shifts_pcc[0, :, start_slice:end_slice] -= offset_init
+        
         else:
-            for theta_idx in range(n_theta):
-                net_x_shifts_pcc[0, theta_idx] -= offset_init
-                
-                aligned_proj[theta_idx] = ndi.shift(proj_img_array_element_to_align_with[theta_idx], shift = (net_y_shifts_pcc[0, theta_idx], net_x_shifts_pcc[0, theta_idx]), cval = cval)
+            net_x_shifts_pcc[0] -= offset_init
+            
+        for theta_idx in range(n_theta):
+            aligned_proj[theta_idx] = warp_shift(proj_img_array_element_to_align_with[theta_idx], net_x_shifts_pcc[0, theta_idx], net_y_shifts_pcc[theta_idx], cval = cval)
         
         if net_x_shifts_pcc.ndim == 3:
             center_of_rotation_avg, _, _ = rot_center_avg(aligned_proj[:, start_slice:end_slice], theta_idx_pairs, theta_array)
@@ -757,16 +606,16 @@ def realign_proj(cor_correction_only,
                 net_x_shift = net_x_shifts_pcc[0, theta_idx]
                 net_y_shift = net_y_shifts_pcc[theta_idx]
 
-                aligned_proj_total_xrt[theta_idx] = warp_rowwise_dx(xrt_proj_img_array[theta_idx], net_x_shift, net_y_shift, cval = I0)
-                aligned_proj_total_opt_dens[theta_idx] = warp_rowwise_dx(opt_dens_proj_img_array[theta_idx], net_x_shift, net_y_shift)
+                aligned_proj_total_xrt[theta_idx] = warp_shift(xrt_proj_img_array[theta_idx], net_x_shift, net_y_shift, cval = I0)
+                aligned_proj_total_opt_dens[theta_idx] = warp_shift(opt_dens_proj_img_array[theta_idx], net_x_shift, net_y_shift)
         
         else:
             for theta_idx in range(n_theta):
                 net_x_shift = net_x_shifts_pcc[0, theta_idx]
                 net_y_shift = net_y_shifts_pcc[0, theta_idx]
 
-                aligned_proj_total_xrt[theta_idx] = ndi.shift(xrt_proj_img_array[theta_idx], shift = (net_y_shift, net_x_shift), cval = I0)
-                aligned_proj_total_opt_dens[theta_idx] = ndi.shift(opt_dens_proj_img_array[theta_idx], shift = (net_y_shift, net_x_shift))
+                aligned_proj_total_xrt[theta_idx] = warp_shift(xrt_proj_img_array[theta_idx], net_x_shift, net_y_shift, cval = I0)
+                aligned_proj_total_opt_dens[theta_idx] = warp_shift(opt_dens_proj_img_array[theta_idx], net_x_shift, net_y_shift)
 
         print('Shifting all elements in cropped XRF aggregate projection array by current net shifts...')
         
@@ -778,7 +627,7 @@ def realign_proj(cor_correction_only,
                     net_x_shift = net_x_shifts_pcc[0, theta_idx]
                     net_y_shift = net_y_shifts_pcc[theta_idx]
 
-                    aligned_proj_total_xrf[element_idx, theta_idx] = warp_rowwise_dx(xrf_proj_img_array[element_idx, theta_idx], net_x_shift, net_y_shift)
+                    aligned_proj_total_xrf[element_idx, theta_idx] = warp_shift(xrf_proj_img_array[element_idx, theta_idx], net_x_shift, net_y_shift)
         
         else:
             for element_idx in range(n_elements_xrf):
@@ -788,7 +637,7 @@ def realign_proj(cor_correction_only,
                     net_x_shift = net_x_shifts_pcc[0, theta_idx]
                     net_y_shift = net_y_shifts_pcc[0, theta_idx]
 
-                    aligned_proj_total_xrf[element_idx, theta_idx] = ndi.shift(xrf_proj_img_array[element_idx, theta_idx], shift = (net_y_shift, net_x_shift))
+                    aligned_proj_total_xrf[element_idx, theta_idx] = warp_shift(xrf_proj_img_array[element_idx, theta_idx], net_x_shift, net_y_shift)
 
         if net_x_shifts_pcc.ndim == 3:
             print('Truncating projection images in y so object is in every projection image\'s field of view...')
@@ -890,7 +739,7 @@ def realign_proj(cor_correction_only,
                     net_x_shift = net_x_shifts_pcc[i - 1, theta_idx]
                     net_y_shift = net_y_shifts_pcc[theta_idx]
 
-                    aligned_proj[theta_idx] = warp_rowwise_dx(proj_img_array_element_to_align_with[theta_idx], net_x_shift, net_y_shift, cval = cval)
+                    aligned_proj[theta_idx] = warp_shift(proj_img_array_element_to_align_with[theta_idx], net_x_shift, net_y_shift, cval = cval)
                 
                 if sample_flipped_remounted_mid_experiment:
                     center_of_rotation_avg_first_part, _, offset_first_part = rot_center_avg(aligned_proj[:zero_deg_idx_array[1], start_slice:end_slice], theta_idx_pairs_first_part, theta_array_first_part)
@@ -1115,8 +964,8 @@ def realign_proj(cor_correction_only,
                         net_x_shift = net_x_shifts_pcc[i, theta_idx]
                         net_y_shift = net_y_shifts_pcc[theta_idx]
 
-                        aligned_proj_total_xrt[theta_idx] = warp_rowwise_dx(xrt_proj_img_array[theta_idx], net_x_shift, net_y_shift, cval = I0)
-                        aligned_proj_total_opt_dens[theta_idx] = warp_rowwise_dx(opt_dens_proj_img_array[theta_idx], net_x_shift, net_y_shift)
+                        aligned_proj_total_xrt[theta_idx] = warp_shift(xrt_proj_img_array[theta_idx], net_x_shift, net_y_shift, cval = I0)
+                        aligned_proj_total_opt_dens[theta_idx] = warp_shift(opt_dens_proj_img_array[theta_idx], net_x_shift, net_y_shift)
                     
                     print('Shifting all elements in cropped XRF aggregate projection array by current net shifts...')
                         
@@ -1127,7 +976,7 @@ def realign_proj(cor_correction_only,
                             net_x_shift = net_x_shifts_pcc[i, theta_idx]
                             net_y_shift = net_y_shifts_pcc[i, theta_idx]
 
-                            aligned_proj_total_xrf[element_idx, theta_idx] = warp_rowwise_dx(xrf_proj_img_array[element_idx, theta_idx], net_x_shift, net_y_shift)
+                            aligned_proj_total_xrf[element_idx, theta_idx] = warp_shift(xrf_proj_img_array[element_idx, theta_idx], net_x_shift, net_y_shift)
                     
                     print('\nTruncating cropped XRT, OD, XRF projection images in y so object is in every projection image\'s field of view...')
 
@@ -1140,8 +989,8 @@ def realign_proj(cor_correction_only,
                         net_x_shift = net_x_shifts_pcc[i, theta_idx]
                         net_y_shift = net_y_shifts_pcc[i, theta_idx]
 
-                        aligned_proj_total_xrt[theta_idx] = ndi.shift(xrt_proj_img_array[theta_idx], shift = (net_y_shift, net_x_shift), cval = I0)
-                        aligned_proj_total_opt_dens[theta_idx] = ndi.shift(opt_dens_proj_img_array[theta_idx], shift = (net_y_shift, net_x_shift))
+                        aligned_proj_total_xrt[theta_idx] = warp_shift(xrt_proj_img_array[theta_idx], net_x_shift, net_y_shift, cval = I0)
+                        aligned_proj_total_opt_dens[theta_idx] = warp_shift(opt_dens_proj_img_array[theta_idx], net_x_shift, net_y_shift)
 
                     for element_idx in range(n_elements_xrf):
                         print(f'\rElement {element_idx + 1}/{n_elements_xrf}', end = '', flush = True)
@@ -1150,7 +999,7 @@ def realign_proj(cor_correction_only,
                             net_x_shift = net_x_shifts_pcc[i, theta_idx]
                             net_y_shift = net_y_shifts_pcc[i, theta_idx]
 
-                            aligned_proj_total_xrf[element_idx, theta_idx] = ndi.shift(xrf_proj_img_array[element_idx, theta_idx], shift = (net_y_shift, net_x_shift))
+                            aligned_proj_total_xrf[element_idx, theta_idx] = warp_shift(xrf_proj_img_array[element_idx, theta_idx], net_x_shift, net_y_shift)
                     
                     if np.any(net_y_shifts_pcc[i]):
                         print("\nTruncating cropped XRT, OD, XRF projection images in y so object is in every projection image's field of view...")
@@ -1181,8 +1030,8 @@ def realign_proj(cor_correction_only,
                     net_x_shift = net_x_shifts_pcc[i, theta_idx]
                     net_y_shift = net_y_shifts_pcc[theta_idx]
 
-                    aligned_proj_total_xrt[theta_idx] = warp_rowwise_dx(xrt_proj_img_array[theta_idx], net_x_shift, net_y_shift, cval = I0)
-                    aligned_proj_total_opt_dens[theta_idx] = warp_rowwise_dx(opt_dens_proj_img_array[theta_idx], net_x_shift, net_y_shift)
+                    aligned_proj_total_xrt[theta_idx] = warp_shift(xrt_proj_img_array[theta_idx], net_x_shift, net_y_shift, cval = I0)
+                    aligned_proj_total_opt_dens[theta_idx] = warp_shift(opt_dens_proj_img_array[theta_idx], net_x_shift, net_y_shift)
 
                 print('Shifting all XRF elements by current net shifts...')
 
@@ -1193,7 +1042,7 @@ def realign_proj(cor_correction_only,
                         net_x_shift = net_x_shifts_pcc[i, theta_idx]
                         net_y_shift = net_y_shifts_pcc[i, theta_idx]
 
-                        aligned_proj_total_xrf[element_idx, theta_idx] = warp_rowwise_dx(xrf_proj_img_array[element_idx, theta_idx], net_x_shift, net_y_shift)
+                        aligned_proj_total_xrf[element_idx, theta_idx] = warp_shift(xrf_proj_img_array[element_idx, theta_idx], net_x_shift, net_y_shift)
                 
                 print('\nTruncating cropped XRT, OD, XRF projection images in y so object is in every projection image\'s field of view...')
 
@@ -1206,8 +1055,8 @@ def realign_proj(cor_correction_only,
                     net_x_shift = net_x_shifts_pcc[i, theta_idx]
                     net_y_shift = net_y_shifts_pcc[i, theta_idx]
 
-                    aligned_proj_total_xrt[theta_idx] = ndi.shift(xrt_proj_img_array[theta_idx], shift = (net_y_shift, net_x_shift), cval = I0)
-                    aligned_proj_total_opt_dens[theta_idx] = ndi.shift(opt_dens_proj_img_array[theta_idx], shift = (net_y_shift, net_x_shift))
+                    aligned_proj_total_xrt[theta_idx] = warp_shift(xrt_proj_img_array[theta_idx], net_x_shift, net_y_shift, cval = I0)
+                    aligned_proj_total_opt_dens[theta_idx] = warp_shift(opt_dens_proj_img_array[theta_idx], net_x_shift, net_y_shift)
 
                 print('Shifting all XRF elements by current net shifts...')
 
@@ -1218,7 +1067,7 @@ def realign_proj(cor_correction_only,
                         net_x_shift = net_x_shifts_pcc[i, theta_idx]
                         net_y_shift = net_y_shifts_pcc[i, theta_idx]
 
-                        aligned_proj_total_xrf[element_idx, theta_idx] = ndi.shift(xrf_proj_img_array[element_idx, theta_idx], shift = (net_y_shift, net_x_shift))
+                        aligned_proj_total_xrf[element_idx, theta_idx] = warp_shift(xrf_proj_img_array[element_idx, theta_idx], net_x_shift, net_y_shift)
             
                 if np.any(net_y_shifts_pcc[i]): # Any nonzero y shifts
                     print("\nTruncating cropped XRT, OD, XRF projection images in y so object is in every projection image's field of view...")

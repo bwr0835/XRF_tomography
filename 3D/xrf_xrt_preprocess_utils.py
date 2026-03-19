@@ -247,6 +247,9 @@ def edge_gauss_filter(image, sigma, alpha, nx, ny):
 def joint_fluct_norm(xrt_array,
                      xrf_array,
                      xrt_data_percentile,
+                     xrt_photon_counting,
+                     incident_photodiode_flux_photons_per_s,
+                     t_dwell_s,
                      sigma_1 = 5,
                      alpha = 10,
                      sigma_2 = 10,
@@ -266,7 +269,8 @@ def joint_fluct_norm(xrt_array,
 
     convolution_mag_array = np.zeros((n_theta, n_slices, n_columns))
     
-    norm_array = np.zeros(n_theta)
+    norm_array_xrt = np.zeros(n_theta)
+    norm_array_xrf = np.zeros(n_theta)
     
     xrt_mask_avg_sum = 0
     
@@ -281,7 +285,8 @@ def joint_fluct_norm(xrt_array,
 
         xrt_mask_avg = xrt_array[theta_idx, mask].mean()
 
-        norm_array[theta_idx] = 1/xrt_mask_avg
+        norm_array_xrt[theta_idx] = 1/xrt_mask_avg
+        norm_array_xrf[theta_idx] = 1/xrt_mask_avg
 
         xrt_array[theta_idx] /= xrt_mask_avg # First part of I0' = I0(<I_theta,mask,avg>/I_theta,mask,avg)
         xrf_array[:, theta_idx] /= xrt_mask_avg
@@ -291,18 +296,56 @@ def joint_fluct_norm(xrt_array,
         convolution_mag_array[theta_idx] = convolution_mag
     
     global_xrt_mask_avg = xrt_mask_avg_sum/n_theta
-    inc_intensity = 8.67768e6
+    
+    if xrt_photon_counting:
+        inc_intensity = global_xrt_mask_avg
+    
+    else:
+        inc_intensity = incident_photodiode_flux_photons_per_s*t_dwell_s # Incident intensity in photons (instead of, for instance, ion chamber units)
 
-    norm_array *= global_xrt_mask_avg
-
-    # xrt_array *= global_xrt_mask_avg # Second part of I0' = I0(<I_theta,mask,avg>/I_theta,mask,avg)
-    xrt_array *= inc_intensity
-    xrf_array *= global_xrt_mask_avg
+    norm_array_xrt *= inc_intensity
+    norm_array_xrf *= global_xrt_mask_avg
     
     if return_conv_mag_array:
-        return xrt_array, xrf_array, norm_array, global_xrt_mask_avg, np.array(convolution_mag_array)
+        return xrt_array, xrf_array, norm_array_xrt, norm_array_xrf, inc_intensity, np.array(convolution_mag_array)
     
-    return xrt_array, xrf_array, norm_array, global_xrt_mask_avg
+    return xrt_array, xrf_array, norm_array_xrt, norm_array_xrf, inc_intensity, global_xrt_mask_avg
+
+def calculate_abs_incident_intensity_photons(xrt_array,
+                                             xrt_data_percentile, 
+                                             sigma_1 = 5, 
+                                             alpha = 10, 
+                                             sigma_2 = 10):
+    
+    if xrt_array.ndim != 3:
+        print('Error: XRT array must be 3D. Exiting program...')
+
+        sys.exit()
+    
+    if xrt_data_percentile is None or xrt_data_percentile < 0 or xrt_data_percentile > 100:
+        print('Error: \'data_percentile\' must be between 0 and 100. Exiting program...')
+
+        sys.exit()
+    
+    n_theta, n_slices, n_columns = xrt_array.shape
+
+    xrt_mask_avg_sum = 0
+    
+    for theta_idx in range(n_theta):
+        xrt_vignetted = edge_gauss_filter(xrt_array[theta_idx], sigma = sigma_1, alpha = alpha, nx = n_columns, ny = n_slices)
+        convolution_mag = ndi.gaussian_filter(xrt_vignetted, sigma = sigma_2) # Blur the entire image using Gaussian filter/convolution
+
+        threshold = np.percentile(convolution_mag, xrt_data_percentile) # EX: Take top 20% of data (data_percentile = 80)
+
+        mask = convolution_mag >= threshold
+
+        xrt_mask_avg = xrt_array[theta_idx, mask].mean()
+
+        xrt_mask_avg_sum += xrt_mask_avg
+    
+    incident_intensity_photons = xrt_mask_avg_sum/n_theta
+
+    return incident_intensity_photons
 
 def find_theta_combos(theta_array_deg, dtheta = 0): # Output type: List of tuples
     '''

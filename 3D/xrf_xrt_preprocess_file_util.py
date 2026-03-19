@@ -89,7 +89,9 @@ def extract_h5_xrf_data(file_path, synchrotron, **kwargs):
             print('Error: Incompatible HDF5 file structure. Exiting program...')
 
             sys.exit()    
-
+        
+        fitting_software = 'MAPS'
+        
         theta_idx = np.where(extra_pvs_names == b'2xfm:m58.VAL')[0]
         
         theta = float(extra_pvs_values[theta_idx][0].decode()) # Get the value of theta and decode it to a float (from a byte)
@@ -108,7 +110,7 @@ def extract_h5_xrf_data(file_path, synchrotron, **kwargs):
                                       b'Fit_Residual', 
                                       b'Total_Fluorescence_Yield',
                                       b'Sum_Elastic_Inelastic']
-            
+
         counts_new = np.zeros((len(elements), ny, nx))
                 
         idx_to_delete = []
@@ -132,33 +134,34 @@ def extract_h5_xrf_data(file_path, synchrotron, **kwargs):
 
         elements_string = [element.decode() for element in elements] # Convert the elements array from a list of bytes to a list of strings
 
-        return elements_string, counts_new, theta, nx, ny, dx_cm, dy_cm
+        return elements_string, counts_new, theta, nx, ny, dx_cm, dy_cm, fitting_software
         
     elif synchrotron == 'nsls-ii':
         try:
-            counts_h5 = h5['xrfmap/detsum/xrf_fit']
-            elements_h5 = h5['xrfmap/detsum/xrf_fit_name']
-            axis_coords_h5 = h5['xrfmap/positions/pos']
-            theta_h5 = h5['xrfmap/scan_metadata'].attrs['param_theta'] # Metadata stored as key-value pairs (attributes) (similar to a Python dictionary)
+            with h5py.File(file_path, 'r') as h5:
+                counts_h5 = h5['xrfmap/detsum/xrf_fit']
+                elements_h5 = h5['xrfmap/detsum/xrf_fit_name']
+                axis_coords_h5 = h5['xrfmap/positions/pos']
+                theta_h5 = h5['xrfmap/scan_metadata'].attrs['param_theta'] # Metadata stored as key-value pairs (attributes) (similar to a Python dictionary)
+                incident_energy_keV = h5['xrfmap/scan_metadata'].attrs['instrument_mono_incident_energy']
+                fitting_software = h5['xrfmap/scan_metadata'].attrs['file_software']
 
-            if kwargs.get('us_ic_enabled') == True:
-                scalers_names_h5 = h5['xrfmap/scalers/name']
-                scalers_h5 = h5['xrfmap/scalers/val']
+                if kwargs.get('us_ic_enabled') == True:
+                    scalers_names_h5 = h5['xrfmap/scalers/name']
+                    scalers_h5 = h5['xrfmap/scalers/val']
 
-                scalers_names = scalers_names_h5[()]
-                scalers = scalers_h5[()]
+                    scalers_names = scalers_names_h5[()]
+                    scalers = scalers_h5[()]
+
+                elements = elements_h5[()]
+                counts = counts_h5[()]
+                axis_coords = axis_coords_h5[()]
+                theta = 1e-3*theta_h5[()] # Convert from mdeg to deg
 
         except:
             print('Error: Incompatible HDF5 file structure. Exiting program...')
 
             sys.exit()
-
-        elements = elements_h5[()]
-        counts = counts_h5[()]
-        axis_coords = axis_coords_h5[()]
-        theta = 1e-3*theta_h5[()] # Convert from mdeg to deg
-
-        h5.close()
 
         x_um = axis_coords[0]
         y_um = axis_coords[1]
@@ -194,10 +197,9 @@ def extract_h5_xrf_data(file_path, synchrotron, **kwargs):
             
             us_ic = scalers[:, :, us_ic_index]
 
-            return elements_string, counts, us_ic, theta, nx, ny, dx_cm, dy_cm
+            return elements_string, counts, us_ic, theta, incident_energy_keV, nx, ny, dx_cm, dy_cm, fitting_software
 
-        else:
-            return elements_string, counts, theta, nx, ny, dx_cm, dy_cm
+        return elements_string, counts, theta, incident_energy_keV, nx, ny, dx_cm, dy_cm, fitting_software
 
 def extract_h5_xrt_data(file_path, synchrotron, **kwargs):
     if not os.path.isfile(file_path):
@@ -317,10 +319,21 @@ def create_aggregate_xrf_h5(file_path_array,
 
     n_theta = len(file_path_array)
 
-    theta_array = np.zeros(n_theta) 
+    theta_array = np.zeros(n_theta)
 
-    elements, counts, theta, nx, ny, _, _ = extract_h5_xrf_data(file_path_array[0], synchrotron) # Invoke the first time for getting the number of elements and the number of pixels
+    if synchrotron == 'nsls-ii':
+        elements, counts, theta, incident_energy_keV, nx, ny, _, _, fitting_software = extract_h5_xrf_data(file_path_array[0], synchrotron) # Invoke the first time for getting the number of elements and the number of pixels
     
+    else:
+        elements, counts, theta, nx, ny, _, _, fitting_software = extract_h5_xrf_data(file_path_array[0], synchrotron) # Invoke the first time for getting the number of elements and the number of pixels
+        
+        if kwargs.get('incident_energy_keV') is None:
+            print('Error: \'incident_energy_keV\' not provided. Exiting program...')
+
+            sys.exit()
+        
+        incident_energy_keV = kwargs['incident_energy_keV']
+        
     n_elements = len(elements)
     
     counts_array = np.zeros((n_elements, n_theta, ny, nx))
@@ -330,20 +343,20 @@ def create_aggregate_xrf_h5(file_path_array,
 
     for theta_idx, file_path in enumerate(file_path_array):
         if theta_idx != len(file_path_array) - 1:
-            print(f'\rHDF file {theta_idx + 1}/{len(file_path_array)} extracted', end = '', flush = True)
+            print(f'\rHDF5 file {theta_idx + 1}/{len(file_path_array)} extracted', end = '', flush = True)
         
         else:
-            print(f'\rHDF file {theta_idx + 1}/{len(file_path_array)} extracted', flush = True)
+            print(f'\rHDF5 file {theta_idx + 1}/{len(file_path_array)} extracted', flush = True)
         
         if synchrotron != 'nsls-ii':
-            elements_new, counts, theta, nx_new, ny_new, _, _ = extract_h5_xrf_data(file_path, synchrotron)
+            elements_new, counts, theta, nx_new, ny_new, _, _, _ = extract_h5_xrf_data(file_path, synchrotron)
         
         else:
             if kwargs.get('us_ic_enabled') == True:
-                elements_new, counts, us_ic, theta, nx_new, ny_new, _, _, = extract_h5_xrf_data(file_path, synchrotron, us_ic_enabled = True)
+                elements_new, counts, us_ic, theta, _, nx_new, ny_new, _, _, _ = extract_h5_xrf_data(file_path, synchrotron, us_ic_enabled = True)
             
             else:
-                elements_new, counts, theta, nx_new, ny_new, _, _, = extract_h5_xrf_data(file_path, synchrotron)
+                elements_new, counts, theta, _, nx_new, ny_new, _, _, _ = extract_h5_xrf_data(file_path, synchrotron)
         
         assert nx == nx_new and ny == ny_new, f"Dimension mismatch in {file_path}." # Check that the dimensions of the new data match the dimensions of the first data set
         assert np.array_equal(elements, elements_new), f"Element mismatch in {file_path}." # Check that the elements are the same
@@ -394,24 +407,21 @@ def create_aggregate_xrf_h5(file_path_array,
         exchange.create_dataset('theta', data = theta_array_sorted)
         
         exchange['data'].attrs['dataset_type'] = 'xrf'
-        
-        if synchrotron == 'aps':
-            exchange.attrs['raw_spectrum_fitting_software'] = 'MAPS'
-            exchange.attrs['raw_spectrum_fitting_method'] = 'NNLS'
-        
-        elif synchrotron == 'nsls-ii':
-            exchange.attrs['raw_spectrum_fitting_software'] = 'PyMCA'
-            exchange.attrs['raw_spectrum_fitting_method'] = 'NNLS'
+        exchange['data'].attrs['raw_spectrum_fitting_software'] = fitting_software
+        exchange['data'].attrs['raw_spectrum_fitting_method'] = 'NNLS'
+        exchange['data'].attrs['incident_energy_keV'] = incident_energy_keV
 
-    if synchrotron == 'nsls-ii' and kwargs.get('us_ic_enabled') == True:   
-        return us_ic_array_sorted
+    if synchrotron == 'nsls-ii':
+        if kwargs.get('us_ic_enabled') == True:   
+            return incident_energy_keV, us_ic_array_sorted
     
-    return
+    return incident_energy_keV
 
 def create_aggregate_xrt_h5(file_path_array, 
                             output_h5_file, 
                             synchrotron, 
-                            sample_flipped_remounted_mid_experiment, 
+                            sample_flipped_remounted_mid_experiment,
+                            incident_energy_keV,
                             **kwargs):
     
     n_theta = len(file_path_array)
@@ -420,17 +430,21 @@ def create_aggregate_xrt_h5(file_path_array,
 
     if synchrotron == 'aps':
         elements, counts, theta, nx, ny, _, _ = extract_h5_xrt_data(file_path_array[0], synchrotron) # Invoke the first time for getting the number of elements and the number of pixels
-    
-    elif synchrotron == 'nsls-ii':
-        us_ic = kwargs.get('us_ic')
 
+        if incident_energy_keV is None:
+            print('Error: \'incident_energy_keV\' not provided. Exiting program...')
+
+            sys.exit()
+
+    elif synchrotron == 'nsls-ii':
+        incident_energy_keV = kwargs['incident_energy_keV']
+        us_ic = kwargs.get('us_ic')
+        
         if us_ic is None:
             print('Error: \'us_ic\' not provided. Exiting program...')
 
             sys.exit()
         
-        print(us_ic.shape)
-
         kwargs['ny'], kwargs['nx'] = us_ic[0].shape
 
         elements, counts, theta, nx, ny, _, _ = extract_h5_xrt_data(file_path_array[0], synchrotron, **kwargs)
@@ -498,14 +512,19 @@ def create_aggregate_xrt_h5(file_path_array,
         exchange.create_dataset('theta', data = theta_array_sorted)
 
         exchange['data'].attrs['dataset_type'] = 'xrt'
+        exchange['data'].attrs['incident_energy_keV'] = incident_energy_keV
 
         if synchrotron == 'aps':
             exchange['data'].attrs['us_ic_scaler_name'] = 'US_IC'
             exchange['data'].attrs['xrt_signal_name'] = 'DS_IC'
-        
+            exchange['data'].attrs['xrt_photon_counting'] = False
+            exchange['data'].attrs['xrt_instrument'] = 'ion_chamber'
+
         elif synchrotron == 'nsls-ii':
             exchange['data'].attrs['us_ic_scaler_name'] = 'sclr1_ch4'
-            exchange['data'].attrs['xrt_signal_name'] = 'stxm'
+            exchange['data'].attrs['xrt_signal_name'] = 'transmitted'
+            exchange['data'].attrs['xrt_photon_counting'] = True
+            exchange['data'].attrs['xrt_instrument'] = 'pixel_array_detector'
 
 def extract_h5_aggregate_xrf_data(file_path, **kwargs):
     if not os.path.isfile(file_path):
@@ -532,9 +551,10 @@ def extract_h5_aggregate_xrf_data(file_path, **kwargs):
                 filenames_h5 = h5['filenames']
 
                 filenames = filenames_h5.asstr()[:]
-
+            
             dataset_type = counts_h5.attrs['dataset_type']
-            raw_spectrum_fitting_method = h5['exchange'].attrs['raw_spectrum_fitting_method']
+            raw_spectrum_fitting_method = counts_h5.attrs['raw_spectrum_fitting_method']
+            incident_energy_keV = counts_h5.attrs['incident_energy_keV']
     
     except KeyboardInterrupt:
         print('\n\nKeyboardInterrupt occurred. Exiting program...')
@@ -549,7 +569,7 @@ def extract_h5_aggregate_xrf_data(file_path, **kwargs):
     if kwargs.get('filename_array') == True:
         return elements, counts, theta, raw_spectrum_fitting_method, dataset_type, filenames
     
-    return elements, counts, theta, raw_spectrum_fitting_method, dataset_type
+    return elements, counts, theta, incident_energy_keV, raw_spectrum_fitting_method, dataset_type
 
 def extract_h5_aggregate_xrt_data(file_path, **kwargs):
     if not os.path.isfile(file_path):
@@ -579,6 +599,8 @@ def extract_h5_aggregate_xrt_data(file_path, **kwargs):
 
             dataset_type = counts_h5.attrs['dataset_type']
             us_ic_scaler_name = counts_h5.attrs['us_ic_scaler_name']
+            xrt_photon_counting = counts_h5.attrs['xrt_photon_counting']
+            incident_energy_keV = counts_h5.attrs['incident_energy_keV']
     
     except KeyboardInterrupt:
         print('\n\nKeyboardInterrupt occurred. Exiting program...')
@@ -593,7 +615,7 @@ def extract_h5_aggregate_xrt_data(file_path, **kwargs):
     if kwargs.get('filename_array') == True:
         return elements, counts, theta, us_ic_scaler_name, dataset_type, filenames
     
-    return elements, counts, theta, us_ic_scaler_name, dataset_type
+    return elements, counts, theta, incident_energy_keV, us_ic_scaler_name, dataset_type, xrt_photon_counting
 
 def extract_csv_norm_net_shift_data(file_path, theta_array):
     if not os.path.isfile(file_path):
@@ -640,7 +662,9 @@ def create_h5_aligned_aggregate_xrf_xrt(dir_path,
                                         opt_dens_array, 
                                         theta_array,
                                         init_edge_info,
-                                        final_edge_info):
+                                        final_edge_info,
+                                        I0_photons,
+                                        incident_energy_keV):
 
     elements_xrt = ['xrt_sig', 'opt_dens']
 
@@ -667,6 +691,9 @@ def create_h5_aligned_aggregate_xrf_xrt(dir_path,
         data.create_dataset('xrf', data = xrf_array, compression = 'gzip', compression_opts = 6)
         data.create_dataset('xrt', data = xrt_array_new, compression = 'gzip', compression_opts = 6)
         exchange.create_dataset('theta', data = theta_array)
+
+        data.attrs['incident_intensity_photons'] = I0_photons
+        data.attrs['incident_energy_keV'] = incident_energy_keV
 
         if init_edge_info is not None:
             exchange['data'].attrs['left_edge_cropped_init'] = init_edge_info['left']
@@ -966,32 +993,33 @@ def create_post_iter_reproj_aux_data_npy(dir_path,
 
 def create_csv_raw_input_data(dir_path,
                               theta_array,
-                              norm_factor,
+                              norm_factor_xrf,
+                              norm_factor_xrt,
                               init_x_shifts,
                               init_y_shifts,
                               pixel_rad_pre_cor_jitter,
                               pixel_rad_cor,
                               pixel_rad_iter_reproj,
-                              I0_cts):
+                              I0_photons):
     
     file_path = os.path.join(dir_path, 'raw_input_data.csv')
 
     pixel_rad_pre_cor_jitter_array = np.append(np.nan, pixel_rad_pre_cor_jitter)
     pixel_rad_iter_reproj_array = np.append(np.nan, pixel_rad_iter_reproj)
 
-    df = pd.DataFrame({'theta_deg': theta_array,
-                       'norm_factor': norm_factor,
-                       'init_x_shifts': init_x_shifts,
-                       'init_y_shifts': init_y_shifts,
-                       'pixel_rad_pre_cor_jitter': pixel_rad_pre_cor_jitter_array,
-                       'pixel_rad_cor': pixel_rad_cor,
-                       'pixel_rad_iter_reproj': pixel_rad_iter_reproj_array,
-                       'I0_cts': I0_cts})
+    output_dict = {'theta_deg': theta_array,
+                   'norm_factor_xrf': norm_factor_xrf,
+                   'norm_factor_xrt': norm_factor_xrt,
+                   'init_x_shifts': init_x_shifts,
+                   'init_y_shifts': init_y_shifts,
+                   'pixel_rad_pre_cor_jitter': pixel_rad_pre_cor_jitter_array,
+                   'pixel_rad_cor': pixel_rad_cor,
+                   'pixel_rad_iter_reproj': pixel_rad_iter_reproj_array,
+                   'I0_photons': I0_photons}
     
-    df.loc[1:, 'I0_cts'] = np.nan # To make sure no errors arise from not having unequal column lengths
-    df.loc[1:, 'pixel_rad_cor'] = np.nan
-
-    df.to_csv(file_path, index = False)
+    df = pd.DataFrame({key: pd.Series(value) for key, value in output_dict.items()})
+    
+    df.to_csv(file_path, index = False, na_rep = '')
 
     return
 
@@ -1019,27 +1047,28 @@ def extract_csv_raw_input_data(file_path):
 
         sys.exit()
 
-    norm_factor = df['norm_factor'].to_numpy().astype(float)
+    norm_factor_xrt = df['norm_factor_xrt'].to_numpy().astype(float)
+    norm_factor_xrf = df['norm_factor_xrf'].to_numpy().astype(float)
     init_x_shifts = df['init_x_shifts'].to_numpy().astype(float)
     init_y_shifts = df['init_y_shifts'].to_numpy().astype(float)
     pixel_rad_pre_cor_jitter = df['pixel_rad_pre_cor_jitter'].to_numpy().astype(float)
     pixel_rad_cor = df['pixel_rad_cor'].to_numpy().astype(float)
     pixel_rad_iter_reproj = df['pixel_rad_iter_reproj'].to_numpy().astype(float)
-    I0_cts = df['I0_cts'].to_numpy().astype(float)    
+    I0_photons = df['I0_photons'].to_numpy().astype(float)    
 
-    return norm_factor, \
+    return norm_factor_xrt, \
+           norm_factor_xrf, \
            init_x_shifts, \
            init_y_shifts, \
            pixel_rad_pre_cor_jitter, \
            pixel_rad_cor, \
            pixel_rad_iter_reproj, \
-           I0_cts
+           I0_photons
 
 def create_csv_output_data(dir_path,
                            theta_array,
                            net_x_shifts,
-                           net_y_shifts,
-                           I0_cts):
+                           net_y_shifts):
 
     file_path = os.path.join(dir_path, 'norm_net_shift_data.csv')
 
@@ -1056,8 +1085,7 @@ def create_csv_output_data(dir_path,
 
     output_dict = {'theta_deg': theta_array_new,
                    'net_x_pixel_shift': net_x_shifts_new,
-                   'net_y_pixel_shift': net_y_shifts_new,
-                   'I0_cts': I0_cts}
+                   'net_y_pixel_shift': net_y_shifts_new}
     
     df = pd.DataFrame({key: pd.Series(value) for key, value in output_dict.items()})
 
