@@ -31,7 +31,7 @@ def preprocess_xrf_xrt_data(synchrotron,
                             desired_xrf_element,
                             xrt_data_percentile,
                             return_aux_data,
-                            I0_photons_per_s,
+                            incident_flux_photons_per_s,
                             t_dwell_s,
                             aligning_element,
                             pre_cor_correction_adjacent_angle_jitter_correction_enabled,
@@ -216,7 +216,7 @@ def preprocess_xrf_xrt_data(synchrotron,
                                                                                                                                               intensity_xrf, 
                                                                                                                                               xrt_data_percentile,
                                                                                                                                               xrt_photon_counting, 
-                                                                                                                                              I0_photons_per_s,
+                                                                                                                                              incident_flux_photons_per_s,
                                                                                                                                               t_dwell_s,
                                                                                                                                               return_conv_mag_array = True)
                 
@@ -225,7 +225,7 @@ def preprocess_xrf_xrt_data(synchrotron,
                                                                                                                               intensity_xrf,
                                                                                                                               xrt_data_percentile,
                                                                                                                               xrt_photon_counting,
-                                                                                                                              I0_photons_per_s,
+                                                                                                                              incident_flux_photons_per_s,
                                                                                                                               t_dwell_s)
 
             else:
@@ -235,17 +235,17 @@ def preprocess_xrf_xrt_data(synchrotron,
                     I0_photons = ppu.calculate_abs_incident_intensity_photons(intensity_xrt_sig, xrt_data_percentile)
                 
                 else:
-                    if I0_photons_per_s is None or t_dwell_s is None:
+                    if incident_flux_photons_per_s is None or t_dwell_s is None:
                         print('Error: Incident photon flux and dwell time must be provided. Exiting program...')
 
                         sys.exit()
                     
-                    if I0_photons_per_s < 0 or t_dwell_s < 0:
+                    if incident_flux_photons_per_s < 0 or t_dwell_s < 0:
                         print('Error: Incident photon flux and dwell time must be positive values. Exiting program...')
 
                         sys.exit()
             
-                    I0_photons = I0_photons_per_s*t_dwell_s
+                    I0_photons = incident_flux_photons_per_s*t_dwell_s
                 
                 norm_array_xrt = np.ones(n_theta)
                 norm_array_xrf = np.ones(n_theta)
