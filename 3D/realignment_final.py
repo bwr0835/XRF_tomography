@@ -251,17 +251,12 @@ def warp_shift(img, net_x_shift, net_y_shift, cval = 0):
 
         # len(dx) = nx; dy is a scalar: different vertical shift per column; same horizontal shift
         
-        rows = np.arange(ny, dtype = float)[:, None] - net_y_shift # Shape: (ny, 1)
-        cols = (np.arange(nx, dtype = float) - net_x_shift)[None] + np.zeros((ny, 1)) # Shape: (1, nx)
+        rows = (np.arange(ny, dtype = float)[:, None] - net_y_shift) + np.zeros((1, nx)) # Shape: (ny, nx)
+        cols = np.arange(nx, dtype = float)[None] - net_x_shift[:, None] # Shape: (ny, nx)
         
-        coords = np.stack([rows, cols], axis = 0)  # shape: (2, ny, nx)
+        coords = np.stack([rows, cols], axis = 0)  # Shape: (2, ny, nx)
  
         return ndi.map_coordinates(img, coords, cval = cval)
-    
-    else:
-        print('Error: \'dx\' must be a 1D array, and \'dy\' must be a scalar. Exiting program...')
-
-        sys.exit()
 
 def realign_proj(cor_correction_only,
                  aligning_element,
