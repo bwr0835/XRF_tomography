@@ -375,6 +375,19 @@ def preprocess_xrf_xrt_data(synchrotron,
                                                                                 theta_array = theta,
                                                                                 fps = fps)
 
+        else:
+            if not init_edge_crop_enabled:
+                edge_info = None
+            
+            elif init_edge_pixel_lengths_to_crop is not None:
+                edge_info = {'top': init_edge_pixel_lengths_to_crop['top'], 
+                             'bottom': init_edge_pixel_lengths_to_crop['bottom']}
+            
+            else:
+                print("Error: Empty field for 'init_edge_pixel_lengths_to_crop'. Exiting program...")
+
+                sys.exit()
+            
         # intensity_xrf_norm[:, np.where(theta == 0)[1]:] = np.flip(intensity_xrf_norm[:, np.where(theta == 0)[1]:], axis = 0)
         
         aligned_proj_final_xrt_sig, \
