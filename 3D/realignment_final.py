@@ -388,13 +388,11 @@ def realign_proj(cor_correction_only,
         
         else:
             net_x_shifts_pcc = np.zeros((n_iterations_iter_reproj, n_theta))
-            # net_y_shifts_pcc = np.zeros((n_iterations_iter_reproj, n_theta))
-            net_y_shifts_pcc = np.zeros(n_theta)
+            net_y_shifts_pcc = np.zeros((n_iterations_iter_reproj, n_theta))
     
     else:
         net_x_shifts_pcc = np.zeros((n_iterations_iter_reproj, n_theta))
-        # net_y_shifts_pcc = np.zeros((n_iterations_iter_reproj, n_theta))
-        net_y_shifts_pcc = np.zeros(n_theta)
+        net_y_shifts_pcc = np.zeros((n_iterations_iter_reproj, n_theta))
 
     aligned_proj_total_xrt = np.zeros((n_theta, n_slices, n_columns))
     aligned_proj_total_opt_dens = np.zeros((n_theta, n_slices, n_columns))
@@ -504,14 +502,14 @@ def realign_proj(cor_correction_only,
                     net_x_shifts_pcc[0, zero_deg_idx_array[1]:] -= offset_init_second_part
 
                 for theta_idx in range(len(theta_array_first_part)):
-                    aligned_proj[theta_idx] = warp_shift(proj_img_array_element_to_align_with[theta_idx], net_x_shifts_pcc[0, theta_idx], net_y_shifts_pcc[theta_idx], cval = cval)
+                    aligned_proj[theta_idx] = warp_shift(proj_img_array_element_to_align_with[theta_idx], net_x_shifts_pcc[0, theta_idx], net_y_shifts_pcc[0, theta_idx], cval = cval)
                         
                 print(f'Applying initial COR correction to post-flipped, post-remounted sample angles: {ppu.round_correct(-offset_init_second_part, ndec = 3)}')
                     
                 for theta_idx in range(len(theta_array_second_part)):
                     theta_idx_aux = theta_idx + len(theta_array_first_part)
                     
-                    aligned_proj[theta_idx_aux] = warp_shift(proj_img_array_element_to_align_with[theta_idx_aux], net_x_shifts_pcc[0, theta_idx_aux], net_y_shifts_pcc[theta_idx_aux], cval = cval)
+                    aligned_proj[theta_idx_aux] = warp_shift(proj_img_array_element_to_align_with[theta_idx_aux], net_x_shifts_pcc[0, theta_idx_aux], net_y_shifts_pcc[0, theta_idx_aux], cval = cval)
 
                 if net_x_shifts_pcc.ndim == 3:
                     center_of_rotation_avg_first_part, center_geom, offset_first_part = rot_center_avg(aligned_proj[:zero_deg_idx_array[1], start_slice:end_slice], 
@@ -581,7 +579,7 @@ def realign_proj(cor_correction_only,
                 for theta_idx in range(len(theta_array_second_part)):
                     theta_idx_aux = theta_idx + len(theta_array_first_part)
                         
-                    aligned_proj[theta_idx_aux] = warp_shift(proj_img_array_element_to_align_with[theta_idx_aux], net_x_shifts_pcc[0, theta_idx_aux], net_y_shifts_pcc[theta_idx_aux], cval = cval)
+                    aligned_proj[theta_idx_aux] = warp_shift(proj_img_array_element_to_align_with[theta_idx_aux], net_x_shifts_pcc[0, theta_idx_aux], net_y_shifts_pcc[0, theta_idx_aux], cval = cval)
 
                 dx_prev = dx
             
@@ -602,8 +600,8 @@ def realign_proj(cor_correction_only,
             net_x_shifts_pcc[0] -= offset_init
             
         for theta_idx in range(n_theta):
-            aligned_proj[theta_idx] = warp_shift(proj_img_array_element_to_align_with[theta_idx], net_x_shifts_pcc[0, theta_idx], net_y_shifts_pcc[theta_idx], cval = cval)
-       
+            aligned_proj[theta_idx] = warp_shift(proj_img_array_element_to_align_with[theta_idx], net_x_shifts_pcc[0, theta_idx], net_y_shifts_pcc[0, theta_idx], cval = cval)
+        
         if net_x_shifts_pcc.ndim == 3:
             center_of_rotation_avg, _, _ = rot_center_avg(aligned_proj[:, start_slice:end_slice], theta_idx_pairs, theta_array)
        
@@ -626,7 +624,7 @@ def realign_proj(cor_correction_only,
         if net_x_shifts_pcc.ndim == 3:
             for theta_idx in range(n_theta):
                 net_x_shift = net_x_shifts_pcc[0, theta_idx]
-                net_y_shift = net_y_shifts_pcc[theta_idx]
+                net_y_shift = net_y_shifts_pcc[0, theta_idx]
 
                 aligned_proj_total_xrt[theta_idx] = warp_shift(xrt_proj_img_array[theta_idx], net_x_shift, net_y_shift, cval = I0)
                 aligned_proj_total_opt_dens[theta_idx] = warp_shift(opt_dens_proj_img_array[theta_idx], net_x_shift, net_y_shift)
@@ -647,7 +645,7 @@ def realign_proj(cor_correction_only,
                 
                 for theta_idx in range(n_theta):
                     net_x_shift = net_x_shifts_pcc[0, theta_idx]
-                    net_y_shift = net_y_shifts_pcc[theta_idx]
+                    net_y_shift = net_y_shifts_pcc[0, theta_idx]
 
                     aligned_proj_total_xrf[element_idx, theta_idx] = warp_shift(xrf_proj_img_array[element_idx, theta_idx], net_x_shift, net_y_shift)
         
@@ -755,7 +753,7 @@ def realign_proj(cor_correction_only,
             if net_x_shifts_pcc.ndim == 3:
                 for theta_idx in range(n_theta):
                     net_x_shift = net_x_shifts_pcc[i - 1, theta_idx]
-                    net_y_shift = net_y_shifts_pcc[theta_idx]
+                    net_y_shift = net_y_shifts_pcc[i - 1, theta_idx]
 
                     aligned_proj[theta_idx] = warp_shift(proj_img_array_element_to_align_with[theta_idx], net_x_shift, net_y_shift, cval = cval)
                 
@@ -980,7 +978,7 @@ def realign_proj(cor_correction_only,
                 if net_x_shifts_pcc.ndim == 3:
                     for theta_idx in range(n_theta):
                         net_x_shift = net_x_shifts_pcc[i, theta_idx]
-                        net_y_shift = net_y_shifts_pcc[theta_idx]
+                        net_y_shift = net_y_shifts_pcc[i, theta_idx]
 
                         aligned_proj_total_xrt[theta_idx] = warp_shift(xrt_proj_img_array[theta_idx], net_x_shift, net_y_shift, cval = I0)
                         aligned_proj_total_opt_dens[theta_idx] = warp_shift(opt_dens_proj_img_array[theta_idx], net_x_shift, net_y_shift)
@@ -1046,7 +1044,7 @@ def realign_proj(cor_correction_only,
             if net_x_shifts_pcc.ndim == 3:
                 for theta_idx in range(n_theta):
                     net_x_shift = net_x_shifts_pcc[i, theta_idx]
-                    net_y_shift = net_y_shifts_pcc[theta_idx]
+                    net_y_shift = net_y_shifts_pcc[i, theta_idx]
 
                     aligned_proj_total_xrt[theta_idx] = warp_shift(xrt_proj_img_array[theta_idx], net_x_shift, net_y_shift, cval = I0)
                     aligned_proj_total_opt_dens[theta_idx] = warp_shift(opt_dens_proj_img_array[theta_idx], net_x_shift, net_y_shift)
