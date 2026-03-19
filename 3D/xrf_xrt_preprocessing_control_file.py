@@ -279,6 +279,8 @@ def preprocess_xrf_xrt_data(synchrotron,
 
                 sys.exit()
 
+            proj_img_array_element_to_align_with_orig = proj_img_array_element_to_align_with.copy()
+
             init_y_shift_array, \
             start_slice_aux, \
             end_slice_aux, \
@@ -352,23 +354,9 @@ def preprocess_xrf_xrt_data(synchrotron,
                 
                 print('Creating vertical jitter-corrected, cropped per-projection data GIF...')
 
-                if aligning_element in elements_xrf:
-                    intensity_ref_element = intensity_xrf_norm[elements_xrf.index(aligning_element), :, start_slice:end_slice]
-                
-                elif aligning_element == 'xrt':
-                    intensity_ref_element = intensity_xrt_norm[:, start_slice:end_slice]
-                
-                elif aligning_element == 'opt_dens':
-                    intensity_ref_element = opt_dens_norm[:, start_slice:end_slice]
-                
-                else:
-                    print('Error: \'aligning_element\' must be in \'elements_xrf\' or \'opt_dens\'. Exiting program...')
-
-                    sys.exit()
-
                 futil.create_adjacent_angle_jitter_corrected_norm_proj_data_gif(dir_path = xrt_od_xrf_realignment_subdir_path,
                                                                                 ref_element = aligning_element,
-                                                                                intensity_ref_element = intensity_ref_element,
+                                                                                intensity_ref_element = proj_img_array_element_to_align_with_orig[:, start_slice:end_slice],
                                                                                 shifted_intensity_ref_element = adj_angle_jitter_corrected_proj_element_to_align_with_aux,
                                                                                 sigma = sigma,
                                                                                 alpha = alpha,

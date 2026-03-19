@@ -90,7 +90,7 @@ def phase_xcorr_manual(ref_img,
         shift_y = pcc_max_idx[0] - center_slice_idx + subpix_shift_y
         shift_x = pcc_max_idx[1] - center_column_idx + subpix_shift_x
     
-    print(shift_y)
+    # print(shift_y)
     
     return np.array([shift_y, shift_x]), phase_xcorr, phase_xcorr_truncated
 
@@ -376,7 +376,7 @@ def realign_proj(cor_correction_only,
     if edge_info is not None:
         if edge_info['top'] + edge_info['bottom'] > 0:
             net_x_shifts_pcc = np.zeros((n_iterations_iter_reproj, n_theta, n_slices))
-            net_y_shifts_pcc = np.zeros(n_theta)
+            net_y_shifts_pcc = np.zeros((n_iterations_iter_reproj, n_theta))
 
             start_slice = edge_info['top'] # Second term is initial common field of view index
             end_slice = edge_info['bottom'] # First term is final common field of view index
@@ -547,7 +547,7 @@ def realign_proj(cor_correction_only,
                                                                     alpha, 
                                                                     pixel_rad_cor_correction,
                                                                     theta = np.array([0, 0]))
-                    print(shifts)
+                    # print(shifts)
                     # fig, axs = plt.subplots(2, 1)
                     # axs[0].imshow(pcc, vmin = pcc.min(), vmax = pcc.max())
                     # axs[1].imshow(pcc_truncated, vmin = pcc_truncated.min(), vmax = pcc_truncated.max())
