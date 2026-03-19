@@ -251,30 +251,11 @@ def warp_shift(img, net_x_shift, net_y_shift, cval = 0):
 
         # len(dx) = nx; dy is a scalar: different vertical shift per column; same horizontal shift
         
-        # rows = np.arange(ny, dtype = float)[:, None] - net_y_shift[None]
-        # cols = (np.arange(nx, dtype = float) - net_x_shift)[None] + np.zeros((ny, 1))
-
-        rows = np.arange(ny, dtype = float)[:, None] - net_y_shift[None]
-        cols = (np.arange(nx, dtype = float) - net_x_shift)[None] + np.zeros((ny, 1))
+        rows = np.arange(ny, dtype = float)[:, None] - net_y_shift # Shape: (ny, 1)
+        cols = (np.arange(nx, dtype = float) - net_x_shift)[None] + np.zeros((ny, 1)) # Shape: (1, nx)
         
-        # Scalar y-shift for all rows, plus nonuniform x-shift.
-        # Support x-shift defined either per-column (len == nx) or per-row (len == ny).
-        # rows = np.broadcast_to(np.arange(ny, dtype = float)[:, None] - net_y_shift, (ny, nx))
-
-        # if net_x_shift.shape[0] == nx:
-        #     cols = np.arange(nx, dtype = float)[None, :] - net_x_shift[None, :]
-        #     cols = np.broadcast_to(cols, (ny, nx))
-        
-        # elif net_x_shift.shape[0] == ny:
-        #     cols = np.arange(nx, dtype = float)[None, :] - net_x_shift[:, None]
-        
-        # else:
-        #     print('Error: For nonuniform shifts, len(\'dx\') must equal either image width (nx) or height (ny). Exiting program...')
-
-        #     sys.exit()
-
         coords = np.stack([rows, cols], axis = 0)  # shape: (2, ny, nx)
-
+ 
         return ndi.map_coordinates(img, coords, cval = cval)
     
     else:
