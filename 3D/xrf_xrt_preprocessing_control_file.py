@@ -353,6 +353,9 @@ def preprocess_xrf_xrt_data(synchrotron,
                                                                                 alpha)
                 
                 print('Creating vertical jitter-corrected, cropped per-projection data GIF...')
+                
+                print(proj_img_array_element_to_align_with_orig.shape)
+                print(adj_angle_jitter_corrected_proj_element_to_align_with_aux.shape)
 
                 futil.create_adjacent_angle_jitter_corrected_norm_proj_data_gif(dir_path = xrt_od_xrf_realignment_subdir_path,
                                                                                 ref_element = aligning_element,
