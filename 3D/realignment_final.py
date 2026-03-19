@@ -854,11 +854,11 @@ def realign_proj(cor_correction_only,
                 
                 pcc_2d_array[i, theta_idx] = phase_xcorr_2d
 
-                start_x = phase_xcorr_2d_truncated.shape[1]//2 - pixel_rad_iter_reproj[theta_idx]
-                start_y = phase_xcorr_2d_truncated.shape[0]//2 - pixel_rad_iter_reproj[theta_idx]
+                start_x = int(phase_xcorr_2d_truncated.shape[1]//2 - pixel_rad_iter_reproj[theta_idx])
+                start_y = int(phase_xcorr_2d_truncated.shape[0]//2 - pixel_rad_iter_reproj[theta_idx])
 
-                end_x = phase_xcorr_2d_truncated.shape[1]//2 + pixel_rad_iter_reproj[theta_idx]
-                end_y = phase_xcorr_2d_truncated.shape[0]//2 + pixel_rad_iter_reproj[theta_idx]
+                end_x = int(phase_xcorr_2d_truncated.shape[1]//2 + pixel_rad_iter_reproj[theta_idx])
+                end_y = int(phase_xcorr_2d_truncated.shape[0]//2 + pixel_rad_iter_reproj[theta_idx])
 
                 pcc_2d_truncated_array[i, theta_idx, start_y:end_y, start_x:end_x] = phase_xcorr_2d_truncated
 
