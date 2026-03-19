@@ -290,7 +290,6 @@ def preprocess_xrf_xrt_data(synchrotron,
                                                                                                                                  alpha,
                                                                                                                                  pixel_rad_adjacent_angle_jitter,
                                                                                                                                  theta,
-                                                                                                                                 common_field_of_view_axes = 'y',
                                                                                                                                  return_aux_data = return_aux_data)
             
             if not init_edge_crop_enabled:
