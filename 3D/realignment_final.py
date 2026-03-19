@@ -603,7 +603,7 @@ def realign_proj(cor_correction_only,
             
         for theta_idx in range(n_theta):
             aligned_proj[theta_idx] = warp_shift(proj_img_array_element_to_align_with[theta_idx], net_x_shifts_pcc[0, theta_idx], net_y_shifts_pcc[theta_idx], cval = cval)
-        print(net_x_shifts_pcc.ndim)
+       
         if net_x_shifts_pcc.ndim == 3:
             center_of_rotation_avg, _, _ = rot_center_avg(aligned_proj[:, start_slice:end_slice], theta_idx_pairs, theta_array)
        
