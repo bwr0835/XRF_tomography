@@ -1,6 +1,6 @@
 synchrotron = aps
 synchrotron_beamline = 2_ide
-create_aggregate_xrf_xrt_files_enabled = False
+create_aggregate_xrf_xrt_files_enabled = True
 pre_existing_aggregate_xrf_xrt_file_lists_enabled = True
 incident_energy_keV = 10
 aggregate_xrf_csv_file_path = /raid/users/roter/Jacobsen/img.dat/2_ide_xrf_xrt_file_list.csv
