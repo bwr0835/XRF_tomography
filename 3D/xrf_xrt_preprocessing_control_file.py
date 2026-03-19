@@ -350,7 +350,7 @@ def preprocess_xrf_xrt_data(synchrotron,
                                                                                 sigma,
                                                                                 alpha)
 
-        intensity_xrf_norm[:, np.where(theta == 0)[1]:] = np.flip(intensity_xrf_norm[:, np.where(theta == 0)[1]:], axis = 0)
+        # intensity_xrf_norm[:, np.where(theta == 0)[1]:] = np.flip(intensity_xrf_norm[:, np.where(theta == 0)[1]:], axis = 0)
 
         aligned_proj_final_xrt_sig, \
         aligned_proj_final_opt_dens, \
