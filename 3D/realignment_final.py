@@ -677,30 +677,26 @@ def realign_proj(cor_correction_only,
 
         sys.exit()
     
+    if pixel_rad_iter_reproj is None:
+        print('Warning: \'pixel_rad_iter_reproj\' not detected. Setting \'pixel_rad_iter_reproj\' to 0 pixels for each projection angle...')
+
+        pixel_rad_iter_reproj = np.zeros(n_theta)
+
     if return_aux_data:
         aligned_exp_proj_array = np.zeros((n_iterations_iter_reproj, n_theta, n_slices, n_columns))
         synth_proj_array = np.zeros((n_iterations_iter_reproj, n_theta, n_slices, n_columns))
         pcc_2d_array = np.zeros((n_iterations_iter_reproj, n_theta, n_slices, n_columns))
         
-        if pixel_rad_iter_reproj is None:
-            print('Warning: \'pixel_rad_iter_reproj\' not detected. Setting \'pixel_rad_iter_reproj\' to 0 pixels...')
-
-            pixel_rad_iter_reproj = 0
-
+        if np.array_equal(pixel_rad_iter_reproj, np.zeros(n_theta)):
             pcc_2d_truncated_array = np.zeros((n_iterations_iter_reproj, n_theta, n_slices, n_columns))
         
         else:
-            if not isinstance(pixel_rad_iter_reproj, np.ndarray):
-                print('Error: \'pixel_rad_iter_reproj\' must be a numpy array. Exiting program...')
-
-                sys.exit()
-
-            if pixel_rad_iter_reproj.ndim != 1:
+            if not isinstance(pixel_rad_iter_reproj, np.ndarray) or pixel_rad_iter_reproj.ndim != 1:
                 print('Error: \'pixel_rad_iter_reproj\' must be a 1D numpy array. Exiting program...')
 
                 sys.exit()
 
-            if pixel_rad_iter_reproj.shape[0] != n_theta - 1:
+            if pixel_rad_iter_reproj.shape[0] != n_theta:
                 print('Error: \'pixel_rad_iter_reproj\' must have the same number of elements as the number of theta angles. Exiting program...')
 
                 sys.exit()
@@ -820,7 +816,7 @@ def realign_proj(cor_correction_only,
                                                   aligned_proj[theta_idx], 
                                                   sigma, 
                                                   alpha, 
-                                                  pixel_rad_iter_reproj,
+                                                  pixel_rad_iter_reproj[theta_idx],
                                                   theta = np.array([theta_array[theta_idx], theta_array[theta_idx]]))
             
             else:
@@ -828,7 +824,7 @@ def realign_proj(cor_correction_only,
                                                                                       aligned_proj[theta_idx], 
                                                                                       sigma, 
                                                                                       alpha, 
-                                                                                      pixel_rad_iter_reproj,
+                                                                                      pixel_rad_iter_reproj[theta_idx],
                                                                                       theta = np.array([theta_array[theta_idx], theta_array[theta_idx]]))
                 
                 pcc_2d_array[i, theta_idx] = phase_xcorr_2d
