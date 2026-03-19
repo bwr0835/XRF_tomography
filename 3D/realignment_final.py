@@ -28,12 +28,16 @@ def phase_xcorr_manual(ref_img,
     phase_xcorr = fft.fftshift(np.abs(fft.ifft2(ref_img_fft*mov_img_fft.conjugate()/np.abs(ref_img_fft*mov_img_fft.conjugate()))))
 
     center_slice_idx = n_slices//2
+    center_column_idx = n_columns//2
 
     if pixel_rad > 0:
         start_slice_idx = center_slice_idx - pixel_rad
         end_slice_idx = center_slice_idx + pixel_rad
 
-        phase_xcorr_truncated = phase_xcorr[start_slice_idx:end_slice_idx]
+        start_column_idx = center_column_idx - pixel_rad
+        end_column_idx = center_column_idx + pixel_rad
+
+        phase_xcorr_truncated = phase_xcorr[start_slice_idx:end_slice_idx, start_column_idx:end_column_idx]
 
     else:
         phase_xcorr_truncated = phase_xcorr
@@ -41,6 +45,7 @@ def phase_xcorr_manual(ref_img,
     pcc_max_idx = np.unravel_index(np.argmax(phase_xcorr_truncated), phase_xcorr_truncated.shape)
 
     n_rows_truncated = phase_xcorr_truncated.shape[0]
+    n_columns_truncated = phase_xcorr_truncated.shape[1]
     
     if pcc_max_idx[0] + 1 < n_rows_truncated and pcc_max_idx[0] - 1 >= 0:
         pcc_p = phase_xcorr_truncated[pcc_max_idx[0] + 1, pcc_max_idx[1]]
@@ -59,15 +64,35 @@ def phase_xcorr_manual(ref_img,
         
         subpix_shift_y = 0
 
+    if pcc_max_idx[1] + 1 < n_columns_truncated and pcc_max_idx[1] - 1 >= 0:
+        pcc_p = phase_xcorr_truncated[pcc_max_idx[0], pcc_max_idx[1] + 1]
+        pcc_0 = phase_xcorr_truncated[pcc_max_idx[0], pcc_max_idx[1]]
+        pcc_n = phase_xcorr_truncated[pcc_max_idx[0], pcc_max_idx[1] - 1]
+        
+        subpix_shift_x = -0.5*(pcc_p - pcc_n)/(pcc_p + pcc_n - 2*pcc_0)
+
+        if not np.isfinite(subpix_shift_x):
+            print('Warning: Subpixel shift is not finite. Returning 0 for subpixel shift.')
+            
+            subpix_shift_x = 0
+    else:
+        print('Warning: Horizontal parabolic fit failed (The peak is at an edge or corner of the truncated region) for theta = {0} and {1} degrees. Returning 0 for subpixel shift.'.format(theta[0], theta[1]))
+        
+        subpix_shift_x = 0
+
     # Include integer peak offset: shift = (peak_position - center) + subpixel_refinement
-    
+
     if pixel_rad > 0:
         shift_y = pcc_max_idx[0] - pixel_rad + subpix_shift_y
+        shift_x = pcc_max_idx[1] - pixel_rad + subpix_shift_x
     
     else:
         shift_y = pcc_max_idx[0] - center_slice_idx + subpix_shift_y
+        shift_x = pcc_max_idx[1] - center_column_idx + subpix_shift_x
     
-    return np.array([shift_y]), phase_xcorr, phase_xcorr_truncated
+    print(shift_y)
+    
+    return np.array([shift_y, shift_x]), phase_xcorr, phase_xcorr_truncated
 
 def correct_adjacent_angle_jitter_pre_cor_correction(init_proj_array,
                                                      net_y_shift_array,
