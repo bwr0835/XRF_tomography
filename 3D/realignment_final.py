@@ -865,28 +865,20 @@ def realign_proj(cor_correction_only,
                 
                 else:
                     pcc_2d_truncated_array[i, theta_idx] = phase_xcorr_2d_truncated
-
-            if net_x_shifts_pcc.ndim == 3:
-                dy = shifts[0]
-
-                dy_array_pcc[i, theta_idx] = dy
-
-                if i == 0:
-                    net_y_shifts_pcc[i, theta_idx] += dy
-                
-                else:
-                    net_y_shifts_pcc[i, theta_idx] = net_y_shifts_pcc[i - 1, theta_idx] + dy
             
-            dx = shifts[1]
+            dy, dx = shifts[0], shifts[1]
             
-            dx_array_pcc[i, theta_idx] = dx
-            
-            if i == 0:            
+            if i == 0:
                 net_x_shifts_pcc[i, theta_idx] += dx
-            
+                net_y_shifts_pcc[i, theta_idx] += dy
+                
             else:
                 net_x_shifts_pcc[i, theta_idx] = net_x_shifts_pcc[i - 1, theta_idx] + dx
-
+                net_y_shifts_pcc[i, theta_idx] = net_y_shifts_pcc[i - 1, theta_idx] + dy
+            
+            dx_array_pcc[i, theta_idx] = dx
+            dy_array_pcc[i, theta_idx] = dy
+            
             if (theta_idx % 7) == 0:
                 if theta_idx == 0:
                     print(f'\nCurrent x-shift: {ppu.round_correct(dx, ndec = 3)} (theta = {ppu.round_correct(theta_array[theta_idx], ndec = 1)})')
