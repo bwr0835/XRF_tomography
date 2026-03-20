@@ -1433,7 +1433,7 @@ def create_gridrec_density_maps_h5(dir_path,
         sample = f.create_group('sample')
         
         sample.create_dataset("densities", data = gridrec_density_maps.astype('f4'))
-        sample.create_dataset("elements", data = elements_xrf_new.astype('S5'))
+        sample.create_dataset("elements", data = np.array(elements_xrf_new).astype('S5'))
 
     return
 

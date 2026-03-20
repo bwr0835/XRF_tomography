@@ -585,12 +585,24 @@ def preprocess_xrf_xrt_data(synchrotron,
                                                   I0_photons,
                                                   incident_energy_keV)
 
-        print('Writing per-projection normalization, final net x and y shifts, and incident intensity to CSV file...')
+        print('Final net x and y shifts to CSV file...')
 
         futil.create_csv_output_data(xrt_od_xrf_realignment_subdir_path,
                                      theta,
                                      net_x_shifts = np.zeros(final_xrt_sig_cropped.shape[0]),
                                      net_y_shifts = np.zeros(final_xrt_sig_cropped.shape[0]))
+
+        print('Creating gridrec-based density maps from aligned and cropped XRF data...')
+        
+        gridrec_density_maps = ppu.create_gridrec_density_maps(final_xrf_cropped,
+                                                               elements_xrf,
+                                                               theta)
+        
+        print('Writing gridrec-based density map data to HDF5 file...')
+        
+        futil.create_gridrec_density_maps_h5(xrt_od_xrf_realignment_subdir_path,
+                                             gridrec_density_maps,
+                                             elements_xrf)
             
         print('Done')
     
