@@ -64,7 +64,7 @@ def extract_h5_xrf_data(file_path, synchrotron, **kwargs):
         try:
             with h5py.File(file_path, 'r') as h5:
                 if "MAPS/XRF_Analyzed/NNLS" in h5.keys():
-                    counts_h5 = h5['MAPS/XRF_Analyzed/NNLS/Counts_Per_Sec']
+                    intensity_h5 = h5['MAPS/XRF_Analyzed/NNLS/intensity_Per_Sec']
                     elements_h5 = h5['MAPS/XRF_Analyzed/NNLS/Channel_Names']
             
                 extra_pvs_h5 = h5['MAPS/Scan/Extra_PVs']
@@ -72,7 +72,7 @@ def extract_h5_xrf_data(file_path, synchrotron, **kwargs):
                 nx_h5 = h5['MAPS/Scan/x_axis']
                 ny_h5 = h5['MAPS/Scan/y_axis']
                 
-                counts = counts_h5[()]
+                intensity = intensity_h5[()]
                 elements = elements_h5[()]
                 extra_pvs_names = extra_pvs_h5['Names'][()]
                 extra_pvs_values = extra_pvs_h5['Values'][()]
@@ -111,7 +111,7 @@ def extract_h5_xrf_data(file_path, synchrotron, **kwargs):
                                       b'Total_Fluorescence_Yield',
                                       b'Sum_Elastic_Inelastic']
 
-        counts_new = np.zeros((len(elements), ny, nx))
+        intensity_new = np.zeros((len(elements), ny, nx))
                 
         idx_to_delete = []
 
@@ -119,12 +119,12 @@ def extract_h5_xrf_data(file_path, synchrotron, **kwargs):
                 element_index = np.ndarray.item(np.where(elements == element)[0])
                     
                 if element not in elements_entries_to_ignore:
-                    counts_new[element_index] = counts[element_index, :, :-2] # MAPS tacks on two extra columns of zeroes post-scan for whatever reason
+                    intensity_new[element_index] = intensity[element_index, :, :-2] # MAPS tacks on two extra columns of zeroes post-scan for whatever reason
                     
                 else:
                     idx_to_delete.append(element_index)
 
-        counts_new = np.delete(counts_new, idx_to_delete, axis = 0) # Delete array elements corresponding to ignored element entries
+        intensity_new = np.delete(intensity_new, idx_to_delete, axis = 0) # Delete array elements corresponding to ignored element entries
         elements = np.delete(elements, idx_to_delete, axis = 0)
 
         # Get corresponding pixel spacings and convert from mm to cm
@@ -134,12 +134,12 @@ def extract_h5_xrf_data(file_path, synchrotron, **kwargs):
 
         elements_string = [element.decode() for element in elements] # Convert the elements array from a list of bytes to a list of strings
 
-        return elements_string, counts_new, theta, nx, ny, dx_cm, dy_cm, fitting_software
+        return elements_string, intensity_new, theta, nx, ny, dx_cm, dy_cm, fitting_software
         
     elif synchrotron == 'nsls-ii':
         try:
             with h5py.File(file_path, 'r') as h5:
-                counts_h5 = h5['xrfmap/detsum/xrf_fit']
+                intensity_h5 = h5['xrfmap/detsum/xrf_fit']
                 elements_h5 = h5['xrfmap/detsum/xrf_fit_name']
                 axis_coords_h5 = h5['xrfmap/positions/pos']
                 theta_h5 = h5['xrfmap/scan_metadata'].attrs['param_theta'] # Metadata stored as key-value pairs (attributes) (similar to a Python dictionary)
@@ -154,7 +154,7 @@ def extract_h5_xrf_data(file_path, synchrotron, **kwargs):
                     scalers = scalers_h5[()]
 
                 elements = elements_h5[()]
-                counts = counts_h5[()]
+                intensity = intensity_h5[()]
                 axis_coords = axis_coords_h5[()]
                 theta = 1e-3*theta_h5[()] # Convert from mdeg to deg
 
@@ -184,7 +184,7 @@ def extract_h5_xrf_data(file_path, synchrotron, **kwargs):
             if element in elements_entries_to_ignore:
                 idx_to_delete.append(element_index)
                 
-        counts = np.delete(counts, idx_to_delete, axis = 0)
+        intensity = np.delete(intensity, idx_to_delete, axis = 0)
         elements = np.delete(elements, idx_to_delete, axis = 0)
         
         dx_cm = 1e-4*(np.abs(x_um[0, -1] - x_um[0, 0])/(nx - 1)) # Convert from µm to cm
@@ -197,9 +197,9 @@ def extract_h5_xrf_data(file_path, synchrotron, **kwargs):
             
             us_ic = scalers[:, :, us_ic_index]
 
-            return elements_string, counts, us_ic, theta, incident_energy_keV, nx, ny, dx_cm, dy_cm, fitting_software
+            return elements_string, intensity, us_ic, theta, incident_energy_keV, nx, ny, dx_cm, dy_cm, fitting_software
 
-        return elements_string, counts, theta, incident_energy_keV, nx, ny, dx_cm, dy_cm, fitting_software
+        return elements_string, intensity, theta, incident_energy_keV, nx, ny, dx_cm, dy_cm, fitting_software
 
 def extract_h5_xrt_data(file_path, synchrotron, **kwargs):
     if not os.path.isfile(file_path):
@@ -322,10 +322,10 @@ def create_aggregate_xrf_h5(file_path_array,
     theta_array = np.zeros(n_theta)
 
     if synchrotron == 'nsls-ii':
-        elements, counts, theta, incident_energy_keV, nx, ny, _, _, fitting_software = extract_h5_xrf_data(file_path_array[0], synchrotron) # Invoke the first time for getting the number of elements and the number of pixels
+        elements, intensity, theta, incident_energy_keV, nx, ny, _, _, fitting_software = extract_h5_xrf_data(file_path_array[0], synchrotron) # Invoke the first time for getting the number of elements and the number of pixels
     
     else:
-        elements, counts, theta, nx, ny, _, _, fitting_software = extract_h5_xrf_data(file_path_array[0], synchrotron) # Invoke the first time for getting the number of elements and the number of pixels
+        elements, intensity, theta, nx, ny, _, _, fitting_software = extract_h5_xrf_data(file_path_array[0], synchrotron) # Invoke the first time for getting the number of elements and the number of pixels
         
         if kwargs.get('incident_energy_keV') is None:
             print('Error: \'incident_energy_keV\' not provided. Exiting program...')
@@ -336,7 +336,7 @@ def create_aggregate_xrf_h5(file_path_array,
         
     n_elements = len(elements)
     
-    counts_array = np.zeros((n_elements, n_theta, ny, nx))
+    intensity_array = np.zeros((n_elements, n_theta, ny, nx))
 
     if synchrotron == 'nsls-ii' and kwargs.get('us_ic_enabled') == True:
         us_ic_array = np.zeros((n_theta, ny, nx))
@@ -349,14 +349,14 @@ def create_aggregate_xrf_h5(file_path_array,
             print(f'\rHDF5 file {theta_idx + 1}/{len(file_path_array)} extracted', flush = True)
         
         if synchrotron != 'nsls-ii':
-            elements_new, counts, theta, nx_new, ny_new, _, _, _ = extract_h5_xrf_data(file_path, synchrotron)
+            elements_new, intensity, theta, nx_new, ny_new, _, _, _ = extract_h5_xrf_data(file_path, synchrotron)
         
         else:
             if kwargs.get('us_ic_enabled') == True:
-                elements_new, counts, us_ic, theta, _, nx_new, ny_new, _, _, _ = extract_h5_xrf_data(file_path, synchrotron, us_ic_enabled = True)
+                elements_new, intensity, us_ic, theta, _, nx_new, ny_new, _, _, _ = extract_h5_xrf_data(file_path, synchrotron, us_ic_enabled = True)
             
             else:
-                elements_new, counts, theta, _, nx_new, ny_new, _, _, _ = extract_h5_xrf_data(file_path, synchrotron)
+                elements_new, intensity, theta, _, nx_new, ny_new, _, _, _ = extract_h5_xrf_data(file_path, synchrotron)
         
         assert nx == nx_new and ny == ny_new, f"Dimension mismatch in {file_path}." # Check that the dimensions of the new data match the dimensions of the first data set
         assert np.array_equal(elements, elements_new), f"Element mismatch in {file_path}." # Check that the elements are the same
@@ -364,7 +364,7 @@ def create_aggregate_xrf_h5(file_path_array,
         if synchrotron == 'nsls-ii' and kwargs.get('us_ic_enabled') == True:
             us_ic_array[theta_idx] = us_ic
 
-        counts_array[:, theta_idx, :, :] = counts
+        intensity_array[:, theta_idx, :, :] = intensity
         theta_array[theta_idx] = theta
         file_path_array[theta_idx] = os.path.basename(file_path)
     
@@ -382,10 +382,12 @@ def create_aggregate_xrf_h5(file_path_array,
         theta_array[second_neg_90_deg_idx:] += 90 # Make all angles after flipping go from 0 to 180°
 
         theta_array_sorted = theta_array
-        counts_array_sorted = counts_array
+        intensity_array_sorted = intensity_array
+        intensity_array_sorted[second_neg_90_deg_idx:] = np.flip(intensity_array_sorted[second_neg_90_deg_idx:], axis = 1) # Flip remounted sample data back to original orientation
 
         if synchrotron == 'nsls-ii' and kwargs.get('us_ic_enabled') == True:
             us_ic_array_sorted = us_ic_array
+            us_ic_array_sorted[second_neg_90_deg_idx:] = np.flip(us_ic_array_sorted[second_neg_90_deg_idx:], axis = 1) # Flip remounted sample data back to original orientation
 
         file_path_array_sorted = [file_path_array[theta_idx] for theta_idx in range(len(theta_array_sorted))]
 
@@ -393,7 +395,7 @@ def create_aggregate_xrf_h5(file_path_array,
         theta_idx_sorted = np.argsort(theta_array) # Get indices for angles for sorting them in ascending order
         
         theta_array_sorted = theta_array[theta_idx_sorted]
-        counts_array_sorted = counts_array[:, theta_idx_sorted]
+        intensity_array_sorted = intensity_array[:, theta_idx_sorted]
 
         file_path_array_sorted = [file_path_array[theta_idx] for theta_idx in theta_idx_sorted]
 
@@ -402,7 +404,7 @@ def create_aggregate_xrf_h5(file_path_array,
 
         exchange = f.create_group('exchange')
 
-        exchange.create_dataset('data', data = counts_array_sorted, compression = 'gzip', compression_opts = 6)
+        exchange.create_dataset('data', data = intensity_array_sorted, compression = 'gzip', compression_opts = 6)
         exchange.create_dataset('elements', data = elements_new)
         exchange.create_dataset('theta', data = theta_array_sorted)
         
@@ -429,7 +431,7 @@ def create_aggregate_xrt_h5(file_path_array,
     theta_array = np.zeros(n_theta) 
 
     if synchrotron == 'aps':
-        elements, counts, theta, nx, ny, _, _ = extract_h5_xrt_data(file_path_array[0], synchrotron) # Invoke the first time for getting the number of elements and the number of pixels
+        elements, intensity, theta, nx, ny, _, _ = extract_h5_xrt_data(file_path_array[0], synchrotron) # Invoke the first time for getting the number of elements and the number of pixels
 
         if incident_energy_keV is None:
             print('Error: \'incident_energy_keV\' not provided. Exiting program...')
@@ -446,11 +448,11 @@ def create_aggregate_xrt_h5(file_path_array,
         
         kwargs['ny'], kwargs['nx'] = us_ic[0].shape
 
-        elements, counts, theta, nx, ny, _, _ = extract_h5_xrt_data(file_path_array[0], synchrotron, **kwargs)
+        elements, intensity, theta, nx, ny, _, _ = extract_h5_xrt_data(file_path_array[0], synchrotron, **kwargs)
 
     n_elements = len(elements)
     
-    counts_array = np.zeros((n_elements, n_theta, ny, nx))
+    intensity_array = np.zeros((n_elements, n_theta, ny, nx))
 
     for theta_idx, file_path in enumerate(file_path_array):
         if theta_idx != len(file_path_array) - 1:
@@ -460,15 +462,15 @@ def create_aggregate_xrt_h5(file_path_array,
             print(f'\rHDF file {theta_idx + 1}/{len(file_path_array)} extracted', flush = True)
         
         if synchrotron == 'nsls-ii':
-            elements_new, counts, theta, nx_new, ny_new, _, _ = extract_h5_xrt_data(file_path, synchrotron, **kwargs)
+            elements_new, intensity, theta, nx_new, ny_new, _, _ = extract_h5_xrt_data(file_path, synchrotron, **kwargs)
             
         else:
-            elements_new, counts, theta, nx_new, ny_new, _, _ = extract_h5_xrt_data(file_path, synchrotron)
+            elements_new, intensity, theta, nx_new, ny_new, _, _ = extract_h5_xrt_data(file_path, synchrotron)
         
         assert nx == nx_new and ny == ny_new, f"Dimension mismatch in {file_path}." # Check that the dimensions of the new data match the dimensions of the first data set
         assert np.array_equal(elements, elements_new), f"Element mismatch in {file_path}." # Check that the elements are the same
 
-        counts_array[:, theta_idx, :, :] = counts
+        intensity_array[:, theta_idx, :, :] = intensity
         theta_array[theta_idx] = theta
         file_path_array[theta_idx] = os.path.basename(file_path)
     
@@ -486,10 +488,11 @@ def create_aggregate_xrt_h5(file_path_array,
         theta_array[second_neg_90_deg_idx:] += 90 # Make all angles after flipping go from 0 to 180°
 
         theta_array_sorted = theta_array
-        counts_array_sorted = counts_array
+        intensity_array_sorted = intensity_array
+        intensity_array_sorted[second_neg_90_deg_idx:] = np.flip(intensity_array_sorted[second_neg_90_deg_idx:], axis = 1) # Flip remounted sample data back to original orientation
 
         if synchrotron == 'nsls-ii':
-            counts_array_sorted[1] = us_ic
+            intensity_array_sorted[1] = us_ic
         
         file_path_array_sorted = [file_path_array[theta_idx] for theta_idx in range(len(theta_array_sorted))]
     
@@ -497,7 +500,7 @@ def create_aggregate_xrt_h5(file_path_array,
         theta_idx_sorted = np.argsort(theta_array) # Get indices for angles for sorting them in ascending order
     
         theta_array_sorted = theta_array[theta_idx_sorted]
-        counts_array_sorted = counts_array[:, theta_idx_sorted]
+        intensity_array_sorted = intensity_array[:, theta_idx_sorted]
 
         file_path_array_sorted = [file_path_array[theta_idx] for theta_idx in theta_idx_sorted]
     
@@ -506,7 +509,7 @@ def create_aggregate_xrt_h5(file_path_array,
 
         exchange = f.create_group('exchange')
 
-        exchange.create_dataset('data', data = counts_array_sorted, compression = 'gzip', compression_opts = 6)
+        exchange.create_dataset('data', data = intensity_array_sorted, compression = 'gzip', compression_opts = 6)
         exchange.create_dataset('elements', data = elements_new)
         exchange.create_dataset('theta', data = theta_array_sorted)
 
@@ -538,11 +541,11 @@ def extract_h5_aggregate_xrf_data(file_path, **kwargs):
     
     try:
         with h5py.File(file_path, 'r') as h5:
-            counts_h5 = h5['exchange/data']
+            intensity_h5 = h5['exchange/data']
             theta_h5 = h5['exchange/theta']
             elements_h5 = h5['exchange/elements']
 
-            counts = counts_h5[()]
+            intensity = intensity_h5[()]
             theta = theta_h5[()]
             elements = list(elements_h5.asstr()[:])
 
@@ -551,9 +554,9 @@ def extract_h5_aggregate_xrf_data(file_path, **kwargs):
 
                 filenames = filenames_h5.asstr()[:]
             
-            dataset_type = counts_h5.attrs['dataset_type']
-            raw_spectrum_fitting_method = counts_h5.attrs['raw_spectrum_fitting_method']
-            incident_energy_keV = counts_h5.attrs['incident_energy_keV']
+            dataset_type = intensity_h5.attrs['dataset_type']
+            raw_spectrum_fitting_method = intensity_h5.attrs['raw_spectrum_fitting_method']
+            incident_energy_keV = intensity_h5.attrs['incident_energy_keV']
     
     except KeyboardInterrupt:
         print('\n\nKeyboardInterrupt occurred. Exiting program...')
@@ -566,9 +569,9 @@ def extract_h5_aggregate_xrf_data(file_path, **kwargs):
         sys.exit()
     
     if kwargs.get('filename_array') == True:
-        return elements, counts, theta, raw_spectrum_fitting_method, dataset_type, filenames
+        return elements, intensity, theta, raw_spectrum_fitting_method, dataset_type, filenames
     
-    return elements, counts, theta, incident_energy_keV, raw_spectrum_fitting_method, dataset_type
+    return elements, intensity, theta, incident_energy_keV, raw_spectrum_fitting_method, dataset_type
 
 def extract_h5_aggregate_xrt_data(file_path, **kwargs):
     if not os.path.isfile(file_path):
@@ -583,11 +586,11 @@ def extract_h5_aggregate_xrt_data(file_path, **kwargs):
     
     try:
         with h5py.File(file_path, 'r') as h5:
-            counts_h5 = h5['exchange/data']
+            intensity_h5 = h5['exchange/data']
             theta_h5 = h5['exchange/theta']
             elements_h5 = h5['exchange/elements']
 
-            counts = counts_h5[()]
+            intensity = intensity_h5[()]
             theta = theta_h5[()]
             elements = list(elements_h5.asstr()[:])
 
@@ -596,10 +599,10 @@ def extract_h5_aggregate_xrt_data(file_path, **kwargs):
 
                 filenames = filenames_h5.asstr()[:]
 
-            dataset_type = counts_h5.attrs['dataset_type']
-            us_ic_scaler_name = counts_h5.attrs['us_ic_scaler_name']
-            xrt_photon_counting = counts_h5.attrs['xrt_photon_counting']
-            incident_energy_keV = counts_h5.attrs['incident_energy_keV']
+            dataset_type = intensity_h5.attrs['dataset_type']
+            us_ic_scaler_name = intensity_h5.attrs['us_ic_scaler_name']
+            xrt_photon_counting = intensity_h5.attrs['xrt_photon_counting']
+            incident_energy_keV = intensity_h5.attrs['incident_energy_keV']
     
     except KeyboardInterrupt:
         print('\n\nKeyboardInterrupt occurred. Exiting program...')
@@ -612,9 +615,9 @@ def extract_h5_aggregate_xrt_data(file_path, **kwargs):
         sys.exit()
 
     if kwargs.get('filename_array') == True:
-        return elements, counts, theta, us_ic_scaler_name, dataset_type, filenames
+        return elements, intensity, theta, us_ic_scaler_name, dataset_type, filenames
     
-    return elements, counts, theta, incident_energy_keV, us_ic_scaler_name, dataset_type, xrt_photon_counting
+    return elements, intensity, theta, incident_energy_keV, us_ic_scaler_name, dataset_type, xrt_photon_counting
 
 def extract_csv_norm_net_shift_data(file_path, theta_array):
     if not os.path.isfile(file_path):
@@ -1423,7 +1426,7 @@ def create_gridrec_density_maps_h5(dir_path,
                                    gridrec_density_maps,
                                    elements_xrf):
     
-    file_name = os.path.join(dir_path, 'gridrec_density_maps')
+    file_name = os.path.join(dir_path, 'gridrec_density_maps.h5')
 
     elements_xrf_new = [element.split('_')[0] for element in elements_xrf]
     

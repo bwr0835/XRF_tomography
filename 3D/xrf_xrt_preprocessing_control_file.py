@@ -279,7 +279,6 @@ def preprocess_xrf_xrt_data(synchrotron,
 
                 sys.exit()
             
-            proj_img_array_element_to_align_with[np.where(theta == 0)[1]:] = np.flip(proj_img_array_element_to_align_with[np.where(theta == 0)[1]:], axis = 1)
             proj_img_array_element_to_align_with_orig = proj_img_array_element_to_align_with.copy()
 
             init_y_shift_array, \
@@ -541,9 +540,9 @@ def preprocess_xrf_xrt_data(synchrotron,
                                             norm_array_xrt,
                                             init_x_shift_array,
                                             init_y_shift_array,
-                                            pixel_rad_pre_cor_jitter = np.zeros(proj_img_array_element_to_align_with.shape[0] - 1),
+                                            pixel_rad_pre_cor_jitter = np.zeros(opt_dens_norm.shape[0] - 1),
                                             pixel_rad_cor = 0,
-                                            pixel_rad_iter_reproj = np.zeros(proj_img_array_element_to_align_with.shape[0] - 1),
+                                            pixel_rad_iter_reproj = np.zeros(opt_dens_norm.shape[0] - 1),
                                             I0_photons = I0_photons)
 
         if return_aux_data:
