@@ -741,8 +741,8 @@ def realign_proj(cor_correction_only,
     synth_proj = np.zeros((n_theta, n_slices, n_columns))
     dx_array_pcc = np.zeros((n_iterations_iter_reproj, n_theta))
     
-    if net_x_shifts_pcc.ndim != 3:
-        dy_array_pcc = np.zeros((n_iterations_iter_reproj, n_theta))
+    # if net_x_shifts_pcc.ndim != 3:
+    dy_array_pcc = np.zeros((n_iterations_iter_reproj, n_theta))
 
     rms_net_shift_prev = 0
 
