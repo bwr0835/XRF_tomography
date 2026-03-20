@@ -894,7 +894,7 @@ def realign_proj(cor_correction_only,
                 else:
                     print(f'Current x-shift: {ppu.round_correct(dx, ndec = 3)} (theta = {ppu.round_correct(theta_array[theta_idx], ndec = 1)})')
                 
-                # print(f'Current y-shift: {ppu.round_correct(dy, ndec = 3)}')
+                print(f'Current y-shift: {ppu.round_correct(dy, ndec = 3)}')
 
         if not sample_flipped_remounted_mid_experiment:
             if net_x_shifts_pcc.ndim == 3:
