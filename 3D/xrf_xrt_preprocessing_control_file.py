@@ -518,6 +518,34 @@ def preprocess_xrf_xrt_data(synchrotron,
         print('Done')
 
     else:
+        if pre_existing_align_norm_file_enabled:
+            print('Updating input data CSV file...')
+
+            futil.create_csv_raw_input_data(xrt_od_xrf_realignment_subdir_path,
+                                            theta,
+                                            norm_array_xrf,
+                                            norm_array_xrt,
+                                            init_x_shift_array,
+                                            init_y_shift_array,
+                                            pixel_rad_adjacent_angle_jitter,
+                                            pixel_rad_cor_correction,
+                                            pixel_rad_iter_reproj,
+                                            I0_photons)
+
+        else:
+            print('Creating input data CSV file...')
+
+            futil.create_csv_raw_input_data(xrt_od_xrf_realignment_subdir_path,
+                                            theta,
+                                            norm_array_xrf,
+                                            norm_array_xrt,
+                                            init_x_shift_array,
+                                            init_y_shift_array,
+                                            pixel_rad_pre_cor_jitter = np.zeros(proj_img_array_element_to_align_with.shape[0] - 1),
+                                            pixel_rad_cor = 0,
+                                            pixel_rad_iter_reproj = np.zeros(proj_img_array_element_to_align_with.shape[0] - 1),
+                                            I0_photons = I0_photons)
+
         if return_aux_data:
             if norm_enabled:
                 if not pre_existing_align_norm_file_enabled:
