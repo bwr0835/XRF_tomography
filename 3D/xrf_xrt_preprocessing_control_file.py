@@ -279,7 +279,7 @@ def preprocess_xrf_xrt_data(synchrotron,
 
                 sys.exit()
             
-            proj_img_array_element_to_align_with[np.where(theta == 0)[1]:] = np.flip(proj_img_array_element_to_align_with[np.where(theta == 0)[1]:], axis = 1)
+            proj_img_array_element_to_align_with[(np.where(theta == 0)[1] + 1):] = np.flip(proj_img_array_element_to_align_with[np.where(theta == 0)[1]:], axis = 1)
             proj_img_array_element_to_align_with_orig = proj_img_array_element_to_align_with.copy()
 
             init_y_shift_array, \
