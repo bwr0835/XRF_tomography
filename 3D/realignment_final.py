@@ -939,35 +939,26 @@ def realign_proj(cor_correction_only,
             print(f'Center of rotation error after jitter correction (after flipping sample): {ppu.round_correct(offset_second_part, ndec = 3)}\n')
             print(f'The two zero degree angles are offset from each other by {ppu.round_correct(np.abs(shifts[1]), ndec = 3)} pixels')
 
-        if i > (n_iter_converge - 1):
-            rms_net_x_shift = np.sqrt((dx_array_pcc[i]**2).mean())
-            
-            if net_x_shifts_pcc.ndim == 3:
-                rms_net_y_shift = np.sqrt((dy_array_pcc[i]**2).mean())
-                
-                rms_net_shift = np.sqrt(rms_net_x_shift**2 + rms_net_y_shift**2)
-            
-            else:
-                rms_net_shift = rms_net_x_shift
+        rms_net_x_shift = np.sqrt((dx_array_pcc[i]**2).mean())
+        rms_net_y_shift = np.sqrt((dy_array_pcc[i]**2).mean())
+        
+        rms_net_shift = np.sqrt(rms_net_x_shift**2 + rms_net_y_shift**2)
 
+        if i > (n_iter_converge - 1):
             if np.abs(rms_net_shift - rms_net_shift_prev) <= eps_iter_reproj:
-                # net_x_shifts_pcc, net_y_shifts_pcc = net_x_shifts_pcc[:(i + 1)], net_y_shifts_pcc[:(i + 1)]
                 net_x_shifts_pcc = net_x_shifts_pcc[:(i + 1)]
+                net_y_shifts_pcc = net_y_shifts_pcc[:(i + 1)]
 
                 if return_aux_data:
                     pcc_2d_array = pcc_2d_array[:(i + 1)]
                     pcc_2d_truncated_array = pcc_2d_truncated_array[:(i + 1)]
                     aligned_exp_proj_array = aligned_exp_proj_array[:(i + 1)]
+                    recon_array = recon_array[:(i + 1)]
                     synth_proj_array = synth_proj_array[:(i + 1)]
 
-                    if net_x_shifts_pcc.ndim != 3:
-                        net_y_shifts_pcc = net_y_shifts_pcc[:(i + 1)]
-                        dy_array_pcc = dy_array_pcc[:(i + 1)]
-                    
                     dx_array_pcc = dx_array_pcc[:(i + 1)]
-                
-                recon_array = recon_array[:(i + 1)]
-
+                    dy_array_pcc = dy_array_pcc[:(i + 1)]
+                   
                 print(f'Number of iterations taken: {i + 1}')
                 print('Shifting all elements in cropped XRT, optical density aggregate projection arrays by current net shifts...')
 
