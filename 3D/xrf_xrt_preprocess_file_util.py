@@ -437,7 +437,6 @@ def create_aggregate_xrt_h5(file_path_array,
             sys.exit()
 
     elif synchrotron == 'nsls-ii':
-        incident_energy_keV = kwargs['incident_energy_keV']
         us_ic = kwargs.get('us_ic')
         
         if us_ic is None:
