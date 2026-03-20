@@ -278,7 +278,8 @@ def preprocess_xrf_xrt_data(synchrotron,
                 print('Error: \'aligning_element\' must be in \'elements_xrf\' or \'opt_dens\'. Exiting program...')
 
                 sys.exit()
-
+            
+            proj_img_array_element_to_align_with[np.where(theta == 0)[1]:] = np.flip(proj_img_array_element_to_align_with[np.where(theta == 0)[1]:], axis = 1)
             proj_img_array_element_to_align_with_orig = proj_img_array_element_to_align_with.copy()
 
             init_y_shift_array, \
@@ -378,8 +379,6 @@ def preprocess_xrf_xrt_data(synchrotron,
                 print("Error: Empty field for 'init_edge_pixel_lengths_to_crop'. Exiting program...")
 
                 sys.exit()
-            
-        # intensity_xrf_norm[:, np.where(theta == 0)[1]:] = np.flip(intensity_xrf_norm[:, np.where(theta == 0)[1]:], axis = 0)
         
         aligned_proj_final_xrt_sig, \
         aligned_proj_final_opt_dens, \
