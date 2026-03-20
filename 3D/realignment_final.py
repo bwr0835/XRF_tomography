@@ -712,7 +712,7 @@ def realign_proj(cor_correction_only,
         synth_proj_array = np.zeros((n_iterations_iter_reproj, n_theta, n_slices, n_columns))
         pcc_2d_array = np.zeros((n_iterations_iter_reproj, n_theta, n_slices, n_columns))
         
-        if np.array_equal(pixel_rad_iter_reproj, np.zeros(n_theta)):
+        if np.any(pixel_rad_iter_reproj == 0):
             pcc_2d_truncated_array = np.zeros((n_iterations_iter_reproj, n_theta, n_slices, n_columns))
         
         else:
@@ -854,13 +854,17 @@ def realign_proj(cor_correction_only,
                 
                 pcc_2d_array[i, theta_idx] = phase_xcorr_2d
 
-                start_x = int(phase_xcorr_2d_truncated.shape[1]//2 - pixel_rad_iter_reproj[theta_idx])
-                start_y = int(phase_xcorr_2d_truncated.shape[0]//2 - pixel_rad_iter_reproj[theta_idx])
+                if np.any(pixel_rad_iter_reproj[theta_idx] > 0):
+                    start_x = int(phase_xcorr_2d_truncated.shape[1]//2 - pixel_rad_iter_reproj[theta_idx])
+                    start_y = int(phase_xcorr_2d_truncated.shape[0]//2 - pixel_rad_iter_reproj[theta_idx])
 
-                end_x = int(phase_xcorr_2d_truncated.shape[1]//2 + pixel_rad_iter_reproj[theta_idx])
-                end_y = int(phase_xcorr_2d_truncated.shape[0]//2 + pixel_rad_iter_reproj[theta_idx])
-
-                pcc_2d_truncated_array[i, theta_idx, start_y:end_y, start_x:end_x] = phase_xcorr_2d_truncated
+                    end_x = int(phase_xcorr_2d_truncated.shape[1]//2 + pixel_rad_iter_reproj[theta_idx])
+                    end_y = int(phase_xcorr_2d_truncated.shape[0]//2 + pixel_rad_iter_reproj[theta_idx])
+                
+                    pcc_2d_truncated_array[i, theta_idx, start_y:end_y, start_x:end_x] = phase_xcorr_2d_truncated
+                
+                else:
+                    pcc_2d_truncated_array[i, theta_idx] = phase_xcorr_2d_truncated
 
             if net_x_shifts_pcc.ndim == 3:
                 dy = shifts[0]
