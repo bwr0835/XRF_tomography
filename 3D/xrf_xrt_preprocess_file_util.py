@@ -1091,7 +1091,7 @@ def create_csv_output_data(dir_path,
     if net_x_shifts.ndim == 3:
         theta_array_new = np.repeat(theta_array, net_x_shifts.shape[2])
         
-        net_x_shifts_new = net_x_shifts[-1].ravel()
+        net_x_shifts_new = (net_x_shifts[-1]).ravel()
         net_y_shifts_new = np.repeat(net_y_shifts[-1], net_x_shifts.shape[2])
     
     else:
