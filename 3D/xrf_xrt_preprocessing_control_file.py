@@ -193,7 +193,19 @@ def preprocess_xrf_xrt_data(synchrotron,
             pixel_rad_adjacent_angle_jitter, \
             pixel_rad_cor_correction, \
             pixel_rad_iter_reproj, \
-            I0_photons = futil.extract_csv_raw_input_data(pre_existing_align_norm_file_path)
+            I0_photons, \
+            data_percentile_aux, \
+            aligning_element_aux = futil.extract_csv_raw_input_data(pre_existing_align_norm_file_path)
+
+            if data_percentile_aux != data_percentile:
+                print('Error: Inconsistent data percentile between input CSV files. Exiting program...')
+
+                sys.exit()
+            
+            if aligning_element_aux != aligning_element:
+                print('Error: Inconsistent aligning elemen between input CSV files. Exiting program...')
+
+                sys.exit()
 
             print('Applying pre-existing per-projection normalizations to XRF, XRT arrays...')
 
