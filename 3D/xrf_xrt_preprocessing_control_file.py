@@ -335,7 +335,7 @@ def preprocess_xrf_xrt_data(synchrotron,
                                                 init_y_shift_array,
                                                 pixel_rad_pre_cor_jitter = np.zeros(proj_img_array_element_to_align_with.shape[0] - 1),
                                                 pixel_rad_cor = 0,
-                                                pixel_rad_iter_reproj = np.zeros(proj_img_array_element_to_align_with.shape[0] - 1),
+                                                pixel_rad_iter_reproj = np.zeros(proj_img_array_element_to_align_with.shape[0]),
                                                 I0_photons = I0_photons)
 
             if return_aux_data:
@@ -392,7 +392,7 @@ def preprocess_xrf_xrt_data(synchrotron,
                                                 init_y_shift_array,
                                                 pixel_rad_pre_cor_jitter = np.zeros(proj_img_array_element_to_align_with.shape[0] - 1),
                                                 pixel_rad_cor = 0,
-                                                pixel_rad_iter_reproj = np.zeros(proj_img_array_element_to_align_with.shape[0] - 1),
+                                                pixel_rad_iter_reproj = np.zeros(proj_img_array_element_to_align_with.shape[0]),
                                                 I0_photons = I0_photons)
 
             if not init_edge_crop_enabled:
@@ -542,7 +542,7 @@ def preprocess_xrf_xrt_data(synchrotron,
                                             init_y_shift_array,
                                             pixel_rad_pre_cor_jitter = np.zeros(opt_dens_norm.shape[0] - 1),
                                             pixel_rad_cor = 0,
-                                            pixel_rad_iter_reproj = np.zeros(opt_dens_norm.shape[0] - 1),
+                                            pixel_rad_iter_reproj = np.zeros(opt_dens_norm.shape[0]),
                                             I0_photons = I0_photons)
 
         if return_aux_data:
