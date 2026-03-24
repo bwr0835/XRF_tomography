@@ -193,7 +193,7 @@ def preprocess_xrf_xrt_data(synchrotron,
             pixel_rad_adjacent_angle_jitter, \
             pixel_rad_cor_correction, \
             pixel_rad_iter_reproj, \
-            I0_photons = futil.extract_csv_raw_input_data(pre_existing_align_norm_file_path, theta)
+            I0_photons = futil.extract_csv_raw_input_data(pre_existing_align_norm_file_path)
 
             print('Applying pre-existing per-projection normalizations to XRF, XRT arrays...')
 
