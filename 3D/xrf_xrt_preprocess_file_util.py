@@ -1067,6 +1067,8 @@ def extract_csv_raw_input_data(file_path):
 
     if data_percentile == '':
         data_percentile = None
+    
+    print(data_percentile)
 
     return norm_factor_xrt, \
            norm_factor_xrf, \
