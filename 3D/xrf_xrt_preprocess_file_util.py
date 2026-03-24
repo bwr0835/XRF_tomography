@@ -1087,7 +1087,7 @@ def create_csv_output_data(dir_path,
                            net_y_shifts,
                            cor_correction_only = False):
 
-    file_path = os.path.join(dir_path, 'norm_net_shift_data.csv')
+    file_path = os.path.join(dir_path, 'output_net_shift_data.csv')
 
     print(net_x_shifts.shape)
 
