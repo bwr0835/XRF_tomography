@@ -101,7 +101,19 @@ def correct_adjacent_angle_jitter_pre_cor_correction(init_proj_array,
                                                      pixel_rad,
                                                      theta,
                                                      return_aux_data):
+    """
+    Adjacent-angle vs cumulative convention
+    ---------------------------------------
+    Phase correlation measures one vertical shift per *pair* (θ_i, θ_{i+1}); call
+    those δ_i (length n_theta - 1). This routine converts them to *per-projection*
+    shifts Y_k (length n_theta) with projection 0 as reference: Y_0 is unchanged
+    here, and Y_k for k >= 1 accumulates δ_0 + … + δ_{k-1} via np.cumsum, then
+    adds that to net_y_shift_array[1:].
 
+    init_y_shifts in raw_input_data.csv and ndi.shift must use the same Y_k
+    (cumulative relative to angle 0), not the raw pair-wise δ_i. Mixing them
+    misaligns the stack and changes min/max(Y), hence the common vertical FOV.
+    """
     n_theta, n_slices, n_columns = init_proj_array.shape
 
     phase_xcorr_2d_aggregate = np.zeros((n_theta - 1, n_slices, n_columns))
@@ -480,7 +492,122 @@ def realign_proj(cor_correction_only,
 
         dx_prev = 0
 
-        for i in range(n_iterations_cor_correction):
+        # for i in range(n_iterations_cor_correction):
+        # for i in range(1):
+        #     print(f'COR correction iteration {i + 1}/{n_iterations_cor_correction}')
+
+        #     center_of_rotation_avg_first_part, center_geom, offset_init_first_part = rot_center_avg(aligned_proj[:zero_deg_idx_array[1], start_slice:end_slice], 
+        #                                                                                             theta_idx_pairs_first_part, 
+        #                                                                                             theta_array_first_part)
+                
+        #     center_of_rotation_avg_second_part, _, offset_init_second_part = rot_center_avg(aligned_proj[zero_deg_idx_array[1]:, start_slice:end_slice], 
+        #                                                                                     theta_idx_pairs_second_part, 
+        #                                                                                     theta_array_second_part)
+
+        #     print(f'Average center of rotation (before flipping sample): {center_of_rotation_avg_first_part}')
+        #     print(f'Average center of rotation (after flipping sample): {center_of_rotation_avg_second_part}\n')
+        #     print(f'Geometric center: {center_geom}\n')
+        #     print(f'Center of rotation error (before flipping sample): {ppu.round_correct(offset_init_first_part, ndec = 3)}')
+        #     print(f'Center of rotation error (after flipping sample): {ppu.round_correct(offset_init_second_part, ndec = 3)}\n')
+
+        #     if i == 0 and offset_init_first_part == 0 and offset_init_second_part == 0:
+        #         print('No COR correction needed.')
+
+        #         break
+
+        #     else:
+        #         print(f'Applying initial COR correction to pre-flipped, pre-remounted sample angles: {ppu.round_correct(-offset_init_first_part, ndec = 3)}')
+
+        #         if net_x_shifts_pcc.ndim == 3:
+        #             net_x_shifts_pcc[0, :zero_deg_idx_array[1], start_slice:end_slice] -= offset_init_first_part
+        #             net_x_shifts_pcc[0, zero_deg_idx_array[1]:, start_slice:end_slice] -= offset_init_second_part
+                
+        #         else:
+        #             net_x_shifts_pcc[0, :zero_deg_idx_array[1]] -= offset_init_first_part
+        #             net_x_shifts_pcc[0, zero_deg_idx_array[1]:] -= offset_init_second_part
+
+        #         for theta_idx in range(len(theta_array_first_part)):
+        #             aligned_proj[theta_idx] = warp_shift(proj_img_array_element_to_align_with[theta_idx], net_x_shifts_pcc[0, theta_idx], net_y_shifts_pcc[0, theta_idx], cval = cval)
+                        
+        #         print(f'Applying initial COR correction to post-flipped, post-remounted sample angles: {ppu.round_correct(-offset_init_second_part, ndec = 3)}')
+                    
+        #         for theta_idx in range(len(theta_array_second_part)):
+        #             theta_idx_aux = theta_idx + len(theta_array_first_part)
+                    
+        #             aligned_proj[theta_idx_aux] = warp_shift(proj_img_array_element_to_align_with[theta_idx_aux], net_x_shifts_pcc[0, theta_idx_aux], net_y_shifts_pcc[0, theta_idx_aux], cval = cval)
+
+        #         if net_x_shifts_pcc.ndim == 3:
+        #             center_of_rotation_avg_first_part, center_geom, offset_first_part = rot_center_avg(aligned_proj[:zero_deg_idx_array[1], start_slice:end_slice], 
+        #                                                                                                theta_idx_pairs_first_part, 
+        #                                                                                                theta_array_first_part)
+                
+        #             center_of_rotation_avg_second_part, _, offset_second_part = rot_center_avg(aligned_proj[zero_deg_idx_array[1]:, start_slice:end_slice], 
+        #                                                                                        theta_idx_pairs_second_part, 
+        #                                                                                        theta_array_second_part)
+
+        #         else:
+        #             center_of_rotation_avg_first_part, center_geom, offset_first_part = rot_center_avg(aligned_proj[:zero_deg_idx_array[1]], 
+        #                                                                                                theta_idx_pairs_first_part, 
+        #                                                                                                theta_array_first_part)
+                    
+        #             center_of_rotation_avg_second_part, _, offset_second_part = rot_center_avg(aligned_proj[zero_deg_idx_array[1]:], 
+        #                                                                                        theta_idx_pairs_second_part, 
+        #                                                                                        theta_array_second_part)
+
+        #         print(f'New center of rotation (before flipping sample): {center_of_rotation_avg_first_part}')
+        #         print(f'New center of rotation (after flipping sample): {center_of_rotation_avg_second_part}\n')
+        #         print(f'Geometric center: {center_geom}\n')
+        #         print(f'New center of rotation error (before flipping sample): {ppu.round_correct(offset_first_part, ndec = 3)}')
+        #         print(f'New center of rotation error (after flipping sample): {ppu.round_correct(offset_second_part, ndec = 3)}\n')
+
+        #         if pixel_rad_cor_correction is None:
+        #             print('Warning: \'pixel_rad_cor_correction\' not detected. Performing peak search without truncation...')
+
+        #             pixel_rad_cor_correction = 0
+
+        #         if net_x_shifts_pcc.ndim == 3:
+        #             shifts, pcc, pcc_truncated = phase_xcorr_manual(aligned_proj[zero_deg_idx_array[0], start_slice:end_slice], 
+        #                                                             aligned_proj[zero_deg_idx_array[1], start_slice:end_slice], 
+        #                                                             sigma, 
+        #                                                             alpha, 
+        #                                                             pixel_rad_cor_correction,
+        #                                                             theta = np.array([0, 0]))
+        #             # print(shifts)
+        #             # fig, axs = plt.subplots(2, 1)
+        #             # axs[0].imshow(pcc, vmin = pcc.min(), vmax = pcc.max())
+        #             # axs[1].imshow(pcc_truncated, vmin = pcc_truncated.min(), vmax = pcc_truncated.max())
+        #             # plt.show()
+                
+        #         else:
+        #             shifts, _, _ = phase_xcorr_manual(aligned_proj[zero_deg_idx_array[0]], 
+        #                                               aligned_proj[zero_deg_idx_array[1]], 
+        #                                               sigma, 
+        #                                               alpha, 
+        #                                               pixel_rad_cor_correction,
+        #                                               theta = np.array([0, 0]))
+                
+        #         dx = shifts[1]
+                
+        #         if np.abs(dx - dx_prev) <= eps_cor_correction or (i == 0 and dx == 0):
+        #             print('No further COR correction needed.')
+
+        #             break
+                    
+        #         print(f'Applying additional COR correction to flipped, remounted sample angles: {ppu.round_correct(dx, ndec = 3)}')
+
+        #         if net_x_shifts_pcc.ndim == 3:
+        #             net_x_shifts_pcc[0, zero_deg_idx_array[1]:, start_slice:end_slice] += dx
+                
+        #         else:
+        #             net_x_shifts_pcc[0, zero_deg_idx_array[1]:] += dx
+
+        #         for theta_idx in range(len(theta_array_second_part)):
+        #             theta_idx_aux = theta_idx + len(theta_array_first_part)
+                        
+        #             aligned_proj[theta_idx_aux] = warp_shift(proj_img_array_element_to_align_with[theta_idx_aux], net_x_shifts_pcc[0, theta_idx_aux], net_y_shifts_pcc[0, theta_idx_aux], cval = cval)
+
+        #         dx_prev = dx
+        for i in range(1):
             print(f'COR correction iteration {i + 1}/{n_iterations_cor_correction}')
 
             center_of_rotation_avg_first_part, center_geom, offset_init_first_part = rot_center_avg(aligned_proj[:zero_deg_idx_array[1], start_slice:end_slice], 
@@ -553,32 +680,27 @@ def realign_proj(cor_correction_only,
                     pixel_rad_cor_correction = 0
 
                 if net_x_shifts_pcc.ndim == 3:
-                    shifts, pcc, pcc_truncated = phase_xcorr_manual(aligned_proj[zero_deg_idx_array[0], start_slice:end_slice], 
+                    shifts, pcc, pcc_truncated = phase_xcorr_manual(aligned_proj[0, start_slice:end_slice], 
                                                                     aligned_proj[zero_deg_idx_array[1], start_slice:end_slice], 
                                                                     sigma, 
                                                                     alpha, 
                                                                     pixel_rad_cor_correction,
-                                                                    theta = np.array([0, 0]))
+                                                                    theta = np.array([-180, 0]))
                     # print(shifts)
-                    # fig, axs = plt.subplots(2, 1)
-                    # axs[0].imshow(pcc, vmin = pcc.min(), vmax = pcc.max())
-                    # axs[1].imshow(pcc_truncated, vmin = pcc_truncated.min(), vmax = pcc_truncated.max())
-                    # plt.show()
+                    fig, axs = plt.subplots(2, 1)
+                    axs[0].imshow(pcc, vmin = pcc.min(), vmax = pcc.max())
+                    axs[1].imshow(pcc_truncated, vmin = pcc_truncated.min(), vmax = pcc_truncated.max())
+                    plt.show()
                 
                 else:
-                    shifts, _, _ = phase_xcorr_manual(aligned_proj[zero_deg_idx_array[0]], 
+                    shifts, _, _ = phase_xcorr_manual(aligned_proj[0], 
                                                       aligned_proj[zero_deg_idx_array[1]], 
                                                       sigma, 
                                                       alpha, 
                                                       pixel_rad_cor_correction,
-                                                      theta = np.array([0, 0]))
+                                                      theta = np.array([-180, 0]))
                 
-                dx = shifts[1]
-                
-                if np.abs(dx - dx_prev) <= eps_cor_correction or (i == 0 and dx == 0):
-                    print('No further COR correction needed.')
-
-                    break
+                dx = center_of_rotation_avg_first_part - (center_of_rotation_avg_second_part + shifts[1])
                     
                 print(f'Applying additional COR correction to flipped, remounted sample angles: {ppu.round_correct(dx, ndec = 3)}')
 
@@ -592,8 +714,6 @@ def realign_proj(cor_correction_only,
                     theta_idx_aux = theta_idx + len(theta_array_first_part)
                         
                     aligned_proj[theta_idx_aux] = warp_shift(proj_img_array_element_to_align_with[theta_idx_aux], net_x_shifts_pcc[0, theta_idx_aux], net_y_shifts_pcc[0, theta_idx_aux], cval = cval)
-
-                dx_prev = dx
             
     else:
         theta_idx_pairs = ppu.find_theta_combos(theta_array)
