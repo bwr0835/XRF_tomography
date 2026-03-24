@@ -1084,13 +1084,20 @@ def extract_csv_raw_input_data(file_path):
 def create_csv_output_data(dir_path,
                            theta_array,
                            net_x_shifts,
-                           net_y_shifts):
+                           net_y_shifts,
+                           cor_correction_only = False):
 
     file_path = os.path.join(dir_path, 'norm_net_shift_data.csv')
 
     print(net_x_shifts.shape)
 
-    if net_x_shifts.ndim == 3:
+    if cor_correction_only: # net_x_shifts.ndim = 2
+        theta_array_new = np.repeat(theta_array, net_x_shifts.shape[1])
+
+        net_x_shifts_new = net_x_shifts.ravel()
+        net_y_shifts_new = np.repeat(net_y_shifts, net_x_shifts.shape[1])
+
+    elif net_x_shifts.ndim == 3:
         theta_array_new = np.repeat(theta_array, net_x_shifts.shape[2])
         
         net_x_shifts_new = (net_x_shifts[-1]).ravel()
