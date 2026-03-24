@@ -246,7 +246,7 @@ def edge_gauss_filter(image, sigma, alpha, nx, ny):
 
 def joint_fluct_norm(xrt_array,
                      xrf_array,
-                     xrt_data_percentile,
+                     data_percentile,
                      xrt_photon_counting,
                      incident_photodiode_flux_photons_per_s,
                      t_dwell_s,
@@ -260,7 +260,7 @@ def joint_fluct_norm(xrt_array,
 
         sys.exit()
 
-    if xrt_data_percentile is None or xrt_data_percentile < 0 or xrt_data_percentile > 100:
+    if data_percentile is None or data_percentile < 0 or data_percentile > 100:
         print('Error: \'data_percentile\' must be between 0 and 100. Exiting program...')
 
         sys.exit() 
@@ -279,7 +279,7 @@ def joint_fluct_norm(xrt_array,
 
         convolution_mag = ndi.gaussian_filter(xrt_vignetted, sigma = sigma_2) # Blur the entire image using Gaussian filter/convolution
 
-        threshold = np.percentile(convolution_mag, xrt_data_percentile) # EX: Take top 20% of data (data_percentile = 80)
+        threshold = np.percentile(convolution_mag, data_percentile) # EX: Take top 20% of data (data_percentile = 80)
 
         mask = convolution_mag >= threshold
 
@@ -316,7 +316,7 @@ def joint_fluct_norm(xrt_array,
     return xrt_array, xrf_array, norm_array_xrt, norm_array_xrf, inc_intensity, global_xrt_mask_avg
 
 def calculate_abs_incident_intensity_photons(xrt_array,
-                                             xrt_data_percentile, 
+                                             data_percentile, 
                                              sigma_1 = 5, 
                                              alpha = 10, 
                                              sigma_2 = 10):
@@ -326,7 +326,7 @@ def calculate_abs_incident_intensity_photons(xrt_array,
 
         sys.exit()
     
-    if xrt_data_percentile is None or xrt_data_percentile < 0 or xrt_data_percentile > 100:
+    if data_percentile is None or data_percentile < 0 or data_percentile > 100:
         print('Error: \'data_percentile\' must be between 0 and 100. Exiting program...')
 
         sys.exit()
@@ -339,7 +339,7 @@ def calculate_abs_incident_intensity_photons(xrt_array,
         xrt_vignetted = edge_gauss_filter(xrt_array[theta_idx], sigma = sigma_1, alpha = alpha, nx = n_columns, ny = n_slices)
         convolution_mag = ndi.gaussian_filter(xrt_vignetted, sigma = sigma_2) # Blur the entire image using Gaussian filter/convolution
 
-        threshold = np.percentile(convolution_mag, xrt_data_percentile) # EX: Take top 20% of data (data_percentile = 80)
+        threshold = np.percentile(convolution_mag, data_percentile) # EX: Take top 20% of data (data_percentile = 80)
 
         mask = convolution_mag >= threshold
 

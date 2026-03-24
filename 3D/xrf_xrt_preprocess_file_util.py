@@ -1004,7 +1004,9 @@ def create_csv_raw_input_data(dir_path,
                               pixel_rad_pre_cor_jitter,
                               pixel_rad_cor,
                               pixel_rad_iter_reproj,
-                              I0_photons):
+                              I0_photons,
+                              data_percentile,
+                              aligning_element):
     
     file_path = os.path.join(dir_path, 'raw_input_data.csv')
 
@@ -1018,7 +1020,9 @@ def create_csv_raw_input_data(dir_path,
                    'pixel_rad_pre_cor_jitter': pixel_rad_pre_cor_jitter_array,
                    'pixel_rad_cor': pixel_rad_cor,
                    'pixel_rad_iter_reproj': pixel_rad_iter_reproj,
-                   'I0_photons': I0_photons}
+                   'I0_photons': I0_photons,
+                   'data_percentile': data_percentile,
+                   'aligning_element': aligning_element}
     
     df = pd.DataFrame({key: pd.Series(value) for key, value in output_dict.items()})
     

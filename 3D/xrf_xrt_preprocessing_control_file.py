@@ -29,7 +29,7 @@ def preprocess_xrf_xrt_data(synchrotron,
                             pre_existing_align_norm_file_path,
                             norm_enabled,
                             desired_xrf_element,
-                            xrt_data_percentile,
+                            data_percentile,
                             return_aux_data,
                             incident_flux_photons_per_s,
                             t_dwell_s,
@@ -214,7 +214,7 @@ def preprocess_xrf_xrt_data(synchrotron,
                 if return_aux_data:
                     intensity_xrt_norm, intensity_xrf_norm, norm_array_xrt, norm_array_xrf, I0_photons, conv_mag_array = ppu.joint_fluct_norm(intensity_xrt_sig,
                                                                                                                                               intensity_xrf, 
-                                                                                                                                              xrt_data_percentile,
+                                                                                                                                              data_percentile,
                                                                                                                                               xrt_photon_counting, 
                                                                                                                                               incident_flux_photons_per_s,
                                                                                                                                               t_dwell_s,
@@ -223,7 +223,7 @@ def preprocess_xrf_xrt_data(synchrotron,
                 else:
                     intensity_xrt_norm, intensity_xrf_norm, norm_array_xrt, norm_array_xrf, I0_photons = ppu.joint_fluct_norm(intensity_xrt_sig,
                                                                                                                               intensity_xrf,
-                                                                                                                              xrt_data_percentile,
+                                                                                                                              data_percentile,
                                                                                                                               xrt_photon_counting,
                                                                                                                               incident_flux_photons_per_s,
                                                                                                                               t_dwell_s)
@@ -232,7 +232,7 @@ def preprocess_xrf_xrt_data(synchrotron,
                 if xrt_photon_counting:
                     print('Calculating incident intensity from XRT data...')
                    
-                    I0_photons = ppu.calculate_abs_incident_intensity_photons(intensity_xrt_sig, xrt_data_percentile)
+                    I0_photons = ppu.calculate_abs_incident_intensity_photons(intensity_xrt_sig, data_percentile)
                 
                 else:
                     if incident_flux_photons_per_s is None or t_dwell_s is None:
@@ -564,7 +564,7 @@ def preprocess_xrf_xrt_data(synchrotron,
                                                                            opt_dens = opt_dens_norm,
                                                                            convolution_mag_array = conv_mag_array,
                                                                            norm_enabled = norm_enabled,
-                                                                           data_percentile = xrt_data_percentile, #
+                                                                           data_percentile = data_percentile, #
                                                                            theta_array = theta,
                                                                            fps = fps)
                 else:
@@ -580,7 +580,7 @@ def preprocess_xrf_xrt_data(synchrotron,
                                                                            intensity_xrt_norm = intensity_xrt_norm,
                                                                            opt_dens = opt_dens_norm,
                                                                            norm_enabled = norm_enabled,
-                                                                           data_percentile = xrt_data_percentile, #
+                                                                           data_percentile = data_percentile, #
                                                                            theta_array = theta,
                                                                            fps = fps)
 
