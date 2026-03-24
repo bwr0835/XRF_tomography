@@ -537,7 +537,8 @@ def preprocess_xrf_xrt_data(synchrotron,
         futil.create_csv_output_data(xrt_od_xrf_realignment_subdir_path,
                                      theta,
                                      net_x_shifts_pcc_final,
-                                     net_y_shifts_pcc_final)
+                                     net_y_shifts_pcc_final,
+                                     cor_correction_only = cor_correction_only)
             
         print('Done')
 

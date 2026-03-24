@@ -107,7 +107,18 @@ def correct_adjacent_angle_jitter_pre_cor_correction(init_proj_array,
     phase_xcorr_2d_aggregate = np.zeros((n_theta - 1, n_slices, n_columns))
 
     net_y_shift_cumsum_temp = np.zeros(n_theta - 1)
+
+    if np.any(net_y_shift_array > 0):
+        print('Applying initial vertical shifts...')
+
+        shifted_proj_aux = np.zeros_like(init_proj_array)
+        
+        for theta_idx in range(n_theta):
+            shifted_proj_aux[theta_idx] = ndi.shift(init_proj_array[theta_idx], shift = (net_y_shift_array[theta_idx], 0))
     
+    else:
+        shifted_proj_aux = init_proj_array
+        
     if pixel_rad is None:
         print('Warning: \'pixel_rad\' not detected. Performing peak search without truncation...')
 
@@ -140,8 +151,8 @@ def correct_adjacent_angle_jitter_pre_cor_correction(init_proj_array,
             phase_xcorr_2d_truncated_aggregate = np.zeros((n_theta - 1, 2*pixel_rad.max(), 2*pixel_rad.max()))
 
     for theta_idx in range(n_theta - 1):
-        shifts, phase_xcorr_2d, phase_xcorr_2d_truncated = phase_xcorr_manual(init_proj_array[theta_idx],
-                                                                              init_proj_array[theta_idx + 1], 
+        shifts, phase_xcorr_2d, phase_xcorr_2d_truncated = phase_xcorr_manual(shifted_proj_aux[theta_idx],
+                                                                              shifted_proj_aux[theta_idx + 1], 
                                                                               sigma, 
                                                                               alpha, 
                                                                               pixel_rad[theta_idx],
