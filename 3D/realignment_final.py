@@ -151,8 +151,8 @@ def correct_adjacent_angle_jitter_pre_cor_correction(init_proj_array,
 
         if pixel_rad is not None and pixel_rad[theta_idx] > 0:
             phase_xcorr_2d_truncated_aggregate_midpt_idy, \
-            phase_xcorr_2d_truncated_aggregate_midpt_idx = phase_xcorr_2d_truncated_aggregate.shape[0]//2, \
-                                                           phase_xcorr_2d_truncated_aggregate.shape[1]//2
+            phase_xcorr_2d_truncated_aggregate_midpt_idx = phase_xcorr_2d_truncated_aggregate.shape[1]//2, \
+                                                           phase_xcorr_2d_truncated_aggregate.shape[2]//2
             
             start_y = int(phase_xcorr_2d_truncated_aggregate_midpt_idy - pixel_rad[theta_idx])
             start_x = int(phase_xcorr_2d_truncated_aggregate_midpt_idx - pixel_rad[theta_idx])
