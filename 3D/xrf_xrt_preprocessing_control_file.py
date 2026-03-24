@@ -430,7 +430,7 @@ def preprocess_xrf_xrt_data(synchrotron,
             
             elif init_edge_pixel_lengths_to_crop is not None and np.any(init_y_shift_array != 0):
                 edge_info = {'top': int(np.clip(np.ceil(np.max(init_y_shift_array)), 0, n_slices) + init_edge_pixel_lengths_to_crop['top']), 
-                            'bottom': int(np.clip(n_slices + np.floor(np.min(init_y_shift_array)), 0, n_slices) - init_edge_pixel_lengths_to_crop['bottom'])}
+                             'bottom': int(np.clip(n_slices + np.floor(np.min(init_y_shift_array)), 0, n_slices) - init_edge_pixel_lengths_to_crop['bottom'])}
             
             else:
                 print("Error: Empty field for 'init_edge_pixel_lengths_to_crop'. Exiting program...")
