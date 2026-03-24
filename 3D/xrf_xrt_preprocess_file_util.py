@@ -1059,7 +1059,7 @@ def extract_csv_raw_input_data(file_path):
     init_x_shifts = df['init_x_shifts'].to_numpy().astype(float)
     init_y_shifts = df['init_y_shifts'].to_numpy().astype(float)
     pixel_rad_pre_cor_jitter = df['pixel_rad_pre_cor_jitter'][1:].to_numpy().astype(int)
-    pixel_rad_cor = df['pixel_rad_cor'][0]
+    pixel_rad_cor = int(df['pixel_rad_cor'][0])
     pixel_rad_iter_reproj = df['pixel_rad_iter_reproj'].to_numpy().astype(int)
     I0_photons = df['I0_photons'][0]   
     aligning_element = df['aligning_element'][0]
