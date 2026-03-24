@@ -197,13 +197,18 @@ def preprocess_xrf_xrt_data(synchrotron,
             data_percentile_aux, \
             aligning_element_aux = futil.extract_csv_raw_input_data(pre_existing_align_norm_file_path)
 
-            if data_percentile_aux != data_percentile:
+            if (data_percentile_aux is None)^(data_percentile is None): # Exclusive OR to see if one is None and the other is not
                 print('Error: Inconsistent data percentile between input CSV files. Exiting program...')
 
                 sys.exit()
             
+            if data_percentile_aux != data_percentile:
+                print('Error: Inconsistent data percentile between input CSV files. Exiting program...')
+
+                sys.exit()
+
             if aligning_element_aux != aligning_element:
-                print('Error: Inconsistent aligning elemen between input CSV files. Exiting program...')
+                print('Error: Inconsistent aligning element between input CSV files. Exiting program...')
 
                 sys.exit()
 

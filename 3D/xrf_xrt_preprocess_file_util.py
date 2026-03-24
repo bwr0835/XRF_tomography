@@ -1058,10 +1058,15 @@ def extract_csv_raw_input_data(file_path):
     norm_factor_xrf = df['norm_factor_xrf'].to_numpy().astype(float)
     init_x_shifts = df['init_x_shifts'].to_numpy().astype(float)
     init_y_shifts = df['init_y_shifts'].to_numpy().astype(float)
-    pixel_rad_pre_cor_jitter = df['pixel_rad_pre_cor_jitter'].to_numpy().astype(float)
-    pixel_rad_cor = df['pixel_rad_cor'].to_numpy().astype(float)
-    pixel_rad_iter_reproj = df['pixel_rad_iter_reproj'].to_numpy().astype(float)
-    I0_photons = df['I0_photons'].to_numpy().astype(float)    
+    pixel_rad_pre_cor_jitter = df['pixel_rad_pre_cor_jitter'][1:].to_numpy().astype(int)
+    pixel_rad_cor = df['pixel_rad_cor'][1]
+    pixel_rad_iter_reproj = df['pixel_rad_iter_reproj'].to_numpy().astype(int)
+    I0_photons = df['I0_photons'][1]   
+    aligning_element = df['aligning_element'][1]
+    data_percentile = df['data_percentile'][1]
+
+    if data_percentile == '':
+        data_percentile = None
 
     return norm_factor_xrt, \
            norm_factor_xrf, \
@@ -1070,7 +1075,9 @@ def extract_csv_raw_input_data(file_path):
            pixel_rad_pre_cor_jitter, \
            pixel_rad_cor, \
            pixel_rad_iter_reproj, \
-           I0_photons
+           I0_photons, \
+           data_percentile, \
+           aligning_element
 
 def create_csv_output_data(dir_path,
                            theta_array,
