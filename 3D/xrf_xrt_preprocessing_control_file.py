@@ -339,7 +339,9 @@ def preprocess_xrf_xrt_data(synchrotron,
                                                 pixel_rad_adjacent_angle_jitter,
                                                 pixel_rad_cor_correction,
                                                 pixel_rad_iter_reproj,
-                                                I0_photons)
+                                                I0_photons,
+                                                data_percentile,
+                                                aligning_element)
 
             else:
                 print('Creating input normalization, net y shift, and incident intensity CSV file...')
@@ -353,7 +355,9 @@ def preprocess_xrf_xrt_data(synchrotron,
                                                 pixel_rad_pre_cor_jitter = np.zeros(proj_img_array_element_to_align_with.shape[0] - 1),
                                                 pixel_rad_cor = 0,
                                                 pixel_rad_iter_reproj = np.zeros(proj_img_array_element_to_align_with.shape[0]),
-                                                I0_photons = I0_photons)
+                                                I0_photons = I0_photons,
+                                                data_percentile = data_percentile,
+                                                aligning_element = aligning_element)
 
             if return_aux_data:
                 print('Writing the following auxiliary, pre-COR-corrected, adjacent angle jitter-corrected, cropped per-projection data to NumPy (.npy) files (NOTE: Python is needed to view these!) and .gif files:')
@@ -396,7 +400,9 @@ def preprocess_xrf_xrt_data(synchrotron,
                                                 pixel_rad_adjacent_angle_jitter,
                                                 pixel_rad_cor_correction,
                                                 pixel_rad_iter_reproj,
-                                                I0_photons)
+                                                I0_photons,
+                                                data_percentile,
+                                                aligning_element)
 
             else:
                 print('Creating input data CSV file...')
@@ -410,7 +416,9 @@ def preprocess_xrf_xrt_data(synchrotron,
                                                 pixel_rad_pre_cor_jitter = np.zeros(proj_img_array_element_to_align_with.shape[0] - 1),
                                                 pixel_rad_cor = 0,
                                                 pixel_rad_iter_reproj = np.zeros(proj_img_array_element_to_align_with.shape[0]),
-                                                I0_photons = I0_photons)
+                                                I0_photons = I0_photons,
+                                                data_percentile = data_percentile,
+                                                aligning_element = aligning_element)
 
             if not init_edge_crop_enabled:
                 edge_info = None
@@ -546,7 +554,9 @@ def preprocess_xrf_xrt_data(synchrotron,
                                             pixel_rad_adjacent_angle_jitter,
                                             pixel_rad_cor_correction,
                                             pixel_rad_iter_reproj,
-                                            I0_photons)
+                                            I0_photons,
+                                            data_percentile,
+                                            aligning_element)
 
         else:
             print('Creating input data CSV file...')
@@ -560,7 +570,9 @@ def preprocess_xrf_xrt_data(synchrotron,
                                             pixel_rad_pre_cor_jitter = np.zeros(opt_dens_norm.shape[0] - 1),
                                             pixel_rad_cor = 0,
                                             pixel_rad_iter_reproj = np.zeros(opt_dens_norm.shape[0]),
-                                            I0_photons = I0_photons)
+                                            I0_photons = I0_photons,
+                                            data_percentile = data_percentile,
+                                            aligning_element = aligning_element)
 
         if return_aux_data:
             if norm_enabled:
