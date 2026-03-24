@@ -1088,6 +1088,8 @@ def create_csv_output_data(dir_path,
 
     file_path = os.path.join(dir_path, 'norm_net_shift_data.csv')
 
+    print(net_x_shifts.shape)
+
     if net_x_shifts.ndim == 3:
         theta_array_new = np.repeat(theta_array, net_x_shifts.shape[2])
         
