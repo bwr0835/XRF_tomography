@@ -421,11 +421,16 @@ def preprocess_xrf_xrt_data(synchrotron,
                                                 aligning_element = aligning_element)
 
             if not init_edge_crop_enabled:
-                edge_info = None
+                if np.any(init_y_shift_array != 0):
+                    edge_info = {'top': np.clip(np.ceil(np.max(init_y_shift_array)), 0, n_slices), 
+                                 'bottom': np.clip(n_slices + np.floor(np.min(init_y_shift_array)), 0, n_slices)}
+                
+                else:
+                    edge_info = None
             
-            elif init_edge_pixel_lengths_to_crop is not None:
-                edge_info = {'top': init_edge_pixel_lengths_to_crop['top'], 
-                             'bottom': init_edge_pixel_lengths_to_crop['bottom']}
+            elif init_edge_pixel_lengths_to_crop is not None and np.any(init_y_shift_array != 0):
+                edge_info = {'top': np.clip(np.ceil(np.max(init_y_shift_array)), 0, n_slices) + init_edge_pixel_lengths_to_crop['top'], 
+                            'bottom': np.clip(n_slices + np.floor(np.min(init_y_shift_array)), 0, n_slices) - init_edge_pixel_lengths_to_crop['bottom']}
             
             else:
                 print("Error: Empty field for 'init_edge_pixel_lengths_to_crop'. Exiting program...")
