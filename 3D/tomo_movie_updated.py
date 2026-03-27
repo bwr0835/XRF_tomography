@@ -107,17 +107,17 @@ def create_multielement_recon_movie(dir_path, counts_xrf, desired_elements, elem
     return
 
 # aps_xrf_file_path = '/Users/bwr0835/Documents/2_ide_aggregate_xrf.h5'
-aps_xrf_file_path = 
 # hxn_xrf_file_path = '/Users/bwr0835/Documents/3_id_aggregate_xrf.h5'
 
 # aps_xrt_file_path = '/Users/bwr0835/Documents/2_ide_aggregate_xrt.h5'
 # hxn_xrt_file_path = '/Users/bwr0835/Documents/3_id_aggregate_xrt.h5'
 
-aps_dir_path = '/Users/bwr0835/Documents/2_ide_realigned_data_02_12_2026_iter_reproj_cor_correction_only'
+aps_dir_path = '/Users/bwr0835/Documents/2_ide_realigned_data_03_27_2026_iter_reproj_cor_correction_only_final'
+# aps_dir_path = '/Users/bwr0835/Documents/2_ide_realigned_data_02_12_2026_iter_reproj_cor_correction_only'
 # hxn_dir_path = '/Users/bwr0835/Documents/3_id_realigned_data_02_10_2026'
 
 # aps_elements = ['Si', 'Ti','Fe', 'Ba_L']
-aps_elements = ['Si', 'Ti','Fe', 'Ba']
+# aps_elements = ['Si', 'Ti','Fe', 'Ba']
 # hxn_elements = ['Ni', 'Cu','Zn', 'Ce_L']
 
 # aps_elements_xrf, aps_counts_xrf, aps_theta_xrf, _, _ = futil.extract_h5_aggregate_xrf_data(aps_xrf_file_path)
@@ -142,8 +142,8 @@ aps_elements = ['Si', 'Ti','Fe', 'Ba']
 # vmin_xrf_hxn = [np.quantile(hxn_counts_xrf_norm[idx], [0.01, 0.99][0]) for idx in range(len(hxn_elements_xrf))]
 # vmax_xrf_hxn = [np.quantile(hxn_counts_xrf_norm[idx], [0.01, 0.99][1]) for idx in range(len(hxn_elements_xrf))]
 
-vmin_xrf_aps = [aps_counts_xrf_norm[idx].min() for idx in range(len(aps_elements_xrf))]
-vmax_xrf_aps = [aps_counts_xrf_norm[idx].max() for idx in range(len(aps_elements_xrf))]
+# vmin_xrf_aps = [aps_counts_xrf_norm[idx].min() for idx in range(len(aps_elements_xrf))]
+# vmax_xrf_aps = [aps_counts_xrf_norm[idx].max() for idx in range(len(aps_elements_xrf))]
 # vmin_xrf_hxn = [hxn_counts_xrf_norm[idx].min() for idx in range(len(hxn_elements_xrf))]
 # vmax_xrf_hxn = [hxn_counts_xrf_norm[idx].max() for idx in range(len(hxn_elements_xrf))]
 
