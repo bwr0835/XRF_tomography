@@ -279,25 +279,25 @@ def preprocess_xrf_xrt_data(synchrotron,
     os.makedirs(xrt_od_xrf_realignment_subdir_path, exist_ok = True)
 
     if realignment_enabled:
-        if pre_cor_correction_adjacent_angle_jitter_correction_enabled:
-            print('Calculating required shifts for vertical jitter correction pre-center of rotation error correction...')
-            
-            if aligning_element == 'opt_dens':
+        if aligning_element == 'opt_dens':
                 proj_img_array_element_to_align_with = opt_dens_norm
             
-            elif aligning_element in elements_xrf:
-                proj_img_array_element_to_align_with = intensity_xrf_norm[elements_xrf.index(aligning_element)]
+        elif aligning_element in elements_xrf:
+            proj_img_array_element_to_align_with = intensity_xrf_norm[elements_xrf.index(aligning_element)]
             
-            elif aligning_element == 'xrt':
-                proj_img_array_element_to_align_with = intensity_xrt_norm
+        elif aligning_element == 'xrt':
+            proj_img_array_element_to_align_with = intensity_xrt_norm
             
-            else:
-                print('Error: \'aligning_element\' must be in \'elements_xrf\' or \'opt_dens\'. Exiting program...')
+        else:
+            print('Error: \'aligning_element\' must be in \'elements_xrf\' or \'opt_dens\'. Exiting program...')
 
-                sys.exit()
+            sys.exit()
             
-            proj_img_array_element_to_align_with_orig = proj_img_array_element_to_align_with.copy()
-
+        proj_img_array_element_to_align_with_orig = proj_img_array_element_to_align_with.copy()
+        
+        if pre_cor_correction_adjacent_angle_jitter_correction_enabled:
+            print('Calculating required shifts for vertical jitter correction pre-center of rotation error correction...')
+        
             init_y_shift_array, \
             start_slice_aux, \
             end_slice_aux, \
