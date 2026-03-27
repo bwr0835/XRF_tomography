@@ -1138,8 +1138,6 @@ def create_nonaligned_norm_non_cropped_proj_data_gif(dir_path,
                                                      fps = None):
 
     n_theta, n_slices, n_columns = intensity_xrf.shape[1:]
-    print(n_slices)
-    sys.exit()
 
     if desired_xrf_element is None:
         print('Error: \'desired_xrf_element\' field empty. Exiting program...')
