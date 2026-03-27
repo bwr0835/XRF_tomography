@@ -508,7 +508,7 @@ def preprocess_xrf_xrt_data(synchrotron,
             aligned_proj_final_opt_dens_cropped = aligned_proj_final_opt_dens
             
             if final_edge_pixel_lengths_to_crop is not None:
-                print("Warning: Non-empty 'init_edge_pixel_lengths_to_crop' dictionary detected. Removing items from 'final_edge_pixel_lengths_to_crop'...")
+                print("Warning: Non-empty 'final_edge_pixel_lengths_to_crop' dictionary detected. Removing items from 'final_edge_pixel_lengths_to_crop'...")
 
             final_edge_pixel_lengths_to_crop = None
         
