@@ -15,11 +15,13 @@ from imageio import v2 as iio2
 plt.rcParams['text.usetex'] = True
 plt.rcParams['font.family'] = 'serif'
 plt.rcParams['text.latex.preamble'] = r'\usepackage{times}'
-
 plt.rcParams['xtick.major.size'] = 9
 plt.rcParams['xtick.minor.size'] = 4.5
 plt.rcParams['ytick.major.size'] = 9
 plt.rcParams['ytick.minor.size'] = 4.5
+plt.rcParams['figure.facecolor'] = 'none'
+plt.rcParams['axes.facecolor'] = 'none'
+plt.rcParams['savefig.facecolor'] = 'none'
 
 def extract_h5_xrf_xrt_data_file_lists_tk(synchrotron):
     root = tk.Tk()
