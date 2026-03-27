@@ -1138,6 +1138,8 @@ def create_nonaligned_norm_non_cropped_proj_data_gif(dir_path,
                                                      fps = None):
 
     n_theta, n_slices, n_columns = intensity_xrf.shape[1:]
+    print(n_slices)
+    sys.exit()
 
     if desired_xrf_element is None:
         print('Error: \'desired_xrf_element\' field empty. Exiting program...')
@@ -1315,9 +1317,9 @@ def create_nonaligned_norm_non_cropped_proj_data_gif(dir_path,
 
         fig3, axs3 = plt.subplots(1, 3, figsize = (11, 6))
 
-        im3_1 = axs3[0].imshow(intensity_xrt_norm[:, 0], vmin = vmin_xrt_norm, vmax = vmax_xrt_norm, origin = 'lower', extent = [0, n_slices - 1, -180, 180], aspect = 1.5)
-        im3_2 = axs3[1].imshow(opt_dens[:, 0], vmin = vmin_opt_dens, vmax = vmax_opt_dens, origin = 'lower', extent = [0, n_slices - 1, -180, 180], aspect = 1.5)
-        im3_3 = axs3[2].imshow(intensity_xrf_ref_element_norm[:, 0], vmin = vmin_xrf_norm, origin = 'lower', extent = [0, n_slices - 1, -180, 180], vmax = vmax_xrf_norm, aspect = 1.5)
+        im3_1 = axs3[0].imshow(intensity_xrt_norm[:, 0], vmin = vmin_xrt_norm, vmax = vmax_xrt_norm, origin = 'lower', extent = [0, n_columns - 1, -180, 180], aspect = 1.5)
+        im3_2 = axs3[1].imshow(opt_dens[:, 0], vmin = vmin_opt_dens, vmax = vmax_opt_dens, origin = 'lower', extent = [0, n_columns - 1, -180, 180], aspect = 1.5)
+        im3_3 = axs3[2].imshow(intensity_xrf_ref_element_norm[:, 0], vmin = vmin_xrf_norm, origin = 'lower', extent = [0, n_columns - 1, -180, 180], vmax = vmax_xrf_norm, aspect = 1.5)
 
         text_3 = axs3[2].text(0.02, 0.02, r'Slice index 0/{0}'.format(n_slices - 1), transform = axs3[2].transAxes, color = 'white')
         
