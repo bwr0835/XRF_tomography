@@ -15,13 +15,11 @@ from imageio import v2 as iio2
 plt.rcParams['text.usetex'] = True
 plt.rcParams['font.family'] = 'serif'
 plt.rcParams['text.latex.preamble'] = r'\usepackage{times}'
+
 plt.rcParams['xtick.major.size'] = 9
 plt.rcParams['xtick.minor.size'] = 4.5
 plt.rcParams['ytick.major.size'] = 9
 plt.rcParams['ytick.minor.size'] = 4.5
-plt.rcParams['figure.facecolor'] = (1, 1, 1, 0) # RGBA: Red, Green, Blue, Alpha (0 = transparent)
-plt.rcParams['axes.facecolor'] = (1, 1, 1, 0)
-plt.rcParams['figure.dpi'] = 300
 
 def extract_h5_xrf_xrt_data_file_lists_tk(synchrotron):
     root = tk.Tk()
@@ -1228,7 +1226,7 @@ def create_nonaligned_norm_non_cropped_proj_data_gif(dir_path,
 
                 fig1.canvas.draw()
 
-                frame1 = np.array(fig1.canvas.renderer.buffer_rgba())
+                frame1 = np.array(fig1.canvas.renderer.buffer_rgba())[:, :, :3]
 
                 theta_frames1.append(frame1)
         
@@ -1261,7 +1259,7 @@ def create_nonaligned_norm_non_cropped_proj_data_gif(dir_path,
 
                 fig1.canvas.draw()
 
-                frame1 = np.array(fig1.canvas.renderer.buffer_rgba())
+                frame1 = np.array(fig1.canvas.renderer.buffer_rgba())[:, :, :3]
 
                 theta_frames1.append(frame1)
 
@@ -1301,7 +1299,7 @@ def create_nonaligned_norm_non_cropped_proj_data_gif(dir_path,
 
             fig2.canvas.draw()
 
-            frame2 = np.array(fig2.canvas.renderer.buffer_rgba())
+            frame2 = np.array(fig2.canvas.renderer.buffer_rgba())[:, :, :3]
 
             theta_frames2.append(frame2)
         
@@ -1340,7 +1338,7 @@ def create_nonaligned_norm_non_cropped_proj_data_gif(dir_path,
 
             fig3.canvas.draw()
 
-            frame3 = np.array(fig3.canvas.renderer.buffer_rgba())
+            frame3 = np.array(fig3.canvas.renderer.buffer_rgba())[:, :, :3]
 
             theta_frames3.append(frame3)
         
@@ -1379,7 +1377,7 @@ def create_nonaligned_norm_non_cropped_proj_data_gif(dir_path,
 
             fig1.canvas.draw()
 
-            frame1 = np.array(fig1.canvas.renderer.buffer_rgba())
+            frame1 = np.array(fig1.canvas.renderer.buffer_rgba())[:, :, :3]
 
             theta_frames1.append(frame1)
         
@@ -1419,7 +1417,7 @@ def create_nonaligned_norm_non_cropped_proj_data_gif(dir_path,
 
             fig2.canvas.draw()
 
-            frame2 = np.array(fig2.canvas.renderer.buffer_rgba())
+            frame2 = np.array(fig2.canvas.renderer.buffer_rgba())[:, :, :3]
 
             theta_frames2.append(frame2)
         
@@ -1507,7 +1505,7 @@ def create_adjacent_angle_jitter_corrected_norm_proj_data_gif(dir_path,
 
         fig1.canvas.draw()
 
-        frame1 = np.array(fig1.canvas.renderer.buffer_rgba())
+        frame1 = np.array(fig1.canvas.renderer.buffer_rgba())[:, :, :3]
         
         theta_frames1.append(frame1)
 
@@ -1543,7 +1541,7 @@ def create_adjacent_angle_jitter_corrected_norm_proj_data_gif(dir_path,
 
         fig2.canvas.draw()
         
-        frame2 = np.array(fig2.canvas.renderer.buffer_rgba())
+        frame2 = np.array(fig2.canvas.renderer.buffer_rgba())[:, :, :3]
         
         slice_frames.append(frame2)
 
@@ -1594,7 +1592,7 @@ def create_final_aligned_proj_data_gif(dir_path,
 
         fig1.canvas.draw()
 
-        frame1 = np.array(fig1.canvas.renderer.buffer_rgba())
+        frame1 = np.array(fig1.canvas.renderer.buffer_rgba())[:, :, :3]
 
         theta_frames.append(frame1)
 
@@ -1629,7 +1627,7 @@ def create_final_aligned_proj_data_gif(dir_path,
 
         fig2.canvas.draw()
 
-        slice_frame = np.array(fig2.canvas.renderer.buffer_rgba())
+        slice_frame = np.array(fig2.canvas.renderer.buffer_rgba())[:, :, :3]
 
         slice_frame_list.append(slice_frame)
 
@@ -1674,7 +1672,7 @@ def create_gridrec_density_map_gif(dir_path,
 
         fig.canvas.draw()
         
-        frame = np.array(fig.canvas.renderer.buffer_rgba())
+        frame = np.array(fig.canvas.renderer.buffer_rgba())[:, :, :3]
 
         slice_frames.append(frame)
 
