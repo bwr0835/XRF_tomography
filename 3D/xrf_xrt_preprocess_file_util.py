@@ -1243,7 +1243,7 @@ def create_nonaligned_norm_non_cropped_proj_data_gif(dir_path,
             axs1[1, 0].set_title(r'XRF data ({0})'.format(desired_xrf_element), fontsize = 14)
             axs1[1, 1].set_title(r'Norm. XRF data ({0})'.format(desired_xrf_element), fontsize = 14)
 
-            text_1 = axs1[2, 0].text(0.02, 0.02, r'$\theta = {0}$\textdegree'.format(theta_array[0]), transform = axs1[2, 0].transAxes, color = 'white')
+            text_1 = axs1[1, 0].text(0.02, 0.02, r'$\theta = {0}$\textdegree'.format(theta_array[0]), transform = axs1[1, 0].transAxes, color = 'white')
 
             for axs in fig1.axes:
                 axs.axis('off')
