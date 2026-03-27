@@ -139,7 +139,6 @@ def preprocess_xrf_xrt_data(synchrotron,
 
         elements_xrf, intensity_xrf, theta, incident_energy_keV, _, dataset_type = futil.extract_h5_aggregate_xrf_data(aggregate_xrf_h5_file_path)
         elements_xrt, intensity_xrt, theta_xrt, _, _, dataset_type, xrt_photon_counting = futil.extract_h5_aggregate_xrt_data(aggregate_xrt_h5_file_path)
-        intensity_xrf_orig = intensity_xrf.copy()
         
         if not np.array_equal(theta, theta_xrt):
             print('Error: Inconsistent XRF, XRT projection angles. Exiting program...')
@@ -178,10 +177,12 @@ def preprocess_xrf_xrt_data(synchrotron,
                 intensity_xrf = ppu.pad_col(intensity_xrf, dataset_type)
 
                 n_columns += 1
-
+        
         intensity_xrt_sig_idx = elements_xrt.index('xrt_sig')
         intensity_xrt_sig = intensity_xrt[intensity_xrt_sig_idx]
         intensity_xrt_sig_orig = intensity_xrt_sig.copy()
+
+        intensity_xrf_orig = intensity_xrf.copy()
 
         if pre_existing_align_norm_file_enabled:
             print('Extracting pre-existing normalizations, net x pixel shifts, net y pixel shifts, pixel radii for adjacent angle jitter correction and iterative reprojection, and incident intensity from CSV file...')
