@@ -21,6 +21,7 @@ plt.rcParams['ytick.major.size'] = 9
 plt.rcParams['ytick.minor.size'] = 4.5
 plt.rcParams['figure.facecolor'] = (1, 1, 1, 0) # RGBA: Red, Green, Blue, Alpha (0 = transparent)
 plt.rcParams['axes.facecolor'] = (1, 1, 1, 0)
+plt.rcParams['figure.dpi'] = 300
 
 def extract_h5_xrf_xrt_data_file_lists_tk(synchrotron):
     root = tk.Tk()
