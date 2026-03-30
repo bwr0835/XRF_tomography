@@ -1492,7 +1492,7 @@ def create_adjacent_angle_jitter_corrected_norm_proj_data_gif(dir_path,
     text_1 = axs1[0].text(0.02, 0.02, r'$\theta = {0}$\textdegree'.format(theta_array[0]), transform = axs1[0].transAxes, color = 'white')
 
     axs1[0].set_title(r'{0}'.format(ref_element), fontsize = 14)
-    axs1[1].set_title(r'{0} (adjacent angle jitter-corrected, cropped)'.format(ref_element), fontsize = 14)
+    axs1[1].set_title(r'{0} (adj. angle jitter-corrected, cropped)'.format(ref_element), fontsize = 14)
 
     for axs in fig1.axes:
         axs.axis('off')
