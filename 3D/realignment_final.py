@@ -30,7 +30,7 @@ def phase_xcorr_manual(ref_img,
     center_slice_idx = int(n_slices//2)
     center_column_idx = int(n_columns//2)
 
-    print(pixel_rad)
+    # print(pixel_rad)
 
     if pixel_rad > 0:
         start_slice_idx = center_slice_idx - pixel_rad

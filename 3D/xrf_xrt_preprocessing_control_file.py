@@ -281,7 +281,7 @@ def preprocess_xrf_xrt_data(synchrotron,
 
     if realignment_enabled:
         if aligning_element == 'opt_dens':
-                proj_img_array_element_to_align_with = opt_dens_norm
+            proj_img_array_element_to_align_with = opt_dens_norm
             
         elif aligning_element in elements_xrf:
             proj_img_array_element_to_align_with = intensity_xrf_norm[elements_xrf.index(aligning_element)]
