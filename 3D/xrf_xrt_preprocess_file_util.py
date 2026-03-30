@@ -1484,7 +1484,7 @@ def create_adjacent_angle_jitter_corrected_norm_proj_data_gif(dir_path,
     theta_frames1 = []
     slice_frames = []
 
-    fig1, axs1 = plt.subplots(1, 2)
+    fig1, axs1 = plt.subplots(2, 1)
 
     im1_1 = axs1[0].imshow(intensity_ref_element[0], vmin = vmin, vmax = vmax)
     im1_2 = axs1[1].imshow(shifted_intensity_ref_element[0], vmin = vmin, vmax = vmax)
