@@ -1475,6 +1475,8 @@ def create_adjacent_angle_jitter_corrected_norm_proj_data_gif(dir_path,
                                                               fps):
 
     n_theta, n_slices, n_columns = intensity_ref_element.shape
+    print(intensity_ref_element.shape)
+    print(shifted_intensity_ref_element.shape)
     
     vmin = np.min([intensity_ref_element, shifted_intensity_ref_element])
     vmax = np.max([intensity_ref_element, shifted_intensity_ref_element])
