@@ -320,6 +320,8 @@ def preprocess_xrf_xrt_data(synchrotron,
                 if init_edge_pixel_lengths_to_crop is not None:
                     start_slice = init_edge_pixel_lengths_to_crop['top'] + start_slice_aux
                     end_slice = end_slice_aux - init_edge_pixel_lengths_to_crop['bottom']
+
+                    adj_angle_jitter_corrected_proj_element_to_align_with_aux = adj_angle_jitter_corrected_proj_element_to_align_with_aux[init_edge_pixel_lengths_to_crop['top']:(end_slice_aux - init_edge_pixel_lengths_to_crop['bottom'])]
                 
                 else:
                     print("Error: Empty field for 'init_edge_pixel_lengths_to_crop'. Exiting program...")
