@@ -7,6 +7,9 @@ plt.rcParams['text.usetex'] = True
 plt.rcParams['font.family'] = 'serif'
 plt.rcParams['text.latex.preamble'] = r'\usepackage{times}'
 
+def normalize_array(array):
+    return (array - np.nanmin(array))/(np.nanmax(array) - np.nanmin(array))
+
 def create_cor_fig(init_proj, shifted_proj, theta_pair, vmin, vmax):
     fig, axs = plt.subplots(2, 3)
 
@@ -14,6 +17,18 @@ def create_cor_fig(init_proj, shifted_proj, theta_pair, vmin, vmax):
     init_proj_theta_1 = init_proj[theta_pair[1]]
     shifted_proj_theta_0 = shifted_proj[theta_pair[0]]
     shifted_proj_theta_1 = shifted_proj[theta_pair[1]]
+
+    init_proj_theta_0_norm = normalize_array(init_proj_theta_0)
+    init_proj_theta_1_norm = normalize_array(init_proj_theta_1)
+    shifted_proj_theta_0_norm = normalize_array(shifted_proj_theta_0)
+    shifted_proj_theta_1_norm = normalize_array(shifted_proj_theta_1)
+
+    
+
+    im1_1 = axs[0, 0].imshow(init_proj_theta_0_norm, vmin = vmin, vmax = vmax)
+    im1_2 = axs[1, 0].imshow(init_proj_theta_1_norm, vmin = vmin, vmax = vmax)
+    im1_3 = axs[2, 0].imshow(shifted_proj_theta_0_norm, vmin = vmin, vmax = vmax)
+    im1_4 = axs[0, 1].imshow(shifted_proj_theta_1_norm, vmin = vmin, vmax = vmax)
 
     
 
