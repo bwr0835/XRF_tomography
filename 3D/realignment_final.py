@@ -689,9 +689,11 @@ def realign_proj(cor_correction_only,
                                                                     pixel_rad_cor_correction,
                                                                     theta = np.array([-180, 0]))
                     # print(shifts)
+                    fig, axs = plt.subplots()
                     # fig, axs = plt.subplots(2, 1)
                     # axs[0].imshow(pcc, vmin = pcc.min(), vmax = pcc.max())
-                    # # axs[1].imshow(pcc_truncated, vmin = pcc.min(), vmax = pcc.max(), extent = [pcc.shape[1]//2 - pixel_rad_cor_correction, 
+                    axs.imshow(pcc, vmin = pcc.min(), vmax = pcc.max())
+                    # axs[1].imshow(pcc_truncated, vmin = pcc.min(), vmax = pcc.max(), extent = [pcc.shape[1]//2 - pixel_rad_cor_correction, 
                                                                                             #    pcc.shape[1]//2 + pixel_rad_cor_correction, 
                                                                                             #    pcc.shape[0]//2 + pixel_rad_cor_correction, 
                                                                                             #    pcc.shape[0]//2 - pixel_rad_cor_correction])
