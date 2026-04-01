@@ -798,7 +798,7 @@ def realign_proj(cor_correction_only,
                     aligned_proj_total_xrf[element_idx, theta_idx] = warp_shift(xrf_proj_img_array[element_idx, theta_idx], net_x_shift, net_y_shift)
 
         if net_x_shifts_pcc.ndim == 3:
-            print('Truncating projection images in y so object is in every projection image\'s field of view...')
+            print('\nTruncating projection images in y so object is in every projection image\'s field of view...')
 
             aligned_proj_total_xrf = aligned_proj_total_xrf[:, :, start_slice:end_slice]
             aligned_proj_total_xrt = aligned_proj_total_xrt[:, start_slice:end_slice]
