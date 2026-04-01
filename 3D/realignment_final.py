@@ -682,12 +682,12 @@ def realign_proj(cor_correction_only,
                     pixel_rad_cor_correction = 0
 
                 if net_x_shifts_pcc.ndim == 3:
-                    shifts, pcc, pcc_truncated = phase_xcorr_manual(aligned_proj[0, start_slice:end_slice], 
-                                                                    aligned_proj[zero_deg_idx_array[1], start_slice:end_slice], 
+                    shifts, pcc, pcc_truncated = phase_xcorr_manual(aligned_proj[zero_deg_idx_array[0], start_slice:end_slice], 
+                                                                    np.fliplr(aligned_proj[-1, start_slice:end_slice]), 
                                                                     sigma, 
                                                                     alpha, 
                                                                     pixel_rad_cor_correction,
-                                                                    theta = np.array([-180, 0]))
+                                                                    theta = np.array([0, 180]))
                     # print(shifts)
                     fig, axs = plt.subplots()
                     # fig, axs = plt.subplots(2, 1)
@@ -700,12 +700,12 @@ def realign_proj(cor_correction_only,
                     plt.show()
                 
                 else:
-                    shifts, _, _ = phase_xcorr_manual(aligned_proj[0], 
-                                                      aligned_proj[zero_deg_idx_array[1]], 
+                    shifts, _, _ = phase_xcorr_manual(aligned_proj[zero_deg_idx_array[0]], 
+                                                      np.fliplr(aligned_proj[-1]), 
                                                       sigma, 
                                                       alpha, 
                                                       pixel_rad_cor_correction,
-                                                      theta = np.array([-180, 0]))
+                                                      theta = np.array([0, 180]))
                 
                 dx = shifts[1]
                     
