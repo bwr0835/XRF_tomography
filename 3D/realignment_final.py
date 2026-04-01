@@ -122,7 +122,6 @@ def correct_adjacent_angle_jitter_pre_cor_correction(init_proj_array,
 
     net_y_shift_cumsum_temp = np.zeros(n_theta - 1)
 
-    # Use != 0, not > 0: cumulative y shifts from file are often negative or mixed sign.
     if np.any(net_y_shift_array != 0):
         print('Applying initial vertical shifts...')
 
