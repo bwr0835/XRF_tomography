@@ -179,10 +179,15 @@ intensity_xrt_norm_hxn, intensity_xrf_norm_hxn, _, _, I0_photons_hxn, _ = ppu.jo
                                                                                                None,
                                                                                                None)
                                                                                             
+element_to_align_with = 'Ni'
+element_to_align_with_idx = elements_xrf_hxn.index(aligning_element_hxn)
 
 aligned_proj_total_xrf = load_h5_data(input_h5_file_path)
 
-ni_aligned = aligned_proj_total_xrf[elements_xrf_hxn.index('Ni')]
+proj_aligned = aligned_proj_total_xrf[element_to_align_with_idx]
+
+cor_offset_first_part = 2.6071765573317
+cor_offset_second_part = 0.014
 
 
 center_of_rotation_avg, center_geom, offset_init = rot_center_avg(shifted_opt_dens_aps, theta_idx_pairs_aps, theta_xrt_aps)
