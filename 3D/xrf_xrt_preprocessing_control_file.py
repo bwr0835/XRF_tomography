@@ -332,7 +332,7 @@ def preprocess_xrf_xrt_data(synchrotron,
 
             if pre_existing_align_norm_file_enabled:
                 print('Updating input normalization, net y shift CSV file...')
-
+                print(init_y_shift_array)
                 futil.create_csv_raw_input_data(xrt_od_xrf_realignment_subdir_path,
                                                 theta,
                                                 norm_array_xrf,
