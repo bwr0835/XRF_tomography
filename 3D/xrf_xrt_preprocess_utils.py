@@ -302,7 +302,6 @@ def joint_fluct_norm(xrt_array,
     
     else:
         inc_intensity = incident_photodiode_flux_photons_per_s*t_dwell_s # Incident intensity in photons (instead of, for instance, ion chamber units)
-        # inc_intensity = global_xrt_mask_avg
     
     xrt_array *= inc_intensity
     xrf_array *= global_xrt_mask_avg
@@ -366,7 +365,7 @@ def find_theta_combos(theta_array_deg, dtheta = 0): # Output type: List of tuple
 
     return valid_theta_idx_pairs
 
-def crop_array(xrf_array, xrt_array, opt_dens_array, edge_dict):
+def crop_array(xrf_array, xrt_array, opt_dens_array, return_aux_data = False, exp_proj_array = None, synth_proj_array = None, edge_dict = None):
     if xrf_array.ndim != 4 or opt_dens_array.ndim != 3:
         print('Error: XRF, XRT, and optical density arrays must be 4D and 3D, respectively. Exiting program...')
 
@@ -389,7 +388,15 @@ def crop_array(xrf_array, xrt_array, opt_dens_array, edge_dict):
     cropped_xrt_array = xrt_array[:, start_slice:end_slice, start_column:end_column]
     cropped_opt_dens_array = opt_dens_array[:, start_slice:end_slice, start_column:end_column]
 
-    return cropped_xrf_array, cropped_xrt_array, cropped_opt_dens_array
+    if return_aux_data:
+        print('Cropping per-iteration experimental and synthetic projection images in y...')
+        
+        cropped_exp_proj_array = exp_proj_array[:, :, start_slice:end_slice, start_column:end_column]
+        cropped_synth_proj_array = synth_proj_array[:, :, start_slice:end_slice, start_column:end_column]
+
+        return cropped_xrf_array, cropped_xrt_array, cropped_opt_dens_array, cropped_exp_proj_array, cropped_synth_proj_array
+    
+    return cropped_xrf_array, cropped_xrt_array, cropped_opt_dens_array, None, None
 
 def create_gridrec_density_maps(xrf_proj_array, elements_xrf, theta_array):
     if xrf_proj_array.ndim != 4:
@@ -417,4 +424,7 @@ def create_gridrec_density_maps(xrf_proj_array, elements_xrf, theta_array):
         
         rho[element_idx] = xrl.ElementDensity(xrl.SymbolToAtomicNumber(element))*(xrf_recon - vmin)/(vmax - vmin) # Initial guess of density based on 0-100% concentration of each element
 
-    return rho       
+    return rho
+
+def normalize_array_for_rgb(array):
+    return (array - np.nanmin(array))/(np.nanmax(array) - np.nanmin(array))

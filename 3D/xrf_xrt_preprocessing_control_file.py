@@ -315,6 +315,8 @@ def preprocess_xrf_xrt_data(synchrotron,
             if not init_edge_crop_enabled:
                 start_slice = start_slice_aux
                 end_slice = end_slice_aux
+
+                
             
             else:
                 if init_edge_pixel_lengths_to_crop is not None:
@@ -322,7 +324,7 @@ def preprocess_xrf_xrt_data(synchrotron,
                     end_slice = end_slice_aux - init_edge_pixel_lengths_to_crop['bottom']
 
                     adj_angle_jitter_corrected_proj_element_to_align_with_aux = adj_angle_jitter_corrected_proj_element_to_align_with_aux[:, init_edge_pixel_lengths_to_crop['top']:(end_slice_aux - init_edge_pixel_lengths_to_crop['bottom'])]
-                
+                    
                 else:
                     print("Error: Empty field for 'init_edge_pixel_lengths_to_crop'. Exiting program...")
 
@@ -330,9 +332,16 @@ def preprocess_xrf_xrt_data(synchrotron,
             
             edge_info = {'top': start_slice, 'bottom': end_slice}
 
+            for key in edge_info.keys():
+                if key == 'top':
+                    init_edge_pixel_lengths_to_crop[key] = edge_info[key]
+                
+                elif key == 'bottom':
+                    init_edge_pixel_lengths_to_crop[key] = n_slices - edge_info[key]
+
             if pre_existing_align_norm_file_enabled:
                 print('Updating input normalization, net y shift CSV file...')
-                print(init_y_shift_array)
+        
                 futil.create_csv_raw_input_data(xrt_od_xrf_realignment_subdir_path,
                                                 theta,
                                                 norm_array_xrf,
@@ -427,6 +436,15 @@ def preprocess_xrf_xrt_data(synchrotron,
                 if np.any(init_y_shift_array != 0):
                     edge_info = {'top': int(np.clip(np.ceil(np.max(init_y_shift_array)), 0, n_slices)), 
                                  'bottom': int(np.clip(n_slices + np.floor(np.min(init_y_shift_array)), 0, n_slices))}
+                    
+                    init_edge_pixel_lengths_to_crop = {'top': 0, 'bottom': 0}
+                    
+                    for key in edge_info.keys():
+                        if key == 'top':
+                            init_edge_pixel_lengths_to_crop[key] = edge_info[key]
+                        
+                        elif key == 'bottom':
+                            init_edge_pixel_lengths_to_crop[key] = n_slices - edge_info[key]
                 
                 else:
                     edge_info = None
@@ -434,7 +452,15 @@ def preprocess_xrf_xrt_data(synchrotron,
             elif init_edge_pixel_lengths_to_crop is not None and np.any(init_y_shift_array != 0):
                 edge_info = {'top': int(np.clip(np.ceil(np.max(init_y_shift_array)), 0, n_slices) + init_edge_pixel_lengths_to_crop['top']), 
                              'bottom': int(np.clip(n_slices + np.floor(np.min(init_y_shift_array)), 0, n_slices) - init_edge_pixel_lengths_to_crop['bottom'])}
-            
+                
+                for key in edge_info.keys():
+                    if key == 'top':
+                        init_edge_pixel_lengths_to_crop[key] = edge_info[key] + init_edge_pixel_lengths_to_crop[key]
+                    
+                    elif key == 'bottom':
+                        init_edge_pixel_lengths_to_crop[key] = n_slices - edge_info[key] + init_edge_pixel_lengths_to_crop[key]
+                
+                
             else:
                 print("Error: Empty field for 'init_edge_pixel_lengths_to_crop'. Exiting program...")
 
