@@ -88,15 +88,17 @@ def rot_center_avg(proj_img_array, theta_pair_array, theta_array):
 def normalize_array(array):
     return (array - np.nanmin(array))/(np.nanmax(array) - np.nanmin(array))
 
-def create_cor_fig_aps(init_proj, shifted_proj, theta_array,theta_pair, aligning_element, offset_init, offset_final):
+def create_cor_fig_hxn(init_proj, shifted_proj, theta_array, aligning_element, offset_init, offset_final):
     fig, axs = plt.subplots(2, 3)
-
+    
     print(init_proj.shape, shifted_proj.shape)
 
-    init_proj_theta_0 = init_proj[theta_pair[0]]
-    init_proj_theta_1 = np.fliplr(init_proj[theta_pair[1]])
-    shifted_proj_theta_0 = shifted_proj[theta_pair[0]]
-    shifted_proj_theta_1 = np.fliplr(shifted_proj[theta_pair[1]])
+    init_proj_theta_0 = init_proj[0]
+    init_proj_theta_1 = np.fliplr(init_proj[-1])
+    shifted_proj_theta_0 = shifted_proj[0]
+    shifted_proj_theta_1 = np.fliplr(shifted_proj[-1])
+
+    print(init_proj_theta_0.shape, init_proj_theta_1.shape, shifted_proj_theta_0.shape, shifted_proj_theta_1.shape)
 
     init_proj_theta_0_norm = normalize_array(init_proj_theta_0)
     init_proj_theta_1_norm = normalize_array(init_proj_theta_1)
@@ -111,7 +113,7 @@ def create_cor_fig_aps(init_proj, shifted_proj, theta_array,theta_pair, aligning
     overlay_init = np.dstack((init_proj_theta_0_norm, init_proj_theta_1_norm, np.zeros_like(init_proj_theta_0_norm)))
     overlay_shifted = np.dstack((shifted_proj_theta_0_norm, shifted_proj_theta_1_norm, np.zeros_like(shifted_proj_theta_0_norm)))
     
-    init_cor = init_proj_theta_0.shape[1]//2 - offset_init
+    init_cor = init_proj_theta_0.shape[1]//2 + offset_init
     final_cor = shifted_proj_theta_0.shape[1]//2 + offset_final
 
     im1_1 = axs[0, 0].imshow(init_proj_theta_0_rgb)
@@ -123,11 +125,13 @@ def create_cor_fig_aps(init_proj, shifted_proj, theta_array,theta_pair, aligning
 
     for ax in fig.axes:
         ax.axis('off')
+        ax.axvline(x = init_proj_theta_0.shape[1]//2, color = 'white', linewidth = 2, linestyle = '--')
+        ax.axhline(y = init_proj_theta_0.shape[0]//2, color = 'white', linewidth = 2, linestyle = '--')
 
-    text_1 = axs[0, 0].text(0.02, 0.02, r'$\theta = {0}$\textdegree'.format(theta_array[theta_pair[0]]), transform = axs[0, 0].transAxes, color = 'white')
-    text_2 = axs[0, 1].text(0.02, 0.02, r'$\theta = {0}$\textdegree'.format(theta_array[theta_pair[1]]), transform = axs[0, 1].transAxes, color = 'white')
-    text_3 = axs[1, 0].text(0.02, 0.02, r'$\theta = {0}$\textdegree'.format(theta_array[theta_pair[0]]), transform = axs[1, 0].transAxes, color = 'white')
-    text_4 = axs[1, 1].text(0.02, 0.02, r'$\theta = {0}$\textdegree'.format(theta_array[theta_pair[1]]), transform = axs[1, 1].transAxes, color = 'white')
+    text_1 = axs[0, 0].text(0.02, 0.02, r'$\theta = {0}$\textdegree'.format(theta_array[0]), transform = axs[0, 0].transAxes, color = 'white')
+    text_2 = axs[0, 1].text(0.02, 0.02, r'$\theta = {0}$\textdegree'.format(theta_array[-1]), transform = axs[0, 1].transAxes, color = 'white')
+    text_3 = axs[1, 0].text(0.02, 0.02, r'$\theta = {0}$\textdegree'.format(theta_array[0]), transform = axs[1, 0].transAxes, color = 'white')
+    text_4 = axs[1, 1].text(0.02, 0.02, r'$\theta = {0}$\textdegree'.format(theta_array[-1]), transform = axs[1, 1].transAxes, color = 'white')
 
     axs[0, 0].set_title(r'{0}'.format(aligning_element), fontsize = 14)
     axs[0, 1].set_title(r'{0}'.format(aligning_element), fontsize = 14)
@@ -136,22 +140,12 @@ def create_cor_fig_aps(init_proj, shifted_proj, theta_array,theta_pair, aligning
     axs[1, 1].set_title(r'{0} (shifted)'.format(aligning_element), fontsize = 14)
     axs[1, 2].set_title(r'{0} (shifted overlay)'.format(aligning_element), fontsize = 14)
 
-    axs[0, 2].hlines(y = init_proj_theta_0.shape[0]//2, xmin = init_cor - 20, xmax = init_cor - 3, color = 'white', linewidth = 2)
-    axs[0, 2].hlines(y = init_proj_theta_0.shape[0]//2, xmin = init_cor + 3, xmax = init_cor + 20, color = 'white', linewidth = 2)
-    axs[0, 2].vlines(x = init_cor, ymin = init_proj_theta_0.shape[0]//2 - 20, ymax = init_proj_theta_0.shape[0]//2 - 3, color = 'white', linewidth = 2)
-    axs[0, 2].vlines(x = init_cor, ymin = init_proj_theta_0.shape[0]//2 + 3, ymax = init_proj_theta_0.shape[0]//2 + 20, color = 'white', linewidth = 2)
-    
-    axs[1, 2].hlines(y = shifted_proj_theta_0.shape[0]//2, xmin = final_cor - 20, xmax = final_cor - 3, color = 'white', linewidth = 2)
-    axs[1, 2].hlines(y = shifted_proj_theta_0.shape[0]//2, xmin = final_cor + 3, xmax = final_cor + 20, color = 'white', linewidth = 2)
-    axs[1, 2].vlines(x = final_cor, ymin = shifted_proj_theta_0.shape[0]//2 - 20, ymax = shifted_proj_theta_0.shape[0]//2 - 3, color = 'white', linewidth = 2)
-    axs[1, 2].vlines(x = final_cor, ymin = shifted_proj_theta_0.shape[0]//2 + 3, ymax = shifted_proj_theta_0.shape[0]//2 + 20, color = 'white', linewidth = 2)
-
     fig.tight_layout()
 
     plt.show()
 
 dir_path = '/Users/bwr0835/Documents'
-final_dir_path = f'{dir_path}/3_id_realigned_data_common_fov_03_30_2026_final'
+final_dir_path = f'{dir_path}/3_id_realigned_data_common_fov_cor_correction_only_03_30_2026_final'
 
 init_hxn_xrt_file_path = f'{dir_path}/3_id_aggregate_xrt.h5'
 init_hxn_xrf_file_path = f'{dir_path}/3_id_aggregate_xrf.h5'
@@ -194,14 +188,61 @@ aligned_proj_total_xrf, edge_info = load_h5_data(input_h5_file_path, get_edge_in
 
 start_slice, end_slice = edge_info['top'], edge_info['bottom']
 
-init_proj = aligned_proj_total_xrf[element_to_align_with_idx]
+init_proj = intensity_xrf_norm_hxn[element_to_align_with_idx]
 aligned_proj_total_xrf = aligned_proj_total_xrf[element_to_align_with_idx]
 
-init_proj = realign.warp_shift(init_proj, 0, init_y_shift_array)
-init_proj = init_proj[:, start_slice:end_slice]
+for theta_idx in range(1, len(theta_xrt_hxn)):
+    init_proj[theta_idx] = ndi.shift(init_proj[theta_idx], shift = (init_y_shift_array[theta_idx], 0))
+
+init_proj_final = init_proj[:, start_slice:(intensity_xrt_norm_hxn.shape[1] - end_slice)]
+
+print(init_proj_final.shape)
+
+zero_deg_idx_array = np.where(theta_xrt_hxn == 0)[0]
+
+theta_array_first_part = theta_xrt_hxn[:zero_deg_idx_array[1]]
+theta_array_second_part = theta_xrt_hxn[zero_deg_idx_array[1]:]
+
+theta_idx_pairs_first_part = [(0, -1)] # These remap to original -180° and 0° indices
+theta_idx_pairs_second_part = [(0, -1)] # These remap to original 0° and +180° indices
+
+center_of_rotation_avg_first_part, geometric_center, offset_init_first_part = rot_center_avg(init_proj_final[:zero_deg_idx_array[1]], 
+                                                                                             theta_idx_pairs_first_part, 
+                                                                                             theta_array_first_part)
+
+center_of_rotation_avg_second_part, geometric_center, offset_final_second_part = rot_center_avg(init_proj_final[zero_deg_idx_array[1]:], 
+                                                                                                theta_idx_pairs_second_part, 
+                                                                                                theta_array_second_part)
+
+shifts_init_first_part, phase_xcorr_2d_first_part, _ = realign.phase_xcorr_manual(init_proj_final[0], np.fliplr(aligned_proj_total_xrf[zero_deg_idx_array[0]]), sigma = 25, alpha = 10, pixel_rad = 0, theta = np.array([-180, 0]))
+shifts_init_second_part, phase_xcorr_2d_second_part, _ = realign.phase_xcorr_manual(init_proj_final[zero_deg_idx_array[1]], np.fliplr(aligned_proj_total_xrf[-1]), sigma = 25, alpha = 10, pixel_rad = 0, theta = np.array([0, 180]))
+
+# plt.imshow(phase_xcorr_2d_first_part, vmin = phase_xcorr_2d_first_part.min(), vmax = phase_xcorr_2d_first_part.max())
+# plt.imshow(phase_xcorr_2d_second_part, vmin = phase_xcorr_2d_second_part.min(), vmax = phase_xcorr_2d_second_part.max())
+# plt.show()
+
+print('Initial offset (first part):', shifts_init_first_part[1]/2)
+print('Initial offset (second part):', shifts_init_second_part[1]/2)
 
 
-create_cor_fig_aps(opt_dens_aps, shifted_opt_dens_aps, theta_xrt_aps, theta_idx_pairs_aps[0], aligning_element_aps, offset_init, cor_shift_aps)
+offset_init_first_part = 2.6071765573317
+offset_init_second_part = 1.9150763284889
+pcc_offset = 0.0143047860342
+
+center_of_rotation_avg_first_part, geometric_center, offset_final_first_part = rot_center_avg(aligned_proj_total_xrf[:zero_deg_idx_array[1]], 
+                                                                                              theta_idx_pairs_first_part, 
+                                                                                              theta_array_first_part)
+
+center_of_rotation_avg_second_part, geometric_center, offset_final_second_part = rot_center_avg(aligned_proj_total_xrf[zero_deg_idx_array[1]:], 
+                                                                                                theta_idx_pairs_second_part, 
+                                                                                                theta_array_second_part)
+
+print(center_of_rotation_avg_first_part, geometric_center, offset_init_first_part)
+print(center_of_rotation_avg_second_part, geometric_center, offset_final_second_part)
+
+
+
+create_cor_fig_hxn(init_proj_final[zero_deg_idx_array[1]:], aligned_proj_total_xrf[zero_deg_idx_array[1]:], theta_array_second_part, aligning_element_hxn, offset_final_second_part, offset_final_second_part)
 
 
 

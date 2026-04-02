@@ -611,13 +611,20 @@ def realign_proj(cor_correction_only,
         for i in range(1):
             print(f'COR correction iteration {i + 1}/{n_iterations_cor_correction}')
 
-            center_of_rotation_avg_first_part, center_geom, offset_init_first_part = rot_center_avg(aligned_proj[:zero_deg_idx_array[1], start_slice:end_slice], 
-                                                                                                    theta_idx_pairs_first_part, 
-                                                                                                    theta_array_first_part)
+            # center_of_rotation_avg_first_part, center_geom, offset_init_first_part = rot_center_avg(aligned_proj[:zero_deg_idx_array[1], start_slice:end_slice], 
+            #                                                                                         theta_idx_pairs_first_part, 
+            #                                                                                         theta_array_first_part)
                 
-            center_of_rotation_avg_second_part, _, offset_init_second_part = rot_center_avg(aligned_proj[zero_deg_idx_array[1]:, start_slice:end_slice], 
-                                                                                            theta_idx_pairs_second_part, 
-                                                                                            theta_array_second_part)
+            # center_of_rotation_avg_second_part, _, offset_init_second_part = rot_center_avg(aligned_proj[zero_deg_idx_array[1]:, start_slice:end_slice], 
+            #                                                                                 theta_idx_pairs_second_part, 
+            #                                                                                 theta_array_second_part)
+            shifts_init_first_part, _, _ = phase_xcorr_manual(aligned_proj[0], np.fliplr(aligned_proj[zero_deg_idx_array[0]]), sigma = sigma, alpha = alpha, pixel_rad = 0, theta = np.array([-180, 0]))
+            shifts_init_second_part, _, _ = phase_xcorr_manual(aligned_proj[zero_deg_idx_array[1]], np.fliplr(aligned_proj[-1]), sigma = sigma, alpha = alpha, pixel_rad = 0, theta = np.array([0, 180]))
+            
+            center_geom = aligned_proj.shape[1]//2
+
+            offset_init_first_part = shifts_init_first_part[1]/2
+            offset_init_second_part = shifts_init_second_part[1]/2
 
             print(f'Average center of rotation (before flipping sample): {ppu.round_correct(center_of_rotation_avg_first_part, ndec = 13)}')
             print(f'Average center of rotation (after flipping sample): {ppu.round_correct(center_of_rotation_avg_second_part, ndec = 13)}\n')
@@ -798,7 +805,7 @@ def realign_proj(cor_correction_only,
                     aligned_proj_total_xrf[element_idx, theta_idx] = warp_shift(xrf_proj_img_array[element_idx, theta_idx], net_x_shift, net_y_shift)
 
         if net_x_shifts_pcc.ndim == 3:
-            print('Truncating projection images in y so object is in every projection image\'s field of view...')
+            print('\nTruncating projection images in y so object is in every projection image\'s field of view...')
 
             aligned_proj_total_xrf = aligned_proj_total_xrf[:, :, start_slice:end_slice]
             aligned_proj_total_xrt = aligned_proj_total_xrt[:, start_slice:end_slice]
@@ -969,7 +976,7 @@ def realign_proj(cor_correction_only,
             sinogram = (xform.radon(recon[slice_idx].copy(), theta_array)).T
 
             synth_proj[:, slice_idx, :] = sinogram
-        
+        tomo.find_center_pc()
         if return_aux_data:
             synth_proj_array[i] = synth_proj
         
