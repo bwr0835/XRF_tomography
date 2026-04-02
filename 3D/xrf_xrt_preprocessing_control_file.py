@@ -455,10 +455,12 @@ def preprocess_xrf_xrt_data(synchrotron,
                 
                 for key in edge_info.keys():
                     if key == 'top':
-                        init_edge_pixel_lengths_to_crop[key] = edge_info[key] - init_edge_pixel_lengths_to_crop[key]
+                        init_edge_pixel_lengths_to_crop[key] = edge_info[key]
                     
                     elif key == 'bottom':
-                        init_edge_pixel_lengths_to_crop[key] = n_slices - edge_info[key]                   
+                        init_edge_pixel_lengths_to_crop[key] = n_slices - edge_info[key]
+                    
+                    
                 
                 
             else:
