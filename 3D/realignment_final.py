@@ -619,11 +619,11 @@ def realign_proj(cor_correction_only,
                                                                                             theta_idx_pairs_second_part, 
                                                                                             theta_array_second_part)
 
-            print(f'Average center of rotation (before flipping sample): {center_of_rotation_avg_first_part}')
-            print(f'Average center of rotation (after flipping sample): {center_of_rotation_avg_second_part}\n')
+            print(f'Average center of rotation (before flipping sample): {ppu.round_correct(center_of_rotation_avg_first_part, ndec = 13)}')
+            print(f'Average center of rotation (after flipping sample): {ppu.round_correct(center_of_rotation_avg_second_part, ndec = 13)}\n')
             print(f'Geometric center: {center_geom}\n')
-            print(f'Center of rotation error (before flipping sample): {ppu.round_correct(offset_init_first_part, ndec = 3)}')
-            print(f'Center of rotation error (after flipping sample): {ppu.round_correct(offset_init_second_part, ndec = 3)}\n')
+            print(f'Center of rotation error (before flipping sample): {ppu.round_correct(offset_init_first_part, ndec = 13)}')
+            print(f'Center of rotation error (after flipping sample): {ppu.round_correct(offset_init_second_part, ndec = 13)}\n')
 
             if i == 0 and offset_init_first_part == 0 and offset_init_second_part == 0:
                 print('No COR correction needed.')
@@ -631,7 +631,7 @@ def realign_proj(cor_correction_only,
                 break
 
             else:
-                print(f'Applying initial COR correction to pre-flipped, pre-remounted sample angles: {ppu.round_correct(-offset_init_first_part, ndec = 3)}')
+                print(f'Applying initial COR correction to pre-flipped, pre-remounted sample angles: {ppu.round_correct(-offset_init_first_part, ndec = 13)}')
 
                 if net_x_shifts_pcc.ndim == 3:
                     net_x_shifts_pcc[0, :zero_deg_idx_array[1], start_slice:end_slice] -= offset_init_first_part
@@ -644,7 +644,7 @@ def realign_proj(cor_correction_only,
                 for theta_idx in range(len(theta_array_first_part)):
                     aligned_proj[theta_idx] = warp_shift(proj_img_array_element_to_align_with[theta_idx], net_x_shifts_pcc[0, theta_idx], net_y_shifts_pcc[0, theta_idx], cval = cval)
                         
-                print(f'Applying initial COR correction to post-flipped, post-remounted sample angles: {ppu.round_correct(-offset_init_second_part, ndec = 3)}')
+                print(f'Applying initial COR correction to post-flipped, post-remounted sample angles: {ppu.round_correct(-offset_init_second_part, ndec = 13)}')
                     
                 for theta_idx in range(len(theta_array_second_part)):
                     theta_idx_aux = theta_idx + len(theta_array_first_part)
@@ -672,8 +672,8 @@ def realign_proj(cor_correction_only,
                 print(f'New center of rotation (before flipping sample): {center_of_rotation_avg_first_part}')
                 print(f'New center of rotation (after flipping sample): {center_of_rotation_avg_second_part}\n')
                 print(f'Geometric center: {center_geom}\n')
-                print(f'New center of rotation error (before flipping sample): {ppu.round_correct(offset_first_part, ndec = 3)}')
-                print(f'New center of rotation error (after flipping sample): {ppu.round_correct(offset_second_part, ndec = 3)}\n')
+                print(f'New center of rotation error (before flipping sample): {ppu.round_correct(offset_first_part, ndec = 13)}')
+                print(f'New center of rotation error (after flipping sample): {ppu.round_correct(offset_second_part, ndec = 13)}\n')
 
                 if pixel_rad_cor_correction is None:
                     print('Warning: \'pixel_rad_cor_correction\' not detected. Performing peak search without truncation...')
@@ -708,7 +708,7 @@ def realign_proj(cor_correction_only,
                 
                 dx = shifts[1]
                     
-                print(f'Applying additional COR correction to flipped, remounted sample angles: {ppu.round_correct(dx, ndec = 3)}')
+                print(f'Applying additional COR correction to flipped, remounted sample angles: {ppu.round_correct(dx, ndec = 13)}')
 
                 if net_x_shifts_pcc.ndim == 3:
                     net_x_shifts_pcc[0, zero_deg_idx_array[1]:, start_slice:end_slice] += dx

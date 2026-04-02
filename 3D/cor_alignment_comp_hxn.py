@@ -9,9 +9,17 @@ plt.rcParams['text.usetex'] = True
 plt.rcParams['font.family'] = 'serif'
 plt.rcParams['text.latex.preamble'] = r'\usepackage{times}'
 
-def load_h5_data(file_path):
+def load_h5_data(file_path, get_edge_info = False):
     with h5py.File(file_path, 'r') as f:
         data = f['exchange/data/xrf'][()]
+
+        if get_edge_info:
+            top_edge_cropped_init = f['exchange/data'].attrs['top_edge_cropped_init']
+            bottom_edge_cropped_init = f['exchange/data'].attrs['bottom_edge_cropped_init']
+
+            edge_info = {'top': top_edge_cropped_init, 'bottom': bottom_edge_cropped_init}
+    
+            return data, edge_info
     
     return data
 
@@ -182,19 +190,16 @@ intensity_xrt_norm_hxn, intensity_xrf_norm_hxn, _, _, I0_photons_hxn, _ = ppu.jo
 element_to_align_with = 'Ni'
 element_to_align_with_idx = elements_xrf_hxn.index(aligning_element_hxn)
 
-aligned_proj_total_xrf = load_h5_data(input_h5_file_path)
+aligned_proj_total_xrf, edge_info = load_h5_data(input_h5_file_path, get_edge_info = True)
 
-proj_aligned = aligned_proj_total_xrf[element_to_align_with_idx]
+start_slice, end_slice = edge_info['top'], edge_info['bottom']
 
-cor_offset_first_part = 2.6071765573317
-cor_offset_second_part = 0.014
+init_proj = aligned_proj_total_xrf[element_to_align_with_idx]
+aligned_proj_total_xrf = aligned_proj_total_xrf[element_to_align_with_idx]
 
+init_proj = realign.warp_shift(init_proj, 0, init_y_shift_array)
+init_proj = init_proj[:, start_slice:end_slice]
 
-center_of_rotation_avg, center_geom, offset_init = rot_center_avg(shifted_opt_dens_aps, theta_idx_pairs_aps, theta_xrt_aps)
-    
-print(f'Average center of rotation after COR correction: {center_of_rotation_avg}')
-print(f'Geometric center: {center_geom}')
-print(f'Center of rotation error: {ppu.round_correct(offset_init, ndec = 3)}')
 
 create_cor_fig_aps(opt_dens_aps, shifted_opt_dens_aps, theta_xrt_aps, theta_idx_pairs_aps[0], aligning_element_aps, offset_init, cor_shift_aps)
 
