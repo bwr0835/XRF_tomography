@@ -626,6 +626,9 @@ def realign_proj(cor_correction_only,
             offset_init_first_part = shifts_init_first_part[1]/2
             offset_init_second_part = shifts_init_second_part[1]/2
 
+            center_of_rotation_avg_first_part = center_geom + offset_init_first_part
+            center_of_rotation_avg_second_part = center_geom + offset_init_second_part
+
             print(f'Average center of rotation (before flipping sample): {ppu.round_correct(center_of_rotation_avg_first_part, ndec = 13)}')
             print(f'Average center of rotation (after flipping sample): {ppu.round_correct(center_of_rotation_avg_second_part, ndec = 13)}\n')
             print(f'Geometric center: {center_geom}\n')
