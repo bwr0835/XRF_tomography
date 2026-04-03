@@ -303,9 +303,9 @@ center_of_rotation_avg_second_part, geometric_center, offset_final_second_part =
 # plt.imshow(intensity_xrt_norm_hxn[:, 0], aspect = 'auto')
 # plt.show()
 
-# create_cor_fig_hxn(init_proj_final[zero_deg_idx_array[1]:], aligned_proj_total_xrf[zero_deg_idx_array[1]:], theta_array_second_part, aligning_element_hxn, offset_final_second_part, offset_final_second_part)
+create_cor_fig_hxn(init_proj_final[zero_deg_idx_array[1]:], aligned_proj_total_xrf[zero_deg_idx_array[1]:], theta_array_second_part, aligning_element_hxn, offset_final_second_part, offset_final_second_part)
 # create_cor_fig_hxn(init_proj_final[:zero_deg_idx_array[1]], aligned_proj_total_xrf[:zero_deg_idx_array[1]], theta_array_first_part, aligning_element_hxn, offset_init_first_part, offset_final_first_part)
-create_cor_fig_hxn_offset(init_proj_final, aligned_proj_total_xrf, theta_xrt_hxn, aligning_element_hxn)
+# create_cor_fig_hxn_offset(init_proj_final, aligned_proj_total_xrf, theta_xrt_hxn, aligning_element_hxn)
 
 
 
