@@ -702,7 +702,7 @@ def realign_proj(cor_correction_only,
 
                 if net_x_shifts_pcc.ndim == 3:
                     shifts, pcc, pcc_truncated = phase_xcorr_manual(aligned_proj[zero_deg_idx_array[0], start_slice:end_slice], 
-                                                                    np.fliplr(aligned_proj[-1, start_slice:end_slice]), 
+                                                                    np.fliplr(aligned_proj[-1])[start_slice:end_slice], 
                                                                     sigma, 
                                                                     alpha, 
                                                                     pixel_rad_cor_correction,

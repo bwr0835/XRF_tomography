@@ -281,7 +281,7 @@ def extract_h5_xrt_data(file_path, synchrotron, **kwargs):
         # STXM calculations adapted from X. Huang, Brookhaven National Laboratory
         try:
             with h5py.File(file_path, 'r') as h5:
-                diffract_map_intensity = h5['diffamp'][()]
+                diffract_map = h5['diffamp'][()]
                 theta = h5['angle'][()]
 
                 dx_cm, dy_cm = h5['dr_x'][()], h5['dr_y'][()] # These are supposed to be different than for XRF due to ptychography requiring overlapping positions
@@ -299,6 +299,8 @@ def extract_h5_xrt_data(file_path, synchrotron, **kwargs):
         nx = kwargs.get('nx')
         ny = kwargs.get('ny')
 
+        diffract_map_intensity = diffract_map**2
+        
         cts_stxm = diffract_map_intensity.sum(axis = (2, 1)) # Sum over axis = 2, then sum over axis = 1
         cts_stxm = cts_stxm.reshape((ny, nx))
 
@@ -383,11 +385,11 @@ def create_aggregate_xrf_h5(file_path_array,
 
         theta_array_sorted = theta_array
         intensity_array_sorted = intensity_array
-        intensity_array_sorted[second_neg_90_deg_idx:] = np.flip(intensity_array_sorted[second_neg_90_deg_idx:], axis = 1) # Flip remounted sample data back to original orientation
+        intensity_array_sorted[second_neg_90_deg_idx:] = np.fliplr(intensity_array_sorted[second_neg_90_deg_idx:]) # Flip remounted sample data back to original orientation
 
         if synchrotron == 'nsls-ii' and kwargs.get('us_ic_enabled') == True:
             us_ic_array_sorted = us_ic_array
-            us_ic_array_sorted[second_neg_90_deg_idx:] = np.flip(us_ic_array_sorted[second_neg_90_deg_idx:], axis = 1) # Flip remounted sample data back to original orientation
+            us_ic_array_sorted[second_neg_90_deg_idx:] = np.fliplr(us_ic_array_sorted[second_neg_90_deg_idx:]) # Flip remounted sample data back to original orientation
 
         file_path_array_sorted = [file_path_array[theta_idx] for theta_idx in range(len(theta_array_sorted))]
 
@@ -489,7 +491,7 @@ def create_aggregate_xrt_h5(file_path_array,
 
         theta_array_sorted = theta_array
         intensity_array_sorted = intensity_array
-        intensity_array_sorted[second_neg_90_deg_idx:] = np.flip(intensity_array_sorted[second_neg_90_deg_idx:], axis = 1) # Flip remounted sample data back to original orientation
+        intensity_array_sorted[second_neg_90_deg_idx:] = np.fliplr(intensity_array_sorted[second_neg_90_deg_idx:]) # Flip remounted sample data back to original orientation
 
         if synchrotron == 'nsls-ii':
             intensity_array_sorted[1] = us_ic
