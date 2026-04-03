@@ -678,8 +678,8 @@ def realign_proj(cor_correction_only,
                 #     center_of_rotation_avg_second_part, _, offset_second_part = rot_center_avg(aligned_proj[zero_deg_idx_array[1]:], 
                 #                                                                                theta_idx_pairs_second_part, 
                 #                                                                                theta_array_second_part)
-                shifts_first_part, _, _ = phase_xcorr_manual(aligned_proj[0], np.fliplr(aligned_proj[zero_deg_idx_array[0]]), sigma = sigma, alpha = alpha, pixel_rad = 0, theta = np.array([-180, 0]))
-                shifts_second_part, _, _ = phase_xcorr_manual(aligned_proj[zero_deg_idx_array[1]], np.fliplr(aligned_proj[-1]), sigma = sigma, alpha = alpha, pixel_rad = 0, theta = np.array([0, 180]))
+                shifts_first_part, _, _ = phase_xcorr_manual(aligned_proj[0, start_slice:end_slice], np.fliplr(aligned_proj[zero_deg_idx_array[0], start_slice:end_slice]), sigma = sigma, alpha = alpha, pixel_rad = 0, theta = np.array([-180, 0]))
+                shifts_second_part, _, _ = phase_xcorr_manual(aligned_proj[zero_deg_idx_array[1], start_slice:end_slice], np.fliplr(aligned_proj[-1, start_slice:end_slice]), sigma = sigma, alpha = alpha, pixel_rad = 0, theta = np.array([0, 180]))
             
                 center_geom = aligned_proj.shape[2]//2
 
