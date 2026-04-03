@@ -726,7 +726,7 @@ def realign_proj(cor_correction_only,
                                                       pixel_rad_cor_correction,
                                                       theta = np.array([0, 180]))
                 
-                dx = shifts[1]
+                dx = -shifts[1]
                     
                 print(f'Applying additional COR correction to flipped, remounted sample angles: {ppu.round_correct(dx, ndec = 13)}')
 
