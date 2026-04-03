@@ -140,7 +140,7 @@ def create_cor_fig_hxn(init_proj, shifted_proj, theta_array, aligning_element, o
     axs[1, 1].set_title(r'{0} (shifted)'.format(aligning_element), fontsize = 14)
     axs[1, 2].set_title(r'{0} (shifted overlay)'.format(aligning_element), fontsize = 14)
 
-    fig.suptitle(r'Center of rotation correction (Phase cross-correlation)', fontsize = 16)
+    fig.suptitle(r'Center of rotation correction (Phase symmetry)', fontsize = 16)
     fig.tight_layout()
 
     plt.show()
@@ -243,7 +243,8 @@ print(center_of_rotation_avg_second_part, geometric_center, offset_final_second_
 
 
 
-create_cor_fig_hxn(init_proj_final[zero_deg_idx_array[1]:], aligned_proj_total_xrf[zero_deg_idx_array[1]:], theta_array_second_part, aligning_element_hxn, offset_final_second_part, offset_final_second_part)
+# create_cor_fig_hxn(init_proj_final[zero_deg_idx_array[1]:], aligned_proj_total_xrf[zero_deg_idx_array[1]:], theta_array_second_part, aligning_element_hxn, offset_final_second_part, offset_final_second_part)
+create_cor_fig_hxn(init_proj_final[:zero_deg_idx_array[1]], aligned_proj_total_xrf[:zero_deg_idx_array[1]], theta_array_first_part, aligning_element_hxn, offset_init_first_part, offset_final_first_part)
 
 
 
