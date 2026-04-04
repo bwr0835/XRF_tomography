@@ -1180,9 +1180,9 @@ def realign_proj(cor_correction_only,
 
                         start_slice = int(np.clip(np.ceil(dy_max), 0, n_slices))
                         end_slice = int(np.clip(n_slices + np.floor(dy_min), 0, n_slices))
-                    
-                        if start_slice + end_slice >= n_slices:
-                            print('Error: Overlapping edge, field-of-view crops in y. Exiting program...')
+
+                        if end_slice <= start_slice:
+                            print('Error: Empty field of view detected - net shifts exceed the number of slices. Exiting program...')
 
                             sys.exit()
 
@@ -1249,8 +1249,8 @@ def realign_proj(cor_correction_only,
                     start_slice = int(np.clip(np.ceil(dy_max), 0, n_slices))
                     end_slice = int(np.clip(n_slices + np.floor(dy_min), 0, n_slices))
 
-                    if start_slice + end_slice >= n_slices:
-                        print('Error: Overlapping edge, field-of-view crops in y. Exiting program...')
+                    if end_slice <= start_slice:
+                        print('Error: Empty field of view detected - net shifts exceed the number of slices. Exiting program...')
 
                         sys.exit()
                 
