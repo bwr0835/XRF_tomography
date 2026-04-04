@@ -300,7 +300,7 @@ def extract_h5_xrt_data(file_path, synchrotron, **kwargs):
         ny = kwargs.get('ny')
 
         diffract_map_intensity = diffract_map**2
-        
+
         cts_stxm = diffract_map_intensity.sum(axis = (2, 1)) # Sum over axis = 2, then sum over axis = 1
         cts_stxm = cts_stxm.reshape((ny, nx))
 
@@ -1112,8 +1112,8 @@ def create_csv_output_data(dir_path,
     
     else:
         theta_array_new = theta_array
-        net_x_shifts_new = net_x_shifts
-        net_y_shifts_new = net_y_shifts
+        net_x_shifts_new = net_x_shifts[-1]
+        net_y_shifts_new = net_y_shifts[-1]
 
     output_dict = {'theta_deg': theta_array_new,
                    'net_x_pixel_shift': net_x_shifts_new,

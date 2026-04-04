@@ -1,4 +1,4 @@
-import numpy as np, os, imageio as iio, tifffile as tf
+import numpy as np, os, imageio as iio, pandas as pd
 
 from matplotlib import pyplot as plt
 
@@ -26,11 +26,10 @@ def create_gif(tiff_filename_array, output_filepath, fps):
     # for filename in tiff_filename_array:
     #     os.remove(filename)
 
-dir_path = '/Users/bwr0835/Documents/xrt_gridrec_6_iter_dynamic_ps_cor_correction_log_w_padding_gridrec_cor_idx_300_skimage_radon_aug_14_2025'
+dir_path = '/home/bwr0835/2_ide_realigned_data_04_04_2026_cor_correction_iter_reproj/xrt_od_xrf_realignment'
 
-aligned_proj_file = '/Users/bwr0835/Documents/xrt_gridrec_6_iter_dynamic_ps_cor_correction_log_w_padding_gridrec_cor_idx_300_skimage_radon_aug_14_2025/aligned_proj_array_iter_ds_ic.npy'
-dx_file = '/Users/bwr0835/Documents/xrt_gridrec_6_iter_dynamic_ps_cor_correction_log_w_padding_gridrec_cor_idx_300_skimage_radon_aug_14_2025/dx_array_iter_ds_ic.npy'
-theta_file = '/Users/bwr0835/Documents/xrt_gridrec_6_iter_dynamic_ps_cor_correction_log_w_padding_gridrec_cor_idx_300_skimage_radon_aug_14_2025/theta_array.npy'
+shift_file = os.path.join(dir_path, 'aux_data', 'dx_iter_array.npy')
+theta_file = 
 
 aligned_proj_array = np.load(aligned_proj_file)
 dx_iter_array = np.load(dx_file)
