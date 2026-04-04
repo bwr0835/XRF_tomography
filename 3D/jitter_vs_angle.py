@@ -41,9 +41,11 @@ n_iter = dx_iter_array.shape[0]
 fig1, axs1 = plt.subplots()
 
 color_array = ['k', 'b', 'g', 'r', 'm']
+print(dx_iter_array.max())
+print(dx_iter_array.min())
 
 for iter_idx in range(n_iter):
-    axs1.plot(theta_array, dx_iter_array[iter_idx], color = color_array[iter_idx], markersize = 3, linewidth = 2, label = r'Iteration index {0}'.format(iter_idx))
+    axs1.plot(theta_array, dx_iter_array[iter_idx], color = color_array[iter_idx], marker = 'o', markersize = 3, linewidth = 2, label = r'Iteration index {0}'.format(iter_idx))
 
 axs1.tick_params(axis = 'both', which = 'major', labelsize = 14)
 axs1.tick_params(axis = 'both', which = 'minor', labelsize = 14)
