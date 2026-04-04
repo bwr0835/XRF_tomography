@@ -70,7 +70,7 @@ def preprocess_xrf_xrt_data(synchrotron,
         xrt_array_dir = os.path.dirname(xrt_file_array[0])
 
         output_xrf_filepath = os.path.join(xrf_array_dir, f'{synchrotron_beamline}_aggregate_xrf.h5')
-        output_xrt_filepath = os.path.join(xrt_array_dir, f'{synchrotron_beamline}_aggregate_xrt.h5')
+        output_xrt_filepath = os.path.join(xrt_array_dir, f'{synchrotron_beamline}_aggregate_xrt_new.h5')
 
         print('Creating aggregate XRF data file...')
 
