@@ -1000,7 +1000,7 @@ def realign_proj(cor_correction_only,
             sinogram = (xform.radon(recon[slice_idx].copy(), theta_array)).T
 
             synth_proj[:, slice_idx, :] = sinogram
-        tomo.find_center_pc()
+
         if return_aux_data:
             synth_proj_array[i] = synth_proj
         
