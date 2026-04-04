@@ -620,19 +620,19 @@ def preprocess_xrf_xrt_data(synchrotron,
             
                     print('Preparing pre-aligned, non-cropped, normalized XRF, XRT, and optical density projection data for GIF creation...')
 
-                    futil.create_nonaligned_norm_non_cropped_proj_data_gif(dir_path = xrt_od_xrf_realignment_subdir_path,
-                                                                           xrf_element_array = elements_xrf,
-                                                                           desired_xrf_element = desired_xrf_element,
-                                                                           intensity_xrf = intensity_xrf_orig,
-                                                                           intensity_xrf_norm = intensity_xrf_norm,
-                                                                           intensity_xrt = intensity_xrt_sig_orig,
-                                                                           intensity_xrt_norm = intensity_xrt_norm,
-                                                                           opt_dens = opt_dens_norm,
-                                                                           convolution_mag_array = conv_mag_array,
-                                                                           norm_enabled = norm_enabled,
-                                                                           data_percentile = data_percentile, #
-                                                                           theta_array = theta,
-                                                                           fps = fps)
+                    # futil.create_nonaligned_norm_non_cropped_proj_data_gif(dir_path = xrt_od_xrf_realignment_subdir_path,
+                    #                                                        xrf_element_array = elements_xrf,
+                    #                                                        desired_xrf_element = desired_xrf_element,
+                    #                                                        intensity_xrf = intensity_xrf_orig,
+                    #                                                        intensity_xrf_norm = intensity_xrf_norm,
+                    #                                                        intensity_xrt = intensity_xrt_sig_orig,
+                    #                                                        intensity_xrt_norm = intensity_xrt_norm,
+                    #                                                        opt_dens = opt_dens_norm,
+                    #                                                        convolution_mag_array = conv_mag_array,
+                    #                                                        norm_enabled = norm_enabled,
+                    #                                                        data_percentile = data_percentile, #
+                    #                                                        theta_array = theta,
+                    #                                                        fps = fps)
                 else:
                     print('Preparing pre-aligned, non-cropped, normalized XRF, XRT, and optical density projection data for GIF creation...')
                     print('(NOTE: Using pre-existing normalization file; thus, no updated convolution array will be output.)')
@@ -674,7 +674,7 @@ def preprocess_xrf_xrt_data(synchrotron,
                 sys.exit()
             
             print('Cropping XRF, XRT, and optical density projection images...')
-
+            print(final_edge_pixel_lengths_to_crop)
             final_xrf_cropped, \
             final_xrt_sig_cropped, \
             final_opt_dens_cropped = ppu.crop_array(final_xrf, 
