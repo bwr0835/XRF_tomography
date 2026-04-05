@@ -686,8 +686,8 @@ def realign_proj(cor_correction_only,
                 offset_first_part = -shifts_first_part[1]/2
                 offset_second_part = -shifts_second_part[1]/2
 
-                center_of_rotation_avg_first_part = center_geom - offset_first_part
-                center_of_rotation_avg_second_part = center_geom - offset_second_part
+                center_of_rotation_avg_first_part = center_geom + offset_first_part
+                center_of_rotation_avg_second_part = center_geom + offset_second_part
                 
                 print(f'New center of rotation (before flipping sample): {center_of_rotation_avg_first_part}')
                 print(f'New center of rotation (after flipping sample): {center_of_rotation_avg_second_part}\n')
