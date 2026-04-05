@@ -12,6 +12,62 @@ from scipy import ndimage as ndi, fft
 def normalize_array(array):
     return (array - np.nanmin(array))/(np.nanmax(array) - np.nanmin(array))
 
+def create_cor_fig_hxn_offset(init_proj, shifted_proj, theta_array, aligning_element):
+    fig, axs = plt.subplots(2, 3)
+    
+    print(init_proj.shape, shifted_proj.shape)
+    
+    zero_deg_idx_array = np.where(theta_array == 0)[0]
+    
+    init_proj_theta_0 = init_proj[zero_deg_idx_array[0]]
+    init_proj_theta_1 = np.fliplr(init_proj[-1])
+    shifted_proj_theta_0 = shifted_proj[zero_deg_idx_array[0]]
+    shifted_proj_theta_1 = np.fliplr(shifted_proj[-1])
+
+    print(init_proj_theta_0.shape, init_proj_theta_1.shape, shifted_proj_theta_0.shape, shifted_proj_theta_1.shape)
+
+    init_proj_theta_0_norm = normalize_array(init_proj_theta_0)
+    init_proj_theta_1_norm = normalize_array(init_proj_theta_1)
+    shifted_proj_theta_0_norm = normalize_array(shifted_proj_theta_0)
+    shifted_proj_theta_1_norm = normalize_array(shifted_proj_theta_1)
+
+    init_proj_theta_0_rgb = np.dstack((init_proj_theta_0_norm, np.zeros_like(init_proj_theta_0_norm), np.zeros_like(init_proj_theta_0_norm)))
+    init_proj_theta_1_rgb = np.dstack((np.zeros_like(init_proj_theta_1_norm), init_proj_theta_1_norm, np.zeros_like(init_proj_theta_1_norm)))
+    shifted_proj_theta_0_rgb = np.dstack((shifted_proj_theta_0_norm, np.zeros_like(shifted_proj_theta_0_norm), np.zeros_like(shifted_proj_theta_0_norm)))
+    shifted_proj_theta_1_rgb = np.dstack((np.zeros_like(shifted_proj_theta_1_norm), shifted_proj_theta_1_norm, np.zeros_like(shifted_proj_theta_1_norm)))
+
+    overlay_init = np.dstack((init_proj_theta_0_norm, init_proj_theta_1_norm, np.zeros_like(init_proj_theta_0_norm)))
+    overlay_shifted = np.dstack((shifted_proj_theta_0_norm, shifted_proj_theta_1_norm, np.zeros_like(shifted_proj_theta_0_norm)))
+
+    im1_1 = axs[0, 0].imshow(init_proj_theta_0_rgb)
+    im1_2 = axs[0, 1].imshow(init_proj_theta_1_rgb)
+    im1_3 = axs[0, 2].imshow(overlay_init)
+    im1_4 = axs[1, 0].imshow(shifted_proj_theta_0_rgb)
+    im1_5 = axs[1, 1].imshow(shifted_proj_theta_1_rgb)
+    im1_6 = axs[1, 2].imshow(overlay_shifted)
+
+    for ax in fig.axes:
+        ax.axis('off')
+        ax.axvline(x = init_proj_theta_0.shape[1]//2, color = 'white', linewidth = 2, linestyle = '--')
+        ax.axhline(y = init_proj_theta_0.shape[0]//2, color = 'white', linewidth = 2, linestyle = '--')
+
+    text_1 = axs[0, 0].text(0.02, 0.02, r'$\theta = {0}$\textdegree'.format(theta_array[zero_deg_idx_array[0]]), transform = axs[0, 0].transAxes, color = 'white')
+    text_2 = axs[0, 1].text(0.02, 0.02, r'$\theta = {0}$\textdegree'.format(theta_array[-1]), transform = axs[0, 1].transAxes, color = 'white')
+    text_3 = axs[1, 0].text(0.02, 0.02, r'$\theta = {0}$\textdegree'.format(theta_array[zero_deg_idx_array[0]]), transform = axs[1, 0].transAxes, color = 'white')
+    text_4 = axs[1, 1].text(0.02, 0.02, r'$\theta = {0}$\textdegree'.format(theta_array[-1]), transform = axs[1, 1].transAxes, color = 'white')
+
+    axs[0, 0].set_title(r'{0}'.format(aligning_element), fontsize = 14)
+    axs[0, 1].set_title(r'{0}'.format(aligning_element), fontsize = 14)
+    axs[0, 2].set_title(r'{0} (overlay)'.format(aligning_element), fontsize = 14)
+    axs[1, 0].set_title(r'{0} (shifted)'.format(aligning_element), fontsize = 14)
+    axs[1, 1].set_title(r'{0} (shifted)'.format(aligning_element), fontsize = 14)
+    axs[1, 2].set_title(r'{0} (shifted overlay)'.format(aligning_element), fontsize = 14)
+
+    fig.suptitle(r'Center of rotation correction (Phase cross-correlation)', fontsize = 16)
+    fig.tight_layout()
+
+    plt.show()
+
 def create_cor_fig_hxn(init_proj, shifted_proj, theta_array, aligning_element):
     fig, axs = plt.subplots(2, 3)
     
@@ -810,7 +866,8 @@ def realign_proj(cor_correction_only,
                         
                     aligned_proj[theta_idx_aux] = warp_shift(proj_img_array_element_to_align_with[theta_idx_aux], net_x_shifts_pcc[0, theta_idx_aux], net_y_shifts_pcc[0, theta_idx_aux], cval = cval)
             
-                create_cor_fig_hxn(xrf_proj_img_array[element_to_align_with_idx, zero_deg_idx_array[1]:, start_slice:end_slice], aligned_proj[zero_deg_idx_array[1]:, start_slice:end_slice], theta_array_second_part, aligning_element)
+                # create_cor_fig_hxn(xrf_proj_img_array[element_to_align_with_idx, zero_deg_idx_array[1]:, start_slice:end_slice], aligned_proj[zero_deg_idx_array[1]:, start_slice:end_slice], theta_array_second_part, aligning_element)
+                create_cor_fig_hxn_offset(xrf_proj_img_array[element_to_align_with_idx, start_slice:end_slice], aligned_proj[element_to_align_with_idx, start_slice:end_slice], theta_array, aligning_element)
                 plt.show()
 
     else:
