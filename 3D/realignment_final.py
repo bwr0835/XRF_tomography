@@ -869,7 +869,7 @@ def realign_proj(cor_correction_only,
                 xrf_proj_copy = xrf_proj_img_array[element_to_align_with_idx].copy()
 
                 for theta_idx in range(1, len(theta_array_first_part)):
-                    xrf_proj_copy[theta_idx] = warp_shift(xrf_proj_copy[theta_idx], np.zeros(len(theta_array_first_part)), net_y_shifts_pcc[0, theta_idx], cval = cval)
+                    xrf_proj_copy[theta_idx] = warp_shift(xrf_proj_copy[theta_idx], np.zeros(len(theta_array_first_part) - 1), net_y_shifts_pcc[0, theta_idx], cval = cval)
                 # create_cor_fig_hxn(xrf_proj_img_array[element_to_align_with_idx, zero_deg_idx_array[1]:, start_slice:end_slice], aligned_proj[zero_deg_idx_array[1]:, start_slice:end_slice], theta_array_second_part, aligning_element)
                 create_cor_fig_hxn_offset(xrf_proj_copy[:, start_slice:end_slice], aligned_proj[:, start_slice:end_slice], theta_array, aligning_element)
                 plt.show()
