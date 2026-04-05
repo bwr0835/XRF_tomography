@@ -683,6 +683,9 @@ def realign_proj(cor_correction_only,
             
                 center_geom = aligned_proj.shape[2]//2
 
+                print(shifts_first_part[1])
+                print(shifts_second_part[1])
+
                 offset_first_part = -shifts_first_part[1]/2
                 offset_second_part = -shifts_second_part[1]/2
 
