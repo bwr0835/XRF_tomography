@@ -810,7 +810,7 @@ def realign_proj(cor_correction_only,
                         
                     aligned_proj[theta_idx_aux] = warp_shift(proj_img_array_element_to_align_with[theta_idx_aux], net_x_shifts_pcc[0, theta_idx_aux], net_y_shifts_pcc[0, theta_idx_aux], cval = cval)
             
-                create_cor_fig_hxn(xrf_proj_img_array[element_to_align_with_idx, :zero_deg_idx_array[1], start_slice:end_slice], aligned_proj[:zero_deg_idx_array[1], start_slice:end_slice], theta_array_first_part, aligning_element)
+                create_cor_fig_hxn(xrf_proj_img_array[element_to_align_with_idx, zero_deg_idx_array[1]:, start_slice:end_slice], aligned_proj[zero_deg_idx_array[1]:, start_slice:end_slice], theta_array_second_part, aligning_element)
                 plt.show()
 
     else:
