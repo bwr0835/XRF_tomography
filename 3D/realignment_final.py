@@ -737,7 +737,7 @@ def realign_proj(cor_correction_only,
                 #                                                                                theta_array_second_part)
                 
                 
-                create_cor_fig_hxn(xrf_proj_img_array[element_to_align_with_idx, zero_deg_idx_array[1]:, start_slice:end_slice], aligned_proj[zero_deg_idx_array[1]:, start_slice:end_slice], theta_array_second_part, aligning_element)
+                create_cor_fig_hxn(xrf_proj_img_array[element_to_align_with_idx, :zero_deg_idx_array[1], start_slice:end_slice], aligned_proj[:zero_deg_idx_array[1], start_slice:end_slice], theta_array_first_part, aligning_element)
                 plt.show()
                 shifts_first_part, _, _ = phase_xcorr_manual(aligned_proj[0, start_slice:end_slice], np.fliplr(aligned_proj[zero_deg_idx_array[0], start_slice:end_slice]), sigma = sigma, alpha = alpha, pixel_rad = 0, theta = np.array([-180, 0]))
                 shifts_second_part, _, _ = phase_xcorr_manual(aligned_proj[zero_deg_idx_array[1], start_slice:end_slice], np.fliplr(aligned_proj[-1, start_slice:end_slice]), sigma = sigma, alpha = alpha, pixel_rad = 0, theta = np.array([0, 180]))
