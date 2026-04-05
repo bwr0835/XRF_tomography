@@ -9,6 +9,63 @@ from matplotlib import pyplot as plt
 from skimage import transform as xform, registration as reg
 from scipy import ndimage as ndi, fft
 
+def normalize_array(array):
+    return (array - np.nanmin(array))/(np.nanmax(array) - np.nanmin(array))
+
+def create_cor_fig_hxn(init_proj, shifted_proj, theta_array, aligning_element):
+    fig, axs = plt.subplots(2, 3)
+    
+    print(init_proj.shape, shifted_proj.shape)
+
+    init_proj_theta_0 = init_proj[0]
+    init_proj_theta_1 = np.fliplr(init_proj[-1])
+    shifted_proj_theta_0 = shifted_proj[0]
+    shifted_proj_theta_1 = np.fliplr(shifted_proj[-1])
+
+    print(init_proj_theta_0.shape, init_proj_theta_1.shape, shifted_proj_theta_0.shape, shifted_proj_theta_1.shape)
+
+    init_proj_theta_0_norm = normalize_array(init_proj_theta_0)
+    init_proj_theta_1_norm = normalize_array(init_proj_theta_1)
+    shifted_proj_theta_0_norm = normalize_array(shifted_proj_theta_0)
+    shifted_proj_theta_1_norm = normalize_array(shifted_proj_theta_1)
+
+    init_proj_theta_0_rgb = np.dstack((init_proj_theta_0_norm, np.zeros_like(init_proj_theta_0_norm), np.zeros_like(init_proj_theta_0_norm)))
+    init_proj_theta_1_rgb = np.dstack((np.zeros_like(init_proj_theta_1_norm), init_proj_theta_1_norm, np.zeros_like(init_proj_theta_1_norm)))
+    shifted_proj_theta_0_rgb = np.dstack((shifted_proj_theta_0_norm, np.zeros_like(shifted_proj_theta_0_norm), np.zeros_like(shifted_proj_theta_0_norm)))
+    shifted_proj_theta_1_rgb = np.dstack((np.zeros_like(shifted_proj_theta_1_norm), shifted_proj_theta_1_norm, np.zeros_like(shifted_proj_theta_1_norm)))
+
+    overlay_init = np.dstack((init_proj_theta_0_norm, init_proj_theta_1_norm, np.zeros_like(init_proj_theta_0_norm)))
+    overlay_shifted = np.dstack((shifted_proj_theta_0_norm, shifted_proj_theta_1_norm, np.zeros_like(shifted_proj_theta_0_norm)))
+
+    im1_1 = axs[0, 0].imshow(init_proj_theta_0_rgb)
+    im1_2 = axs[0, 1].imshow(init_proj_theta_1_rgb)
+    im1_3 = axs[0, 2].imshow(overlay_init)
+    im1_4 = axs[1, 0].imshow(shifted_proj_theta_0_rgb)
+    im1_5 = axs[1, 1].imshow(shifted_proj_theta_1_rgb)
+    im1_6 = axs[1, 2].imshow(overlay_shifted)
+
+    for ax in fig.axes:
+        ax.axis('off')
+        ax.axvline(x = init_proj_theta_0.shape[1]//2, color = 'white', linewidth = 2, linestyle = '--')
+        ax.axhline(y = init_proj_theta_0.shape[0]//2, color = 'white', linewidth = 2, linestyle = '--')
+
+    text_1 = axs[0, 0].text(0.02, 0.02, r'$\theta = {0}$\textdegree'.format(theta_array[0]), transform = axs[0, 0].transAxes, color = 'white')
+    text_2 = axs[0, 1].text(0.02, 0.02, r'$\theta = {0}$\textdegree'.format(theta_array[-1]), transform = axs[0, 1].transAxes, color = 'white')
+    text_3 = axs[1, 0].text(0.02, 0.02, r'$\theta = {0}$\textdegree'.format(theta_array[0]), transform = axs[1, 0].transAxes, color = 'white')
+    text_4 = axs[1, 1].text(0.02, 0.02, r'$\theta = {0}$\textdegree'.format(theta_array[-1]), transform = axs[1, 1].transAxes, color = 'white')
+
+    axs[0, 0].set_title(r'{0}'.format(aligning_element), fontsize = 14)
+    axs[0, 1].set_title(r'{0}'.format(aligning_element), fontsize = 14)
+    axs[0, 2].set_title(r'{0} (overlay)'.format(aligning_element), fontsize = 14)
+    axs[1, 0].set_title(r'{0} (shifted)'.format(aligning_element), fontsize = 14)
+    axs[1, 1].set_title(r'{0} (shifted)'.format(aligning_element), fontsize = 14)
+    axs[1, 2].set_title(r'{0} (shifted overlay)'.format(aligning_element), fontsize = 14)
+
+    fig.suptitle(r'Center of rotation correction (Phase cross-correlation)', fontsize = 16)
+    fig.tight_layout()
+
+    plt.show()
+
 def phase_xcorr_manual(ref_img,
                        mov_img, 
                        sigma, 
@@ -678,13 +735,14 @@ def realign_proj(cor_correction_only,
                 #     center_of_rotation_avg_second_part, _, offset_second_part = rot_center_avg(aligned_proj[zero_deg_idx_array[1]:], 
                 #                                                                                theta_idx_pairs_second_part, 
                 #                                                                                theta_array_second_part)
+                
+                
+                create_cor_fig_hxn(aligned_proj[zero_deg_idx_array[1]:], aligned_proj[zero_deg_idx_array[1]:], theta_array_second_part, aligning_element)
+                plt.show()
                 shifts_first_part, _, _ = phase_xcorr_manual(aligned_proj[0, start_slice:end_slice], np.fliplr(aligned_proj[zero_deg_idx_array[0], start_slice:end_slice]), sigma = sigma, alpha = alpha, pixel_rad = 0, theta = np.array([-180, 0]))
                 shifts_second_part, _, _ = phase_xcorr_manual(aligned_proj[zero_deg_idx_array[1], start_slice:end_slice], np.fliplr(aligned_proj[-1, start_slice:end_slice]), sigma = sigma, alpha = alpha, pixel_rad = 0, theta = np.array([0, 180]))
             
                 center_geom = aligned_proj.shape[2]//2
-
-                print(shifts_first_part[1])
-                print(shifts_second_part[1])
 
                 offset_first_part = -shifts_first_part[1]/2
                 offset_second_part = -shifts_second_part[1]/2
