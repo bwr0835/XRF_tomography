@@ -803,7 +803,7 @@ def realign_proj(cor_correction_only,
                 print(f'Applying additional COR correction to flipped, remounted sample angles: {ppu.round_correct(dx, ndec = 13)}')
 
                 if net_x_shifts_pcc.ndim == 3:
-                    net_x_shifts_pcc[0, zero_deg_idx_array[1]:, start_slice:end_slice] += dx
+                    net_x_shifts_pcc[0, zero_deg_idx_array[1]:, start_slice:end_slice] -= dx
                 
                 else:
                     net_x_shifts_pcc[0, zero_deg_idx_array[1]:] += dx
