@@ -755,8 +755,21 @@ def realign_proj(cor_correction_only,
     else:
         theta_idx_pairs = ppu.find_theta_combos(theta_array)
 
-        center_of_rotation_avg, center_geom, offset_init = rot_center_avg(aligned_proj, theta_idx_pairs, theta_array)
-    
+        # center_of_rotation_avg, center_geom, offset_init = rot_center_avg(aligned_proj, theta_idx_pairs, theta_array)
+        center_of_rotation_avg = 0
+        center_geom = aligned_proj.shape[2]//2
+        for theta_idx_pair in theta_idx_pairs:
+            shifts, _, _ = phase_xcorr_manual(aligned_proj[theta_idx_pair[0]], np.fliplr(aligned_proj[theta_idx_pair[1]]), sigma = sigma, alpha = alpha, pixel_rad = 0, theta = np.array([theta_array[theta_idx_pair[0]], theta_array[theta_idx_pair[1]]]))
+            center_of_rotation = center_geom + shifts[1]/2
+            
+            print(f'Center of rotation: {center_of_rotation} ({theta_array[theta_idx_pair[0]]} degrees, {theta_array[theta_idx_pair[1]]} degrees)')
+
+            center_of_rotation_avg += center_of_rotation
+
+        center_of_rotation_avg /= len(theta_idx_pairs)
+
+        offset_init = center_of_rotation_avg - center_geom
+
         print(f'Average center of rotation: {center_of_rotation_avg}')
         print(f'Geometric center: {center_geom}')
         print(f'Center of rotation error: {ppu.round_correct(offset_init, ndec = 3)}')
@@ -771,11 +784,23 @@ def realign_proj(cor_correction_only,
         for theta_idx in range(n_theta):
             aligned_proj[theta_idx] = warp_shift(proj_img_array_element_to_align_with[theta_idx], net_x_shifts_pcc[0, theta_idx], net_y_shifts_pcc[0, theta_idx], cval = cval)
         
-        if net_x_shifts_pcc.ndim == 3:
-            center_of_rotation_avg, _, _ = rot_center_avg(aligned_proj[:, start_slice:end_slice], theta_idx_pairs, theta_array)
+        # if net_x_shifts_pcc.ndim == 3:
+        #     center_of_rotation_avg, _, _ = rot_center_avg(aligned_proj[:, start_slice:end_slice], theta_idx_pairs, theta_array)
        
-        else:
-            center_of_rotation_avg, _, _ = rot_center_avg(aligned_proj, theta_idx_pairs, theta_array)
+        # else:
+        #     center_of_rotation_avg, _, _ = rot_center_avg(aligned_proj, theta_idx_pairs, theta_array)
+
+        center_of_rotation_avg = 0
+        
+        for theta_idx_pair in theta_idx_pairs:
+            shifts, _, _ = phase_xcorr_manual(aligned_proj[theta_idx_pair[0]], np.fliplr(aligned_proj[theta_idx_pair[1]]), sigma = sigma, alpha = alpha, pixel_rad = 0, theta = np.array([theta_array[theta_idx_pair[0]], theta_array[theta_idx_pair[1]]]))
+            center_of_rotation = center_geom + shifts[1]/2
+            
+            print(f'Center of rotation: {center_of_rotation} ({theta_array[theta_idx_pair[0]]} degrees, {theta_array[theta_idx_pair[1]]} degrees)')
+
+            center_of_rotation_avg += center_of_rotation
+
+        center_of_rotation_avg /= len(theta_idx_pairs)
 
         offset = center_of_rotation_avg - center_geom
 
