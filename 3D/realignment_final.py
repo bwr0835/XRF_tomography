@@ -680,8 +680,8 @@ def realign_proj(cor_correction_only,
             
             center_geom = aligned_proj.shape[2]//2
 
-            offset_init_first_part = -shifts_init_first_part[1]/2
-            offset_init_second_part = -shifts_init_second_part[1]/2
+            offset_init_first_part = shifts_init_first_part[1]/2
+            offset_init_second_part = shifts_init_second_part[1]/2
 
             center_of_rotation_avg_first_part = center_geom + offset_init_first_part
             center_of_rotation_avg_second_part = center_geom + offset_init_second_part
