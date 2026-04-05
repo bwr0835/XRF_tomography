@@ -1,4 +1,4 @@
-import numpy as np, os, sys, xrf_xrt_preprocess_file_util as futil, xrf_xrt_preprocess_utils as ppu, realignment_final as realign
+import numpy as np, pandas as pd,os, sys, xrf_xrt_preprocess_file_util as futil, xrf_xrt_preprocess_utils as ppu, realignment_final as realign
 
 from matplotlib import pyplot as plt
 from scipy import ndimage as ndi, fft
@@ -9,19 +9,23 @@ plt.rcParams['text.usetex'] = True
 plt.rcParams['font.family'] = 'serif'
 plt.rcParams['text.latex.preamble'] = r'\usepackage{times}'
 
-def load_h5_data(file_path, get_edge_info = False):
+def load_h5_data(file_path, get_init_edge_info = False, get_final_edge_info = False):
     with h5py.File(file_path, 'r') as f:
-        data = f['exchange/data/xrf'][()]
+        data = f['exchange/data/xrt'][()]
 
-        if get_edge_info:
+        if get_init_edge_info:
             top_edge_cropped_init = f['exchange/data'].attrs['top_edge_cropped_init']
             bottom_edge_cropped_init = f['exchange/data'].attrs['bottom_edge_cropped_init']
+    
+            return data, {'top': top_edge_cropped_init, 'bottom': bottom_edge_cropped_init}
+    
+        if get_final_edge_info:
+            top_edge_cropped_final = f['exchange/data'].attrs['top_edge_cropped_final']
+            bottom_edge_cropped_final = f['exchange/data'].attrs['bottom_edge_cropped_final']
+    
+            return data, {'top': top_edge_cropped_final, 'bottom': bottom_edge_cropped_final}
 
-            edge_info = {'top': top_edge_cropped_init, 'bottom': bottom_edge_cropped_init}
-    
-            return data, edge_info
-    
-    return data
+    return data, None
 
 def rot_center(theta_sum):
     """
@@ -88,7 +92,7 @@ def rot_center_avg(proj_img_array, theta_pair_array, theta_array):
 def normalize_array(array):
     return (array - np.nanmin(array))/(np.nanmax(array) - np.nanmin(array))
 
-def create_cor_fig_hxn(init_proj, shifted_proj, theta_array, theta_idx_pair, aligning_element):
+def create_cor_fig_aps(init_proj, shifted_proj, theta_array, theta_idx_pair, aligning_element):
     fig, axs = plt.subplots(2, 3)
     
     print(init_proj.shape, shifted_proj.shape)
@@ -130,123 +134,67 @@ def create_cor_fig_hxn(init_proj, shifted_proj, theta_array, theta_idx_pair, ali
     text_3 = axs[1, 0].text(0.02, 0.02, r'$\theta = {0}$\textdegree'.format(theta_array[theta_idx_pair[0]]), transform = axs[1, 0].transAxes, color = 'white')
     text_4 = axs[1, 1].text(0.02, 0.02, r'$\theta = {0}$\textdegree'.format(theta_array[theta_idx_pair[1]]), transform = axs[1, 1].transAxes, color = 'white')
 
-    axs[0, 0].set_title(r'{0}'.format(aligning_element), fontsize = 14)
-    axs[0, 1].set_title(r'{0}'.format(aligning_element), fontsize = 14)
+    axs[0, 0].set_title(r'{0}'.format(aligning_element), color = 'red', fontsize = 14)
+    axs[0, 1].set_title(r'{0}'.format(aligning_element), color = 'green', fontsize = 14)
     axs[0, 2].set_title(r'{0} (overlay)'.format(aligning_element), fontsize = 14)
-    axs[1, 0].set_title(r'{0} (shifted)'.format(aligning_element), fontsize = 14)
-    axs[1, 1].set_title(r'{0} (shifted)'.format(aligning_element), fontsize = 14)
+    axs[1, 0].set_title(r'{0} (shifted)'.format(aligning_element), color = 'red', fontsize = 14)
+    axs[1, 1].set_title(r'{0} (shifted)'.format(aligning_element), color = 'green', fontsize = 14)
     axs[1, 2].set_title(r'{0} (shifted overlay)'.format(aligning_element), fontsize = 14)
 
-    fig.suptitle(r'Center of rotation correction (Phase cross-correlation)', fontsize = 16)
     fig.tight_layout()
 
     plt.show()
 
 dir_path = '/Users/bwr0835/Documents'
-final_dir_path = f'{dir_path}/
+final_dir_path = f'{dir_path}/2_ide_realigned_data_03_27_2026_iter_reproj_cor_correction_only_final'
 
-init_hxn_xrt_file_path = f'{dir_path}/3_id_aggregate_xrt.h5'
-init_hxn_xrf_file_path = f'{dir_path}/3_id_aggregate_xrf.h5'
+init_aps_xrt_file_path = f'{dir_path}/2_ide_aggregate_xrt.h5'
+init_aps_xrf_file_path = f'{dir_path}/2_ide_aggregate_xrf.h5'
 
-elements_xrt_hxn, intensity_xrt_hxn, theta_xrt_hxn, _, _, _, _ = futil.extract_h5_aggregate_xrt_data(init_hxn_xrt_file_path)
-elements_xrf_hxn, intensity_xrf_hxn, theta_xrf_hxn, _, _, _ = futil.extract_h5_aggregate_xrf_data(init_hxn_xrf_file_path)
+elements_xrt_aps, intensity_xrt_aps, theta_xrt_aps, _, _, _, _ = futil.extract_h5_aggregate_xrt_data(init_aps_xrt_file_path)
+elements_xrf_aps, intensity_xrf_aps, theta_xrf_aps, _, _, _ = futil.extract_h5_aggregate_xrf_data(init_aps_xrf_file_path)
 
-input_csv_file_path = f'{final_dir_path}/xrt_od_xrf_realignment/raw_input_data.csv'
+intensity_xrt_aps = ppu.pad_col_row(intensity_xrt_aps, 'xrt')
+intensity_xrf_aps = ppu.pad_col_row(intensity_xrf_aps, 'xrf')
+
+input_csv_file_path = f'{final_dir_path}/xrt_od_xrf_realignment/output_net_shift_data.csv'
 input_h5_file_path = f'{final_dir_path}/xrt_od_xrf_realignment/aligned_data/aligned_aggregate_xrf_xrt.h5'
 
 # aligning_element_aps = 'opt_dens'
-aligning_element_hxn = 'Ni'
+aligning_element_aps = 'opt_dens'
 
-xrt_sig_hxn = intensity_xrt_hxn[elements_xrt_hxn.index('xrt_sig')]
+xrt_sig_aps = intensity_xrt_aps[elements_xrt_aps.index('xrt_sig')]
 
 # aligning_element_idx_aps = elements_xrt_aps.index(aligning_element_aps)
-# aligning_element_idx_hxn = elements_xrf_hxn.index(aligning_element_hxn)
-_, \
-_, \
-_, \
-init_y_shift_array, \
-_, \
-_, \
-_, \
-_, \
-_, \
-_ = futil.extract_csv_raw_input_data(input_csv_file_path)
+# aligning_element_idx_aps = elements_xrf_aps.index(aligning_element_aps)
 
-intensity_xrt_norm_hxn, intensity_xrf_norm_hxn, _, _, I0_photons_hxn, _ = ppu.joint_fluct_norm(xrt_sig_hxn,
-                                                                                               intensity_xrf_hxn,
+x_shift_data = pd.read_csv(input_csv_file_path)
+net_x_shifts = x_shift_data['net_x_pixel_shift'].to_numpy().astype(float)
+
+intensity_xrt_norm_aps, intensity_xrf_norm_aps, _, _, I0_photons_aps, _ = ppu.joint_fluct_norm(xrt_sig_aps,
+                                                                                               intensity_xrf_aps,
                                                                                                93,
                                                                                                True,
                                                                                                None,
                                                                                                None)
-                                                                                            
-element_to_align_with = 'Ni'
-element_to_align_with_idx = elements_xrf_hxn.index(aligning_element_hxn)
 
-aligned_proj_total_xrf, edge_info = load_h5_data(input_h5_file_path, get_edge_info = True)
+opt_dens = -np.log(intensity_xrt_norm_aps/I0_photons_aps)
+# element_to_align_with = 'opt_dens'
+# element_to_align_with_idx = elements_xrt_aps.index(element_to_align_with)``
 
-start_slice, end_slice = edge_info['top'], edge_info['bottom']
+aligned_proj_total_xrf, edge_info = load_h5_data(input_h5_file_path, get_final_edge_info = True)
 
-init_proj = intensity_xrf_norm_hxn[element_to_align_with_idx]
-aligned_proj_total_xrf = aligned_proj_total_xrf[element_to_align_with_idx]
+# init_proj_final = intensity_xrt_norm_aps[element_to_align_with_idx]
+init_proj_final = opt_dens
+shifted_proj_final = np.zeros_like(init_proj_final)
 
-for theta_idx in range(1, len(theta_xrt_hxn)):
-    init_proj[theta_idx] = ndi.shift(init_proj[theta_idx], shift = (init_y_shift_array[theta_idx], 0))
+for theta_idx in range(len(theta_xrt_aps)):
+    shifted_proj_final[theta_idx] = ndi.shift(init_proj_final[theta_idx], shift = (0, net_x_shifts[theta_idx]))
 
-init_proj_final = init_proj[:, start_slice:(intensity_xrt_norm_hxn.shape[1] - end_slice)]
+init_proj_final = init_proj_final[:, :-2]
+shifted_proj_final = shifted_proj_final[:, :-2]
 
-print(init_proj_final.shape)
+theta_idx_pairs = ppu.find_theta_combos(theta_xrt_aps)
+theta_idx_pair_desired = theta_idx_pairs[0]
 
-zero_deg_idx_array = np.where(theta_xrt_hxn == 0)[0]
-
-theta_array_first_part = theta_xrt_hxn[:zero_deg_idx_array[1]]
-theta_array_second_part = theta_xrt_hxn[zero_deg_idx_array[1]:]
-
-theta_idx_pairs_first_part = [(0, -1)] # These remap to original -180° and 0° indices
-theta_idx_pairs_second_part = [(0, -1)] # These remap to original 0° and +180° indices
-
-center_of_rotation_avg_first_part, geometric_center, offset_init_first_part = rot_center_avg(init_proj_final[:zero_deg_idx_array[1]], 
-                                                                                             theta_idx_pairs_first_part, 
-                                                                                             theta_array_first_part)
-
-center_of_rotation_avg_second_part, geometric_center, offset_final_second_part = rot_center_avg(init_proj_final[zero_deg_idx_array[1]:], 
-                                                                                                theta_idx_pairs_second_part, 
-                                                                                                theta_array_second_part)
-
-shifts_init_first_part, phase_xcorr_2d_first_part, _ = realign.phase_xcorr_manual(init_proj_final[0], np.fliplr(aligned_proj_total_xrf[zero_deg_idx_array[0]]), sigma = 25, alpha = 10, pixel_rad = 0, theta = np.array([-180, 0]))
-shifts_init_second_part, phase_xcorr_2d_second_part, _ = realign.phase_xcorr_manual(init_proj_final[zero_deg_idx_array[1]], np.fliplr(aligned_proj_total_xrf[-1]), sigma = 25, alpha = 10, pixel_rad = 0, theta = np.array([0, 180]))
-
-# plt.imshow(phase_xcorr_2d_first_part, vmin = phase_xcorr_2d_first_part.min(), vmax = phase_xcorr_2d_first_part.max())
-# plt.imshow(phase_xcorr_2d_second_part, vmin = phase_xcorr_2d_second_part.min(), vmax = phase_xcorr_2d_second_part.max())
-# plt.show()
-
-print('Initial offset (first part):', shifts_init_first_part[1]/2)
-print('Initial offset (second part):', shifts_init_second_part[1]/2)
-
-
-offset_init_first_part = 2.6071765573317
-offset_init_second_part = 1.9150763284889
-pcc_offset = 0.0143047860342
-
-center_of_rotation_avg_first_part, geometric_center, offset_final_first_part = rot_center_avg(aligned_proj_total_xrf[:zero_deg_idx_array[1]], 
-                                                                                              theta_idx_pairs_first_part, 
-                                                                                              theta_array_first_part)
-
-center_of_rotation_avg_second_part, geometric_center, offset_final_second_part = rot_center_avg(aligned_proj_total_xrf[zero_deg_idx_array[1]:], 
-                                                                                                theta_idx_pairs_second_part, 
-                                                                                                theta_array_second_part)
-
-# print(center_of_rotation_avg_first_part, geometric_center, offset_init_first_part)
-# print(center_of_rotation_avg_second_part, geometric_center, offset_final_second_part)
-
-# intensity_xrt_norm_hxn[0] = np.fliplr(intensity_xrt_norm_hxn[0])
-
-# # plt.imshow(intensity_xrt_norm_hxn[0])
-# plt.imshow(intensity_xrt_norm_hxn[:, 0], aspect = 'auto')
-# plt.show()
-
-create_cor_fig_hxn(init_proj_final[zero_deg_idx_array[1]:], aligned_proj_total_xrf[zero_deg_idx_array[1]:], theta_array_second_part, aligning_element_hxn, offset_final_second_part, offset_final_second_part)
-# create_cor_fig_hxn(init_proj_final[:zero_deg_idx_array[1]], aligned_proj_total_xrf[:zero_deg_idx_array[1]], theta_array_first_part, aligning_element_hxn, offset_init_first_part, offset_final_first_part)
-# create_cor_fig_hxn_offset(init_proj_final, aligned_proj_total_xrf, theta_xrt_hxn, aligning_element_hxn)
-
-
-
+create_cor_fig_aps(init_proj_final, shifted_proj_final, theta_xrt_aps, theta_idx_pair_desired, aligning_element_aps)
