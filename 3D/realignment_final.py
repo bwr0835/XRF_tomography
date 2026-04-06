@@ -853,26 +853,26 @@ def realign_proj(cor_correction_only,
                 
                 dx = shifts[1]
                     
-                print(f'Applying additional COR correction to flipped, remounted sample angles: {ppu.round_correct(dx, ndec = 13)}')
+                print(f'Applying additional COR correction to flipped, remounted sample angles: {ppu.round_correct(-dx, ndec = 13)}')
 
                 if net_x_shifts_pcc.ndim == 3:
                     net_x_shifts_pcc[0, zero_deg_idx_array[1]:, start_slice:end_slice] -= dx
                 
                 else:
-                    net_x_shifts_pcc[0, zero_deg_idx_array[1]:] += dx
+                    net_x_shifts_pcc[0, zero_deg_idx_array[1]:] -= dx
 
                 for theta_idx in range(len(theta_array_second_part)):
                     theta_idx_aux = theta_idx + len(theta_array_first_part)
                         
                     aligned_proj[theta_idx_aux] = warp_shift(proj_img_array_element_to_align_with[theta_idx_aux], net_x_shifts_pcc[0, theta_idx_aux], net_y_shifts_pcc[0, theta_idx_aux], cval = cval)
                 
-                xrf_proj_copy = xrf_proj_img_array[element_to_align_with_idx].copy()
+                # xrf_proj_copy = xrf_proj_img_array[element_to_align_with_idx].copy()
 
-                for theta_idx in range(n_theta):
-                    xrf_proj_copy[theta_idx] = ndi.shift(xrf_proj_copy[theta_idx], shift = (net_y_shifts_pcc[0, theta_idx], 0))
-                create_cor_fig_hxn(xrf_proj_copy[zero_deg_idx_array[1]:, start_slice:end_slice], aligned_proj[zero_deg_idx_array[1]:, start_slice:end_slice], theta_array_second_part, aligning_element)
-                # create_cor_fig_hxn_offset(xrf_proj_copy[:, start_slice:end_slice], aligned_proj[:, start_slice:end_slice], theta_array, aligning_element)
-                plt.show()
+                # for theta_idx in range(n_theta):
+                #     xrf_proj_copy[theta_idx] = ndi.shift(xrf_proj_copy[theta_idx], shift = (net_y_shifts_pcc[0, theta_idx], 0))
+                # create_cor_fig_hxn(xrf_proj_copy[zero_deg_idx_array[1]:, start_slice:end_slice], aligned_proj[zero_deg_idx_array[1]:, start_slice:end_slice], theta_array_second_part, aligning_element)
+                # # create_cor_fig_hxn_offset(xrf_proj_copy[:, start_slice:end_slice], aligned_proj[:, start_slice:end_slice], theta_array, aligning_element)
+                # plt.show()
 
     else:
         theta_idx_pairs = ppu.find_theta_combos(theta_array)
