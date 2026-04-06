@@ -88,7 +88,7 @@ def rot_center_avg(proj_img_array, theta_pair_array, theta_array):
 def normalize_array(array):
     return (array - np.nanmin(array))/(np.nanmax(array) - np.nanmin(array))
 
-def create_cor_fig_hxn(init_proj, shifted_proj, theta_array, aligning_element, offset_init, offset_final):
+def create_cor_fig_hxn(init_proj, shifted_proj, theta_array, aligning_element):
     fig, axs = plt.subplots(2, 3)
     
     print(init_proj.shape, shifted_proj.shape)
@@ -112,9 +112,6 @@ def create_cor_fig_hxn(init_proj, shifted_proj, theta_array, aligning_element, o
 
     overlay_init = np.dstack((init_proj_theta_0_norm, init_proj_theta_1_norm, np.zeros_like(init_proj_theta_0_norm)))
     overlay_shifted = np.dstack((shifted_proj_theta_0_norm, shifted_proj_theta_1_norm, np.zeros_like(shifted_proj_theta_0_norm)))
-    
-    init_cor = init_proj_theta_0.shape[1]//2 + offset_init
-    final_cor = shifted_proj_theta_0.shape[1]//2 + offset_final
 
     im1_1 = axs[0, 0].imshow(init_proj_theta_0_rgb)
     im1_2 = axs[0, 1].imshow(init_proj_theta_1_rgb)
@@ -152,9 +149,9 @@ def create_cor_fig_hxn_offset(init_proj, shifted_proj, theta_array, aligning_ele
     
     zero_deg_idx_array = np.where(theta_array == 0)[0]
     
-    init_proj_theta_0 = init_proj[zero_deg_idx_array[1]]
+    init_proj_theta_0 = init_proj[zero_deg_idx_array[0]]
     init_proj_theta_1 = np.fliplr(init_proj[-1])
-    shifted_proj_theta_0 = shifted_proj[zero_deg_idx_array[1]]
+    shifted_proj_theta_0 = shifted_proj[zero_deg_idx_array[0]]
     shifted_proj_theta_1 = np.fliplr(shifted_proj[-1])
 
     print(init_proj_theta_0.shape, init_proj_theta_1.shape, shifted_proj_theta_0.shape, shifted_proj_theta_1.shape)
@@ -172,12 +169,12 @@ def create_cor_fig_hxn_offset(init_proj, shifted_proj, theta_array, aligning_ele
     overlay_init = np.dstack((init_proj_theta_0_norm, init_proj_theta_1_norm, np.zeros_like(init_proj_theta_0_norm)))
     overlay_shifted = np.dstack((shifted_proj_theta_0_norm, shifted_proj_theta_1_norm, np.zeros_like(shifted_proj_theta_0_norm)))
 
-    im1_1 = axs[0, 0].imshow(init_proj_theta_0_rgb)
-    im1_2 = axs[0, 1].imshow(init_proj_theta_1_rgb)
-    im1_3 = axs[0, 2].imshow(overlay_init)
-    im1_4 = axs[1, 0].imshow(shifted_proj_theta_0_rgb)
-    im1_5 = axs[1, 1].imshow(shifted_proj_theta_1_rgb)
-    im1_6 = axs[1, 2].imshow(overlay_shifted)
+    im1_1 = axs[0, 0].imshow(init_proj_theta_0_rgb, aspect = 'equal')
+    im1_2 = axs[0, 1].imshow(init_proj_theta_1_rgb, aspect = 'equal')
+    im1_3 = axs[0, 2].imshow(overlay_init, aspect = 'equal')
+    im1_4 = axs[1, 0].imshow(shifted_proj_theta_0_rgb, aspect = 'equal')
+    im1_5 = axs[1, 1].imshow(shifted_proj_theta_1_rgb, aspect = 'equal')
+    im1_6 = axs[1, 2].imshow(overlay_shifted, aspect = 'equal')
 
     for ax in fig.axes:
         ax.axis('off')
@@ -305,8 +302,8 @@ center_of_rotation_avg_second_part, geometric_center, offset_final_second_part =
 # plt.imshow(intensity_xrt_norm_hxn[:, 0], aspect = 'auto')
 # plt.show()
 
-# create_cor_fig_hxn(init_proj_final[zero_deg_idx_array[1]:], aligned_proj_total_xrf[zero_deg_idx_array[1]:], theta_array_second_part, aligning_element_hxn, offset_final_second_part, offset_final_second_part)
-# create_cor_fig_hxn(init_proj_final[:zero_deg_idx_array[1]], aligned_proj_total_xrf[:zero_deg_idx_array[1]], theta_array_first_part, aligning_element_hxn, offset_init_first_part, offset_final_first_part)
+create_cor_fig_hxn(init_proj_final[:zero_deg_idx_array[1]], aligned_proj_total_xrf[:zero_deg_idx_array[1]], theta_array_first_part, aligning_element_hxn)
+# create_cor_fig_hxn(init_proj_final[zero_deg_idx_array[1]:], aligned_proj_total_xrf[zero_deg_idx_array[1]:], theta_array_second_part, aligning_element_hxn)
 create_cor_fig_hxn_offset(init_proj_final, aligned_proj_total_xrf, theta_xrt_hxn, aligning_element_hxn)
 
 
