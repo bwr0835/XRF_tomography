@@ -724,23 +724,23 @@ def realign_proj(cor_correction_only,
         for i in range(1):
             print(f'COR correction iteration {i + 1}/{n_iterations_cor_correction}')
 
-            # center_of_rotation_avg_first_part, center_geom, offset_init_first_part = rot_center_avg(aligned_proj[:zero_deg_idx_array[1], start_slice:end_slice], 
-            #                                                                                         theta_idx_pairs_first_part, 
-            #                                                                                         theta_array_first_part)
+            center_of_rotation_avg_first_part, center_geom, offset_init_first_part = rot_center_avg(aligned_proj[:zero_deg_idx_array[1], start_slice:end_slice], 
+                                                                                                    theta_idx_pairs_first_part, 
+                                                                                                    theta_array_first_part)
                 
-            # center_of_rotation_avg_second_part, _, offset_init_second_part = rot_center_avg(aligned_proj[zero_deg_idx_array[1]:, start_slice:end_slice], 
-            #                                                                                 theta_idx_pairs_second_part, 
-            #                                                                                 theta_array_second_part)
-            shifts_init_first_part, phase_xcorr_first_part, _ = phase_xcorr_manual(aligned_proj[0, start_slice:end_slice], np.fliplr(aligned_proj[zero_deg_idx_array[0], start_slice:end_slice]), sigma = sigma, alpha = alpha, pixel_rad = 0, theta = np.array([-180, 0]))
-            shifts_init_second_part, phase_xcorr_second_part, _ = phase_xcorr_manual(aligned_proj[zero_deg_idx_array[1] + 1, start_slice:end_slice], np.fliplr(aligned_proj[-1, start_slice:end_slice]), sigma = sigma, alpha = alpha, pixel_rad = 0, theta = np.array([0, 180]))
+            center_of_rotation_avg_second_part, _, offset_init_second_part = rot_center_avg(aligned_proj[(zero_deg_idx_array[1] + 1):, start_slice:end_slice], 
+                                                                                            theta_idx_pairs_second_part, 
+                                                                                            theta_array_second_part)
+            # shifts_init_first_part, phase_xcorr_first_part, _ = phase_xcorr_manual(aligned_proj[0, start_slice:end_slice], np.fliplr(aligned_proj[zero_deg_idx_array[0], start_slice:end_slice]), sigma = sigma, alpha = alpha, pixel_rad = 0, theta = np.array([-180, 0]))
+            # shifts_init_second_part, phase_xcorr_second_part, _ = phase_xcorr_manual(aligned_proj[zero_deg_idx_array[1] + 1, start_slice:end_slice], np.fliplr(aligned_proj[-1, start_slice:end_slice]), sigma = sigma, alpha = alpha, pixel_rad = 0, theta = np.array([0, 180]))
             
-            center_geom = aligned_proj.shape[2]//2
+            # center_geom = aligned_proj.shape[2]//2
 
-            offset_init_first_part = shifts_init_first_part[1]/2
-            offset_init_second_part = shifts_init_second_part[1]/2
+            # offset_init_first_part = shifts_init_first_part[1]/2
+            # offset_init_second_part = shifts_init_second_part[1]/2
 
-            center_of_rotation_avg_first_part = center_geom + offset_init_first_part
-            center_of_rotation_avg_second_part = center_geom + offset_init_second_part
+            # center_of_rotation_avg_first_part = center_geom + offset_init_first_part
+            # center_of_rotation_avg_second_part = center_geom + offset_init_second_part
 
             print(f'Average center of rotation (before flipping sample): {ppu.round_correct(center_of_rotation_avg_first_part, ndec = 13)}')
             print(f'Average center of rotation (after flipping sample): {ppu.round_correct(center_of_rotation_avg_second_part, ndec = 13)}\n')
@@ -767,21 +767,21 @@ def realign_proj(cor_correction_only,
                 for theta_idx in range(len(theta_array_first_part)):
                     aligned_proj[theta_idx] = warp_shift(proj_img_array_element_to_align_with[theta_idx], net_x_shifts_pcc[0, theta_idx], net_y_shifts_pcc[0, theta_idx], cval = cval)
 
-                fig1, axs1 = plt.subplots(2, 1)
-                axs1[0].imshow(phase_xcorr_first_part, vmin = phase_xcorr_first_part.min(), vmax = phase_xcorr_first_part.max())
-                axs1[1].imshow(phase_xcorr_second_part, vmin = phase_xcorr_second_part.min(), vmax = phase_xcorr_second_part.max())
-                axs1[0].set_title(r'$\theta = -180^{\circ}, 0^{-}$')
-                axs1[1].set_title(r'$\theta = 0^{+}, 180^{\circ}$')
+                # fig1, axs1 = plt.subplots(2, 1)
+                # axs1[0].imshow(phase_xcorr_first_part, vmin = phase_xcorr_first_part.min(), vmax = phase_xcorr_first_part.max())
+                # axs1[1].imshow(phase_xcorr_second_part, vmin = phase_xcorr_second_part.min(), vmax = phase_xcorr_second_part.max())
+                # axs1[0].set_title(r'$\theta = -180^{\circ}, 0^{-}$')
+                # axs1[1].set_title(r'$\theta = 0^{+}, 180^{\circ}$')
                 
-                for ax in fig1.axes:
-                    ax.axis('off')
-                    ax.axvline(x = phase_xcorr_first_part.shape[1]//2, color = 'white', linewidth = 2, linestyle = '--')
-                    ax.axhline(y = phase_xcorr_first_part.shape[0]//2, color = 'white', linewidth = 2, linestyle = '--')
-                    ax.axvline(x = phase_xcorr_second_part.shape[1]//2, color = 'white', linewidth = 2, linestyle = '--')
-                    ax.axhline(y = phase_xcorr_second_part.shape[0]//2, color = 'white', linewidth = 2, linestyle = '--')
+                # for ax in fig1.axes:
+                #     ax.axis('off')
+                #     ax.axvline(x = phase_xcorr_first_part.shape[1]//2, color = 'white', linewidth = 2, linestyle = '--')
+                #     ax.axhline(y = phase_xcorr_first_part.shape[0]//2, color = 'white', linewidth = 2, linestyle = '--')
+                #     ax.axvline(x = phase_xcorr_second_part.shape[1]//2, color = 'white', linewidth = 2, linestyle = '--')
+                #     ax.axhline(y = phase_xcorr_second_part.shape[0]//2, color = 'white', linewidth = 2, linestyle = '--')
                     
-                fig1.tight_layout()
-                plt.show()
+                # fig1.tight_layout()
+                # plt.show()
 
                 print(f'Applying initial COR correction to post-flipped, post-remounted sample angles: {ppu.round_correct(-offset_init_second_part, ndec = 13)}')
                     
@@ -808,16 +808,16 @@ def realign_proj(cor_correction_only,
                 #                                                                                theta_idx_pairs_second_part, 
                 #                                                                                theta_array_second_part)
                 
-                shifts_first_part, _, _ = phase_xcorr_manual(aligned_proj[0, start_slice:end_slice], np.fliplr(aligned_proj[zero_deg_idx_array[0], start_slice:end_slice]), sigma = sigma, alpha = alpha, pixel_rad = 0, theta = np.array([-180, 0]))
-                shifts_second_part, _, _ = phase_xcorr_manual(aligned_proj[zero_deg_idx_array[1], start_slice:end_slice], np.fliplr(aligned_proj[-1, start_slice:end_slice]), sigma = sigma, alpha = alpha, pixel_rad = 0, theta = np.array([0, 180]))
+                # shifts_first_part, _, _ = phase_xcorr_manual(aligned_proj[0, start_slice:end_slice], np.fliplr(aligned_proj[zero_deg_idx_array[0], start_slice:end_slice]), sigma = sigma, alpha = alpha, pixel_rad = 0, theta = np.array([-180, 0]))
+                # shifts_second_part, _, _ = phase_xcorr_manual(aligned_proj[zero_deg_idx_array[1], start_slice:end_slice], np.fliplr(aligned_proj[-1, start_slice:end_slice]), sigma = sigma, alpha = alpha, pixel_rad = 0, theta = np.array([0, 180]))
 
-                center_geom = aligned_proj.shape[2]//2
+                # center_geom = aligned_proj.shape[2]//2
 
-                offset_first_part = shifts_first_part[1]/2
-                offset_second_part = shifts_second_part[1]/2
+                # offset_first_part = shifts_first_part[1]/2
+                # offset_second_part = shifts_second_part[1]/2
 
-                center_of_rotation_avg_first_part = center_geom + offset_first_part
-                center_of_rotation_avg_second_part = center_geom + offset_second_part
+                # center_of_rotation_avg_first_part = center_geom + offset_first_part
+                # center_of_rotation_avg_second_part = center_geom + offset_second_part
                 
                 print(f'New center of rotation (before flipping sample): {center_of_rotation_avg_first_part}')
                 print(f'New center of rotation (after flipping sample): {center_of_rotation_avg_second_part}\n')
