@@ -113,12 +113,12 @@ def create_cor_fig_hxn(init_proj, shifted_proj, theta_array, aligning_element):
     overlay_init = np.dstack((init_proj_theta_0_norm, init_proj_theta_1_norm, np.zeros_like(init_proj_theta_0_norm)))
     overlay_shifted = np.dstack((shifted_proj_theta_0_norm, shifted_proj_theta_1_norm, np.zeros_like(shifted_proj_theta_0_norm)))
 
-    im1_1 = axs[0, 0].imshow(init_proj_theta_0_rgb)
-    im1_2 = axs[0, 1].imshow(init_proj_theta_1_rgb)
-    im1_3 = axs[0, 2].imshow(overlay_init)
-    im1_4 = axs[1, 0].imshow(shifted_proj_theta_0_rgb)
-    im1_5 = axs[1, 1].imshow(shifted_proj_theta_1_rgb)
-    im1_6 = axs[1, 2].imshow(overlay_shifted)
+    im1_1 = axs[0, 0].imshow(init_proj_theta_0_rgb, interpolation = 'none')
+    im1_2 = axs[0, 1].imshow(init_proj_theta_1_rgb, interpolation = 'none')
+    im1_3 = axs[0, 2].imshow(overlay_init, interpolation = 'none')
+    im1_4 = axs[1, 0].imshow(shifted_proj_theta_0_rgb, interpolation = 'none')
+    im1_5 = axs[1, 1].imshow(shifted_proj_theta_1_rgb, interpolation = 'none')
+    im1_6 = axs[1, 2].imshow(overlay_shifted, interpolation = 'none')
 
     for ax in fig.axes:
         ax.axis('off')
@@ -169,12 +169,12 @@ def create_cor_fig_hxn_offset(init_proj, shifted_proj, theta_array, aligning_ele
     overlay_init = np.dstack((init_proj_theta_0_norm, init_proj_theta_1_norm, np.zeros_like(init_proj_theta_0_norm)))
     overlay_shifted = np.dstack((shifted_proj_theta_0_norm, shifted_proj_theta_1_norm, np.zeros_like(shifted_proj_theta_0_norm)))
 
-    im1_1 = axs[0, 0].imshow(init_proj_theta_0_rgb, aspect = 'equal')
-    im1_2 = axs[0, 1].imshow(init_proj_theta_1_rgb, aspect = 'equal')
-    im1_3 = axs[0, 2].imshow(overlay_init, aspect = 'equal')
-    im1_4 = axs[1, 0].imshow(shifted_proj_theta_0_rgb, aspect = 'equal')
-    im1_5 = axs[1, 1].imshow(shifted_proj_theta_1_rgb, aspect = 'equal')
-    im1_6 = axs[1, 2].imshow(overlay_shifted, aspect = 'equal')
+    im1_1 = axs[0, 0].imshow(init_proj_theta_0_rgb, aspect = 'equal', interpolation = 'none')
+    im1_2 = axs[0, 1].imshow(init_proj_theta_1_rgb, aspect = 'equal', interpolation = 'none')
+    im1_3 = axs[0, 2].imshow(overlay_init, aspect = 'equal', interpolation = 'none')
+    im1_4 = axs[1, 0].imshow(shifted_proj_theta_0_rgb, aspect = 'equal', interpolation = 'none')
+    im1_5 = axs[1, 1].imshow(shifted_proj_theta_1_rgb, aspect = 'equal', interpolation = 'none')
+    im1_6 = axs[1, 2].imshow(overlay_shifted, aspect = 'equal', interpolation = 'none')
 
     for ax in fig.axes:
         ax.axis('off')
