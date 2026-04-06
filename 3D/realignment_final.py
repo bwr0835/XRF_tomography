@@ -801,7 +801,7 @@ def realign_proj(cor_correction_only,
                 axs1[0].set_title(r'$\theta = -180^{\circ}, 0^{-}$')
                 axs1[1].set_title(r'$\theta = 0^{+}, 180^{\circ}$')
                 
-                for ax in axs1.axes:
+                for ax in fig1.axes:
                     ax.axis('off')
                     ax.axvline(x = phase_xcorr_first_part.shape[1]//2, color = 'white', linewidth = 2, linestyle = '--')
                     ax.axhline(y = phase_xcorr_first_part.shape[0]//2, color = 'white', linewidth = 2, linestyle = '--')
