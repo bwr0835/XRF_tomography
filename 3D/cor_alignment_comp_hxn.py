@@ -202,7 +202,7 @@ def create_cor_fig_hxn_offset(init_proj, shifted_proj, theta_array, aligning_ele
     plt.show()
 
 dir_path = '/Users/bwr0835/Documents'
-final_dir_path = f'{dir_path}/3_id_realigned_data_common_fov_cor_correction_only_03_30_2026_final'
+final_dir_path = f'{dir_path}/3_id_realigned_data_common_fov_cor_correction_only_03_30_2026'
 
 init_hxn_xrt_file_path = f'{dir_path}/3_id_aggregate_xrt.h5'
 init_hxn_xrf_file_path = f'{dir_path}/3_id_aggregate_xrf.h5'
