@@ -938,7 +938,7 @@ def realign_proj(cor_correction_only,
                     net_x_shift = net_x_shifts_pcc[0, theta_idx]
                     net_y_shift = net_y_shifts_pcc[0, theta_idx]
 
-                    aligned_proj_total_xrf[element_idx, theta_idx] = warp_shift(xrf_proj_img_array[element_idx, theta_idx], net_x_shift, net_y_shift)
+                    aligned_proj_total_xrf[element_idx, theta_idx] = warp_shift(xrf_proj_img_array[element_idx, theta_idx].copy(), net_x_shift, net_y_shift)
         
         else:
             for element_idx in range(n_elements_xrf):
