@@ -790,14 +790,14 @@ def realign_proj(cor_correction_only,
                     
                     aligned_proj[theta_idx_aux] = warp_shift(proj_img_array_element_to_align_with[theta_idx_aux], net_x_shifts_pcc[0, theta_idx_aux], net_y_shifts_pcc[0, theta_idx_aux], cval = cval)
 
-                # if net_x_shifts_pcc.ndim == 3:
-                #     center_of_rotation_avg_first_part, center_geom, offset_first_part = rot_center_avg(aligned_proj[:zero_deg_idx_array[1], start_slice:end_slice], 
-                #                                                                                        theta_idx_pairs_first_part, 
-                #                                                                                        theta_array_first_part)
+                if net_x_shifts_pcc.ndim == 3:
+                    center_of_rotation_avg_first_part, center_geom, offset_first_part = rot_center_avg(aligned_proj[:zero_deg_idx_array[1], start_slice:end_slice], 
+                                                                                                       theta_idx_pairs_first_part, 
+                                                                                                       theta_array_first_part)
                 
-                #     center_of_rotation_avg_second_part, _, offset_second_part = rot_center_avg(aligned_proj[zero_deg_idx_array[1]:, start_slice:end_slice], 
-                #                                                                                theta_idx_pairs_second_part, 
-                #                                                                                theta_array_second_part)
+                    center_of_rotation_avg_second_part, _, offset_second_part = rot_center_avg(aligned_proj[zero_deg_idx_array[1]:, start_slice:end_slice], 
+                                                                                               theta_idx_pairs_second_part, 
+                                                                                               theta_array_second_part)
 
                 # else:
                 #     center_of_rotation_avg_first_part, center_geom, offset_first_part = rot_center_avg(aligned_proj[:zero_deg_idx_array[1]], 
