@@ -831,7 +831,7 @@ def realign_proj(cor_correction_only,
                     fig, axs = plt.subplots()
                     # fig, axs = plt.subplots(2, 1)
                     # axs[0].imshow(pcc, vmin = pcc.min(), vmax = pcc.max())
-                    axs.imshow(pcc, vmin = pcc.min(), vmax = pcc.max(), aspect = 'equal')
+                    axs.imshow(pcc, vmin = pcc.min(), vmax = pcc.max(), aspect = 'equal', interpolation = 'none')
                     axs.axvline(x = pcc.shape[1]//2, color = 'white', linewidth = 2, linestyle = '--')
                     axs.axhline(y = pcc.shape[0]//2, color = 'white', linewidth = 2, linestyle = '--')
                     axs.axis('off')
