@@ -792,9 +792,25 @@ def realign_proj(cor_correction_only,
                 #                                                                                theta_idx_pairs_second_part, 
                 #                                                                                theta_array_second_part)
                 
-                shifts_first_part, _, _ = phase_xcorr_manual(aligned_proj[0, start_slice:end_slice], np.fliplr(aligned_proj[zero_deg_idx_array[0], start_slice:end_slice]), sigma = sigma, alpha = alpha, pixel_rad = 0, theta = np.array([-180, 0]))
-                shifts_second_part, _, _ = phase_xcorr_manual(aligned_proj[zero_deg_idx_array[1], start_slice:end_slice], np.fliplr(aligned_proj[-1, start_slice:end_slice]), sigma = sigma, alpha = alpha, pixel_rad = 0, theta = np.array([0, 180]))
-            
+                shifts_first_part, phase_xcorr_first_part, _ = phase_xcorr_manual(aligned_proj[0, start_slice:end_slice], np.fliplr(aligned_proj[zero_deg_idx_array[0], start_slice:end_slice]), sigma = sigma, alpha = alpha, pixel_rad = 0, theta = np.array([-180, 0]))
+                shifts_second_part, phase_xcorr_second_part, _ = phase_xcorr_manual(aligned_proj[zero_deg_idx_array[1], start_slice:end_slice], np.fliplr(aligned_proj[-1, start_slice:end_slice]), sigma = sigma, alpha = alpha, pixel_rad = 0, theta = np.array([0, 180]))
+
+                fig1, axs1 = plt.subplots(2, 1)
+                axs1[0].imshow(phase_xcorr_first_part, vmin = phase_xcorr_first_part.min(), vmax = phase_xcorr_first_part.max())
+                axs1[1].imshow(phase_xcorr_second_part, vmin = phase_xcorr_second_part.min(), vmax = phase_xcorr_second_part.max())
+                axs1[0].set_title(r'$\theta = -180^{\circ}, 0^{-}$')
+                axs1[1].set_title(r'$\theta = 0^{+}, 180^{\circ}$')
+                
+                for ax in axs1.axes:
+                    ax.axis('off')
+                    ax.axvline(x = phase_xcorr_first_part.shape[1]//2, color = 'white', linewidth = 2, linestyle = '--')
+                    ax.axhline(y = phase_xcorr_first_part.shape[0]//2, color = 'white', linewidth = 2, linestyle = '--')
+                    ax.axvline(x = phase_xcorr_second_part.shape[1]//2, color = 'white', linewidth = 2, linestyle = '--')
+                    ax.axhline(y = phase_xcorr_second_part.shape[0]//2, color = 'white', linewidth = 2, linestyle = '--')
+                    
+                fig1.tight_layout()
+                plt.show()
+
                 center_geom = aligned_proj.shape[2]//2
 
                 offset_first_part = shifts_first_part[1]/2
