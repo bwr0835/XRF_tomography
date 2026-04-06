@@ -222,7 +222,7 @@ xrt_sig_hxn = intensity_xrt_hxn[elements_xrt_hxn.index('xrt_sig')]
 # aligning_element_idx_hxn = elements_xrf_hxn.index(aligning_element_hxn)
 _, \
 _, \
-_, \
+init_x_shift_array, \
 init_y_shift_array, \
 _, \
 _, \
