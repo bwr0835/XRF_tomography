@@ -837,12 +837,18 @@ def realign_proj(cor_correction_only,
                     #                                                 alpha, 
                     #                                                 pixel_rad_cor_correction,
                     #                                                 theta = np.array([0, 180]))
+                    # shifts, pcc, pcc_truncated = phase_xcorr_manual(aligned_proj[zero_deg_idx_array[0], start_slice:end_slice], 
+                    #                                                 np.fliplr(aligned_proj[-1, start_slice:end_slice]), 
+                    #                                                 sigma, 
+                    #                                                 alpha, 
+                    #                                                 pixel_rad_cor_correction,
+                    #                                                 theta = np.array([0, 180]))
                     shifts, pcc, pcc_truncated = phase_xcorr_manual(aligned_proj[zero_deg_idx_array[0], start_slice:end_slice], 
-                                                                    np.fliplr(aligned_proj[-1, start_slice:end_slice]), 
+                                                                    np.fliplr(aligned_proj[zero_deg_idx_array[1], start_slice:end_slice]), 
                                                                     sigma, 
                                                                     alpha, 
                                                                     pixel_rad_cor_correction,
-                                                                    theta = np.array([0, 180]))
+                                                                    theta = np.array([0, 180]))               
                     print(shifts)
                     fig, axs = plt.subplots()
                     # fig, axs = plt.subplots(2, 1)
