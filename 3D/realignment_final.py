@@ -766,7 +766,23 @@ def realign_proj(cor_correction_only,
 
                 for theta_idx in range(len(theta_array_first_part)):
                     aligned_proj[theta_idx] = warp_shift(proj_img_array_element_to_align_with[theta_idx], net_x_shifts_pcc[0, theta_idx], net_y_shifts_pcc[0, theta_idx], cval = cval)
-                        
+
+                fig1, axs1 = plt.subplots(2, 1)
+                axs1[0].imshow(phase_xcorr_first_part, vmin = phase_xcorr_first_part.min(), vmax = phase_xcorr_first_part.max())
+                axs1[1].imshow(phase_xcorr_second_part, vmin = phase_xcorr_second_part.min(), vmax = phase_xcorr_second_part.max())
+                axs1[0].set_title(r'$\theta = -180^{\circ}, 0^{-}$')
+                axs1[1].set_title(r'$\theta = 0^{+}, 180^{\circ}$')
+                
+                for ax in fig1.axes:
+                    ax.axis('off')
+                    ax.axvline(x = phase_xcorr_first_part.shape[1]//2, color = 'white', linewidth = 2, linestyle = '--')
+                    ax.axhline(y = phase_xcorr_first_part.shape[0]//2, color = 'white', linewidth = 2, linestyle = '--')
+                    ax.axvline(x = phase_xcorr_second_part.shape[1]//2, color = 'white', linewidth = 2, linestyle = '--')
+                    ax.axhline(y = phase_xcorr_second_part.shape[0]//2, color = 'white', linewidth = 2, linestyle = '--')
+                    
+                fig1.tight_layout()
+                plt.show()
+                
                 print(f'Applying initial COR correction to post-flipped, post-remounted sample angles: {ppu.round_correct(-offset_init_second_part, ndec = 13)}')
                     
                 for theta_idx in range(len(theta_array_second_part)):
@@ -794,22 +810,6 @@ def realign_proj(cor_correction_only,
                 
                 shifts_first_part, phase_xcorr_first_part, _ = phase_xcorr_manual(aligned_proj[0, start_slice:end_slice], np.fliplr(aligned_proj[zero_deg_idx_array[0], start_slice:end_slice]), sigma = sigma, alpha = alpha, pixel_rad = 0, theta = np.array([-180, 0]))
                 shifts_second_part, phase_xcorr_second_part, _ = phase_xcorr_manual(aligned_proj[zero_deg_idx_array[1], start_slice:end_slice], np.fliplr(aligned_proj[-1, start_slice:end_slice]), sigma = sigma, alpha = alpha, pixel_rad = 0, theta = np.array([0, 180]))
-
-                fig1, axs1 = plt.subplots(2, 1)
-                axs1[0].imshow(phase_xcorr_first_part, vmin = phase_xcorr_first_part.min(), vmax = phase_xcorr_first_part.max())
-                axs1[1].imshow(phase_xcorr_second_part, vmin = phase_xcorr_second_part.min(), vmax = phase_xcorr_second_part.max())
-                axs1[0].set_title(r'$\theta = -180^{\circ}, 0^{-}$')
-                axs1[1].set_title(r'$\theta = 0^{+}, 180^{\circ}$')
-                
-                for ax in fig1.axes:
-                    ax.axis('off')
-                    ax.axvline(x = phase_xcorr_first_part.shape[1]//2, color = 'white', linewidth = 2, linestyle = '--')
-                    ax.axhline(y = phase_xcorr_first_part.shape[0]//2, color = 'white', linewidth = 2, linestyle = '--')
-                    ax.axvline(x = phase_xcorr_second_part.shape[1]//2, color = 'white', linewidth = 2, linestyle = '--')
-                    ax.axhline(y = phase_xcorr_second_part.shape[0]//2, color = 'white', linewidth = 2, linestyle = '--')
-                    
-                fig1.tight_layout()
-                plt.show()
 
                 center_geom = aligned_proj.shape[2]//2
 
