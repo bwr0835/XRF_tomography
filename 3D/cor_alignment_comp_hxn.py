@@ -152,9 +152,9 @@ def create_cor_fig_hxn_offset(init_proj, shifted_proj, theta_array, aligning_ele
     
     zero_deg_idx_array = np.where(theta_array == 0)[0]
     
-    init_proj_theta_0 = init_proj[zero_deg_idx_array[0]]
+    init_proj_theta_0 = init_proj[zero_deg_idx_array[1]]
     init_proj_theta_1 = np.fliplr(init_proj[-1])
-    shifted_proj_theta_0 = shifted_proj[zero_deg_idx_array[0]]
+    shifted_proj_theta_0 = shifted_proj[zero_deg_idx_array[1]]
     shifted_proj_theta_1 = np.fliplr(shifted_proj[-1])
 
     print(init_proj_theta_0.shape, init_proj_theta_1.shape, shifted_proj_theta_0.shape, shifted_proj_theta_1.shape)
@@ -260,31 +260,33 @@ zero_deg_idx_array = np.where(theta_xrt_hxn == 0)[0]
 theta_array_first_part = theta_xrt_hxn[:zero_deg_idx_array[1]]
 theta_array_second_part = theta_xrt_hxn[zero_deg_idx_array[1]:]
 
+
+
 theta_idx_pairs_first_part = [(0, -1)] # These remap to original -180° and 0° indices
 theta_idx_pairs_second_part = [(0, -1)] # These remap to original 0° and +180° indices
 
-center_of_rotation_avg_first_part, geometric_center, offset_init_first_part = rot_center_avg(init_proj_final[:zero_deg_idx_array[1]], 
-                                                                                             theta_idx_pairs_first_part, 
-                                                                                             theta_array_first_part)
+# center_of_rotation_avg_first_part, geometric_center, offset_init_first_part = rot_center_avg(init_proj_final[:zero_deg_idx_array[1]], 
+#                                                                                              theta_idx_pairs_first_part, 
+#                                                                                              theta_array_first_part)
 
-center_of_rotation_avg_second_part, geometric_center, offset_final_second_part = rot_center_avg(init_proj_final[zero_deg_idx_array[1]:], 
-                                                                                                theta_idx_pairs_second_part, 
-                                                                                                theta_array_second_part)
+# center_of_rotation_avg_second_part, geometric_center, offset_final_second_part = rot_center_avg(init_proj_final[zero_deg_idx_array[1]:], 
+#                                                                                                 theta_idx_pairs_second_part, 
+#                                                                                                 theta_array_second_part)
 
-shifts_init_first_part, phase_xcorr_2d_first_part, _ = realign.phase_xcorr_manual(init_proj_final[0], np.fliplr(aligned_proj_total_xrf[zero_deg_idx_array[0]]), sigma = 25, alpha = 10, pixel_rad = 0, theta = np.array([-180, 0]))
-shifts_init_second_part, phase_xcorr_2d_second_part, _ = realign.phase_xcorr_manual(init_proj_final[zero_deg_idx_array[1]], np.fliplr(aligned_proj_total_xrf[-1]), sigma = 25, alpha = 10, pixel_rad = 0, theta = np.array([0, 180]))
+# shifts_init_first_part, phase_xcorr_2d_first_part, _ = realign.phase_xcorr_manual(init_proj_final[0], np.fliplr(aligned_proj_total_xrf[zero_deg_idx_array[0]]), sigma = 25, alpha = 10, pixel_rad = 0, theta = np.array([-180, 0]))
+# shifts_init_second_part, phase_xcorr_2d_second_part, _ = realign.phase_xcorr_manual(init_proj_final[zero_deg_idx_array[1]], np.fliplr(aligned_proj_total_xrf[-1]), sigma = 25, alpha = 10, pixel_rad = 0, theta = np.array([0, 180]))
 
 # plt.imshow(phase_xcorr_2d_first_part, vmin = phase_xcorr_2d_first_part.min(), vmax = phase_xcorr_2d_first_part.max())
 # plt.imshow(phase_xcorr_2d_second_part, vmin = phase_xcorr_2d_second_part.min(), vmax = phase_xcorr_2d_second_part.max())
 # plt.show()
 
-print('Initial offset (first part):', shifts_init_first_part[1]/2)
-print('Initial offset (second part):', shifts_init_second_part[1]/2)
+# print('Initial offset (first part):', shifts_init_first_part[1]/2)
+# print('Initial offset (second part):', shifts_init_second_part[1]/2)
 
 
-offset_init_first_part = 2.6071765573317
-offset_init_second_part = 1.9150763284889
-pcc_offset = 0.0143047860342
+# offset_init_first_part = 2.6071765573317
+# offset_init_second_part = 1.9150763284889
+# pcc_offset = 0.0143047860342
 
 center_of_rotation_avg_first_part, geometric_center, offset_final_first_part = rot_center_avg(aligned_proj_total_xrf[:zero_deg_idx_array[1]], 
                                                                                               theta_idx_pairs_first_part, 
@@ -303,9 +305,9 @@ center_of_rotation_avg_second_part, geometric_center, offset_final_second_part =
 # plt.imshow(intensity_xrt_norm_hxn[:, 0], aspect = 'auto')
 # plt.show()
 
-create_cor_fig_hxn(init_proj_final[zero_deg_idx_array[1]:], aligned_proj_total_xrf[zero_deg_idx_array[1]:], theta_array_second_part, aligning_element_hxn, offset_final_second_part, offset_final_second_part)
+# create_cor_fig_hxn(init_proj_final[zero_deg_idx_array[1]:], aligned_proj_total_xrf[zero_deg_idx_array[1]:], theta_array_second_part, aligning_element_hxn, offset_final_second_part, offset_final_second_part)
 # create_cor_fig_hxn(init_proj_final[:zero_deg_idx_array[1]], aligned_proj_total_xrf[:zero_deg_idx_array[1]], theta_array_first_part, aligning_element_hxn, offset_init_first_part, offset_final_first_part)
-# create_cor_fig_hxn_offset(init_proj_final, aligned_proj_total_xrf, theta_xrt_hxn, aligning_element_hxn)
+create_cor_fig_hxn_offset(init_proj_final, aligned_proj_total_xrf, theta_xrt_hxn, aligning_element_hxn)
 
 
 
