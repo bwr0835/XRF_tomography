@@ -762,7 +762,7 @@ def realign_proj(cor_correction_only,
                     ddx = 0
                     net_x_shifts_pcc[0, :zero_deg_idx_array[1], start_slice:end_slice] -= offset_init_first_part
                     net_x_shifts_pcc[0, zero_deg_idx_array[1]:, start_slice:end_slice] -= (offset_init_second_part + ddx)
-                    net_y_shifts_pcc[0, zero_deg_idx_array[1]:, start_slice:end_slice] -= vert_shift_second_part
+                    net_y_shifts_pcc[0, zero_deg_idx_array[1]:] -= vert_shift_second_part
                 else:
                     net_x_shifts_pcc[0, :zero_deg_idx_array[1]] -= offset_init_first_part
                     net_x_shifts_pcc[0, zero_deg_idx_array[1]:] -= offset_init_second_part
