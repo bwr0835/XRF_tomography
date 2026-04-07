@@ -758,7 +758,7 @@ def realign_proj(cor_correction_only,
 
                 if net_x_shifts_pcc.ndim == 3:
                     print('Yes')
-                    ddx = -10
+                    ddx = 6
                     net_x_shifts_pcc[0, :zero_deg_idx_array[1], start_slice:end_slice] -= offset_init_first_part
                     net_x_shifts_pcc[0, zero_deg_idx_array[1]:, start_slice:end_slice] -= (offset_init_second_part + ddx)
                 
