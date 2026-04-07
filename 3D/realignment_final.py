@@ -19,7 +19,7 @@ def normalize_array_for_gif(array):
     return np.clip((array - np.nanmin(array_nonzero))/(np.nanmax(array_nonzero) - np.nanmin(array_nonzero)), 0, 1)
 
 def create_cor_fig_hxn_offset(init_proj, shifted_proj, theta_array, aligning_element):
-    fig, axs = plt.subplots(2, 3, figsize = (15, 9))
+    fig, axs = plt.subplots(2, 3)
     
     print(init_proj.shape, shifted_proj.shape)
     
@@ -69,7 +69,7 @@ def create_cor_fig_hxn_offset(init_proj, shifted_proj, theta_array, aligning_ele
     axs[1, 1].set_title(r'{0} (shifted)'.format(aligning_element), fontsize = 14)
     axs[1, 2].set_title(r'{0} (shifted overlay)'.format(aligning_element), fontsize = 14)
 
-    fig.suptitle(r'Center of rotation correction (Phase cross-correlation)' + '\n' + r'$\theta = 3$\textdegree used for second half dataset COR correction', fontsize = 16)
+    fig.suptitle(r'Center of rotation correction (Phase cross-correlation)', fontsize = 16)
     fig.tight_layout()
 
     plt.show()
@@ -130,7 +130,7 @@ def create_cor_fig_hxn(init_proj, shifted_proj, theta_array, aligning_element):
     plt.show()
 
 def create_cor_fig_hxn_offset_for_gif(raw_proj, net_x_shift_array, net_y_shift_array, shift_array, theta_array, aligning_element, start_slice, end_slice):
-    fig, axs = plt.subplots(3, 3)
+    fig, axs = plt.subplots(3, 3, figsize = (15, 9))
     
     zero_deg_idx_array = np.where(theta_array == 0)[0]
 
@@ -201,7 +201,7 @@ def create_cor_fig_hxn_offset_for_gif(raw_proj, net_x_shift_array, net_y_shift_a
     axs[2, 1].set_title(r'$\theta = {0}$\textdegree'.format(theta_array[-1]), fontsize = 14)
     axs[2, 2].set_title(r'{0} (shifted overlay)'.format(aligning_element), fontsize = 14)
 
-    fig.suptitle(r'Post-individual COR-corrected sample remount offset correction shifts ({0})'.format(aligning_element), fontsize = 16)
+    fig.suptitle(r'Post-individual COR-corrected sample remount offset correction shifts ({0})'.format(aligning_element) + '\n' + r'$\theta = 3$\textdegree used for second half dataset COR correction', fontsize = 16)
     
     frames = []
     for shift in shift_array:
