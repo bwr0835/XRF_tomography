@@ -757,8 +757,9 @@ def realign_proj(cor_correction_only,
                 print(f'Applying initial COR correction to pre-flipped, pre-remounted sample angles: {ppu.round_correct(-offset_init_first_part, ndec = 13)}')
 
                 if net_x_shifts_pcc.ndim == 3:
+                    ddx = 6
                     net_x_shifts_pcc[0, :zero_deg_idx_array[1], start_slice:end_slice] -= offset_init_first_part
-                    net_x_shifts_pcc[0, zero_deg_idx_array[1]:, start_slice:end_slice] -= offset_init_second_part
+                    net_x_shifts_pcc[0, zero_deg_idx_array[1]:, start_slice:end_slice] -= (offset_init_second_part + ddx)
                 
                 else:
                     net_x_shifts_pcc[0, :zero_deg_idx_array[1]] -= offset_init_first_part
