@@ -202,7 +202,7 @@ def create_cor_fig_hxn_offset_for_gif(raw_proj, net_x_shift_array, net_y_shift_a
     axs[2, 2].set_title(r'{0} (shifted overlay)'.format(aligning_element), fontsize = 14)
 
     fig.suptitle(r'Post-individual COR-corrected sample remount offset correction shifts ({0})'.format(aligning_element) 
-                 + '\n' + r'($\theta = 3$\textdegree{} used for second half dataset COR correction)', fontsize = 16)
+                 + '\n' + r'($\theta = 0^{-}$ used for second half dataset COR correction)', fontsize = 16)
     
     frames = []
     for shift in shift_array:
@@ -261,7 +261,7 @@ def create_cor_fig_hxn_offset_for_gif(raw_proj, net_x_shift_array, net_y_shift_a
 
     plt.close(fig)
   
-    gif_filename = '/home/bwr0835/3_id_realigned_data_common_fov_cor_correction_only_03_30_2026_final/xrt_od_xrf_realignment/shifted_proj_theta_3_deg.gif'
+    gif_filename = '/home/bwr0835/3_id_realigned_data_common_fov_cor_correction_only_03_30_2026_final/xrt_od_xrf_realignment/shifted_proj_theta_0_deg_minus.gif'
 
     iio2.mimsave(gif_filename, frames, fps = 10)
 
@@ -877,7 +877,7 @@ def realign_proj(cor_correction_only,
             #                                                                                 theta_idx_pairs_second_part, 
             #                                                                                 theta_array_second_part)
             shifts_init_first_part, phase_xcorr_first_part, _ = phase_xcorr_manual(aligned_proj[0, start_slice:end_slice], np.fliplr(aligned_proj[zero_deg_idx_array[0], start_slice:end_slice]), sigma = sigma, alpha = alpha, pixel_rad = 0, theta = np.array([-180, 0]))
-            shifts_init_second_part, phase_xcorr_second_part, _ = phase_xcorr_manual(aligned_proj[zero_deg_idx_array[1] + 1, start_slice:end_slice], np.fliplr(aligned_proj[-1, start_slice:end_slice]), sigma = sigma, alpha = alpha, pixel_rad = 0, theta = np.array([0, 180]))
+            shifts_init_second_part, phase_xcorr_second_part, _ = phase_xcorr_manual(aligned_proj[zero_deg_idx_array[1], start_slice:end_slice], np.fliplr(aligned_proj[-1, start_slice:end_slice]), sigma = sigma, alpha = alpha, pixel_rad = 0, theta = np.array([0, 180]))
             
             center_geom = aligned_proj.shape[2]//2
 
