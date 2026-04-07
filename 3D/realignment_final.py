@@ -822,20 +822,20 @@ def realign_proj(cor_correction_only,
 
                 # center_of_rotation_avg_first_part = center_geom + offset_first_part
                 # center_of_rotation_avg_second_part = center_geom + offset_second_part
-                fig, axs = plt.subplots()
+                # fig, axs = plt.subplots()
                 
-                im1_norm = normalize_array(aligned_proj[zero_deg_idx_array[1] + 1, start_slice:end_slice])
-                im2_norm = normalize_array(np.fliplr(aligned_proj[-1, start_slice:end_slice]))
+                # im1_norm = normalize_array(aligned_proj[zero_deg_idx_array[1] + 1, start_slice:end_slice])
+                # im2_norm = normalize_array(np.fliplr(aligned_proj[-1, start_slice:end_slice]))
                 
-                im = np.dstack((im1_norm, im2_norm, np.zeros_like(im1_norm)))
-                axs.imshow(im, aspect = 'equal')
-                axs.axvline(x = im.shape[1]//2, color = 'white', linewidth = 2, linestyle = '--')
-                axs.axhline(y = im.shape[0]//2, color = 'white', linewidth = 2, linestyle = '--')
-                axs.axis('off')
-                axs.set_title(r'Phase cross-correlation ($\theta = 0^{+}, 180$\textdegree) (phase cross-correlation COR alignment)', fontsize = 16)
-                fig.tight_layout()
+                # im = np.dstack((im1_norm, im2_norm, np.zeros_like(im1_norm)))
+                # axs.imshow(im, aspect = 'equal')
+                # axs.axvline(x = im.shape[1]//2, color = 'white', linewidth = 2, linestyle = '--')
+                # axs.axhline(y = im.shape[0]//2, color = 'white', linewidth = 2, linestyle = '--')
+                # axs.axis('off')
+                # axs.set_title(r'Phase cross-correlation ($\theta = 0^{+}, 180$\textdegree) (phase cross-correlation COR alignment)', fontsize = 16)
+                # fig.tight_layout()
                
-                plt.show()
+                # plt.show()
                 
                 print(f'New center of rotation (before flipping sample): {center_of_rotation_avg_first_part}')
                 print(f'New center of rotation (after flipping sample): {center_of_rotation_avg_second_part}\n')
