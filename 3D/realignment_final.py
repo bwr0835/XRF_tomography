@@ -854,7 +854,7 @@ def realign_proj(cor_correction_only,
                     theta_sum = aligned_proj[zero_deg_idx_array[0], start_slice:end_slice] + aligned_proj[-1, start_slice:end_slice]
                     offset = center_geom - rot_center(theta_sum)
 
-                    shifts = (0, offset)
+                    shifts = (0, -offset)
                     
                     # fig, axs = plt.subplots()
                     # fig, axs = plt.subplots(2, 1)
