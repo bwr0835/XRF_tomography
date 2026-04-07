@@ -16,7 +16,7 @@ def normalize_array(array):
 def normalize_array_for_gif(array):
     array_nonzero = array[array != 0]
 
-    return np.clip((array_nonzero - np.nanmin(array_nonzero))/(np.nanmax(array_nonzero) - np.nanmin(array_nonzero)), 0, 1)
+    return np.clip((array - np.nanmin(array_nonzero))/(np.nanmax(array_nonzero) - np.nanmin(array_nonzero)), 0, 1)
 
 def create_cor_fig_hxn_offset(init_proj, shifted_proj, theta_array, aligning_element):
     fig, axs = plt.subplots(2, 3)
