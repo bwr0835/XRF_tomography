@@ -135,7 +135,7 @@ def create_cor_fig_hxn_offset_for_gif(raw_proj, net_x_shift_array, net_y_shift_a
     zero_deg_idx_array = np.where(theta_array == 0)[0]
 
     net_x_shift = net_x_shift_array.copy()
-    shifted_proj = np.zeros_like(raw_proj)
+    shifted_proj = raw_proj.copy()
 
     n_theta_first_part = len(theta_array[:zero_deg_idx_array[1]])
     n_theta_second_part = len(theta_array[zero_deg_idx_array[1]:])
@@ -232,7 +232,7 @@ def create_cor_fig_hxn_offset_for_gif(raw_proj, net_x_shift_array, net_y_shift_a
 
         shifted_proj_theta_0_0_rgb = np.dstack((shifted_proj_theta_0_0_norm, np.zeros_like(shifted_proj_theta_0_0_norm), np.zeros_like(shifted_proj_theta_0_0_norm)))
         shifted_proj_theta_0_1_rgb = np.dstack((np.zeros_like(shifted_proj_theta_0_1_norm), shifted_proj_theta_0_1_norm, np.zeros_like(shifted_proj_theta_0_1_norm)))
-        shifted_proj_theta_1_0_rgb = np.dstack((np.zeros_like(shifted_proj_theta_1_0_norm), shifted_proj_theta_1_0_norm, np.zeros_like(shifted_proj_theta_1_0_norm)))
+        shifted_proj_theta_1_0_rgb = np.dstack((shifted_proj_theta_1_0_norm, np.zeros_like(shifted_proj_theta_1_0_norm), np.zeros_like(shifted_proj_theta_1_0_norm)))
         shifted_proj_theta_1_1_rgb = np.dstack((np.zeros_like(shifted_proj_theta_1_1_norm), shifted_proj_theta_1_1_norm, np.zeros_like(shifted_proj_theta_1_1_norm)))
         shifted_proj_theta_2_0_rgb = np.dstack((shifted_proj_theta_2_0_norm, np.zeros_like(shifted_proj_theta_2_0_norm), np.zeros_like(shifted_proj_theta_2_0_norm)))
         shifted_proj_theta_2_1_rgb = np.dstack((np.zeros_like(shifted_proj_theta_2_1_norm), shifted_proj_theta_2_1_norm, np.zeros_like(shifted_proj_theta_2_1_norm)))
