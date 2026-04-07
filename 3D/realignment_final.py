@@ -727,7 +727,7 @@ def realign_proj(cor_correction_only,
             # center_of_rotation_avg_first_part, center_geom, offset_init_first_part = rot_center_avg(aligned_proj[:zero_deg_idx_array[1], start_slice:end_slice], 
             #                                                                                         theta_idx_pairs_first_part, 
             #                                                                                         theta_array_first_part)
-                
+            
             center_of_rotation_avg_second_part, _, offset_init_second_part = rot_center_avg(aligned_proj[(zero_deg_idx_array[1] + 1):, start_slice:end_slice], 
                                                                                             theta_idx_pairs_second_part, 
                                                                                             theta_array_second_part)
@@ -739,7 +739,7 @@ def realign_proj(cor_correction_only,
             offset_init_first_part = shifts_init_first_part[1]/2
             # offset_init_second_part = shifts_init_second_part[1]/2
 
-            # center_of_rotation_avg_first_part = center_geom + offset_init_first_part
+            center_of_rotation_avg_first_part = center_geom + offset_init_first_part
             # center_of_rotation_avg_second_part = center_geom + offset_init_second_part
 
             print(f'Average center of rotation (before flipping sample): {ppu.round_correct(center_of_rotation_avg_first_part, ndec = 13)}')
