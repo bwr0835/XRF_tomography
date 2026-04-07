@@ -821,7 +821,7 @@ def realign_proj(cor_correction_only,
                 fig, axs = plt.subplots()
                 
                 im1_norm = normalize_array(aligned_proj[zero_deg_idx_array[0], start_slice:end_slice])
-                im2_norm = normalize_array(aligned_proj[-1, start_slice:end_slice])
+                im2_norm = normalize_array(np.fliplr(aligned_proj[-1, start_slice:end_slice]))
                 
                 im = np.dstack((im1_norm, im2_norm, np.zeros_like(im1_norm)))
                 axs.imshow(im, aspect = 'equal')
