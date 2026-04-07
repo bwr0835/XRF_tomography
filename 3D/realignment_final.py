@@ -129,7 +129,7 @@ def create_cor_fig_hxn(init_proj, shifted_proj, theta_array, aligning_element):
 
     plt.show()
 
-def create_cor_fig_hxn_offset_for_gif(raw_proj, net_x_shift_array, net_y_shift_array, shift_array, theta_array, aligning_element):
+def create_cor_fig_hxn_offset_for_gif(raw_proj, net_x_shift_array, net_y_shift_array, shift_array, theta_array, aligning_element, start_slice, end_slice):
     fig, axs = plt.subplots(3, 3)
     
     zero_deg_idx_array = np.where(theta_array == 0)[0]
@@ -147,14 +147,14 @@ def create_cor_fig_hxn_offset_for_gif(raw_proj, net_x_shift_array, net_y_shift_a
 
         shifted_proj[theta_idx_aux] = warp_shift(raw_proj[theta_idx_aux], net_x_shift[0, theta_idx_aux], net_y_shift_array[0, theta_idx_aux], cval = 0)
         
-    shifted_proj_theta_0_0 = shifted_proj[zero_deg_idx_array[0]]
-    shifted_proj_theta_0_1 = np.fliplr(shifted_proj[-1])
+    shifted_proj_theta_0_0 = shifted_proj[zero_deg_idx_array[0], start_slice:end_slice]
+    shifted_proj_theta_0_1 = np.fliplr(shifted_proj[-1], start_slice:end_slice)
 
-    shifted_proj_theta_1_0 = shifted_proj[zero_deg_idx_array[1]]
-    shifted_proj_theta_1_1 = np.fliplr(shifted_proj[-1])
+    shifted_proj_theta_1_0 = shifted_proj[zero_deg_idx_array[1], start_slice:end_slice]
+    shifted_proj_theta_1_1 = np.fliplr(shifted_proj[-1], start_slice:end_slice)
 
-    shifted_proj_theta_2_0 = shifted_proj[zero_deg_idx_array[1] + 1]
-    shifted_proj_theta_2_1 = np.fliplr(shifted_proj[-1])
+    shifted_proj_theta_2_0 = shifted_proj[zero_deg_idx_array[1] + 1, start_slice:end_slice]
+    shifted_proj_theta_2_1 = np.fliplr(shifted_proj[-1], start_slice:end_slice)
 
     shifted_proj_theta_0_0_norm = normalize_array_for_gif(shifted_proj_theta_0_0)
     shifted_proj_theta_0_1_norm = normalize_array_for_gif(shifted_proj_theta_0_1)
@@ -980,7 +980,7 @@ def realign_proj(cor_correction_only,
                 # fig.tight_layout()
                 shift_array = np.linspace(-20, 20, 41)
                 # plt.show()
-                create_cor_fig_hxn_offset_for_gif(aligned_proj, net_x_shifts_pcc, net_y_shifts_pcc, shift_array, theta_array, aligning_element)
+                create_cor_fig_hxn_offset_for_gif(aligned_proj, net_x_shifts_pcc, net_y_shifts_pcc, shift_array, theta_array, aligning_element, start_slice, end_slice)
                 print(f'New center of rotation (before flipping sample): {center_of_rotation_avg_first_part}')
                 print(f'New center of rotation (after flipping sample): {center_of_rotation_avg_second_part}\n')
                 print(f'Geometric center: {center_geom}\n')
