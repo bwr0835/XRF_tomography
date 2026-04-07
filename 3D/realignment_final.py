@@ -758,7 +758,7 @@ def realign_proj(cor_correction_only,
 
                 if net_x_shifts_pcc.ndim == 3:
                     print('Yes')
-                    ddx = 100
+                    ddx = -4
                     net_x_shifts_pcc[0, :zero_deg_idx_array[1], start_slice:end_slice] -= offset_init_first_part
                     net_x_shifts_pcc[0, zero_deg_idx_array[1]:, start_slice:end_slice] -= (offset_init_second_part + ddx)
                 
@@ -822,7 +822,7 @@ def realign_proj(cor_correction_only,
                 # center_of_rotation_avg_second_part = center_geom + offset_second_part
                 fig, axs = plt.subplots()
                 
-                im1_norm = normalize_array(aligned_proj[zero_deg_idx_array[0], start_slice:end_slice])
+                im1_norm = normalize_array(aligned_proj[zero_deg_idx_array[1], start_slice:end_slice])
                 im2_norm = normalize_array(np.fliplr(aligned_proj[-1, start_slice:end_slice]))
                 
                 im = np.dstack((im1_norm, im2_norm, np.zeros_like(im1_norm)))
