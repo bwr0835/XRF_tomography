@@ -227,6 +227,8 @@ def create_cor_fig_hxn_offset_for_gif(raw_proj, net_x_shift_array, net_y_shift_a
     
     frames = []
     for shift in shift_array:
+        fig, axs = plt.subplots(3, 3, figsize = (15, 9))
+        
         net_x_shift = net_x_shift_array.copy()
         net_x_shift[0, zero_deg_idx_array[1]:] += shift
 
