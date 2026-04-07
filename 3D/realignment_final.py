@@ -757,13 +757,14 @@ def realign_proj(cor_correction_only,
                 print(f'Applying initial COR correction to pre-flipped, pre-remounted sample angles: {ppu.round_correct(-offset_init_first_part, ndec = 13)}')
 
                 if net_x_shifts_pcc.ndim == 3:
-                    ddx = 10
+                    
                     net_x_shifts_pcc[0, :zero_deg_idx_array[1], start_slice:end_slice] -= offset_init_first_part
-                    net_x_shifts_pcc[0, zero_deg_idx_array[1]:, start_slice:end_slice] -= (offset_init_second_part + ddx)
+                    net_x_shifts_pcc[0, zero_deg_idx_array[1]:, start_slice:end_slice] -= (offset_init_second_part)
                 
                 else:
+                    ddx = 10
                     net_x_shifts_pcc[0, :zero_deg_idx_array[1]] -= offset_init_first_part
-                    net_x_shifts_pcc[0, zero_deg_idx_array[1]:] -= offset_init_second_part
+                    net_x_shifts_pcc[0, zero_deg_idx_array[1]:] -= (offset_init_second_part + ddx)
 
                 for theta_idx in range(len(theta_array_first_part)):
                     aligned_proj[theta_idx] = warp_shift(proj_img_array_element_to_align_with[theta_idx], net_x_shifts_pcc[0, theta_idx], net_y_shifts_pcc[0, theta_idx], cval = cval)
