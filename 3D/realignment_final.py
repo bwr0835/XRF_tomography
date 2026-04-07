@@ -861,6 +861,12 @@ def realign_proj(cor_correction_only,
                     #                                                 alpha, 
                     #                                                 pixel_rad_cor_correction,
                     #                                                 theta = np.array([0, 180]))
+                    for theta_idx in range(len(theta_array_second_part)):
+                        theta_idx_aux = theta_idx + len(theta_array_first_part)
+                        net_x_shifts_pcc[0, theta_idx_aux] += 2
+
+                        aligned_proj[theta_idx_aux] = warp_shift(proj_img_array_element_to_align_with[theta_idx_aux], net_x_shifts_pcc[0, theta_idx_aux], net_y_shifts_pcc[0, theta_idx_aux], cval = cval)
+                    
                     pixel_rad_cor_correction = 5
                     shifts, pcc, pcc_truncated = phase_xcorr_manual(aligned_proj[zero_deg_idx_array[0], start_slice:end_slice], 
                                                                     aligned_proj[-1, start_slice:end_slice], 
