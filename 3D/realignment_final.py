@@ -191,10 +191,10 @@ def create_cor_fig_hxn_offset_for_gif(raw_proj, net_x_shift_array, net_y_shift_a
 
     text_1 = axs[0, 0].text(0.02, 0.02, r'Shift = {0}'.format(shift_array[0]), transform = axs[0, 0].transAxes, color = 'white')
 
-    axs[0, 0].set_title(r'$\theta = {0}^{{+}}$'.format(theta_array[zero_deg_idx_array[1]]), fontsize = 14)
+    axs[0, 0].set_title(r'$\theta = {0}^{{-}}$'.format(theta_array[zero_deg_idx_array[1]]), fontsize = 14)
     axs[0, 1].set_title(r'$\theta = {0}$\textdegree'.format(theta_array[-1]), fontsize = 14)
     axs[0, 2].set_title(r'{0} (overlay)'.format(aligning_element), fontsize = 14)
-    axs[1, 0].set_title(r'$\theta = {0}^{{-}}$'.format(theta_array[zero_deg_idx_array[0]]), fontsize = 14)
+    axs[1, 0].set_title(r'$\theta = {0}^{{+}}$'.format(theta_array[zero_deg_idx_array[0]]), fontsize = 14)
     axs[1, 1].set_title(r'$\theta = {0}$\textdegree'.format(theta_array[-1]), fontsize = 14)
     axs[1, 2].set_title(r'{0} (shifted overlay)'.format(aligning_element), fontsize = 14)
     axs[2, 0].set_title(r'$\theta = {0}$\textdegree'.format(theta_array[zero_deg_idx_array[1] + 1]), fontsize = 14)
