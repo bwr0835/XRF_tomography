@@ -69,7 +69,7 @@ def create_cor_fig_hxn_offset(init_proj, shifted_proj, theta_array, aligning_ele
     axs[1, 1].set_title(r'{0} (shifted)'.format(aligning_element), fontsize = 14)
     axs[1, 2].set_title(r'{0} (shifted overlay)'.format(aligning_element), fontsize = 14)
 
-    fig.suptitle(r'Center of rotation correction (Phase cross-correlation)', fontsize = 16)
+    fig.suptitle(r'Center of rotation correction (Phase cross-correlation)' + '\n' + r'$\theta = 3$\textdegree used for second half dataset COR correction', fontsize = 16)
     fig.tight_layout()
 
     plt.show()
