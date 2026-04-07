@@ -861,6 +861,7 @@ def realign_proj(cor_correction_only,
                     #                                                 alpha, 
                     #                                                 pixel_rad_cor_correction,
                     #                                                 theta = np.array([0, 180]))
+                    pixel_rad_cor_correction = 5
                     shifts, pcc, pcc_truncated = phase_xcorr_manual(aligned_proj[zero_deg_idx_array[0], start_slice:end_slice], 
                                                                     aligned_proj[-1, start_slice:end_slice], 
                                                                     sigma, 
