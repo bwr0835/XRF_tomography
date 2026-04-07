@@ -728,19 +728,19 @@ def realign_proj(cor_correction_only,
             #                                                                                         theta_idx_pairs_first_part, 
             #                                                                                         theta_array_first_part)
                 
-            # center_of_rotation_avg_second_part, _, offset_init_second_part = rot_center_avg(aligned_proj[(zero_deg_idx_array[1] + 1):, start_slice:end_slice], 
-            #                                                                                 theta_idx_pairs_second_part, 
-            #                                                                                 theta_array_second_part)
+            center_of_rotation_avg_second_part, _, offset_init_second_part = rot_center_avg(aligned_proj[(zero_deg_idx_array[1] + 1):, start_slice:end_slice], 
+                                                                                            theta_idx_pairs_second_part, 
+                                                                                            theta_array_second_part)
             shifts_init_first_part, phase_xcorr_first_part, _ = phase_xcorr_manual(aligned_proj[0, start_slice:end_slice], np.fliplr(aligned_proj[zero_deg_idx_array[0], start_slice:end_slice]), sigma = sigma, alpha = alpha, pixel_rad = 0, theta = np.array([-180, 0]))
-            shifts_init_second_part, phase_xcorr_second_part, _ = phase_xcorr_manual(aligned_proj[zero_deg_idx_array[1] + 1, start_slice:end_slice], np.fliplr(aligned_proj[-1, start_slice:end_slice]), sigma = sigma, alpha = alpha, pixel_rad = 0, theta = np.array([0, 180]))
+            # shifts_init_second_part, phase_xcorr_second_part, _ = phase_xcorr_manual(aligned_proj[zero_deg_idx_array[1] + 1, start_slice:end_slice], np.fliplr(aligned_proj[-1, start_slice:end_slice]), sigma = sigma, alpha = alpha, pixel_rad = 0, theta = np.array([0, 180]))
             
-            center_geom = aligned_proj.shape[2]//2
+            # center_geom = aligned_proj.shape[2]//2
 
             offset_init_first_part = shifts_init_first_part[1]/2
-            offset_init_second_part = shifts_init_second_part[1]/2
+            # offset_init_second_part = shifts_init_second_part[1]/2
 
-            center_of_rotation_avg_first_part = center_geom + offset_init_first_part
-            center_of_rotation_avg_second_part = center_geom + offset_init_second_part
+            # center_of_rotation_avg_first_part = center_geom + offset_init_first_part
+            # center_of_rotation_avg_second_part = center_geom + offset_init_second_part
 
             print(f'Average center of rotation (before flipping sample): {ppu.round_correct(center_of_rotation_avg_first_part, ndec = 13)}')
             print(f'Average center of rotation (after flipping sample): {ppu.round_correct(center_of_rotation_avg_second_part, ndec = 13)}\n')
@@ -843,33 +843,27 @@ def realign_proj(cor_correction_only,
                     #                                                 alpha, 
                     #                                                 pixel_rad_cor_correction,
                     #                                                 theta = np.array([0, 180]))
-                    # shifts, pcc, pcc_truncated = phase_xcorr_manual(aligned_proj[zero_deg_idx_array[0], start_slice:end_slice], 
-                    #                                                 aligned_proj[-1, start_slice:end_slice], 
-                    #                                                 sigma, 
-                    #                                                 alpha, 
-                    #                                                 pixel_rad_cor_correction,
-                    #                                                 theta = np.array([0, 180]))               
-                    # print(shifts)
-    
-                    theta_sum = aligned_proj[zero_deg_idx_array[0], start_slice:end_slice] + aligned_proj[-1, start_slice:end_slice]
-                    offset = center_geom - rot_center(theta_sum)
-
-                    shifts = (0, -offset)
-                    
-                    # fig, axs = plt.subplots()
+                    shifts, pcc, pcc_truncated = phase_xcorr_manual(aligned_proj[zero_deg_idx_array[0], start_slice:end_slice], 
+                                                                    aligned_proj[-1, start_slice:end_slice], 
+                                                                    sigma, 
+                                                                    alpha, 
+                                                                    pixel_rad_cor_correction,
+                                                                    theta = np.array([0, 180]))               
+                    print(shifts)
+                    fig, axs = plt.subplots()
                     # fig, axs = plt.subplots(2, 1)
                     # axs[0].imshow(pcc, vmin = pcc.min(), vmax = pcc.max())
-                    # axs.imshow(pcc, vmin = pcc.min(), vmax = pcc.max(), aspect = 'equal', interpolation = 'none')
-                    # axs.axvline(x = pcc.shape[1]//2, color = 'white', linewidth = 2, linestyle = '--')
-                    # axs.axhline(y = pcc.shape[0]//2, color = 'white', linewidth = 2, linestyle = '--')
-                    # axs.axis('off')
-                    # axs.set_title(r'Phase cross-correlation ($\theta = 0^{-}, 180$\textdegree) (phase cross-correlation COR alignment)', fontsize = 16)
-                    # fig.tight_layout()
+                    axs.imshow(pcc, vmin = pcc.min(), vmax = pcc.max(), aspect = 'equal', interpolation = 'none')
+                    axs.axvline(x = pcc.shape[1]//2, color = 'white', linewidth = 2, linestyle = '--')
+                    axs.axhline(y = pcc.shape[0]//2, color = 'white', linewidth = 2, linestyle = '--')
+                    axs.axis('off')
+                    axs.set_title(r'Phase cross-correlation ($\theta = 0^{-}, 180$\textdegree) (phase cross-correlation COR alignment)', fontsize = 16)
+                    fig.tight_layout()
                     # axs[1].imshow(pcc_truncated, vmin = pcc.min(), vmax = pcc.max(), extent = [pcc.shape[1]//2 - pixel_rad_cor_correction, 
                                                                                             #    pcc.shape[1]//2 + pixel_rad_cor_correction, 
                                                                                             #    pcc.shape[0]//2 + pixel_rad_cor_correction, 
                                                                                             #    pcc.shape[0]//2 - pixel_rad_cor_correction])
-                    # plt.show()
+                    plt.show()
                 
                 else:
                     shifts, _, _ = phase_xcorr_manual(aligned_proj[zero_deg_idx_array[0]], 
@@ -879,7 +873,7 @@ def realign_proj(cor_correction_only,
                                                       pixel_rad_cor_correction,
                                                       theta = np.array([0, 180]))
                 
-                dx = shifts[1]
+                dx = -shifts[1]
                     
                 print(f'Applying additional COR correction to flipped, remounted sample angles: {ppu.round_correct(-dx, ndec = 13)}')
 
