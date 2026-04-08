@@ -212,20 +212,20 @@ def create_cor_fig_hxn_offset_for_gif(raw_proj, net_x_shift_array, net_y_shift_a
     # axs[2, 1].set_title(r'$\theta = {0}$\textdegree'.format(theta_array[-1]), fontsize = 14)
     # axs[2, 2].set_title(r'{0} (shifted overlay)'.format(aligning_element), fontsize = 14)
 
-    axs[0, 0].set_title(r'$\theta = {0}^{{-}}$'.format(theta_array[zero_deg_idx_array[1]]), fontsize = 14)
-    axs[0, 1].set_title(r'$\theta = {0}$\textdegree'.format(theta_array[-1]), fontsize = 14)
-    axs[0, 2].set_title(r'{0} (overlay)'.format(aligning_element), fontsize = 14)
-    axs[1, 0].set_title(r'$\theta = {0}$\textdegree'.format(theta_array[theta_pair_idx[2][0]]), fontsize = 14)
-    axs[1, 1].set_title(r'$\theta = {0}$\textdegree'.format(theta_array[theta_pair_idx[2][1]]), fontsize = 14)
-    axs[1, 2].set_title(r'{0} (overlay)'.format(aligning_element), fontsize = 14)
-    axs[2, 0].set_title(r'$\theta = {0}$\textdegree'.format(theta_array[theta_pair_idx[5][0]]), fontsize = 14)
-    axs[2, 1].set_title(r'$\theta = {0}$\textdegree'.format(theta_array[theta_pair_idx[5][1]]), fontsize = 14)
-    axs[2, 2].set_title(r'{0} (overlay)'.format(aligning_element), fontsize = 14)
+    # axs[0, 0].set_title(r'$\theta = {0}^{{-}}$'.format(theta_array[zero_deg_idx_array[1]]), fontsize = 14)
+    # axs[0, 1].set_title(r'$\theta = {0}$\textdegree'.format(theta_array[-1]), fontsize = 14)
+    # axs[0, 2].set_title(r'{0} (overlay)'.format(aligning_element), fontsize = 14)
+    # axs[1, 0].set_title(r'$\theta = {0}$\textdegree'.format(theta_array[theta_pair_idx[2][0]]), fontsize = 14)
+    # axs[1, 1].set_title(r'$\theta = {0}$\textdegree'.format(theta_array[theta_pair_idx[2][1]]), fontsize = 14)
+    # axs[1, 2].set_title(r'{0} (overlay)'.format(aligning_element), fontsize = 14)
+    # axs[2, 0].set_title(r'$\theta = {0}$\textdegree'.format(theta_array[theta_pair_idx[5][0]]), fontsize = 14)
+    # axs[2, 1].set_title(r'$\theta = {0}$\textdegree'.format(theta_array[theta_pair_idx[5][1]]), fontsize = 14)
+    # axs[2, 2].set_title(r'{0} (overlay)'.format(aligning_element), fontsize = 14)
 
-    fig.suptitle(r'Post-individual COR-corrected sample remount offset correction shifts ({0})'.format(aligning_element) 
-                 + '\n' + r'($\theta = 0^{-}$ used for second half dataset COR correction)', fontsize = 16)
+    # fig.suptitle(r'Post-individual COR-corrected sample remount offset correction shifts ({0})'.format(aligning_element) 
+    #              + '\n' + r'($\theta = 0^{-}$ used for second half dataset COR correction)', fontsize = 16)
     
-    frames = []
+    # frames = []
     for shift in shift_array:
         fig, axs = plt.subplots(3, 3, figsize = (15, 9))
         
