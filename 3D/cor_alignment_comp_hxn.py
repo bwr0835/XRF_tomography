@@ -257,15 +257,19 @@ zero_deg_idx_array = np.where(theta_xrt_hxn == 0)[0]
 theta_array_first_part = theta_xrt_hxn[:zero_deg_idx_array[1]]
 theta_array_second_part = theta_xrt_hxn[zero_deg_idx_array[1]:]
 
-vert_shift = 6.04640699
+vert_shift = 0
 
 for theta_idx in range(len(theta_array_second_part)):
     theta_idx_aux = theta_idx + len(theta_array_first_part)
     
     aligned_proj_total_xrf[theta_idx_aux] = ndi.shift(aligned_proj_total_xrf[theta_idx_aux], shift = (vert_shift, 0))
 
-init_proj_final = init_proj[:, (start_slice + 7):(intensity_xrt_norm_hxn.shape[1] - end_slice)]
-aligned_proj_final = aligned_proj_total_xrf[:, 7:]
+# init_proj_final = init_proj[:, (start_slice + 7):(intensity_xrt_norm_hxn.shape[1] - end_slice)]
+init_proj_final = init_proj[:, start_slice:(intensity_xrt_norm_hxn.shape[1] - end_slice)]
+# aligned_proj_final = aligned_proj_total_xrf[:, 7:]
+
+# init_proj_final = init_proj
+aligned_proj_final = aligned_proj_total_xrf
 
 theta_idx_pairs_first_part = [(0, -1)] # These remap to original -180° and 0° indices
 theta_idx_pairs_second_part = [(0, -1)] # These remap to original 0° and +180° indices

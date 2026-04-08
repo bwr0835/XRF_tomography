@@ -130,8 +130,179 @@ def create_cor_fig_hxn(init_proj, shifted_proj, theta_array, aligning_element):
     plt.show()
 
 def create_cor_fig_hxn_offset_for_gif(raw_proj, net_x_shift_array, net_y_shift_array, shift_array, theta_array, aligning_element, start_slice, end_slice):
-    # fig, axs = plt.subplots(3, 3, figsize = (15, 9))
+    fig, axs = plt.subplots(3, 3, figsize = (15, 9))
     
+    zero_deg_idx_array = np.where(theta_array == 0)[0]
+
+    theta_pair_idx = ppu.find_theta_combos(theta_array[theta_array != 0])
+
+    net_x_shift = net_x_shift_array.copy()
+    shifted_proj = raw_proj.copy()
+
+    n_theta_first_part = len(theta_array[:zero_deg_idx_array[1]])
+    n_theta_second_part = len(theta_array[zero_deg_idx_array[1]:])
+
+    net_x_shift[0, zero_deg_idx_array[1]:] += shift_array[0]
+
+    for theta_idx in range(n_theta_second_part):
+        theta_idx_aux = theta_idx + n_theta_first_part
+
+        shifted_proj[theta_idx_aux] = warp_shift(raw_proj[theta_idx_aux], net_x_shift[0, theta_idx_aux], net_y_shift_array[0, theta_idx_aux], cval = 0)
+        
+    shifted_proj_theta_0_0 = shifted_proj[zero_deg_idx_array[0], start_slice:end_slice]
+    shifted_proj_theta_0_1 = np.fliplr(shifted_proj[-1, start_slice:end_slice])
+
+    shifted_proj_theta_1_0 = shifted_proj[zero_deg_idx_array[1], start_slice:end_slice]
+    shifted_proj_theta_1_1 = np.fliplr(shifted_proj[-1, start_slice:end_slice])
+
+    shifted_proj_theta_2_0 = shifted_proj[zero_deg_idx_array[1] + 1, start_slice:end_slice]
+    shifted_proj_theta_2_1 = np.fliplr(shifted_proj[-1, start_slice:end_slice])
+
+    # shifted_proj_theta_0_0 = shifted_proj[zero_deg_idx_array[0], start_slice:end_slice]
+    # shifted_proj_theta_0_1 = np.fliplr(shifted_proj[-1, start_slice:end_slice])
+
+    # shifted_proj_theta_1_0 = shifted_proj[theta_pair_idx[2][0], start_slice:end_slice]
+    # shifted_proj_theta_1_1 = np.fliplr(shifted_proj[theta_pair_idx[2][1], start_slice:end_slice])
+
+    # shifted_proj_theta_2_0 = shifted_proj[theta_pair_idx[5][0], start_slice:end_slice]
+    # shifted_proj_theta_2_1 = np.fliplr(shifted_proj[theta_pair_idx[5][1], start_slice:end_slice])
+
+    shifted_proj_theta_0_0_norm = normalize_array_for_gif(shifted_proj_theta_0_0)
+    shifted_proj_theta_0_1_norm = normalize_array_for_gif(shifted_proj_theta_0_1)
+    shifted_proj_theta_1_0_norm = normalize_array_for_gif(shifted_proj_theta_1_0)
+    shifted_proj_theta_1_1_norm = normalize_array_for_gif(shifted_proj_theta_1_1)
+    shifted_proj_theta_2_0_norm = normalize_array_for_gif(shifted_proj_theta_2_0)
+    shifted_proj_theta_2_1_norm = normalize_array_for_gif(shifted_proj_theta_2_1)
+
+    shifted_proj_theta_0_0_rgb = np.dstack((shifted_proj_theta_0_0_norm, np.zeros_like(shifted_proj_theta_0_0_norm), np.zeros_like(shifted_proj_theta_0_0_norm)))
+    shifted_proj_theta_0_1_rgb = np.dstack((np.zeros_like(shifted_proj_theta_0_1_norm), shifted_proj_theta_0_1_norm, np.zeros_like(shifted_proj_theta_0_1_norm)))
+    shifted_proj_theta_1_0_rgb = np.dstack((shifted_proj_theta_1_0_norm, np.zeros_like(shifted_proj_theta_1_0_norm), np.zeros_like(shifted_proj_theta_1_0_norm)))
+    shifted_proj_theta_1_1_rgb = np.dstack((np.zeros_like(shifted_proj_theta_1_1_norm), shifted_proj_theta_1_1_norm, np.zeros_like(shifted_proj_theta_1_1_norm)))
+    shifted_proj_theta_2_0_rgb = np.dstack((shifted_proj_theta_2_0_norm, np.zeros_like(shifted_proj_theta_2_0_norm), np.zeros_like(shifted_proj_theta_2_0_norm)))
+    shifted_proj_theta_2_1_rgb = np.dstack((np.zeros_like(shifted_proj_theta_2_1_norm), shifted_proj_theta_2_1_norm, np.zeros_like(shifted_proj_theta_2_1_norm)))
+
+    overlay_shifted_0 = np.dstack((shifted_proj_theta_0_0_norm, shifted_proj_theta_0_1_norm, np.zeros_like(shifted_proj_theta_0_0_norm)))
+    overlay_shifted_1 = np.dstack((shifted_proj_theta_1_0_norm, shifted_proj_theta_1_1_norm, np.zeros_like(shifted_proj_theta_1_0_norm)))
+    overlay_shifted_2 = np.dstack((shifted_proj_theta_2_0_norm, shifted_proj_theta_2_1_norm, np.zeros_like(shifted_proj_theta_2_0_norm)))
+
+    im1_1 = axs[0, 0].imshow(shifted_proj_theta_0_0_rgb)
+    im1_2 = axs[0, 1].imshow(shifted_proj_theta_0_1_rgb)
+    im1_3 = axs[0, 2].imshow(overlay_shifted_0)
+    im1_4 = axs[1, 0].imshow(shifted_proj_theta_1_0_rgb)
+    im1_5 = axs[1, 1].imshow(shifted_proj_theta_1_1_rgb)
+    im1_6 = axs[1, 2].imshow(overlay_shifted_1)
+    im1_7 = axs[2, 0].imshow(shifted_proj_theta_2_0_rgb)
+    im1_8 = axs[2, 1].imshow(shifted_proj_theta_2_1_rgb)
+    im1_9 = axs[2, 2].imshow(overlay_shifted_2)
+
+    for ax in fig.axes:
+        ax.axis('off')
+        ax.axvline(x = shifted_proj_theta_0_0.shape[1]//2, color = 'white', linewidth = 2, linestyle = '--')
+        ax.axhline(y = shifted_proj_theta_0_0.shape[0]//2, color = 'white', linewidth = 2, linestyle = '--')
+
+    text_1 = axs[0, 0].text(0.02, 0.02, r'Shift = {0}'.format(shift_array[0]), transform = axs[0, 0].transAxes, color = 'white')
+
+    axs[0, 0].set_title(r'$\theta = {0}^{{-}}$'.format(theta_array[zero_deg_idx_array[1]]), fontsize = 14)
+    axs[0, 1].set_title(r'$\theta = {0}$\textdegree'.format(theta_array[-1]), fontsize = 14)
+    axs[0, 2].set_title(r'{0} (overlay)'.format(aligning_element), fontsize = 14)
+    axs[1, 0].set_title(r'$\theta = {0}^{{+}}$'.format(theta_array[zero_deg_idx_array[0]]), fontsize = 14)
+    axs[1, 1].set_title(r'$\theta = {0}$\textdegree'.format(theta_array[-1]), fontsize = 14)
+    axs[1, 2].set_title(r'{0} (shifted overlay)'.format(aligning_element), fontsize = 14)
+    axs[2, 0].set_title(r'$\theta = {0}$\textdegree'.format(theta_array[zero_deg_idx_array[1] + 1]), fontsize = 14)
+    axs[2, 1].set_title(r'$\theta = {0}$\textdegree'.format(theta_array[-1]), fontsize = 14)
+    axs[2, 2].set_title(r'{0} (shifted overlay)'.format(aligning_element), fontsize = 14)
+
+    # axs[0, 0].set_title(r'$\theta = {0}^{{-}}$'.format(theta_array[zero_deg_idx_array[1]]), fontsize = 14)
+    # axs[0, 1].set_title(r'$\theta = {0}$\textdegree'.format(theta_array[-1]), fontsize = 14)
+    # axs[0, 2].set_title(r'{0} (overlay)'.format(aligning_element), fontsize = 14)
+    # axs[1, 0].set_title(r'$\theta = {0}$\textdegree'.format(theta_array[theta_pair_idx[2][0]]), fontsize = 14)
+    # axs[1, 1].set_title(r'$\theta = {0}$\textdegree'.format(theta_array[theta_pair_idx[2][1]]), fontsize = 14)
+    # axs[1, 2].set_title(r'{0} (overlay)'.format(aligning_element), fontsize = 14)
+    # axs[2, 0].set_title(r'$\theta = {0}$\textdegree'.format(theta_array[theta_pair_idx[5][0]]), fontsize = 14)
+    # axs[2, 1].set_title(r'$\theta = {0}$\textdegree'.format(theta_array[theta_pair_idx[5][1]]), fontsize = 14)
+    # axs[2, 2].set_title(r'{0} (overlay)'.format(aligning_element), fontsize = 14)
+
+    fig.suptitle(r'Post-individual COR-corrected sample remount offset correction shifts ({0})'.format(aligning_element) 
+                 + '\n' + r'($\theta = 0^{+}$ used for second half dataset COR correction)', fontsize = 16)
+    
+    frames = []
+    for shift in shift_array:
+        net_x_shift = net_x_shift_array.copy()
+        net_x_shift[0, zero_deg_idx_array[1]:] += shift
+
+        for theta_idx in range(n_theta_second_part):
+            theta_idx_aux = theta_idx + n_theta_first_part
+
+            shifted_proj[theta_idx_aux] = warp_shift(raw_proj[theta_idx_aux], net_x_shift[0, theta_idx_aux], net_y_shift_array[0, theta_idx_aux], cval = 0)
+        
+
+        # shifted_proj_theta_0_0 = shifted_proj[zero_deg_idx_array[0], start_slice:end_slice]
+        # shifted_proj_theta_0_1 = np.fliplr(shifted_proj[-1, start_slice:end_slice])
+
+        # shifted_proj_theta_1_0 = shifted_proj[zero_deg_idx_array[1], start_slice:end_slice]
+        # shifted_proj_theta_1_1 = np.fliplr(shifted_proj[-1, start_slice:end_slice])
+
+        # shifted_proj_theta_2_0 = shifted_proj[zero_deg_idx_array[1] + 1, start_slice:end_slice]
+        # shifted_proj_theta_2_1 = np.fliplr(shifted_proj[-1, start_slice:end_slice])
+
+        shifted_proj_theta_0_0 = shifted_proj[zero_deg_idx_array[0], start_slice:end_slice]
+        shifted_proj_theta_0_1 = np.fliplr(shifted_proj[-1, start_slice:end_slice])
+
+        shifted_proj_theta_1_0 = shifted_proj[theta_pair_idx[2][0], start_slice:end_slice]
+        shifted_proj_theta_1_1 = np.fliplr(shifted_proj[theta_pair_idx[2][1], start_slice:end_slice])
+
+        shifted_proj_theta_2_0 = shifted_proj[theta_pair_idx[5][0], start_slice:end_slice]
+        shifted_proj_theta_2_1 = np.fliplr(shifted_proj[theta_pair_idx[5][1], start_slice:end_slice])
+
+        shifted_proj_theta_0_0_norm = normalize_array_for_gif(shifted_proj_theta_0_0)
+        shifted_proj_theta_0_1_norm = normalize_array_for_gif(shifted_proj_theta_0_1)
+        shifted_proj_theta_1_0_norm = normalize_array_for_gif(shifted_proj_theta_1_0)
+        shifted_proj_theta_1_1_norm = normalize_array_for_gif(shifted_proj_theta_1_1)
+        shifted_proj_theta_2_0_norm = normalize_array_for_gif(shifted_proj_theta_2_0)
+        shifted_proj_theta_2_1_norm = normalize_array_for_gif(shifted_proj_theta_2_1)
+
+        shifted_proj_theta_0_0_rgb = np.dstack((shifted_proj_theta_0_0_norm, np.zeros_like(shifted_proj_theta_0_0_norm), np.zeros_like(shifted_proj_theta_0_0_norm)))
+        shifted_proj_theta_0_1_rgb = np.dstack((np.zeros_like(shifted_proj_theta_0_1_norm), shifted_proj_theta_0_1_norm, np.zeros_like(shifted_proj_theta_0_1_norm)))
+        shifted_proj_theta_1_0_rgb = np.dstack((shifted_proj_theta_1_0_norm, np.zeros_like(shifted_proj_theta_1_0_norm), np.zeros_like(shifted_proj_theta_1_0_norm)))
+        shifted_proj_theta_1_1_rgb = np.dstack((np.zeros_like(shifted_proj_theta_1_1_norm), shifted_proj_theta_1_1_norm, np.zeros_like(shifted_proj_theta_1_1_norm)))
+        shifted_proj_theta_2_0_rgb = np.dstack((shifted_proj_theta_2_0_norm, np.zeros_like(shifted_proj_theta_2_0_norm), np.zeros_like(shifted_proj_theta_2_0_norm)))
+        shifted_proj_theta_2_1_rgb = np.dstack((np.zeros_like(shifted_proj_theta_2_1_norm), shifted_proj_theta_2_1_norm, np.zeros_like(shifted_proj_theta_2_1_norm)))
+
+        overlay_shifted_0 = np.dstack((shifted_proj_theta_0_0_norm, shifted_proj_theta_0_1_norm, np.zeros_like(shifted_proj_theta_0_0_norm)))
+        overlay_shifted_1 = np.dstack((shifted_proj_theta_1_0_norm, shifted_proj_theta_1_1_norm, np.zeros_like(shifted_proj_theta_1_0_norm)))
+        overlay_shifted_2 = np.dstack((shifted_proj_theta_2_0_norm, shifted_proj_theta_2_1_norm, np.zeros_like(shifted_proj_theta_2_0_norm)))
+
+        im1_1.set_data(shifted_proj_theta_0_0_rgb)
+        im1_2.set_data(shifted_proj_theta_0_1_rgb)
+        im1_3.set_data(overlay_shifted_0)
+        im1_4.set_data(shifted_proj_theta_1_0_rgb)
+        im1_5.set_data(shifted_proj_theta_1_1_rgb)
+        im1_6.set_data(overlay_shifted_1)
+        im1_7.set_data(shifted_proj_theta_2_0_rgb)
+        im1_8.set_data(shifted_proj_theta_2_1_rgb)
+        im1_9.set_data(overlay_shifted_2)
+
+        text_1.set_text(r'Shift = {0}'.format(shift))
+
+        for ax in fig.axes:
+            ax.axis('off')
+            ax.axvline(x = shifted_proj_theta_0_0.shape[1]//2, color = 'white', linewidth = 2, linestyle = '--')
+            ax.axhline(y = shifted_proj_theta_0_0.shape[0]//2, color = 'white', linewidth = 2, linestyle = '--')
+
+        fig.canvas.draw()
+        
+        frame = np.array(fig.canvas.renderer.buffer_rgba())[:, :, :3]
+        frames.append(frame)
+
+    plt.close(fig)
+  
+    gif_filename = '/home/bwr0835/3_id_realigned_data_common_fov_cor_correction_only_03_30_2026_final/xrt_od_xrf_realignment/shifted_proj_theta_0_deg_minus_diff_theta_combos.gif'
+
+    iio2.mimsave(gif_filename, frames, fps = 10)
+
+    return
+
+def create_cor_fig_hxn_offset_for_gif_2(raw_proj, net_x_shift_array, net_y_shift_array, shift_array, theta_array, aligning_element, start_slice, end_slice):
     zero_deg_idx_array = np.where(theta_array == 0)[0]
 
     theta_pair_idx = ppu.find_theta_combos(theta_array[theta_array != 0])
@@ -236,16 +407,6 @@ def create_cor_fig_hxn_offset_for_gif(raw_proj, net_x_shift_array, net_y_shift_a
             theta_idx_aux = theta_idx + n_theta_first_part
 
             shifted_proj[theta_idx_aux] = warp_shift(raw_proj[theta_idx_aux], net_x_shift[0, theta_idx_aux], net_y_shift_array[0, theta_idx_aux], cval = 0)
-        
-
-        # shifted_proj_theta_0_0 = shifted_proj[zero_deg_idx_array[0], start_slice:end_slice]
-        # shifted_proj_theta_0_1 = np.fliplr(shifted_proj[-1, start_slice:end_slice])
-
-        # shifted_proj_theta_1_0 = shifted_proj[zero_deg_idx_array[1], start_slice:end_slice]
-        # shifted_proj_theta_1_1 = np.fliplr(shifted_proj[-1, start_slice:end_slice])
-
-        # shifted_proj_theta_2_0 = shifted_proj[zero_deg_idx_array[1] + 1, start_slice:end_slice]
-        # shifted_proj_theta_2_1 = np.fliplr(shifted_proj[-1, start_slice:end_slice])
 
         shifted_proj_theta_0_0 = shifted_proj[zero_deg_idx_array[0], start_slice:end_slice]
         shifted_proj_theta_0_1 = np.fliplr(shifted_proj[-1, start_slice:end_slice])
@@ -285,16 +446,7 @@ def create_cor_fig_hxn_offset_for_gif(raw_proj, net_x_shift_array, net_y_shift_a
         axs[2, 2].set_title(r'{0} (overlay)'.format(aligning_element), fontsize = 14)
 
         fig.suptitle(r'Post-individual COR-corrected sample remount offset correction shifts ({0})'.format(aligning_element) 
-                     + '\n' + r'($\theta = 0^{-}$ used for second half dataset COR correction)', fontsize = 16)
-        # im1_1.set_data(shifted_proj_theta_0_0_rgb)
-        # im1_2.set_data(shifted_proj_theta_0_1_rgb)
-        # im1_3.set_data(overlay_shifted_0)
-        # im1_4.set_data(shifted_proj_theta_1_0_rgb)
-        # im1_5.set_data(shifted_proj_theta_1_1_rgb)
-        # im1_6.set_data(overlay_shifted_1)
-        # im1_7.set_data(shifted_proj_theta_2_0_rgb)
-        # im1_8.set_data(shifted_proj_theta_2_1_rgb)
-        # im1_9.set_data(overlay_shifted_2)
+                     + '\n' + r'($\theta = 0^{+}$ used for second half dataset COR correction)', fontsize = 16)
 
         im1_1 = axs[0, 0].imshow(shifted_proj_theta_0_0_rgb)
         im1_2 = axs[0, 1].imshow(shifted_proj_theta_0_1_rgb)
@@ -306,7 +458,6 @@ def create_cor_fig_hxn_offset_for_gif(raw_proj, net_x_shift_array, net_y_shift_a
         im1_8 = axs[2, 1].imshow(shifted_proj_theta_2_1_rgb)
         im1_9 = axs[2, 2].imshow(overlay_shifted_2)
 
-        # text_1.set_text(r'Shift = {0}'.format(shift))
         text_1 = axs[0, 0].text(0.02, 0.02, r'Shift = {0}'.format(shift), transform = axs[0, 0].transAxes, color = 'white')
 
         for ax in fig.axes:
@@ -316,18 +467,8 @@ def create_cor_fig_hxn_offset_for_gif(raw_proj, net_x_shift_array, net_y_shift_a
 
         plt.show()
 
-    #     fig.canvas.draw()
-        
-    #     frame = np.array(fig.canvas.renderer.buffer_rgba())[:, :, :3]
-    #     frames.append(frame)
-
-    # plt.close(fig)
-  
-    # gif_filename = '/home/bwr0835/3_id_realigned_data_common_fov_cor_correction_only_03_30_2026_final/xrt_od_xrf_realignment/shifted_proj_theta_0_deg_minus_diff_theta_combos.gif'
-
-    # iio2.mimsave(gif_filename, frames, fps = 10)
-
     return
+
 
 def phase_xcorr_manual(ref_img,
                        mov_img, 
@@ -1041,7 +1182,7 @@ def realign_proj(cor_correction_only,
                 # fig.tight_layout()
                 shift_array = np.linspace(-20, 20, 41)
                 # plt.show()
-                create_cor_fig_hxn_offset_for_gif(aligned_proj, net_x_shifts_pcc, net_y_shifts_pcc, shift_array, theta_array, aligning_element, start_slice, end_slice)
+                create_cor_fig_hxn_offset_for_gif_2(aligned_proj, net_x_shifts_pcc, net_y_shifts_pcc, shift_array, theta_array, aligning_element, start_slice, end_slice)
                 print(f'New center of rotation (before flipping sample): {center_of_rotation_avg_first_part}')
                 print(f'New center of rotation (after flipping sample): {center_of_rotation_avg_second_part}\n')
                 print(f'Geometric center: {center_geom}\n')
