@@ -1107,7 +1107,7 @@ def realign_proj(cor_correction_only,
                 shift_array = np.linspace(-20, 20, 41)
                 # plt.show()
                 raw_proj = xrf_proj_img_array[element_to_align_with_idx].copy()
-                create_cor_fig_hxn_offset_for_gif_2(raw_proj, net_x_shifts_pcc, shift_array, theta_array, aligning_element, start_slice, end_slice)
+                create_cor_fig_hxn_offset_for_gif_2(raw_proj, net_x_shifts_pcc, net_y_shifts_pcc, shift_array, theta_array, aligning_element, start_slice, end_slice)
                 print(f'New center of rotation (before flipping sample): {center_of_rotation_avg_first_part}')
                 print(f'New center of rotation (after flipping sample): {center_of_rotation_avg_second_part}\n')
                 print(f'Geometric center: {center_geom}\n')
