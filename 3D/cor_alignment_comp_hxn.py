@@ -314,9 +314,16 @@ center_of_rotation_avg_second_part, geometric_center, offset_final_second_part =
 # plt.imshow(intensity_xrt_norm_hxn[:, 0], aspect = 'auto')
 # plt.show()
 
+# IMPORTANT: `find_theta_combos` returns index pairs for the *array you pass in*.
+# If you filter `theta_xrt_hxn` first, you must print from that same filtered array,
+# otherwise indices won't match and you'll see non-180° pairs.
+theta_nonzero = theta_xrt_hxn[theta_xrt_hxn != 0]
+a = ppu.find_theta_combos(theta_nonzero)
+print(theta_nonzero[a])
+
 # create_cor_fig_hxn(init_proj_final[:zero_deg_idx_array[1]], aligned_proj_final[:zero_deg_idx_array[1]], theta_array_first_part, aligning_element_hxn)
-create_cor_fig_hxn(init_proj_final[zero_deg_idx_array[1]:], aligned_proj_final[zero_deg_idx_array[1]:], theta_array_second_part, aligning_element_hxn)
-create_cor_fig_hxn_offset(init_proj_final, aligned_proj_final, theta_xrt_hxn, aligning_element_hxn)
+# create_cor_fig_hxn(init_proj_final[zero_deg_idx_array[1]:], aligned_proj_final[zero_deg_idx_array[1]:], theta_array_second_part, aligning_element_hxn)
+# create_cor_fig_hxn_offset(init_proj_final, aligned_proj_final, theta_xrt_hxn, aligning_element_hxn)
 
 
 

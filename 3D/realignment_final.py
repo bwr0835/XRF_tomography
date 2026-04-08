@@ -304,8 +304,9 @@ def create_cor_fig_hxn_offset_for_gif(raw_proj, net_x_shift_array, net_y_shift_a
 
 def create_cor_fig_hxn_offset_for_gif_2(raw_proj, net_x_shift_array, net_y_shift_array, shift_array, theta_array, aligning_element, start_slice, end_slice):
     zero_deg_idx_array = np.where(theta_array == 0)[0]
-
-    theta_pair_idx = ppu.find_theta_combos(theta_array[theta_array != 0])
+    
+    theta_nonzero = theta_array[theta_array != 0]
+    theta_pair_idx = ppu.find_theta_combos(theta_nonzero)
 
     net_x_shift = net_x_shift_array.copy()
     shifted_proj = raw_proj.copy()
