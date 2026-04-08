@@ -274,17 +274,33 @@ def create_cor_fig_hxn_offset_for_gif(raw_proj, net_x_shift_array, net_y_shift_a
         overlay_shifted_1 = np.dstack((shifted_proj_theta_1_0_norm, shifted_proj_theta_1_1_norm, np.zeros_like(shifted_proj_theta_1_0_norm)))
         overlay_shifted_2 = np.dstack((shifted_proj_theta_2_0_norm, shifted_proj_theta_2_1_norm, np.zeros_like(shifted_proj_theta_2_0_norm)))
 
-        im1_1.set_data(shifted_proj_theta_0_0_rgb)
-        im1_2.set_data(shifted_proj_theta_0_1_rgb)
-        im1_3.set_data(overlay_shifted_0)
-        im1_4.set_data(shifted_proj_theta_1_0_rgb)
-        im1_5.set_data(shifted_proj_theta_1_1_rgb)
-        im1_6.set_data(overlay_shifted_1)
-        im1_7.set_data(shifted_proj_theta_2_0_rgb)
-        im1_8.set_data(shifted_proj_theta_2_1_rgb)
-        im1_9.set_data(overlay_shifted_2)
+        # im1_1.set_data(shifted_proj_theta_0_0_rgb)
+        # im1_2.set_data(shifted_proj_theta_0_1_rgb)
+        # im1_3.set_data(overlay_shifted_0)
+        # im1_4.set_data(shifted_proj_theta_1_0_rgb)
+        # im1_5.set_data(shifted_proj_theta_1_1_rgb)
+        # im1_6.set_data(overlay_shifted_1)
+        # im1_7.set_data(shifted_proj_theta_2_0_rgb)
+        # im1_8.set_data(shifted_proj_theta_2_1_rgb)
+        # im1_9.set_data(overlay_shifted_2)
 
-        text_1.set_text(r'Shift = {0}'.format(shift))
+        im1_1 = axs[0, 0].imshow(shifted_proj_theta_0_0_rgb)
+        im1_2 = axs[0, 1].imshow(shifted_proj_theta_0_1_rgb)
+        im1_3 = axs[0, 2].imshow(overlay_shifted_0)
+        im1_4 = axs[1, 0].imshow(shifted_proj_theta_1_0_rgb)
+        im1_5 = axs[1, 1].imshow(shifted_proj_theta_1_1_rgb)
+        im1_6 = axs[1, 2].imshow(overlay_shifted_1)
+        im1_7 = axs[2, 0].imshow(shifted_proj_theta_2_0_rgb)
+        im1_8 = axs[2, 1].imshow(shifted_proj_theta_2_1_rgb)
+        im1_9 = axs[2, 2].imshow(overlay_shifted_2)
+
+        # text_1.set_text(r'Shift = {0}'.format(shift))
+        text_1 = axs[0, 0].text(0.02, 0.02, r'Shift = {0}'.format(shift), transform = axs[0, 0].transAxes, color = 'white')
+
+        for ax in fig.axes:
+            ax.axis('off')
+            ax.axvline(x = shifted_proj_theta_0_0.shape[1]//2, color = 'white', linewidth = 2, linestyle = '--')
+            ax.axhline(y = shifted_proj_theta_0_0.shape[0]//2, color = 'white', linewidth = 2, linestyle = '--')
 
         plt.show()
 
