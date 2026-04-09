@@ -840,7 +840,7 @@ def extract_csv_preprocessing_input_params(file_path):
         sys.exit()
 
     synchrotron = input_param_dict['synchrotron'].lower()
-    cor_correction_alg = input_param_dict['cor_correction_algorithm'].lower()
+    cor_correction_alg = input_param_dict['cor_correction_alg'].lower()
 
     if synchrotron in available_synchrotrons:
         input_param_dict['synchrotron'] = synchrotron
