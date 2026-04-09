@@ -1,6 +1,9 @@
 available_synchrotrons = ['aps',
                           'nsls-ii']
 
+available_cor_correction_algorithms = ['phase_xcorr',
+                                       'phase_symm']
+
 available_noise_models = ['gaussian',
                           'poisson']
 
@@ -31,6 +34,7 @@ preprocessing_params_ordered = ['synchrotron',
                                 'init_edge_crop_enabled',
                                 'init_edge_pixel_lengths_to_crop',
                                 'realignment_enabled',
+                                'cor_correction_algorithm',
                                 'cor_correction_only',
                                 'n_iter_iter_reproj',
                                 'sample_flipped_remounted_mid_experiment',

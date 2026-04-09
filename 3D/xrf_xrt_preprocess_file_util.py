@@ -750,6 +750,7 @@ def extract_csv_preprocessing_input_params(file_path):
     all_params_ordered = pd.Series(ipn.preprocessing_params_ordered)
 
     available_synchrotrons = ipn.available_synchrotrons
+    available_cor_correction_algorithms = ipn.available_cor_correction_algorithms
     edge_crop_dxns = ipn.edge_crop_dxns
 
     missing_data = set(all_params_ordered) - set(input_params)
@@ -839,12 +840,18 @@ def extract_csv_preprocessing_input_params(file_path):
         sys.exit()
 
     synchrotron = input_param_dict['synchrotron'].lower()
+    cor_correction_alg = input_param_dict['cor_correction_algorithm'].lower()
 
     if synchrotron in available_synchrotrons:
         input_param_dict['synchrotron'] = synchrotron
     
     else:
         print('Error: Synchrotron unavailable. Exiting program...')
+
+        sys.exit()
+
+    if cor_correction_alg not in available_cor_correction_algorithms:
+        print('Error: Correction algorithm unavailable. Exiting program...')
 
         sys.exit()
     
