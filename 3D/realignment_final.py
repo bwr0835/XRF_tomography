@@ -665,7 +665,7 @@ def rot_center_avg(proj_img_array,
     n_columns = proj_img_array.shape[2]
 
     geom_center = n_columns//2
-   
+    print(theta_pair_array)
     center_of_rotation_sum = 0
     
     if cor_correction_alg == 'phase_xcorr':
@@ -1002,8 +1002,8 @@ def realign_proj(cor_correction_only,
                     
                     center_geom = aligned_proj.shape[2]//2
 
-                    offset_first_part = shifts_first_part[1]/2
-                    offset_second_part = shifts_second_part[1]/2
+                    offset_first_part = shifts_first_part/2
+                    offset_second_part = shifts_second_part/2
 
                     center_of_rotation_avg_first_part = center_geom + offset_first_part
                     center_of_rotation_avg_second_part = center_geom + offset_second_part
