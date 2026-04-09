@@ -672,7 +672,7 @@ def rot_center_avg(proj_img_array,
         for theta_pair in theta_pair_array:
             shifts, _, _ = phase_xcorr_manual(proj_img_array[theta_pair[0]], 
                                               np.fliplr(proj_img_array[theta_pair[1]]), 
-                                              sigma = sigma, 
+                                              sigma = 5, 
                                               alpha = alpha, 
                                               pixel_rad = 0, 
                                               theta = np.array([theta_array[theta_pair[0]], theta_array[theta_pair[1]]]))
