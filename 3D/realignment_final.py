@@ -296,7 +296,7 @@ def create_cor_fig_hxn_offset_for_gif(raw_proj, net_x_shift_array, net_y_shift_a
 
     plt.close(fig)
   
-    gif_filename = '/home/bwr0835/3_id_realigned_data_common_fov_cor_correction_only_03_30_2026_final/xrt_od_xrf_realignment/shifted_proj_theta_0_deg_minus.gif'
+    gif_filename = '/home/bwr0835/3_id_realigned_data_common_fov_cor_correction_only_03_30_2026_final/xrt_od_xrf_realignment/shifted_proj_theta_3_deg.gif'
 
     iio2.mimsave(gif_filename, frames, fps = 10)
 
@@ -678,7 +678,7 @@ def rot_center_avg(proj_img_array,
                 second_idx = len(theta_array) - 1
 
             elif half_dataset_part == 'second':
-                first_idx = n_theta - len(theta_array)
+                first_idx = n_theta - len(theta_array) + 1
                 second_idx = theta_pair_array[0][1]
             
             shifts, _, _ = phase_xcorr_manual(proj_img_array[first_idx], 
@@ -1100,10 +1100,10 @@ def realign_proj(cor_correction_only,
                 # axs.axis('off')
                 # axs.set_title(r'Phase cross-correlation ($\theta = 0^{+}, 180$\textdegree) (phase cross-correlation COR alignment)', fontsize = 16)
                 # fig.tight_layout()
-                # shift_array = np.linspace(-20, 20, 41)
+                shift_array = np.linspace(-20, 20, 41)
                 # plt.show()
-                # raw_proj = xrf_proj_img_array[element_to_align_with_idx].copy()
-                # create_cor_fig_hxn_offset_for_gif(raw_proj, net_x_shifts_pcc, net_y_shifts_pcc, shift_array, theta_array, aligning_element, start_slice, end_slice)
+                raw_proj = xrf_proj_img_array[element_to_align_with_idx].copy()
+                create_cor_fig_hxn_offset_for_gif(raw_proj, net_x_shifts_pcc, net_y_shifts_pcc, shift_array, theta_array, aligning_element, start_slice, end_slice)
 
                 # create_cor_fig_hxn_offset_for_gif_2(raw_proj, net_x_shifts_pcc, net_y_shifts_pcc, shift_array, theta_array, aligning_element, start_slice, end_slice)
                 print(f'New center of rotation (before flipping sample): {center_of_rotation_avg_first_part}')
