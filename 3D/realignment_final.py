@@ -994,7 +994,7 @@ def realign_proj(cor_correction_only,
                 if cor_correction_alg == 'phase_xcorr':
                     if net_x_shifts_pcc.ndim == 3:
                         shifts_first_part, phase_xcorr_first_part, _ = rot_center_avg(aligned_proj[:, start_slice:end_slice], theta_idx_pairs_first_part, theta_array_first_part, cor_correction_alg = cor_correction_alg, sigma = sigma, alpha = alpha)
-                        shifts_second_part, phase_xcorr_second_part, _ = rot_center_avg(aligned_proj[:, start_slice:end_slice], theta_idx_pairs_second_part, theta_array_second_part, sigma = sigma, alpha = alpha)
+                        shifts_second_part, phase_xcorr_second_part, _ = rot_center_avg(aligned_proj[:, start_slice:end_slice], theta_idx_pairs_second_part, theta_array_second_part, cor_correction_alg = cor_correction_alg, sigma = sigma, alpha = alpha)
                 
                     else:
                         shifts_first_part, phase_xcorr_first_part, _ = rot_center_avg(aligned_proj, theta_idx_pairs_first_part, theta_array_first_part, cor_correction_alg = cor_correction_alg, sigma = sigma, alpha = alpha)
