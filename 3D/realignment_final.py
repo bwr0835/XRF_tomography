@@ -686,12 +686,12 @@ def rot_center_avg(proj_img_array,
                                               sigma = sigma, 
                                               alpha = alpha, 
                                               pixel_rad = 0, 
-                                              theta = np.array([theta_array[theta_pair[0]], theta_array[theta_pair[1]]]))
+                                              theta = np.array([theta_array[theta_pair_array[0][0]], theta_array[theta_pair_array[0][1]]]))
             offset = shifts[1]/2
 
             center_of_rotation = geom_center + offset
 
-            print(f'Center of rotation ({theta_array[theta_pair[0]]} degrees, {theta_array[theta_pair[1]]} degrees) = {ppu.round_correct(center_of_rotation, ndec = 3)}')
+            print(f'Center of rotation ({theta_array[theta_pair_array[0][0]]} degrees, {theta_array[theta_pair_array[0][1]]} degrees) = {ppu.round_correct(center_of_rotation, ndec = 3)}')
 
             center_of_rotation_sum += center_of_rotation
 
@@ -726,7 +726,7 @@ def rot_center_avg(proj_img_array,
 
             center_of_rotation = rot_center_ps(theta_sum)
 
-            print(f'Center of rotation ({theta_array[theta_pair[0]]} degrees, {theta_array[theta_pair[1]]} degrees) = {ppu.round_correct(center_of_rotation, ndec = 3)}')
+            print(f'Center of rotation ({theta_array[theta_pair_array[0][0]]} degrees, {theta_array[theta_pair_array[0][1]]} degrees) = {ppu.round_correct(center_of_rotation, ndec = 3)}')
 
             center_of_rotation_sum += center_of_rotation
         
