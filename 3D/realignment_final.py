@@ -675,7 +675,7 @@ def rot_center_avg(proj_img_array,
         if sample_flipped_remounted_mid_experiment:
             if half_dataset_part == 'first':
                 first_idx = theta_pair_array[0][0]
-                second_idx = len(theta_pair_array) - 1
+                second_idx = len(theta_array) - 1
 
             elif half_dataset_part == 'second':
                 first_idx = n_theta - len(theta_array)
@@ -716,7 +716,7 @@ def rot_center_avg(proj_img_array,
         if sample_flipped_remounted_mid_experiment:
             if half_dataset_part == 'first':
                 first_idx = theta_pair_array[0][0]
-                second_idx = len(theta_pair_array) - 1
+                second_idx = len(theta_array) - 1
 
             elif half_dataset_part == 'second':
                 first_idx = n_theta - len(theta_array)
