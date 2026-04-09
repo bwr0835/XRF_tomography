@@ -908,35 +908,35 @@ def realign_proj(cor_correction_only,
 
             if cor_correction_alg == 'phase_xcorr':
                 if net_x_shifts_pcc.ndim == 3:
-                    center_of_rotation_avg_first_part, center_geom, offset_init_first_part = rot_center_avg(aligned_proj[0, start_slice:end_slice], np.fliplr(aligned_proj[zero_deg_idx_array[0], start_slice:end_slice]), theta_idx_pairs_first_part, theta_array_first_part, sigma = sigma, alpha = alpha)
-                    center_of_rotation_avg_second_part, _, offset_init_second_part = rot_center_avg(aligned_proj[zero_deg_idx_array[1], start_slice:end_slice], np.fliplr(aligned_proj[-1, start_slice:end_slice]), theta_idx_pairs_second_part, theta_array_second_part, sigma = sigma, alpha = alpha)
+                    center_of_rotation_avg_first_part, center_geom, offset_init_first_part = rot_center_avg(aligned_proj[:, start_slice:end_slice], theta_idx_pairs_first_part, theta_array_first_part, cor_correction_alg = cor_correction_alg, sigma = sigma, alpha = alpha)
+                    center_of_rotation_avg_second_part, _, offset_init_second_part = rot_center_avg(aligned_proj[:, start_slice:end_slice], theta_idx_pairs_second_part, theta_array_second_part, cor_correction_alg = cor_correction_alg, sigma = sigma, alpha = alpha)
                 
                 else:
-                    center_of_rotation_avg_first_part, center_geom, offset_init_first_part = rot_center_avg(aligned_proj[0], np.fliplr(aligned_proj[zero_deg_idx_array[0]]), theta_idx_pairs_first_part, theta_array_first_part, sigma = sigma, alpha = alpha)
-                    center_of_rotation_avg_second_part, _, offset_init_second_part = rot_center_avg(aligned_proj[zero_deg_idx_array[1]], np.fliplr(aligned_proj[-1]), theta_idx_pairs_second_part, theta_array_second_part, sigma = sigma, alpha = alpha)
+                    center_of_rotation_avg_first_part, center_geom, offset_init_first_part = rot_center_avg(aligned_proj, theta_idx_pairs_first_part, theta_array_first_part, cor_correction_alg = cor_correction_alg, sigma = sigma, alpha = alpha)
+                    center_of_rotation_avg_second_part, _, offset_init_second_part = rot_center_avg(aligned_proj, theta_idx_pairs_second_part, theta_array_second_part, cor_correction_alg = cor_correction_alg, sigma = sigma, alpha = alpha)
 
             
             elif cor_correction_alg == 'phase_symm':
                 if net_x_shifts_pcc.ndim == 3:
-                    center_of_rotation_avg_first_part, center_geom, offset_init_first_part = rot_center_avg(aligned_proj[:zero_deg_idx_array[1], start_slice:end_slice], 
+                    center_of_rotation_avg_first_part, center_geom, offset_init_first_part = rot_center_avg(aligned_proj[:, start_slice:end_slice], 
                                                                                                             theta_idx_pairs_first_part, 
                                                                                                             theta_array_first_part, 
-                                                                                                            cor_correction_alg)
+                                                                                                            cor_correction_alg = cor_correction_alg)
                     
-                    center_of_rotation_avg_second_part, _, offset_init_second_part = rot_center_avg(aligned_proj[zero_deg_idx_array[1]:, start_slice:end_slice], 
+                    center_of_rotation_avg_second_part, _, offset_init_second_part = rot_center_avg(aligned_proj[:, start_slice:end_slice], 
                                                                                                     theta_idx_pairs_second_part, 
                                                                                                     theta_array_second_part, 
-                                                                                                    cor_correction_alg)
+                                                                                                    cor_correction_alg = cor_correction_alg)
                 else:
-                    center_of_rotation_avg_first_part, center_geom, offset_init_first_part = rot_center_avg(aligned_proj[:zero_deg_idx_array[1]], 
+                    center_of_rotation_avg_first_part, center_geom, offset_init_first_part = rot_center_avg(aligned_proj, 
                                                                                                             theta_idx_pairs_first_part, 
                                                                                                             theta_array_first_part, 
-                                                                                                            cor_correction_alg)
+                                                                                                            cor_correction_alg = cor_correction_alg)
                     
-                    center_of_rotation_avg_second_part, _, offset_init_second_part = rot_center_avg(aligned_proj[zero_deg_idx_array[1]:], 
+                    center_of_rotation_avg_second_part, _, offset_init_second_part = rot_center_avg(aligned_proj, 
                                                                                                     theta_idx_pairs_second_part, 
                                                                                                     theta_array_second_part, 
-                                                                                                    cor_correction_alg)
+                                                                                                    cor_correction_alg = cor_correction_alg)
             
             else:
                 print('Error: Correction algorithm unavailable. Exiting program...')
@@ -993,12 +993,12 @@ def realign_proj(cor_correction_only,
                 
                 if cor_correction_alg == 'phase_xcorr':
                     if net_x_shifts_pcc.ndim == 3:
-                        shifts_first_part, phase_xcorr_first_part, _ = rot_center_avg(aligned_proj[:, start_slice:end_slice], np.fliplr(aligned_proj[zero_deg_idx_array[0], start_slice:end_slice]), theta_idx_pairs_first_part, theta_array_first_part, sigma = sigma, alpha = alpha)
-                        shifts_second_part, phase_xcorr_second_part, _ = rot_center_avg(aligned_proj[:, start_slice:end_slice], np.fliplr(aligned_proj[-1, start_slice:end_slice]), theta_idx_pairs_second_part, theta_array_second_part, sigma = sigma, alpha = alpha)
+                        shifts_first_part, phase_xcorr_first_part, _ = rot_center_avg(aligned_proj[:, start_slice:end_slice], theta_idx_pairs_first_part, theta_array_first_part, cor_correction_alg = cor_correction_alg, sigma = sigma, alpha = alpha)
+                        shifts_second_part, phase_xcorr_second_part, _ = rot_center_avg(aligned_proj[:, start_slice:end_slice], theta_idx_pairs_second_part, theta_array_second_part, sigma = sigma, alpha = alpha)
                 
                     else:
-                        shifts_first_part, phase_xcorr_first_part, _ = rot_center_avg(aligned_proj, theta_idx_pairs_first_part, theta_array_first_part, sigma = sigma, alpha = alpha)
-                        shifts_second_part, phase_xcorr_second_part, _ = rot_center_avg(aligned_proj, np.fliplr(aligned_proj[-1]), theta_idx_pairs_second_part, theta_array_second_part, sigma = sigma, alpha = alpha)
+                        shifts_first_part, phase_xcorr_first_part, _ = rot_center_avg(aligned_proj, theta_idx_pairs_first_part, theta_array_first_part, cor_correction_alg = cor_correction_alg, sigma = sigma, alpha = alpha)
+                        shifts_second_part, phase_xcorr_second_part, _ = rot_center_avg(aligned_proj, theta_idx_pairs_second_part, theta_array_second_part, cor_correction_alg = cor_correction_alg, sigma = sigma, alpha = alpha)
                     
                     center_geom = aligned_proj.shape[2]//2
 
@@ -1012,19 +1012,23 @@ def realign_proj(cor_correction_only,
                     if net_x_shifts_pcc.ndim == 3:
                         center_of_rotation_avg_first_part, center_geom, offset_first_part = rot_center_avg(aligned_proj[:, start_slice:end_slice], 
                                                                                                            theta_idx_pairs_first_part, 
-                                                                                                           theta_array_first_part)
+                                                                                                           theta_array_first_part,
+                                                                                                           cor_correction_alg = cor_correction_alg)
                         
                         center_of_rotation_avg_second_part, _, offset_second_part = rot_center_avg(aligned_proj[:, start_slice:end_slice], 
                                                                                                    theta_idx_pairs_second_part, 
-                                                                                                   theta_array_second_part)
+                                                                                                   theta_array_second_part,
+                                                                                                   cor_correction_alg = cor_correction_alg)
                     else:
                         center_of_rotation_avg_first_part, center_geom, offset_first_part = rot_center_avg(aligned_proj, 
                                                                                                            theta_idx_pairs_first_part, 
-                                                                                                           theta_array_first_part)
+                                                                                                           theta_array_first_part,
+                                                                                                           cor_correction_alg = cor_correction_alg)
                         
                         center_of_rotation_avg_second_part, _, offset_second_part = rot_center_avg(aligned_proj, 
                                                                                                    theta_idx_pairs_second_part, 
-                                                                                                   theta_array_second_part)
+                                                                                                   theta_array_second_part,
+                                                                                                   cor_correction_alg = cor_correction_alg)
 
                 else:
                     print('Error: Correction algorithm unavailable. Exiting program...')
