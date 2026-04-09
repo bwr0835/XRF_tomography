@@ -1100,10 +1100,10 @@ def realign_proj(cor_correction_only,
                 # axs.axis('off')
                 # axs.set_title(r'Phase cross-correlation ($\theta = 0^{+}, 180$\textdegree) (phase cross-correlation COR alignment)', fontsize = 16)
                 # fig.tight_layout()
-                shift_array = np.linspace(-20, 20, 41)
+                # shift_array = np.linspace(-20, 20, 41)
                 # plt.show()
-                raw_proj = xrf_proj_img_array[element_to_align_with_idx].copy()
-                create_cor_fig_hxn_offset_for_gif(raw_proj, net_x_shifts_pcc, net_y_shifts_pcc, shift_array, theta_array, aligning_element, start_slice, end_slice)
+                # raw_proj = xrf_proj_img_array[element_to_align_with_idx].copy()
+                # create_cor_fig_hxn_offset_for_gif(raw_proj, net_x_shifts_pcc, net_y_shifts_pcc, shift_array, theta_array, aligning_element, start_slice, end_slice)
 
                 # create_cor_fig_hxn_offset_for_gif_2(raw_proj, net_x_shifts_pcc, net_y_shifts_pcc, shift_array, theta_array, aligning_element, start_slice, end_slice)
                 print(f'New center of rotation (before flipping sample): {center_of_rotation_avg_first_part}')
@@ -1119,7 +1119,7 @@ def realign_proj(cor_correction_only,
                 
                 if net_x_shifts_pcc.ndim == 3:
                     shifts, pcc, pcc_truncated = phase_xcorr_manual(aligned_proj[zero_deg_idx_array[0], start_slice:end_slice], 
-                                                                    np.fliplr(aligned_proj[-1])[start_slice:end_slice], 
+                                                                    np.fliplr(aligned_proj[-1, start_slice:end_slice]), 
                                                                     sigma, 
                                                                     alpha, 
                                                                     pixel_rad_cor_correction,
@@ -1134,7 +1134,7 @@ def realign_proj(cor_correction_only,
                     
                     for theta_idx in range(len(theta_array_second_part)):
                         theta_idx_aux = theta_idx + len(theta_array_first_part)
-                        net_x_shifts_pcc[0, theta_idx_aux] += -2
+                        # net_x_shifts_pcc[0, theta_idx_aux] += -2
 
                         aligned_proj[theta_idx_aux] = warp_shift(proj_img_array_element_to_align_with[theta_idx_aux], net_x_shifts_pcc[0, theta_idx_aux], net_y_shifts_pcc[0, theta_idx_aux], cval = cval)
                     
