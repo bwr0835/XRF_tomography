@@ -1148,10 +1148,10 @@ def realign_proj(cor_correction_only,
                     axs.axis('off')
                     axs.set_title(r'Phase cross-correlation ($\theta = 0^{-}, 180$\textdegree) (phase cross-correlation COR alignment)', fontsize = 16)
                     fig.tight_layout()
-                    axs[1].imshow(pcc_truncated, vmin = pcc.min(), vmax = pcc.max(), extent = [pcc.shape[1]//2 - pixel_rad_cor_correction, 
-                                                                                               pcc.shape[1]//2 + pixel_rad_cor_correction, 
-                                                                                               pcc.shape[0]//2 + pixel_rad_cor_correction, 
-                                                                                               pcc.shape[0]//2 - pixel_rad_cor_correction])
+                    # axs[1].imshow(pcc_truncated, vmin = pcc.min(), vmax = pcc.max(), extent = [pcc.shape[1]//2 - pixel_rad_cor_correction, 
+                                                                                            #    pcc.shape[1]//2 + pixel_rad_cor_correction, 
+                                                                                            #    pcc.shape[0]//2 + pixel_rad_cor_correction, 
+                                                                                            #    pcc.shape[0]//2 - pixel_rad_cor_correction])
                     plt.show()
                 
                 else:
