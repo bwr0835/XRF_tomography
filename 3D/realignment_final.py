@@ -155,11 +155,11 @@ def create_cor_fig_hxn_offset_for_gif(raw_proj, net_x_shift_array, net_y_shift_a
     # shifted_proj_theta_1_0 = shifted_proj[zero_deg_idx_array[1] + 1, start_slice:end_slice]
     # shifted_proj_theta_1_1 = np.fliplr(shifted_proj[-1, start_slice:end_slice])
 
-    shifted_proj_theta_2_0 = shifted_proj[zero_deg_idx_array[1], start_slice:end_slice]
-    shifted_proj_theta_2_1 = np.fliplr(shifted_proj[-1, start_slice:end_slice])
+    shifted_proj_theta_1_0 = shifted_proj[zero_deg_idx_array[1], start_slice:end_slice]
+    shifted_proj_theta_1_1 = np.fliplr(shifted_proj[-1, start_slice:end_slice])
 
-    shifted_proj_theta_0_0 = shifted_proj[zero_deg_idx_array[1] + 1, start_slice:end_slice]
-    shifted_proj_theta_0_1 = np.fliplr(shifted_proj[-1, start_slice:end_slice])
+    shifted_proj_theta_2_0 = shifted_proj[zero_deg_idx_array[1] + 1, start_slice:end_slice]
+    shifted_proj_theta_2_1 = np.fliplr(shifted_proj[-1, start_slice:end_slice])
 
     # shifted_proj_theta_1_0 = shifted_proj[theta_pair_idx[14][0], start_slice:end_slice]
     # shifted_proj_theta_1_1 = np.fliplr(shifted_proj[theta_pair_idx[14][1], start_slice:end_slice])
