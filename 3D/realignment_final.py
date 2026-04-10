@@ -296,7 +296,7 @@ def create_cor_fig_hxn_offset_for_gif(raw_proj, net_x_shift_array, net_y_shift_a
 
     plt.close(fig)
   
-    gif_filename = '/home/bwr0835/3_id_realigned_data_common_fov_cor_correction_only_03_30_2026_final/xrt_od_xrf_realignment/shifted_proj_theta_0_deg_minus_diff_combos.gif'
+    gif_filename = '/home/bwr0835/3_id_realigned_data_common_fov_cor_correction_only_03_30_2026_final/xrt_od_xrf_realignment/shifted_proj_theta_0_deg_minus.gif'
 
     iio2.mimsave(gif_filename, frames, fps = 10)
 
