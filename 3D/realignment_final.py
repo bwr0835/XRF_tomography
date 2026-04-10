@@ -134,7 +134,7 @@ def create_cor_fig_hxn_offset_for_gif(raw_proj, net_x_shift_array, net_y_shift_a
     
     zero_deg_idx_array = np.where(theta_array == 0)[0]
 
-    theta_pair_idx = ppu.find_theta_combos(theta_array[theta_array != 0])
+    # theta_pair_idx = ppu.find_theta_combos(theta_array[theta_array != 0])
 
     net_x_shift = net_x_shift_array.copy()
     shifted_proj = raw_proj.copy()
@@ -149,23 +149,23 @@ def create_cor_fig_hxn_offset_for_gif(raw_proj, net_x_shift_array, net_y_shift_a
 
         shifted_proj[theta_idx_aux] = warp_shift(raw_proj[theta_idx_aux], net_x_shift[0, theta_idx_aux], net_y_shift_array[0, theta_idx_aux], cval = 0)
         
-    # shifted_proj_theta_0_0 = shifted_proj[zero_deg_idx_array[0], start_slice:end_slice]
-    # shifted_proj_theta_0_1 = np.fliplr(shifted_proj[-1, start_slice:end_slice])
-
-    # shifted_proj_theta_1_0 = shifted_proj[zero_deg_idx_array[1], start_slice:end_slice]
-    # shifted_proj_theta_1_1 = np.fliplr(shifted_proj[-1, start_slice:end_slice])
-
-    # shifted_proj_theta_2_0 = shifted_proj[zero_deg_idx_array[1] + 1, start_slice:end_slice]
-    # shifted_proj_theta_2_1 = np.fliplr(shifted_proj[-1, start_slice:end_slice])
-
     shifted_proj_theta_0_0 = shifted_proj[zero_deg_idx_array[0], start_slice:end_slice]
     shifted_proj_theta_0_1 = np.fliplr(shifted_proj[-1, start_slice:end_slice])
 
-    shifted_proj_theta_1_0 = shifted_proj[theta_pair_idx[14][0], start_slice:end_slice]
-    shifted_proj_theta_1_1 = np.fliplr(shifted_proj[theta_pair_idx[14][1], start_slice:end_slice])
+    # shifted_proj_theta_1_0 = shifted_proj[zero_deg_idx_array[1] + 1, start_slice:end_slice]
+    # shifted_proj_theta_1_1 = np.fliplr(shifted_proj[-1, start_slice:end_slice])
 
-    shifted_proj_theta_2_0 = shifted_proj[theta_pair_idx[-1][0], start_slice:end_slice]
-    shifted_proj_theta_2_1 = np.fliplr(shifted_proj[theta_pair_idx[-1][1], start_slice:end_slice])
+    shifted_proj_theta_2_0 = shifted_proj[zero_deg_idx_array[1], start_slice:end_slice]
+    shifted_proj_theta_2_1 = np.fliplr(shifted_proj[-1, start_slice:end_slice])
+
+    shifted_proj_theta_0_0 = shifted_proj[zero_deg_idx_array[1] + 1, start_slice:end_slice]
+    shifted_proj_theta_0_1 = np.fliplr(shifted_proj[-1, start_slice:end_slice])
+
+    # shifted_proj_theta_1_0 = shifted_proj[theta_pair_idx[14][0], start_slice:end_slice]
+    # shifted_proj_theta_1_1 = np.fliplr(shifted_proj[theta_pair_idx[14][1], start_slice:end_slice])
+
+    # shifted_proj_theta_2_0 = shifted_proj[theta_pair_idx[-1][0], start_slice:end_slice]
+    # shifted_proj_theta_2_1 = np.fliplr(shifted_proj[theta_pair_idx[-1][1], start_slice:end_slice])
 
     shifted_proj_theta_0_0_norm = normalize_array_for_gif(shifted_proj_theta_0_0)
     shifted_proj_theta_0_1_norm = normalize_array_for_gif(shifted_proj_theta_0_1)
@@ -202,25 +202,25 @@ def create_cor_fig_hxn_offset_for_gif(raw_proj, net_x_shift_array, net_y_shift_a
 
     text_1 = axs[0, 0].text(0.02, 0.02, r'Shift = {0}'.format(shift_array[0]), transform = axs[0, 0].transAxes, color = 'white')
 
+    axs[0, 0].set_title(r'$\theta = {0}^{{-}}$'.format(theta_array[zero_deg_idx_array[0]]), fontsize = 14)
+    axs[0, 1].set_title(r'$\theta = {0}$\textdegree'.format(theta_array[-1]), fontsize = 14)
+    axs[0, 2].set_title(r'{0} (overlay)'.format(aligning_element), fontsize = 14)
+    axs[1, 0].set_title(r'$\theta = {0}^{{+}}$'.format(theta_array[zero_deg_idx_array[1]]), fontsize = 14)
+    axs[1, 1].set_title(r'$\theta = {0}$\textdegree'.format(theta_array[-1]), fontsize = 14)
+    axs[1, 2].set_title(r'{0} (shifted overlay)'.format(aligning_element), fontsize = 14)
+    axs[2, 0].set_title(r'$\theta = {0}$\textdegree'.format(theta_array[zero_deg_idx_array[1] + 1]), fontsize = 14)
+    axs[2, 1].set_title(r'$\theta = {0}$\textdegree'.format(theta_array[-1]), fontsize = 14)
+    axs[2, 2].set_title(r'{0} (shifted overlay)'.format(aligning_element), fontsize = 14)
+
     # axs[0, 0].set_title(r'$\theta = {0}^{{-}}$'.format(theta_array[zero_deg_idx_array[0]]), fontsize = 14)
     # axs[0, 1].set_title(r'$\theta = {0}$\textdegree'.format(theta_array[-1]), fontsize = 14)
     # axs[0, 2].set_title(r'{0} (overlay)'.format(aligning_element), fontsize = 14)
-    # axs[1, 0].set_title(r'$\theta = {0}^{{+}}$'.format(theta_array[zero_deg_idx_array[1]]), fontsize = 14)
-    # axs[1, 1].set_title(r'$\theta = {0}$\textdegree'.format(theta_array[-1]), fontsize = 14)
-    # axs[1, 2].set_title(r'{0} (shifted overlay)'.format(aligning_element), fontsize = 14)
-    # axs[2, 0].set_title(r'$\theta = {0}$\textdegree'.format(theta_array[zero_deg_idx_array[1] + 1]), fontsize = 14)
-    # axs[2, 1].set_title(r'$\theta = {0}$\textdegree'.format(theta_array[-1]), fontsize = 14)
-    # axs[2, 2].set_title(r'{0} (shifted overlay)'.format(aligning_element), fontsize = 14)
-
-    axs[0, 0].set_title(r'$\theta = {0}^{{-}}$'.format(theta_array[zero_deg_idx_array[1]]), fontsize = 14)
-    axs[0, 1].set_title(r'$\theta = {0}$\textdegree'.format(theta_array[-1]), fontsize = 14)
-    axs[0, 2].set_title(r'{0} (overlay)'.format(aligning_element), fontsize = 14)
-    axs[1, 0].set_title(r'$\theta = {0}$\textdegree'.format(theta_array[theta_pair_idx[14][0]]), fontsize = 14)
-    axs[1, 1].set_title(r'$\theta = {0}$\textdegree'.format(theta_array[theta_pair_idx[14][1]]), fontsize = 14)
-    axs[1, 2].set_title(r'{0} (overlay)'.format(aligning_element), fontsize = 14)
-    axs[2, 0].set_title(r'$\theta = {0}$\textdegree'.format(theta_array[theta_pair_idx[-1][0]]), fontsize = 14)
-    axs[2, 1].set_title(r'$\theta = {0}$\textdegree'.format(theta_array[theta_pair_idx[-1][1]]), fontsize = 14)
-    axs[2, 2].set_title(r'{0} (overlay)'.format(aligning_element), fontsize = 14)
+    # axs[1, 0].set_title(r'$\theta = {0}$\textdegree'.format(theta_array[theta_pair_idx[14][0]]), fontsize = 14)
+    # axs[1, 1].set_title(r'$\theta = {0}$\textdegree'.format(theta_array[theta_pair_idx[14][1]]), fontsize = 14)
+    # axs[1, 2].set_title(r'{0} (overlay)'.format(aligning_element), fontsize = 14)
+    # axs[2, 0].set_title(r'$\theta = {0}$\textdegree'.format(theta_array[theta_pair_idx[-1][0]]), fontsize = 14)
+    # axs[2, 1].set_title(r'$\theta = {0}$\textdegree'.format(theta_array[theta_pair_idx[-1][1]]), fontsize = 14)
+    # axs[2, 2].set_title(r'{0} (overlay)'.format(aligning_element), fontsize = 14)
 
     fig.suptitle(r'Post-individual COR-corrected sample remount offset correction shifts ({0})'.format(aligning_element) 
                  + '\n' + r'($\theta = 0^{+}$ used for second half dataset COR correction)', fontsize = 16)
@@ -236,23 +236,23 @@ def create_cor_fig_hxn_offset_for_gif(raw_proj, net_x_shift_array, net_y_shift_a
             shifted_proj[theta_idx_aux] = warp_shift(raw_proj[theta_idx_aux], net_x_shift[0, theta_idx_aux], net_y_shift_array[0, theta_idx_aux], cval = 0)
         
 
-        # shifted_proj_theta_0_0 = shifted_proj[zero_deg_idx_array[0], start_slice:end_slice]
-        # shifted_proj_theta_0_1 = np.fliplr(shifted_proj[-1, start_slice:end_slice])
-
-        # shifted_proj_theta_1_0 = shifted_proj[zero_deg_idx_array[1], start_slice:end_slice]
-        # shifted_proj_theta_1_1 = np.fliplr(shifted_proj[-1, start_slice:end_slice])
-
-        # shifted_proj_theta_2_0 = shifted_proj[zero_deg_idx_array[1] + 1, start_slice:end_slice]
-        # shifted_proj_theta_2_1 = np.fliplr(shifted_proj[-1, start_slice:end_slice])
-
         shifted_proj_theta_0_0 = shifted_proj[zero_deg_idx_array[0], start_slice:end_slice]
         shifted_proj_theta_0_1 = np.fliplr(shifted_proj[-1, start_slice:end_slice])
 
-        shifted_proj_theta_1_0 = shifted_proj[theta_pair_idx[14][0], start_slice:end_slice]
-        shifted_proj_theta_1_1 = np.fliplr(shifted_proj[theta_pair_idx[14][1], start_slice:end_slice])
+        shifted_proj_theta_1_0 = shifted_proj[zero_deg_idx_array[1], start_slice:end_slice]
+        shifted_proj_theta_1_1 = np.fliplr(shifted_proj[-1, start_slice:end_slice])
 
-        shifted_proj_theta_2_0 = shifted_proj[theta_pair_idx[-1][0], start_slice:end_slice]
-        shifted_proj_theta_2_1 = np.fliplr(shifted_proj[theta_pair_idx[-1][1], start_slice:end_slice])
+        shifted_proj_theta_2_0 = shifted_proj[zero_deg_idx_array[1] + 1, start_slice:end_slice]
+        shifted_proj_theta_2_1 = np.fliplr(shifted_proj[-1, start_slice:end_slice])
+
+        # shifted_proj_theta_0_0 = shifted_proj[zero_deg_idx_array[0], start_slice:end_slice]
+        # shifted_proj_theta_0_1 = np.fliplr(shifted_proj[-1, start_slice:end_slice])
+
+        # shifted_proj_theta_1_0 = shifted_proj[theta_pair_idx[14][0], start_slice:end_slice]
+        # shifted_proj_theta_1_1 = np.fliplr(shifted_proj[theta_pair_idx[14][1], start_slice:end_slice])
+
+        # shifted_proj_theta_2_0 = shifted_proj[theta_pair_idx[-1][0], start_slice:end_slice]
+        # shifted_proj_theta_2_1 = np.fliplr(shifted_proj[theta_pair_idx[-1][1], start_slice:end_slice])
 
         shifted_proj_theta_0_0_norm = normalize_array_for_gif(shifted_proj_theta_0_0)
         shifted_proj_theta_0_1_norm = normalize_array_for_gif(shifted_proj_theta_0_1)
@@ -1103,6 +1103,7 @@ def realign_proj(cor_correction_only,
                 shift_array = np.linspace(-20, 20, 41)
                 # plt.show()
                 raw_proj = xrf_proj_img_array[element_to_align_with_idx].copy()
+                
                 create_cor_fig_hxn_offset_for_gif(raw_proj, net_x_shifts_pcc, net_y_shifts_pcc, shift_array, theta_array, aligning_element, start_slice, end_slice)
 
                 # create_cor_fig_hxn_offset_for_gif_2(raw_proj, net_x_shifts_pcc, net_y_shifts_pcc, shift_array, theta_array, aligning_element, start_slice, end_slice)
@@ -1138,16 +1139,16 @@ def realign_proj(cor_correction_only,
                     #                                                 alpha, 
                     #                                                 pixel_rad_cor_correction,
                     #                                                 theta = np.array([0, 180]))               
-                    print(shifts)
-                    fig, axs = plt.subplots()
-                    # fig, axs = plt.subplots(2, 1)
-                    # axs[0].imshow(pcc, vmin = pcc.min(), vmax = pcc.max())
-                    axs.imshow(pcc, vmin = pcc.min(), vmax = pcc.max(), aspect = 'equal', interpolation = 'none')
-                    axs.axvline(x = pcc.shape[1]//2, color = 'white', linewidth = 2, linestyle = '--')
-                    axs.axhline(y = pcc.shape[0]//2, color = 'white', linewidth = 2, linestyle = '--')
-                    axs.axis('off')
-                    axs.set_title(r'Phase cross-correlation ($\theta = 0^{-}, 180$\textdegree) (phase cross-correlation COR alignment)', fontsize = 16)
-                    fig.tight_layout()
+                    # print(shifts)
+                    # fig, axs = plt.subplots()
+                    # # fig, axs = plt.subplots(2, 1)
+                    # # axs[0].imshow(pcc, vmin = pcc.min(), vmax = pcc.max())
+                    # axs.imshow(pcc, vmin = pcc.min(), vmax = pcc.max(), aspect = 'equal', interpolation = 'none')
+                    # axs.axvline(x = pcc.shape[1]//2, color = 'white', linewidth = 2, linestyle = '--')
+                    # axs.axhline(y = pcc.shape[0]//2, color = 'white', linewidth = 2, linestyle = '--')
+                    # axs.axis('off')
+                    # axs.set_title(r'Phase cross-correlation ($\theta = 0^{-}, 180$\textdegree) (phase cross-correlation COR alignment)', fontsize = 16)
+                    # fig.tight_layout()
                     # axs[1].imshow(pcc_truncated, vmin = pcc.min(), vmax = pcc.max(), extent = [pcc.shape[1]//2 - pixel_rad_cor_correction, 
                                                                                             #    pcc.shape[1]//2 + pixel_rad_cor_correction, 
                                                                                             #    pcc.shape[0]//2 + pixel_rad_cor_correction, 
@@ -1181,7 +1182,7 @@ def realign_proj(cor_correction_only,
 
                 for theta_idx in range(n_theta):
                     xrf_proj_copy[theta_idx] = ndi.shift(xrf_proj_copy[theta_idx], shift = (net_y_shifts_pcc[0, theta_idx], 0))
-                create_cor_fig_hxn(xrf_proj_copy[zero_deg_idx_array[1] + 1:, start_slice:end_slice], aligned_proj[zero_deg_idx_array[1] + 1:, start_slice:end_slice], theta_array_second_part, aligning_element)
+                create_cor_fig_hxn(xrf_proj_copy[zero_deg_idx_array[1]:, start_slice:end_slice], aligned_proj[zero_deg_idx_array[1] + 1:, start_slice:end_slice], theta_array_second_part, aligning_element)
                 create_cor_fig_hxn_offset(xrf_proj_copy[:, start_slice:end_slice], aligned_proj[:, start_slice:end_slice], theta_array, aligning_element)
                 # plt.show()
 
@@ -1504,7 +1505,15 @@ def realign_proj(cor_correction_only,
         
         for theta_idx in range(n_theta):
             if not return_aux_data:
-                shifts, _, _ = phase_xcorr_manual(synth_proj[theta_idx], 
+                if net_x_shifts_pcc.ndim == 3:
+                    shifts, _, _ = phase_xcorr_manual(synth_proj[theta_idx, start_slice:end_slice], 
+                                                  aligned_proj[theta_idx, start_slice:end_slice], 
+                                                  sigma, 
+                                                  alpha, 
+                                                  pixel_rad_iter_reproj[theta_idx],
+                                                  theta = np.array([theta_array[theta_idx], theta_array[theta_idx]]))
+                else:
+                    shifts, _, _ = phase_xcorr_manual(synth_proj[theta_idx], 
                                                   aligned_proj[theta_idx], 
                                                   sigma, 
                                                   alpha, 
@@ -1512,12 +1521,20 @@ def realign_proj(cor_correction_only,
                                                   theta = np.array([theta_array[theta_idx], theta_array[theta_idx]]))
             
             else:
-                shifts, phase_xcorr_2d, phase_xcorr_2d_truncated = phase_xcorr_manual(synth_proj[theta_idx], 
-                                                                                      aligned_proj[theta_idx], 
-                                                                                      sigma, 
-                                                                                      alpha, 
-                                                                                      pixel_rad_iter_reproj[theta_idx],
-                                                                                      theta = np.array([theta_array[theta_idx], theta_array[theta_idx]]))
+                if net_x_shifts_pcc.ndim == 3:
+                    shifts, phase_xcorr_2d, phase_xcorr_2d_truncated = phase_xcorr_manual(synth_proj[theta_idx, start_slice:end_slice], 
+                                                                                          aligned_proj[theta_idx, start_slice:end_slice], 
+                                                                                          sigma, 
+                                                                                          alpha, 
+                                                                                          pixel_rad_iter_reproj[theta_idx],
+                                                                                          theta = np.array([theta_array[theta_idx], theta_array[theta_idx]]))
+                else:
+                    shifts, phase_xcorr_2d, phase_xcorr_2d_truncated = phase_xcorr_manual(synth_proj[theta_idx], 
+                                                                                          aligned_proj[theta_idx], 
+                                                                                          sigma, 
+                                                                                          alpha, 
+                                                                                          pixel_rad_iter_reproj[theta_idx],
+                                                                                          theta = np.array([theta_array[theta_idx], theta_array[theta_idx]]))
                 
                 pcc_2d_array[i, theta_idx] = phase_xcorr_2d
 
