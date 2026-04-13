@@ -588,6 +588,7 @@ def correct_adjacent_angle_jitter_pre_cor_correction(init_proj_array,
     plt.ylabel(r'$\delta y$ (cumulative)', fontsize = 16)
     plt.tick_params(axis = 'both', which = 'major', labelsize = 14)
     plt.tick_params(axis = 'both', which = 'minor', labelsize = 14)
+    plt.tight_layout()
     plt.show()
 
     if return_aux_data:
