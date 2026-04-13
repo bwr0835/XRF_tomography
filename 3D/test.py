@@ -1,288 +1,160 @@
-import numpy as np, h5py, pandas as pd, pandas as pd, xrf_xrt_preprocess_utils as ppu, sys, os
+import numpy as np, h5py, pandas as pd, pandas as pd, xrf_xrt_preprocess_utils as ppu, sys, os, xrf_xrt_preprocess_file_util as futil
 # import xrf_xrt_preprocess_file_util as futil_pp, xraylib_np as xrl_np, xraylib as xrl
 # import  xrf_xrt_jxrft_file_util as futil_jxrft
 from matplotlib import pyplot as plt
 from itertools import combinations as combos
 from scipy import ndimage as ndi
+from imageio import v2 as iio2
+from mpl_toolkits.axes_grid1 import make_axes_locatable
 
-# mda_array = ['0116', '0117', '0118', '0119', '0120', '0121', '0122', '0123', '0124', '0125', '0126']
-# mda_array = ['0124', '0125', '0126']
+def create_xrf_intensity_norm_plots_hxn(intensity_xrf_norm, elements_xrf, theta_xrf, dir_path, fps):
+    fig, axs = plt.subplots(2, 2)
 
-# for mda, MDA in enumerate(mda_array):
-#     try:
-#         h5 = h5py.File(f'/raid/users/roter/Jacobsen/img.dat/2xfm_{MDA}.mda.h5')
+    vmin_xrf_norm = intensity_xrf_norm.min()
+    vmax_xrf_norm = intensity_xrf_norm.max()
 
-#         extra_pv_names = h5['MAPS/Scan/Extra_PVs/Names'][()]
-#         extra_pv_values = h5['MAPS/Scan/Extra_PVs/Values'][()]
+    element_list = ['Ni', 'Cu', 'Zn', 'Ce_L']
+
+    element_idx_array = [elements_xrf.index(element) for element in element_list]
+
+    im1_1 = axs[0, 0].imshow(intensity_xrf_norm[element_idx_array[0], 0], vmin = vmin_xrf_norm, vmax = vmax_xrf_norm)
+    im1_2 = axs[0, 1].imshow(intensity_xrf_norm[element_idx_array[1], 0], vmin = vmin_xrf_norm, vmax = vmax_xrf_norm)
+    im1_3 = axs[1, 0].imshow(intensity_xrf_norm[element_idx_array[2], 0], vmin = vmin_xrf_norm, vmax = vmax_xrf_norm)
+    im1_4 = axs[1, 1].imshow(intensity_xrf_norm[element_idx_array[3], 0], vmin = vmin_xrf_norm, vmax = vmax_xrf_norm)
+
+    axs[0, 0].set_title(r'{0}'.format(element_list[0]))
+    axs[0, 1].set_title(r'{0}'.format(element_list[1]))
+    axs[1, 0].set_title(r'{0}'.format(element_list[2]))
+    axs[1, 1].set_title(r'{0}'.format(element_list[3]))
+
+    text = axs[0, 0].text(0.02, 0.02, r'$\theta = {0}$\textdegree'.format(theta_xrf[0]), transform = axs[0, 0].transAxes, color = 'white')
+
+    for ax in fig.axes:
+        ax.axis('off')
+    
+    theta_frames = []
+
+    for theta_idx in range(len(theta_xrf)):
+        im1_1.set_data(intensity_xrf_norm[element_idx_array[0], theta_idx])
+        im1_2.set_data(intensity_xrf_norm[element_idx_array[1], theta_idx])
+        im1_3.set_data(intensity_xrf_norm[element_idx_array[2], theta_idx])
+        im1_4.set_data(intensity_xrf_norm[element_idx_array[3], theta_idx])
+
+        text.set_text(r'$\theta = {0}$\textdegree'.format(theta_xrf[theta_idx]))
+
+        fig.canvas.draw()
+
+        frame = np.array(fig.canvas.renderer.buffer_rgba())[:, :, :3]
+
+        theta_frames.append(frame)
+
+    plt.close(fig)
+
+    filename = os.path.join(dir_path, 'xrf_intensity_norm_plots_hxn.gif')
+    
+    iio2.mimsave(filename, theta_frames, fps = fps)
+
+    return  
+
+def create_xrf_intensity_norm_plots_aps_hxn(intensity_xrf_aps, intensity_xrf_hxn, element_aps, element_hxn, element_array_aps, element_array_hxn, theta_aps, theta_hxn, theta_array_aps, theta_array_hxn):
+    fig, axs = plt.subplots(1, 2)
+    
+    element_idx_aps = element_array_aps.index(element_aps)
+    element_idx_hxn = element_array_hxn.index(element_hxn)
+
+    theta_idx_aps = np.argmin(np.abs(theta_array_aps - theta_aps))
+    theta_idx_hxn = np.argmin(np.abs(theta_array_hxn - theta_hxn))
+
+    vmin_xrf_aps = intensity_xrf_aps[element_idx_aps, theta_idx_aps].min()
+    vmax_xrf_aps = intensity_xrf_aps[element_idx_aps, theta_idx_aps].max()
+
+    vmin_xrf_hxn = intensity_xrf_hxn[element_idx_hxn, theta_idx_hxn].min()
+    vmax_xrf_hxn = intensity_xrf_hxn[element_idx_hxn, theta_idx_hxn].max()
+
+    im1_1 = axs[0].imshow(intensity_xrf_aps[element_idx_aps, theta_idx_aps])
+    im1_2 = axs[1].imshow(intensity_xrf_hxn[element_idx_hxn, theta_idx_hxn])
+
+    axs[0].set_title(r'{0} (APS)'.format(element_aps), fontsize = 16)
+    axs[1].set_title(r'{0} (NSLS-II)'.format(element_hxn), fontsize = 16)
+
+    # cb_1 = fig.colorbar(im1_1, ax = axs[0], fraction = 0.047)
+    # cb_2 = fig.colorbar(im1_2, ax = axs[1], fraction = 0.047)
+
+    # cb_1.ax.set_title(r'Intensity (counts)', fontsize = 16)
+    # cb_2.ax.set_title(r'Intensity (counts)', fontsize = 16)
+    
+    # cb_1.ax.tick_params(labelsize = 16)
+    # cb_2.ax.tick_params(labelsize = 16)
+
+    text_1 = axs[0].text(0.02, 0.02, r'$\theta = {0}$\textdegree'.format(theta_aps), transform = axs[0].transAxes, color = 'white', fontsize = 14)
+    text_2 = axs[1].text(0.02, 0.02, r'$\theta = {0}$\textdegree'.format(theta_hxn), transform = axs[1].transAxes, color = 'white', fontsize = 14)
+
+    for ax, im in zip(axs, [im1_1, im1_2]):    
+        divider = make_axes_locatable(ax)    
+        cax = divider.append_axes("right", size="5%", pad=0.05)    
+        cb = fig.colorbar(im, cax=cax)
+        cb.ax.set_title(r'photons', fontsize = 16)
+        cb.ax.tick_params(labelsize = 16)
+        ax.axis('off')
         
-#         scalers_names = h5['MAPS/Scalers/Names'][()]
-#         scalers_values = h5['MAPS/Scalers/Values'][()]
-
-#         z_idx = np.ndarray.item(np.where(extra_pv_names == b'2xfm:m26.VAL')[0])
-#         us_ic_idx = np.ndarray.item(np.where(scalers_names == b'US_IC')[0])
-
-#         z = extra_pv_values[z_idx]
-#         us_ic = scalers_values[us_ic_idx].astype(float)
-
-#         print(f'MDA {MDA}: z = {z}; US_IC Total = {us_ic.sum()}')
-
-#     except:
-#         print('None')
-
-# sid = 235324
-# sid_end = 235675
-
-# filename_array = []
-
-# # Commented out SIDs in sid_array are for if they don't have Si maps (no idea how they didn't get recorded)
-
-# sid_array = [235324,
-#              235327,
-#              235330,
-#              235333,
-#              235336,
-#              235339,
-#              235342,
-#              235345,
-#              235348,
-#              235351,
-#              235354,
-#              235358,
-#              235364,
-#              235374,
-#              235377,
-#              235386,
-#              235389,
-#              235392,
-#              235395,
-#              235398,
-#              235401,
-#              235404,
-#              235407,
-#              235410,
-#              235413,
-#              235416,
-#              235419,
-#              235422,
-#              235425,
-#              235428,
-#              235431,
-#              235434,
-#              235437,
-#              235440,
-#              235443,
-#              235446,
-#              235449,
-#              235452,
-#              235455,
-#              235458,
-#              235461,
-#              235464,
-#              235467,
-#              235470,
-#              235473,
-#              235476,
-#              235479,
-#              235482,
-#              235485,
-#              235488,
-#              235491,
-#              235494,
-#              235497,
-#              235500,
-#              235503,
-#              235506,
-#              235509,
-#              235512,
-#              235515,
-#              235518,
-#              235546,
-#              235549,
-#              235552,
-#              235555,
-#              235558,
-#              235561,
-#              235564,
-#              235567,
-#              235570,
-#              235573,
-#              235576,
-#              235579,
-#              235582,
-#              235585,
-#              235588,
-#              235592,
-#             #  235595,
-#              235598,
-#              235601,
-#              235604,
-#              235607,
-#              235610,
-#              235613,
-#              235616,
-#              235619,
-#              235622,
-#              235625,
-#              235628,
-#              235631,
-#             #  235634,
-#              235637,
-#              235640,
-#              235643,
-#              235646,
-#              235649,
-#              235652,
-#              235655,
-#              235658,
-#             #  235661,
-#              235664,
-#              235667,
-#              235670,
-#              235673]
-
-
-# while sid < sid_end:
-#     filename = f'/raid/users/roter/Jacobsen-nslsii/data/xrf/scan2D_{sid}.h5'
-
-#     try:
-#         elements_string, _, theta, nx, ny, _, _ = h5_util.extract_h5_xrf_data(filename, synchrotron = 'nsls-ii')
-
-#         if 'Si_K' not in elements_string:
-#             print(f'SID: {sid}; n_elements = {len(elements_string)}; {nx} x {ny} (theta = {theta}); No Si')
+        if ax == axs[0]:
+            cb.ax.set_ylim(vmin_xrf_aps, vmax_xrf_aps)
         
-#         else:
-#             print(f'SID: {sid}; n_elements = {len(elements_string)}; {nx} x {ny} (theta = {theta})')
+        else:
+            cb.ax.set_ylim(vmin_xrf_hxn, vmax_xrf_hxn)
 
-#     except:
-#         pass
-
-#     sid += 1
-
-# for sid in sid_array:
-#     filename = f'/raid/users/roter/Jacobsen-nslsii/data/xrf/scan2D_{sid}.h5'
-
-#     filename_array.append(filename)
-
-# output_filename = '/home/bwr0835/hxn_aggregate_xrf.h5'
-
-# h5_util.create_aggregate_xrf_h5(filename_array, output_filename, synchrotron = "nsls-ii")
-
-# filename = '/home/bwr0835/2_ide_realigned_data_no_cor_correction/xrt_od_xrf_realignment/aligned_data/aligned_aggregate_xrf_xrt.h5'
-
-# E = np.array([10., 11.])
-# print(xrl_np.CS_Total_Kissel(np.array([4]), E).squeeze())
-
-# aggregate_xrt_h5_file_path = '/raid/users/roter/Jacobsen-nslsii/data/ptycho/h5_data/3_id_aggregate_xrt.h5'
-def extract_h5_aggregate_xrt_data(file_path, **kwargs):
-    if not os.path.isfile(file_path):
-        print('Error: HDF5 file path cannot be found. Exiting program...')
-
-        sys.exit()
-
-    if not file_path.endswith('.h5'):
-        print('Error: File must be HDF5. Exiting program...')
-
-        sys.exit()
-    
-    try:
-        with h5py.File(file_path, 'r') as h5:
-            counts_h5 = h5['exchange/data']
-            theta_h5 = h5['exchange/theta']
-            elements_h5 = h5['exchange/elements']
-
-            counts = counts_h5[()]
-            theta = theta_h5[()]
-            elements = list(elements_h5.asstr()[:])
-
-            if kwargs.get('filename_array') == True:
-                filenames_h5 = h5['filenames']
-
-                filenames = filenames_h5.asstr()[:]
-
-            dataset_type = counts_h5.attrs['dataset_type']
-            us_ic_scaler_name = counts_h5.attrs['us_ic_scaler_name']
-    
-    except KeyboardInterrupt:
-        print('\n\nKeyboardInterrupt occurred. Exiting program...')
-            
-        sys.exit()
-
-    except:
-        print('Error: Incompatible XRT HDF5 file structure. Exiting program...')
-
-        sys.exit()
-
-    if kwargs.get('filename_array') == True:
-        return elements, counts, theta, us_ic_scaler_name, dataset_type, filenames
-    
-    return elements, counts, theta, us_ic_scaler_name, dataset_type
-
-# aggregate_xrt_h5_file_path = '/Users/bwr0835/Documents/2_ide_aggregate_xrt.h5'
-aggregate_xrt_h5_file_path = '/Users/bwr0835/Documents/3_id_aggregate_xrt.h5'
-# aggregate_xrt_h5_file_path = '/raid/users/roter/Jacobsen/img.dat/2_ide_aggregate_xrt.h5'
-elements_xrt, counts_xrt, theta_xrt, _, dataset_type = extract_h5_aggregate_xrt_data(aggregate_xrt_h5_file_path)
-
-xrt_sig = counts_xrt[elements_xrt.index('xrt_sig')]
-
-n_theta, n_slices, n_columns = xrt_sig.shape
-
-flux_tot = np.zeros(n_theta)
-
-mask_avg_tot = 0
-bool_mask = np.zeros((n_theta, n_slices, n_columns), dtype = bool)
-mask_avg = np.zeros(n_theta)
-
-for theta_idx in range(n_theta):
-    xrt_vignetted = ppu.edge_gauss_filter(xrt_sig[theta_idx], sigma = 5, alpha = 10, nx = n_columns, ny = n_slices)
-
-    convolution_mag = ndi.gaussian_filter(xrt_vignetted, sigma = 10) # Blur the entire image using Gaussian filter/convolution
-
-    threshold = np.percentile(convolution_mag, 93)  # Top 7% (brightest/non-absorbing). Use ~20 for top 80%, but that inflates values by including absorbing pixels
-
-    mask = convolution_mag >= threshold
-
-    mask_avg[theta_idx] = np.mean(xrt_sig[theta_idx, mask])
-    bool_mask[theta_idx] = mask.copy()
-    xrt_sig[theta_idx] /= mask_avg[theta_idx]
-
-    mask_avg_tot += mask_avg[theta_idx]
-
-mask_avg_tot /= n_theta
-
-# xrt_sig *= 8.67768e6
-xrt_sig *= mask_avg_tot
-
-
-mask_avg_tot = 0
-
-for theta_idx in range(n_theta):
-    # xrt_vignetted = ppu.edge_gauss_filter(xrt_sig[theta_idx], sigma = 5, alpha = 10, nx = n_columns, ny = n_slices)
-
-    # convolution_mag = ndi.gaussian_filter(xrt_vignetted, sigma = 10) # Blur the entire image using Gaussian filter/convolution
-
-    # threshold = np.percentile(convolution_mag, 90) # Take top 20% of intensities for masking
-
-    # mask = convolution_mag >= threshold
-    
-    # bool_mask[theta_idx] = mask
-
-    mask_avg_new = xrt_sig[theta_idx, bool_mask[theta_idx]].mean()
-    # print(mask_avg_new)
-
-    mask_avg_tot += mask_avg_new
-
-    # print(np.mean(xrt_sig[theta_idx, mask]))
-
-print(mask_avg_tot/n_theta)
-
-for theta_idx in range(n_theta):
-    # print(xrt_sig[theta_idx, bool_mask[theta_idx]].mean())
-    # fig, axs = plt.subplots(2, 1)
-    # axs[0].imshow(xrt_sig[theta_idx], vmin = xrt_sig.min(), vmax = xrt_sig.max())
-    # axs[1].imshow(xrt_sig[theta_idx]*bool_mask[theta_idx], vmin = xrt_sig.min(), vmax = xrt_sig.max())
+    fig.tight_layout()
     plt.show()
 
+    return
 
+dir_path = '/Users/bwr0835/Documents'
 
-# fig, axs = plt.subplots()
-# plt.plot(theta_xrt, mask_avg)
+aggregate_xrf_h5_file_path_aps = f'{dir_path}/2_ide_aggregate_xrf.h5'
+aggregate_xrt_h5_file_path_aps = f'{dir_path}/2_ide_aggregate_xrt.h5'
+
+aggregate_xrf_h5_file_path_hxn = f'{dir_path}/3_id_aggregate_xrf.h5'
+aggregate_xrt_h5_file_path_hxn = f'{dir_path}/3_id_aggregate_xrt.h5'
+
+theta_aps = 77
+theta_hxn = 24
+
+fps = 10
+
+elements_xrf_aps, intensity_xrf_aps, theta_xrf_aps, incident_energy_keV_aps, _, dataset_type_aps = futil.extract_h5_aggregate_xrf_data(aggregate_xrf_h5_file_path_aps)
+elements_xrt_aps, intensity_xrt_aps, theta_xrt_aps, _, _, dataset_type_aps, xrt_photon_counting_aps = futil.extract_h5_aggregate_xrt_data(aggregate_xrt_h5_file_path_aps)
+
+elements_xrf_hxn, intensity_xrf_hxn, theta_xrf_hxn, incident_energy_keV_hxn, _, dataset_type_hxn = futil.extract_h5_aggregate_xrf_data(aggregate_xrf_h5_file_path_hxn)
+elements_xrt_hxn, intensity_xrt_hxn, theta_xrt_hxn, _, _, dataset_type_hxn, xrt_photon_counting_hxn = futil.extract_h5_aggregate_xrt_data(aggregate_xrt_h5_file_path_hxn)
+
+intensity_xrt_aps = ppu.pad_col_row(intensity_xrt_aps, 'xrt')
+intensity_xrf_aps = ppu.pad_col_row(intensity_xrf_aps, 'xrf')
+
+xrt_sig_hxn = intensity_xrt_hxn[elements_xrt_hxn.index('xrt_sig')]
+xrt_sig_aps = intensity_xrt_aps[elements_xrt_aps.index('xrt_sig')]
+
+intensity_xrt_norm_aps, intensity_xrf_norm_aps, norm_array_xrt_aps, norm_array_xrf_aps, I0_photons_aps, _ = ppu.joint_fluct_norm(xrt_sig_aps,
+                                                                                                                              intensity_xrf_aps,
+                                                                                                                              93,
+                                                                                                                              xrt_photon_counting_aps,
+                                                                                                                              8.6776e8,
+                                                                                                                              0.01)
+
+intensity_xrt_norm_hxn, intensity_xrf_norm_hxn, norm_array_xrt_hxn, norm_array_xrf_hxn, I0_photons_hxn, _ = ppu.joint_fluct_norm(xrt_sig_hxn,
+                                                                                                                              intensity_xrf_hxn,
+                                                                                                                              93,
+                                                                                                                              xrt_photon_counting_hxn,
+                                                                                                                              None,
+                                                                                                                              None)
+
+element_aps = 'Fe'
+element_hxn = 'Ni'
+
+fe = intensity_xrf_norm_aps[elements_xrf_aps.index(element_aps)]
+
+idx_77 = np.argmin(np.abs(theta_xrf_aps - theta_aps))
+
+# plt.imshow(fe[idx_77])
+# plt.show()
+# create_xrf_intensity_norm_plots_hxn(intensity_xrf_norm_hxn, elements_xrf_hxn, theta_hxn, dir_path, fps)
+create_xrf_intensity_norm_plots_aps_hxn(intensity_xrf_norm_aps, intensity_xrf_norm_hxn, element_aps, element_hxn, elements_xrf_aps, elements_xrf_hxn, theta_aps, theta_hxn, theta_xrf_aps, theta_xrf_hxn)
