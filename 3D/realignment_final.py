@@ -582,6 +582,12 @@ def correct_adjacent_angle_jitter_pre_cor_correction(init_proj_array,
     net_y_shift_array[1:] += net_y_shift_cumsum
 
     plt.plot(theta, net_y_shift_array, 'ko', markersize = 3, linewidth = 2)
+    plt.xlim(-180, 180)
+    plt.ylim(-25, 25)
+    plt.xlabel(r'$\theta$ (\textdegree{})', fontsize = 16)
+    plt.ylabel(r'$\delta y$ (cumulative)', fontsize = 16)
+    plt.tick_params(axis = 'both', which = 'major', labelsize = 14)
+    plt.tick_params(axis = 'both', which = 'minor', labelsize = 14)
     plt.show()
 
     if return_aux_data:
