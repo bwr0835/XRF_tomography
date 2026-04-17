@@ -242,7 +242,7 @@ def edge_gauss_filter(image, sigma, alpha, nx, ny):
         if idx > 0:
             idx -= 1
     
-    return (image + dc_value)
+    return (image + dc_value), dc_value
 
 def joint_fluct_norm(xrt_array,
                      xrf_array,
@@ -250,10 +250,10 @@ def joint_fluct_norm(xrt_array,
                      xrt_photon_counting,
                      incident_photodiode_flux_photons_per_s,
                      t_dwell_s,
+                     return_aux_data,
                      sigma_1 = 5,
                      alpha = 10,
-                     sigma_2 = 10,
-                     return_conv_mag_array = False):
+                     sigma_2 = 10):
 
     if xrt_array.ndim != 3 or xrf_array.ndim != 4:
         print('Error: Number of XRT dimensions ≠ 3 and/or number of XRF array dimesions ≠ 4. Exiting program...')
@@ -309,10 +309,10 @@ def joint_fluct_norm(xrt_array,
     norm_array_xrt *= inc_intensity
     norm_array_xrf *= global_xrt_mask_avg
     
-    if return_conv_mag_array:
+    if return_aux_data:
         return xrt_array, xrf_array, norm_array_xrt, norm_array_xrf, inc_intensity, np.array(convolution_mag_array)
     
-    return xrt_array, xrf_array, norm_array_xrt, norm_array_xrf, inc_intensity, global_xrt_mask_avg
+    return xrt_array, xrf_array, norm_array_xrt, norm_array_xrf, inc_intensity, None
 
 def calculate_abs_incident_intensity_photons(xrt_array,
                                              data_percentile, 
@@ -365,40 +365,95 @@ def find_theta_combos(theta_array_deg, dtheta = 0): # Output type: List of tuple
 
     return valid_theta_idx_pairs
 
-# def crop_array(xrf_array, xrt_array, opt_dens_array, return_aux_data = False, exp_proj_array = None, synth_proj_array = None, edge_dict = None):
-def crop_array(xrf_array, xrt_array, opt_dens_array, edge_dict):
+def crop_array(array, net_y_shift_array, edge_dict):
+    if array.ndim != 3:
+        print('Error: Array must be 3D. Exiting program...')
+
+        sys.exit()
+
+    n_slices, n_columns = array.shape[1], array.shape[2]
+    
+    if np.any(net_y_shift_array != 0):
+        start_slice = int(np.clip(np.ceil(np.max(net_y_shift_array)), 0, n_slices)) # Crop top: exclude rows where positive shifts pushed content out
+        end_slice = int(np.clip(n_slices + np.floor(np.min(net_y_shift_array)), 0, n_slices)) # Crop bottom: exclude rows where negative shifts pushed content out. This index is exclusive.
+
+        if edge_dict is not None:
+            start_slice += edge_dict['top']
+            end_slice -= edge_dict['bottom']
+
+    else:
+        start_slice = 0
+        end_slice = n_slices
+
+    if edge_dict is not None:
+        start_column = edge_dict['left']
+        end_column = n_columns - edge_dict['right']
+
+    else:
+        start_column = 0
+        end_column = n_columns
+
+    if end_slice <= start_slice or end_column <= start_column:
+        print('Error: Empty field of view detected - net shifts exceed the number of slices. Exiting program...')
+
+        sys.exit()
+    
+    if (start_slice, start_column) != (0, 0) or (end_slice, end_column) != (n_slices, n_columns):
+        array_final = array[:, start_slice:end_slice, start_column:end_column]
+    
+    else:
+        print('Warning: No cropping performed - common field of view is the original field of view. Returning original projection images...')
+
+        array_final = array
+
+    return array_final, start_slice, end_slice, start_column, end_column
+
+def joint_array_crop(xrf_array, xrt_array, opt_dens_array, net_y_shift_array, edge_dict):
     if xrf_array.ndim != 4 or opt_dens_array.ndim != 3:
         print('Error: XRF, XRT, and optical density arrays must be 4D and 3D, respectively. Exiting program...')
 
         sys.exit()
 
-    _, n_slices, n_columns = opt_dens_array.shape
-    
-    if (edge_dict['bottom'] + edge_dict['top'] >= n_slices) or (edge_dict['left'] + edge_dict['right'] >= n_columns):
-        print('Error: Overlapping crops detected. Exiting program...')
+    n_slices, n_columns = xrt_array.shape[1], xrt_array.shape[2]
+
+    if np.any(net_y_shift_array != 0):
+        start_slice = int(np.clip(np.ceil(np.max(net_y_shift_array)), 0, n_slices)) # Crop top: exclude rows where positive shifts pushed content out
+        end_slice = int(np.clip(n_slices + np.floor(np.min(net_y_shift_array)), 0, n_slices)) # Crop bottom: exclude rows where negative shifts pushed content out. This index is exclusive.
+
+        if edge_dict is not None:
+            start_slice += edge_dict['top']
+            end_slice -= edge_dict['bottom']
+
+    else:
+        start_slice = 0
+        end_slice = n_slices
+
+    if edge_dict is not None:
+        start_column = edge_dict['left']
+        end_column = n_columns - edge_dict['right']
+
+    else:
+        start_column = 0
+        end_column = n_columns
+
+    if end_slice <= start_slice or end_column <= start_column:
+        print('Error: Empty field of view detected - net shifts exceed the number of slices. Exiting program...')
 
         sys.exit()
     
-    start_slice = edge_dict['top']
-    end_slice = n_slices - edge_dict['bottom']
-
-    start_column = edge_dict['left']
-    end_column = n_columns - edge_dict['right']
-
-    cropped_xrf_array = xrf_array[:, :, start_slice:end_slice, start_column:end_column]
-    cropped_xrt_array = xrt_array[:, start_slice:end_slice, start_column:end_column]
-    cropped_opt_dens_array = opt_dens_array[:, start_slice:end_slice, start_column:end_column]
-
-    # if return_aux_data:
-    #     print('Cropping per-iteration experimental and synthetic projection images in y...')
-        
-    #     cropped_exp_proj_array = exp_proj_array[:, :, start_slice:end_slice, start_column:end_column]
-    #     cropped_synth_proj_array = synth_proj_array[:, :, start_slice:end_slice, start_column:end_column]
-
-    #     return cropped_xrf_array, cropped_xrt_array, cropped_opt_dens_array, cropped_exp_proj_array, cropped_synth_proj_array
+    if (start_slice, start_column) != (0, 0) or (end_slice, end_column) != (n_slices, n_columns):
+        xrf_array_final = xrf_array[:, :, start_slice:end_slice, start_column:end_column]
+        xrt_array_final = xrt_array[:, start_slice:end_slice, start_column:end_column]
+        opt_dens_array_final = opt_dens_array[:, start_slice:end_slice, start_column:end_column]
     
-    # return cropped_xrf_array, cropped_xrt_array, cropped_opt_dens_array, None, None
-    return cropped_xrf_array, cropped_xrt_array, cropped_opt_dens_array
+    else:
+        print('Warning: No cropping performed - common field of view is the original field of view. Returning original projection images...')
+
+        xrf_array_final = xrf_array
+        xrt_array_final = xrt_array
+        opt_dens_array_final = opt_dens_array
+
+    return xrf_array_final, xrt_array_final, opt_dens_array_final, start_slice, end_slice, start_column, end_column
 
 def create_gridrec_density_maps(xrf_proj_array, elements_xrf, theta_array):
     if xrf_proj_array.ndim != 4:
@@ -430,3 +485,8 @@ def create_gridrec_density_maps(xrf_proj_array, elements_xrf, theta_array):
 
 def normalize_array_for_rgb(array):
     return (array - np.nanmin(array))/(np.nanmax(array) - np.nanmin(array))
+
+def normalize_array_for_gif(array):
+    array_nonzero = array[array != 0]
+
+    return np.clip((array - np.nanmin(array_nonzero))/(np.nanmax(array_nonzero) - np.nanmin(array_nonzero)), 0, 1)

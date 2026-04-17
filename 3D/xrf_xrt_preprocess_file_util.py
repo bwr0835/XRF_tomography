@@ -2,6 +2,7 @@ import numpy as np, \
        pandas as pd, \
        tkinter as tk, \
        xrf_xrt_input_param_names as ipn, \
+       xrf_xrt_preprocess_utils as ppu, \
        csv, \
        h5py, \
        ast, \
@@ -10,10 +11,11 @@ import numpy as np, \
 
 from tkinter import filedialog as fd
 from matplotlib import pyplot as plt
+from mpl_toolkits.axes_grid1 import make_axes_locatable
 from imageio import v2 as iio2
 
 plt.rcParams['text.usetex'] = True
-plt.rcParams['font.family'] = 'serif'
+plt.rcParams['font.family'] = 'serif' 
 plt.rcParams['text.latex.preamble'] = r'\usepackage{times}'
 
 plt.rcParams['xtick.major.size'] = 9
@@ -663,8 +665,7 @@ def create_h5_aligned_aggregate_xrf_xrt(dir_path,
                                         xrt_array,
                                         opt_dens_array, 
                                         theta_array,
-                                        init_edge_info,
-                                        final_edge_info,
+                                        edge_info,
                                         I0_photons,
                                         incident_energy_keV):
 
@@ -697,17 +698,11 @@ def create_h5_aligned_aggregate_xrf_xrt(dir_path,
         data.attrs['incident_intensity_photons'] = I0_photons
         data.attrs['incident_energy_keV'] = incident_energy_keV
 
-        if init_edge_info is not None:
-            exchange['data'].attrs['left_edge_cropped_init'] = init_edge_info['left']
-            exchange['data'].attrs['right_edge_cropped_init'] = init_edge_info['right']
-            exchange['data'].attrs['top_edge_cropped_init'] = init_edge_info['top']
-            exchange['data'].attrs['bottom_edge_cropped_init'] = init_edge_info['bottom']
-            
-        if final_edge_info is not None:
-            exchange['data'].attrs['left_edge_cropped_final'] = final_edge_info['left']
-            exchange['data'].attrs['right_edge_cropped_final'] = final_edge_info['right']
-            exchange['data'].attrs['top_edge_cropped_final'] = final_edge_info['top']
-            exchange['data'].attrs['bottom_edge_cropped_final'] = final_edge_info['bottom']
+        if edge_info is not None:
+            exchange['data'].attrs['left_edge_cropped'] = edge_info['left']
+            exchange['data'].attrs['right_edge_cropped'] = edge_info['right']
+            exchange['data'].attrs['top_edge_cropped'] = edge_info['top']
+            exchange['data'].attrs['bottom_edge_cropped'] = edge_info['bottom']
 
     return
 
@@ -968,8 +963,45 @@ def create_aux_conv_mag_data_npy(dir_path, array):
 
     return
 
+def create_post_adjacent_angle_jitter_correction_aux_data_npy(dir_path,
+                                                              proj_img_array_element_to_align_with_orig,
+                                                              adj_angle_jitter_corrected_proj_element_to_align_with,
+                                                              phase_xcorr_2d_aggregate_aux,
+                                                              phase_xcorr_2d_truncated_aggregate_aux,
+                                                              net_x_shift_array,
+                                                              net_y_shift_array):
+    
+    os.makedirs(dir_path, exist_ok = True)
+    
+    np.save(os.path.join(dir_path, 'proj_img_array_element_to_align_with_orig.npy'), proj_img_array_element_to_align_with_orig)
+    np.save(os.path.join(dir_path, 'adj_angle_jitter_corrected_proj_element_to_align_with.npy'), adj_angle_jitter_corrected_proj_element_to_align_with)
+
+    np.save(os.path.join(dir_path, 'phase_xcorr_2d_aggregate_aux.npy'), phase_xcorr_2d_aggregate_aux)
+    
+    if phase_xcorr_2d_truncated_aggregate_aux is not None:
+        np.save(os.path.join(dir_path, 'phase_xcorr_2d_truncated_aggregate_aux.npy'), phase_xcorr_2d_truncated_aggregate_aux)
+    
+    np.save(os.path.join(dir_path, 'net_x_shift_array.npy'), net_x_shift_array)
+    np.save(os.path.join(dir_path, 'net_y_shift_array.npy'), net_y_shift_array)
+
+    return
+
+def create_post_cor_correction_aux_data_npy(dir_path,
+                                            shifted_proj_img_array_element_to_align_with,
+                                            shifted_proj_img_array_element_to_align_with_aux,
+                                            shifted_proj_img_array_element_to_align_with_orig):
+    
+    os.makedirs(dir_path, exist_ok = True)
+    
+    np.save(os.path.join(dir_path, 'shifted_proj_img_array_element_to_align_with_orig.npy'), shifted_proj_img_array_element_to_align_with_orig)
+    np.save(os.path.join(dir_path, 'shifted_proj_img_array_element_to_align_with.npy'), shifted_proj_img_array_element_to_align_with)
+    
+    if shifted_proj_img_array_element_to_align_with_aux is not None:
+        np.save(os.path.join(dir_path, 'shifted_proj_img_array_element_to_align_with_aux.npy'), shifted_proj_img_array_element_to_align_with_aux)
+
+    return
+
 def create_post_iter_reproj_aux_data_npy(dir_path,
-                                         cor_correction_only,
                                          aligned_exp_proj_array,
                                          recon_array,
                                          synth_proj_array,
@@ -978,27 +1010,19 @@ def create_post_iter_reproj_aux_data_npy(dir_path,
                                          dx_array,
                                          dy_array,
                                          net_x_shifts_pcc_array,
-                                         net_y_shifts_pcc_array,
-                                         **kwargs):
-    
-    subdir_path = os.path.join(dir_path, 'aux_data')
+                                         net_y_shifts_pcc_array):
 
-    os.makedirs(subdir_path, exist_ok = True)
+    os.makedirs(dir_path, exist_ok = True)
 
-    np.save(os.path.join(subdir_path, 'aligned_exp_proj_iter_array.npy'), aligned_exp_proj_array)
-
-    if not cor_correction_only:
-        np.save(os.path.join(subdir_path, 'recon_iter_array.npy'), recon_array)
-        np.save(os.path.join(subdir_path, 'synth_proj_iter_array.npy'), synth_proj_array)
-        np.save(os.path.join(subdir_path, 'pcc_2d_iter_array.npy'), pcc_2d_array)
-        np.save(os.path.join(subdir_path, 'pcc_2d_truncated_iter_array.npy'), pcc_2d_truncated_array)
-        np.save(os.path.join(subdir_path, 'dx_iter_array.npy'), dx_array)
-        np.save(os.path.join(subdir_path, 'dy_iter_array.npy'), dy_array)
-        np.save(os.path.join(subdir_path, 'net_x_shifts_pcc_iter_array.npy'), net_x_shifts_pcc_array)
-        np.save(os.path.join(subdir_path, 'net_y_shifts_pcc_iter_array.npy'), net_y_shifts_pcc_array)
-
-    if kwargs.get('cropped_aligned_exp_proj_iter_array') is not None:
-        np.save(os.path.join(subdir_path, 'cropped_aligned_exp_proj_iter_array.npy'), kwargs['cropped_aligned_exp_proj_iter_array'])
+    np.save(os.path.join(dir_path, 'aligned_exp_proj_iter_array.npy'), aligned_exp_proj_array)
+    np.save(os.path.join(dir_path, 'recon_iter_array.npy'), recon_array)
+    np.save(os.path.join(dir_path, 'synth_proj_iter_array.npy'), synth_proj_array)
+    np.save(os.path.join(dir_path, 'pcc_2d_iter_array.npy'), pcc_2d_array)
+    np.save(os.path.join(dir_path, 'pcc_2d_truncated_iter_array.npy'), pcc_2d_truncated_array)
+    np.save(os.path.join(dir_path, 'dx_iter_array.npy'), dx_array)
+    np.save(os.path.join(dir_path, 'dy_iter_array.npy'), dy_array)
+    np.save(os.path.join(dir_path, 'net_x_shifts_pcc_iter_array.npy'), net_x_shifts_pcc_array)
+    np.save(os.path.join(dir_path, 'net_y_shifts_pcc_iter_array.npy'), net_y_shifts_pcc_array)
 
     return
 
@@ -1482,14 +1506,12 @@ def create_adjacent_angle_jitter_corrected_norm_proj_data_gif(dir_path,
                                                               fps):
 
     n_theta, n_slices, n_columns = intensity_ref_element.shape
-    print(intensity_ref_element.shape)
-    print(shifted_intensity_ref_element.shape)
     
     vmin = np.min([intensity_ref_element, shifted_intensity_ref_element])
     vmax = np.max([intensity_ref_element, shifted_intensity_ref_element])
 
     theta_frames1 = []
-    slice_frames = []
+    # slice_frames = []
 
     fig1, axs1 = plt.subplots(2, 1)
 
@@ -1526,42 +1548,413 @@ def create_adjacent_angle_jitter_corrected_norm_proj_data_gif(dir_path,
 
     iio2.mimsave(gif_filename, theta_frames1, fps = fps)
 
-    print(f'Plotting common field of view original, adjacent angle jitter-corrected, cropped {ref_element} sinograms...')
+    # print(f'Plotting common field of view original, adjacent angle jitter-corrected, cropped {ref_element} sinograms...')
 
-    fig2, axs2 = plt.subplots(1, 2, figsize = (11, 6))
+    # fig2, axs2 = plt.subplots(1, 2, figsize = (11, 6))
 
-    im2_1 = axs2[0].imshow(intensity_ref_element[:, 0], vmin = vmin, vmax = vmax, origin = 'lower', extent = [0, n_slices - 1, -180, 180], aspect = 10)
-    im2_2 = axs2[1].imshow(shifted_intensity_ref_element[:, 0], vmin = vmin, vmax = vmax, origin = 'lower', extent = [0, n_slices - 1, -180, 180], aspect = 10)
+    # im2_1 = axs2[0].imshow(intensity_ref_element[:, 0], vmin = vmin, vmax = vmax, origin = 'lower', extent = [0, n_slices - 1, -180, 180], aspect = 10)
+    # im2_2 = axs2[1].imshow(shifted_intensity_ref_element[:, 0], vmin = vmin, vmax = vmax, origin = 'lower', extent = [0, n_slices - 1, -180, 180], aspect = 10)
 
-    text_2 = axs2[0].text(0.02, 0.02, r'Slice index 0/{0}'.format(n_slices - 1), transform = axs2[0].transAxes, color = 'white')
+    # text_2 = axs2[0].text(0.02, 0.02, r'Slice index 0/{0}'.format(n_slices - 1), transform = axs2[0].transAxes, color = 'white')
     
-    axs2[0].set_title(r'{0}'.format(ref_element), fontsize = 14)
-    axs2[1].set_title(r'{0} (vert. jitter-corrected, cropped)'.format(ref_element), fontsize = 14)
+    # axs2[0].set_title(r'{0}'.format(ref_element), fontsize = 14)
+    # axs2[1].set_title(r'{0} (vert. jitter-corrected, cropped)'.format(ref_element), fontsize = 14)
 
-    for axs in fig2.axes:
-        axs.set_xlabel(r'Pixel index', fontsize = 14)
-        axs.set_ylabel(r'$\theta$ (\textdegree)', fontsize = 14)
+    # for axs in fig2.axes:
+    #     axs.set_xlabel(r'Pixel index', fontsize = 14)
+    #     axs.set_ylabel(r'$\theta$ (\textdegree)', fontsize = 14)
 
-    for slice_idx in range(n_slices):
-        im2_1.set_data(intensity_ref_element[:, slice_idx])
-        im2_2.set_data(shifted_intensity_ref_element[:, slice_idx])
+    # for slice_idx in range(n_slices):
+    #     im2_1.set_data(intensity_ref_element[:, slice_idx])
+    #     im2_2.set_data(shifted_intensity_ref_element[:, slice_idx])
 
-        text_2.set_text(r'Slice index {0}/{1}'.format(slice_idx, n_slices - 1))
+    #     text_2.set_text(r'Slice index {0}/{1}'.format(slice_idx, n_slices - 1))
 
-        fig2.canvas.draw()
+    #     fig2.canvas.draw()
         
-        frame2 = np.array(fig2.canvas.renderer.buffer_rgba())[:, :, :3]
+    #     frame2 = np.array(fig2.canvas.renderer.buffer_rgba())[:, :, :3]
         
-        slice_frames.append(frame2)
+    #     slice_frames.append(frame2)
 
-    plt.close(fig2)
+    # plt.close(fig2)
 
-    gif_filename = os.path.join(dir_path, f'vert_jitter_corrected_sinogram_comp_sigma_{sigma}_alpha_{alpha}.gif')
+    # gif_filename = os.path.join(dir_path, f'vert_jitter_corrected_sinogram_comp_sigma_{sigma}_alpha_{alpha}.gif')
 
-    print('Saving sinogram data to GIF...')
+    # print('Saving sinogram data to GIF...')
 
-    iio2.mimsave(gif_filename, slice_frames, fps = fps)
+    # iio2.mimsave(gif_filename, slice_frames, fps = fps)
     
+    return
+
+def create_phase_xcorr_2d_gif(dir_path,
+                              phase_xcorr_2d_orig,
+                              phase_xcorr_2d_truncated_orig,
+                              theta_array,
+                              ref_element,
+                              correction_type,
+                              fps):
+    
+    n_theta, n_slices, n_columns = phase_xcorr_2d.shape
+
+    vmin = phase_xcorr_2d.min()
+    vmax = phase_xcorr_2d.max()
+
+    theta_frames = []
+
+    if correction_type == 'adjacent_angle_jitter':
+        phase_xcorr_2d = phase_xcorr_2d_orig
+
+        gif_filename = os.path.join(dir_path, f'phase_xcorr_2d_adjacent_angle_jitter.gif')
+    
+    elif correction_type == 'iter_reproj':
+        phase_xcorr_2d = phase_xcorr_2d_orig[0]
+
+        gif_filename = os.path.join(dir_path, f'phase_xcorr_2d_iter_reproj.gif')
+
+    if phase_xcorr_2d_truncated_orig is not None:
+        if correction_type == 'adjacent_angle_jitter':
+            phase_xcorr_2d_truncated = phase_xcorr_2d_truncated_orig
+
+        elif correction_type == 'iter_reproj':
+            phase_xcorr_2d_truncated = phase_xcorr_2d_truncated_orig[0]
+
+        fig, axs = plt.subplots(1, 2)
+        
+        im1_1 = axs[0].imshow(phase_xcorr_2d[0], vmin = vmin, vmax = vmax)
+        im1_2 = axs[1].imshow(phase_xcorr_2d_truncated[0], vmin = vmin, vmax = vmax)
+        
+        text1 = axs[0].text(0.02, 0.02, r'$\theta = {0}$\textdegree'.format(theta_array[0]), transform = axs[0].transAxes, color = 'white')
+
+        for axs in fig.axes:
+            axs.axis('off')
+            axs.axvline(x = n_columns//2, color = 'white', linewidth = 2, linestyle = '--')
+            axs.axhline(y = n_slices//2, color = 'white', linewidth = 2, linestyle = '--')
+        
+        axs[0].set_title(r'{0} PCC'.format(ref_element), fontsize = 14)
+        axs[1].set_title(r'{0} PCC (truncated)'.format(ref_element), fontsize = 14)
+        
+        for theta_idx in range(n_theta):
+            im1_1.set_data(phase_xcorr_2d[theta_idx])
+            im1_2.set_data(phase_xcorr_2d_truncated[theta_idx])
+            
+            text1.set_text(r'$\theta = {0}$\textdegree'.format(theta_array[theta_idx]))
+
+            fig.canvas.draw()
+
+            frame1 = np.array(fig.canvas.renderer.buffer_rgba())[:, :, :3]
+
+            theta_frames.append(frame1)
+    
+    else:
+        fig, axs = plt.subplots()
+
+        im1_1 = axs.imshow(phase_xcorr_2d[0], vmin = vmin, vmax = vmax)
+    
+        text1 = axs.text(0.02, 0.02, r'$\theta = {0}$\textdegree'.format(theta_array[0]), transform = axs.transAxes, color = 'white')
+    
+        axs.axis('off')
+        axs.axvline(x = n_columns//2, color = 'white', linewidth = 2, linestyle = '--')
+        axs.axhline(y = n_slices//2, color = 'white', linewidth = 2, linestyle = '--')
+    
+        for theta_idx in range(n_theta):
+            im1_1.set_data(phase_xcorr_2d[theta_idx])
+        
+            text1.set_text(r'$\theta = {0}$\textdegree'.format(theta_array[theta_idx]))
+        
+            fig.canvas.draw()
+        
+            frame1 = np.array(fig.canvas.renderer.buffer_rgba())[:, :, :3]
+        
+            theta_frames.append(frame1)
+        
+    plt.close(fig)
+    
+    iio2.mimsave(gif_filename, theta_frames, fps = fps)
+    
+    return
+
+def create_center_of_rotation_figures(dir_path,
+                                      shifted_proj_img_array_element_to_align_with,
+                                      shifted_proj_img_array_element_to_align_with_aux,
+                                      sample_flipped_remounted_mid_experiment,
+                                      theta_array):
+                                                
+    if sample_flipped_remounted_mid_experiment:
+        if np.count_nonzero(theta_array == 0) != 2:
+            print('Error: Must have two 0° angles. Exiting program...')
+
+            sys.exit()
+
+        zero_deg_idx_array = np.where(theta_array == 0)[0]
+
+        shifted_proj_img_array_element_to_align_with_theta_aux_0_0 = shifted_proj_img_array_element_to_align_with_aux[0]
+        shifted_proj_img_array_element_to_align_with_theta_aux_0_1 = np.fliplr(shifted_proj_img_array_element_to_align_with_aux[zero_deg_idx_array[0]])
+
+        shifted_proj_img_array_element_to_align_with_theta_aux_1_0 = shifted_proj_img_array_element_to_align_with_aux[zero_deg_idx_array[1]]
+        shifted_proj_img_array_element_to_align_with_theta_aux_1_1 = np.fliplr(shifted_proj_img_array_element_to_align_with_aux[-1])
+        
+        shifted_proj_img_array_element_to_align_with_theta_0_0 = shifted_proj_img_array_element_to_align_with[0]
+        shifted_proj_img_array_element_to_align_with_theta_0_1 = np.fliplr(shifted_proj_img_array_element_to_align_with[zero_deg_idx_array[0]])
+        shifted_proj_img_array_element_to_align_with_theta_1_0 = shifted_proj_img_array_element_to_align_with[zero_deg_idx_array[1]]
+        shifted_proj_img_array_element_to_align_with_theta_1_1 = np.fliplr(shifted_proj_img_array_element_to_align_with[-1])
+
+        shifted_proj_img_array_element_to_align_with_theta_aux_0_0_norm = ppu.normalize_array_for_rgb(shifted_proj_img_array_element_to_align_with_theta_aux_0_0)
+        shifted_proj_img_array_element_to_align_with_theta_aux_0_1_norm = ppu.normalize_array_for_rgb(shifted_proj_img_array_element_to_align_with_theta_aux_0_1)
+        shifted_proj_img_array_element_to_align_with_theta_aux_1_0_norm = ppu.normalize_array_for_rgb(shifted_proj_img_array_element_to_align_with_theta_aux_1_0)
+        shifted_proj_img_array_element_to_align_with_theta_aux_1_1_norm = ppu.normalize_array_for_rgb(shifted_proj_img_array_element_to_align_with_theta_aux_1_1)
+
+        shifted_proj_img_array_element_to_align_with_theta_0_0_norm = ppu.normalize_array_for_rgb(shifted_proj_img_array_element_to_align_with_theta_0_0)
+        shifted_proj_img_array_element_to_align_with_theta_0_1_norm = ppu.normalize_array_for_rgb(shifted_proj_img_array_element_to_align_with_theta_0_1)
+        shifted_proj_img_array_element_to_align_with_theta_1_0_norm = ppu.normalize_array_for_rgb(shifted_proj_img_array_element_to_align_with_theta_1_0)
+        shifted_proj_img_array_element_to_align_with_theta_1_1_norm = ppu.normalize_array_for_rgb(shifted_proj_img_array_element_to_align_with_theta_1_1)
+
+        shifted_proj_img_array_element_to_align_with_theta_aux_0_0_rgb = np.dstack((shifted_proj_img_array_element_to_align_with_theta_aux_0_0_norm, np.zeros_like(shifted_proj_img_array_element_to_align_with_theta_aux_0_0_norm), np.zeros_like(shifted_proj_img_array_element_to_align_with_theta_aux_0_0_norm)))
+        shifted_proj_img_array_element_to_align_with_theta_aux_0_1_rgb = np.dstack((np.zeros_like(shifted_proj_img_array_element_to_align_with_theta_aux_0_1_norm), shifted_proj_img_array_element_to_align_with_theta_aux_0_1_norm, np.zeros_like(shifted_proj_img_array_element_to_align_with_theta_aux_0_1_norm)))
+        shifted_proj_img_array_element_to_align_with_theta_aux_1_0_rgb = np.dstack((shifted_proj_img_array_element_to_align_with_theta_aux_1_0_norm, np.zeros_like(shifted_proj_img_array_element_to_align_with_theta_aux_1_0_norm), np.zeros_like(shifted_proj_img_array_element_to_align_with_theta_aux_1_0_norm)))
+        shifted_proj_img_array_element_to_align_with_theta_aux_1_1_rgb = np.dstack((np.zeros_like(shifted_proj_img_array_element_to_align_with_theta_aux_1_1_norm), shifted_proj_img_array_element_to_align_with_theta_aux_1_1_norm, np.zeros_like(shifted_proj_img_array_element_to_align_with_theta_aux_1_1_norm)))
+    
+        shifted_proj_img_array_element_to_align_with_theta_0_0_rgb = np.dstack((shifted_proj_img_array_element_to_align_with_theta_0_0_norm, np.zeros_like(shifted_proj_img_array_element_to_align_with_theta_0_0_norm), np.zeros_like(shifted_proj_img_array_element_to_align_with_theta_0_0_norm)))
+        shifted_proj_img_array_element_to_align_with_theta_0_1_rgb = np.dstack((np.zeros_like(shifted_proj_img_array_element_to_align_with_theta_0_1_norm), shifted_proj_img_array_element_to_align_with_theta_0_1_norm, np.zeros_like(shifted_proj_img_array_element_to_align_with_theta_0_1_norm)))
+        shifted_proj_img_array_element_to_align_with_theta_1_0_rgb = np.dstack((shifted_proj_img_array_element_to_align_with_theta_1_0_norm, np.zeros_like(shifted_proj_img_array_element_to_align_with_theta_1_0_norm), np.zeros_like(shifted_proj_img_array_element_to_align_with_theta_1_0_norm)))
+        shifted_proj_img_array_element_to_align_with_theta_1_1_rgb = np.dstack((np.zeros_like(shifted_proj_img_array_element_to_align_with_theta_1_1_norm), shifted_proj_img_array_element_to_align_with_theta_1_1_norm, np.zeros_like(shifted_proj_img_array_element_to_align_with_theta_1_1_norm)))
+        
+        shifted_proj_img_array_element_to_align_with_sample_offset_1_rgb = np.dstack((np.zeros_like(shifted_proj_img_array_element_to_align_with_theta_1_0_norm), shifted_proj_img_array_element_to_align_with_theta_1_0_norm, np.zeros_like(shifted_proj_img_array_element_to_align_with_theta_0_0_norm)))
+
+        overlay_aux_shifted_0 = np.dstack((shifted_proj_img_array_element_to_align_with_theta_aux_0_0_norm, shifted_proj_img_array_element_to_align_with_theta_aux_0_1_norm, np.zeros_like(shifted_proj_img_array_element_to_align_with_theta_aux_0_0_norm)))
+        overlay_aux_shifted_1 = np.dstack((shifted_proj_img_array_element_to_align_with_theta_aux_1_0_norm, shifted_proj_img_array_element_to_align_with_theta_aux_1_1_norm, np.zeros_like(shifted_proj_img_array_element_to_align_with_theta_aux_1_0_norm)))
+        
+        overlay_shifted_0 = np.dstack((shifted_proj_img_array_element_to_align_with_theta_0_0_norm, shifted_proj_img_array_element_to_align_with_theta_1_0_norm, np.zeros_like(shifted_proj_img_array_element_to_align_with_theta_0_0_norm)))
+        overlay_shifted_1 = np.dstack((shifted_proj_img_array_element_to_align_with_theta_0_0_norm, shifted_proj_img_array_element_to_align_with_theta_0_1_norm, np.zeros_like(shifted_proj_img_array_element_to_align_with_theta_0_0_norm)))
+        overlay_shifted_2 = np.dstack((shifted_proj_img_array_element_to_align_with_theta_1_0_norm, shifted_proj_img_array_element_to_align_with_theta_1_1_norm, np.zeros_like(shifted_proj_img_array_element_to_align_with_theta_1_0_norm)))
+        
+       
+        fig1, axs1 = plt.subplots(2, 3)
+        
+        im1_4 = axs1[1, 0].imshow(shifted_proj_img_array_element_to_align_with_theta_aux_0_0_rgb)
+        im1_5 = axs1[1, 1].imshow(shifted_proj_img_array_element_to_align_with_theta_aux_0_1_rgb)
+        im1_6 = axs1[1, 2].imshow(overlay_aux_shifted_0)
+        im1_7 = axs1[2, 0].imshow(shifted_proj_img_array_element_to_align_with_theta_aux_1_0_rgb)
+        im1_8 = axs1[2, 1].imshow(shifted_proj_img_array_element_to_align_with_theta_aux_1_1_rgb)
+        im1_9 = axs1[2, 2].imshow(overlay_aux_shifted_1)
+
+        text1 = axs1[0, 0].text(0.02, 0.02, r'$\theta = -180$\textdegree', transform = axs1[0, 0].transAxes, color = 'white')
+        text2 = axs1[0, 1].text(0.02, 0.02, r'$\theta = 0^{-}$', transform = axs1[0, 1].transAxes, color = 'white')
+        text3 = axs1[1, 0].text(0.02, 0.02, r'$\theta = 0^{+}$', transform = axs1[1, 0].transAxes, color = 'white')
+        text4 = axs1[1, 1].text(0.02, 0.02, r'$\theta = 180$\textdegree', transform = axs1[1, 1].transAxes, color = 'white')
+
+        for ax in fig1.axes:
+            ax.axis('off')
+            ax.axvline(x = shifted_proj_img_array_element_to_align_with_theta_0_0.shape[1]//2, color = 'white', linewidth = 2, linestyle = '--')
+            ax.axhline(y = shifted_proj_img_array_element_to_align_with_theta_0_0.shape[0]//2, color = 'white', linewidth = 2, linestyle = '--')
+
+        fig1.tight_layout()
+
+        plt.show()
+        # plt.close(fig1)
+        
+        # fig_filename = os.path.join(dir_path, f'aux_shifted_center_of_rotation_figure.svg')
+        
+        # fig1.savefig(fig_filename)
+
+        fig2, axs2 = plt.subplots(3, 3)
+
+        im2_1 = axs2[0, 0].imshow(shifted_proj_img_array_element_to_align_with_theta_0_0_rgb)
+        im2_2 = axs2[0, 1].imshow(shifted_proj_img_array_element_to_align_with_sample_offset_1_rgb)
+        im2_3 = axs2[0, 2].imshow(overlay_shifted_0)
+        im2_4 = axs2[1, 0].imshow(shifted_proj_img_array_element_to_align_with_theta_0_0_rgb)
+        im2_5 = axs2[1, 1].imshow(shifted_proj_img_array_element_to_align_with_theta_0_1_rgb)
+        im2_6 = axs2[1, 2].imshow(overlay_shifted_1)
+        im2_7 = axs2[2, 0].imshow(shifted_proj_img_array_element_to_align_with_theta_1_0_rgb)
+        im2_8 = axs2[2, 1].imshow(shifted_proj_img_array_element_to_align_with_theta_1_1_rgb)
+        im2_9 = axs2[2, 2].imshow(overlay_shifted_2)
+
+        text1 = axs2[0, 0].text(0.02, 0.02, r'$\theta = -180$\textdegree', transform = axs2[0, 0].transAxes, color = 'white')
+        text2 = axs2[0, 1].text(0.02, 0.02, r'$\theta = 0^{+}$', transform = axs2[0, 1].transAxes, color = 'white')
+        text3 = axs2[1, 0].text(0.02, 0.02, r'$\theta = -180$\textdegree', transform = axs2[1, 0].transAxes, color = 'white')
+        text4 = axs2[1, 1].text(0.02, 0.02, r'$\theta = 0^{-}$', transform = axs2[1, 1].transAxes, color = 'white')
+        text5 = axs2[2, 0].text(0.02, 0.02, r'$\theta = 0^{+}$', transform = axs2[2, 0].transAxes, color = 'white')
+        text6 = axs2[2, 1].text(0.02, 0.02, r'$\theta = 180$\textdegree', transform = axs2[2, 1].transAxes, color = 'white')
+
+        for ax in fig2.axes:
+            ax.axis('off')
+            ax.axvline(x = shifted_proj_img_array_element_to_align_with_theta_0_0.shape[1]//2, color = 'white', linewidth = 2, linestyle = '--')
+            ax.axhline(y = shifted_proj_img_array_element_to_align_with_theta_0_0.shape[0]//2, color = 'white', linewidth = 2, linestyle = '--')
+
+        fig2.tight_layout()
+
+        plt.show()
+        # plt.close(fig2)
+
+        # fig_filename = os.path.join(dir_path, f'shifted_center_of_rotation_figure.svg')
+        
+        # fig2.savefig(fig_filename)
+
+    else:
+        theta_pair_idx = ppu.find_theta_combos(theta_array)[0]
+
+        shifted_proj_img_array_element_to_align_with_theta_0_0 = shifted_proj_img_array_element_to_align_with[theta_pair_idx[0]]
+        shifted_proj_img_array_element_to_align_with_theta_0_1 = shifted_proj_img_array_element_to_align_with[theta_pair_idx[1]]
+
+        shifted_proj_img_array_element_to_align_with_theta_0_0_norm = ppu.normalize_array_for_rgb(shifted_proj_img_array_element_to_align_with_theta_0_0)
+        shifted_proj_img_array_element_to_align_with_theta_0_1_norm = ppu.normalize_array_for_rgb(shifted_proj_img_array_element_to_align_with_theta_0_1)
+
+        shifted_proj_img_array_element_to_align_with_theta_0_0_rgb = np.dstack((shifted_proj_img_array_element_to_align_with_theta_0_0_norm, np.zeros_like(shifted_proj_img_array_element_to_align_with_theta_0_0_norm), np.zeros_like(shifted_proj_img_array_element_to_align_with_theta_0_0_norm)))
+        shifted_proj_img_array_element_to_align_with_theta_0_1_rgb = np.dstack((np.zeros_like(shifted_proj_img_array_element_to_align_with_theta_0_1_norm), shifted_proj_img_array_element_to_align_with_theta_0_1_norm, np.zeros_like(shifted_proj_img_array_element_to_align_with_theta_0_1_norm)))
+        
+        overlay_shifted_0 = np.dstack((shifted_proj_img_array_element_to_align_with_theta_0_0_norm, shifted_proj_img_array_element_to_align_with_theta_0_1_norm, np.zeros_like(shifted_proj_img_array_element_to_align_with_theta_0_0_norm)))
+
+        fig1, axs1 = plt.subplots(1, 3)
+
+        im1_1 = axs1[0].imshow(shifted_proj_img_array_element_to_align_with_theta_0_0_rgb)
+        im1_2 = axs1[1].imshow(shifted_proj_img_array_element_to_align_with_theta_0_1_rgb)
+        im1_3 = axs1[2].imshow(overlay_shifted_0)
+
+        text1 = axs1[0].text(0.02, 0.02, r'$\theta = {0}$\textdegree'.format(theta_array[theta_pair_idx[0]]), transform = axs1[0].transAxes, color = 'white')
+        text2 = axs1[1].text(0.02, 0.02, r'$\theta = {0}$\textdegree'.format(theta_array[theta_pair_idx[1]]), transform = axs1[1].transAxes, color = 'white')
+
+        for ax in fig1.axes:
+            ax.axis('off')
+            ax.axvline(x = shifted_proj_img_array_element_to_align_with_theta_0_0.shape[1]//2, color = 'white', linewidth = 2, linestyle = '--')
+            ax.axhline(y = shifted_proj_img_array_element_to_align_with_theta_0_0.shape[0]//2, color = 'white', linewidth = 2, linestyle = '--')
+        
+        fig1.tight_layout()
+
+        plt.show()
+        # plt.close(fig1)
+
+        # fig_filename = os.path.join(dir_path, f'shifted_center_of_rotation_figure.svg')
+        
+        # fig1.savefig(fig_filename)
+
+    return
+
+def create_exp_synth_proj_data_gif(dir_path,
+                                   exp_proj,
+                                   synth_proj,
+                                   theta_array,
+                                   fps):
+    
+    n_theta, n_slices, n_columns = exp_proj.shape
+
+    exp_proj_first_iter = exp_proj[0]
+    synth_proj_first_iter = synth_proj[0]
+
+    exp_proj_final_iter = exp_proj[-1]
+    synth_proj_final_iter = synth_proj[-1]
+
+    exp_proj_first_iter_norm = ppu.normalize_array_for_gif(exp_proj_first_iter[0])
+    synth_proj_first_iter_norm = ppu.normalize_array_for_gif(synth_proj_first_iter[0])
+    exp_proj_final_iter_norm = ppu.normalize_array_for_gif(exp_proj_final_iter[0])
+    synth_proj_final_iter_norm = ppu.normalize_array_for_gif(synth_proj_final_iter[0])
+
+    exp_proj_first_iter_rgb = np.dstack((exp_proj_first_iter_norm, np.zeros_like(exp_proj_first_iter_norm), np.zeros_like(exp_proj_first_iter_norm)))
+    synth_proj_first_iter_rgb = np.dstack((np.zeros_like(synth_proj_first_iter_norm), synth_proj_first_iter_norm, np.zeros_like(synth_proj_first_iter_norm)))
+    exp_proj_final_iter_rgb = np.dstack((exp_proj_final_iter_norm, np.zeros_like(exp_proj_final_iter_norm), np.zeros_like(exp_proj_final_iter_norm)))
+    synth_proj_final_iter_rgb = np.dstack((np.zeros_like(synth_proj_final_iter_norm), synth_proj_final_iter_norm, np.zeros_like(synth_proj_final_iter_norm)))
+
+    overlay_exp_synth_proj_first_iter = np.dstack((exp_proj_first_iter_norm, synth_proj_first_iter_norm, np.zeros_like(exp_proj_first_iter_norm)))
+    overlay_exp_synth_proj_final_iter = np.dstack((exp_proj_final_iter_norm, synth_proj_final_iter_norm, np.zeros_like(exp_proj_final_iter_norm)))
+
+    fig1, axs1 = plt.subplots(2, 3)
+
+    img1_1 = axs1[0, 0].imshow(exp_proj_first_iter_rgb)
+    img1_2 = axs1[0, 1].imshow(synth_proj_first_iter_rgb)
+    img1_3 = axs1[0, 2].imshow(overlay_exp_synth_proj_first_iter)
+    img1_4 = axs1[1, 0].imshow(exp_proj_final_iter_rgb)
+    img1_5 = axs1[1, 1].imshow(synth_proj_final_iter_rgb)
+    img1_6 = axs1[1, 2].imshow(overlay_exp_synth_proj_final_iter)
+
+    text1 = axs1[0, 0].text(0.02, 0.02, r'$\theta = {0}$\textdegree'.format(theta_array[0]), transform = axs1[0, 0].transAxes, color = 'white')
+    
+    theta_frames = []
+    
+    for ax in fig1.axes:
+        ax.axis('off')
+        ax.axvline(x = n_columns//2, color = 'red', linewidth = 2)
+        ax.axhline(y = n_slices//2, color = 'red', linewidth = 2)
+    
+    for theta_idx in range(n_theta):
+        exp_proj_first_iter_norm = ppu.normalize_array_for_gif(exp_proj_first_iter[theta_idx])
+        synth_proj_first_iter_norm = ppu.normalize_array_for_gif(synth_proj_first_iter[theta_idx])
+        exp_proj_final_iter_norm = ppu.normalize_array_for_gif(exp_proj_final_iter[theta_idx])
+        synth_proj_final_iter_norm = ppu.normalize_array_for_gif(synth_proj_final_iter[theta_idx])
+
+        exp_proj_first_iter_rgb = np.dstack((exp_proj_first_iter_norm, np.zeros_like(exp_proj_first_iter_norm), np.zeros_like(exp_proj_first_iter_norm)))
+        synth_proj_first_iter_rgb = np.dstack((np.zeros_like(synth_proj_first_iter_norm), synth_proj_first_iter_norm, np.zeros_like(synth_proj_first_iter_norm)))
+        exp_proj_final_iter_rgb = np.dstack((exp_proj_final_iter_norm, np.zeros_like(exp_proj_final_iter_norm), np.zeros_like(exp_proj_final_iter_norm)))
+        synth_proj_final_iter_rgb = np.dstack((np.zeros_like(synth_proj_final_iter_norm), synth_proj_final_iter_norm, np.zeros_like(synth_proj_final_iter_norm)))
+
+        overlay_exp_synth_proj_first_iter = np.dstack((exp_proj_first_iter_norm, synth_proj_first_iter_norm, np.zeros_like(exp_proj_first_iter_norm)))
+        overlay_exp_synth_proj_final_iter = np.dstack((exp_proj_final_iter_norm, synth_proj_final_iter_norm, np.zeros_like(exp_proj_final_iter_norm)))
+
+        img1_1.set_data(exp_proj_first_iter_rgb)
+        img1_2.set_data(synth_proj_first_iter_rgb)
+        img1_3.set_data(overlay_exp_synth_proj_first_iter)
+        img1_4.set_data(exp_proj_final_iter_rgb)
+        img1_5.set_data(synth_proj_final_iter_rgb)
+        img1_6.set_data(overlay_exp_synth_proj_final_iter)
+        
+        text1.set_text(r'$\theta = {0}$\textdegree'.format(theta_array[theta_idx]))
+
+        fig1.canvas.draw()
+
+        frame1 = np.array(fig1.canvas.renderer.buffer_rgba())[:, :, :3]
+
+        theta_frames.append(frame1)
+        
+    plt.close(fig1)
+
+    gif_filename = os.path.join(dir_path, f'exp_synth_proj_data.gif')
+
+    iio2.mimsave(gif_filename, theta_frames, fps = fps)
+
+    return
+
+def create_incremental_shifts_vs_angle_plot(dir_path,
+                                            net_x_shift_array,
+                                            net_y_shift_array,
+                                            correction_type,
+                                            theta_array):
+    
+    fig1, axs1 = plt.subplots()
+
+    vmin = np.min([net_x_shift_array, net_y_shift_array])
+    vmax = np.max([net_x_shift_array, net_y_shift_array])
+    
+    if correction_type == 'adjacent_angle_jitter':
+        color_array = ['k', 'b', 'g', 'r', 'm']
+    
+        for iter_idx in range(net_x_shift_array.shape[0]):
+            if iter_idx == 0:
+                axs1.plot(theta_array, net_x_shift_array[iter_idx], marker = 'o', markersize = 3, linewidth = 2, color = color_array[iter_idx], label = r'$\delta x$')
+                axs1.plot(theta_array, net_y_shift_array[iter_idx], linestyle = '--', marker = 'o', markersize = 3, linewidth = 2, color = color_array[iter_idx], label = r'$\delta y$')
+            else:
+                axs1.plot(theta_array, net_x_shift_array[iter_idx], marker = 'o', markersize = 3, linewidth = 2, color = color_array[iter_idx])
+                axs1.plot(theta_array, net_y_shift_array[iter_idx], linestyle = '--', marker = 'o', markersize = 3, linewidth = 2, color = color_array[iter_idx])
+
+        axs1.set_ylim(vmin, vmax)
+    
+    elif correction_type == 'iter_reproj':
+        axs1.plot(theta_array, net_x_shift_array[0], marker = 'o', markersize = 3, linewidth = 2, color = 'k', label = r'$\delta x$')
+        axs1.plot(theta_array, net_y_shift_array[0], linestyle = '--', marker = 'o', markersize = 3, linewidth = 2, color = 'k', label = r'$\delta y$')
+
+        axs1.set_ylim(vmin, vmax)
+    
+    axs1.set_xlim(-180, 180)
+    axs1.tick_params(axis = 'both', which = 'major', labelsize = 14)
+    axs1.tick_params(axis = 'both', which = 'minor', labelsize = 14)
+    axs1.set_xlabel(r'$\theta$ (\textdegree{})', fontsize = 16)
+    axs1.set_ylabel(r'Incremental shift', fontsize = 16)
+    axs1.legend(frameon = False, fontsize = 14)
+
+    fig1.tight_layout()
+    
+    plt.show()
+    # plt.close(fig1)
+
+    # fig_filename = os.path.join(dir_path, f'incremental_shifts_vs_angle_plot.svg')
+    # fig1.savefig(fig_filename)
+
     return
 
 def create_final_aligned_proj_data_gif(dir_path,
@@ -1611,40 +2004,40 @@ def create_final_aligned_proj_data_gif(dir_path,
 
     iio2.mimsave(gif_filename, theta_frames, fps = fps)
 
-    print('Creating final aligned projection sinogram GIF...')
+    # print('Creating final aligned projection sinogram GIF...')
 
-    fig2, axs2 = plt.subplots(1, 2)
+    # fig2, axs2 = plt.subplots(1, 2)
 
-    im2_1 = axs2[0].imshow(raw_proj[:, 0], vmin = vmin, vmax = vmax, origin = 'lower', extent = [0, n_slices_raw - 1, -180, 180], aspect = 10)
-    im2_2 = axs2[1].imshow(aligned_proj[:, 0], vmin = vmin, vmax = vmax, origin = 'lower', extent = [0, n_slices_raw - 1, -180, 180], aspect = 10)
+    # im2_1 = axs2[0].imshow(raw_proj[:, 0], vmin = vmin, vmax = vmax, origin = 'lower', extent = [0, n_slices_raw - 1, -180, 180], aspect = 10)
+    # im2_2 = axs2[1].imshow(aligned_proj[:, 0], vmin = vmin, vmax = vmax, origin = 'lower', extent = [0, n_slices_raw - 1, -180, 180], aspect = 10)
 
-    text2 = axs2[0].text(0.02, 0.02, r'Slice index 0/{0}'.format(n_slices_raw - 1), transform = axs2[0].transAxes, color = 'white')
+    # text2 = axs2[0].text(0.02, 0.02, r'Slice index 0/{0}'.format(n_slices_raw - 1), transform = axs2[0].transAxes, color = 'white')
     
-    axs2[0].set_title(r'{0}'.format(aligning_element), fontsize = 14)
-    axs2[1].set_title(r'{0} (aligned)'.format(aligning_element), fontsize = 14)
+    # axs2[0].set_title(r'{0}'.format(aligning_element), fontsize = 14)
+    # axs2[1].set_title(r'{0} (aligned)'.format(aligning_element), fontsize = 14)
 
-    slice_frame_list = []
+    # slice_frame_list = []
 
-    for axs in fig2.axes:
-        axs.set_xlabel(r'Pixel index', fontsize = 14)
-        axs.set_ylabel(r'$\theta$ (\textdegree)', fontsize = 14)
+    # for axs in fig2.axes:
+    #     axs.set_xlabel(r'Pixel index', fontsize = 14)
+    #     axs.set_ylabel(r'$\theta$ (\textdegree)', fontsize = 14)
 
-    for slice_idx in range(n_slices_raw):
-        im2_1.set_data(raw_proj[:, slice_idx])
-        im2_2.set_data(aligned_proj[:, slice_idx])
-        text2.set_text(r'Slice index {0}/{1}'.format(slice_idx, n_slices_raw - 1))
+    # for slice_idx in range(n_slices_raw):
+    #     im2_1.set_data(raw_proj[:, slice_idx])
+    #     im2_2.set_data(aligned_proj[:, slice_idx])
+    #     text2.set_text(r'Slice index {0}/{1}'.format(slice_idx, n_slices_raw - 1))
 
-        fig2.canvas.draw()
+    #     fig2.canvas.draw()
 
-        slice_frame = np.array(fig2.canvas.renderer.buffer_rgba())[:, :, :3]
+    #     slice_frame = np.array(fig2.canvas.renderer.buffer_rgba())[:, :, :3]
 
-        slice_frame_list.append(slice_frame)
+    #     slice_frame_list.append(slice_frame)
 
-    plt.close(fig2)
+    # plt.close(fig2)
 
-    gif_filename = os.path.join(dir_path, f'final_aligned_sinogram_data_comp_aligning_element_{aligning_element}.gif')
+    # gif_filename = os.path.join(dir_path, f'final_aligned_sinogram_data_comp_aligning_element_{aligning_element}.gif')
 
-    iio2.mimsave(gif_filename, slice_frame_list, fps = fps)
+    # iio2.mimsave(gif_filename, slice_frame_list, fps = fps)
 
     return
 
@@ -1654,29 +2047,71 @@ def create_gridrec_density_map_gif(dir_path,
                                    elements_xrf, 
                                    fps):    
 
-    desired_element_idx = elements_xrf.index(desired_element)
+    desired_element_idx_1 = elements_xrf.index(desired_element[0])
+    desired_element_idx_2 = elements_xrf.index(desired_element[1])
+    desired_element_idx_3 = elements_xrf.index(desired_element[2])
+    desired_element_idx_4 = elements_xrf.index(desired_element[3])
     
-    density_map = gridrec_density_maps[desired_element_idx]
+    density_map_1 = gridrec_density_maps[desired_element_idx_1]
+    density_map_2 = gridrec_density_maps[desired_element_idx_2]
+    density_map_3 = gridrec_density_maps[desired_element_idx_3]
+    density_map_4 = gridrec_density_maps[desired_element_idx_4]
 
-    n_slices = density_map.shape[0]
+    n_slices = density_map_1.shape[0]
 
-    vmin = density_map.min()
-    vmax = density_map.max()
+    vmin_1 = density_map_1.min()
+    vmax_1 = density_map_1.max()
+    vmin_2 = density_map_2.min()
+    vmax_2 = density_map_2.max()
+    vmin_3 = density_map_3.min()
+    vmax_3 = density_map_3.max()
+    vmin_4 = density_map_4.min()
+    vmax_4 = density_map_4.max()
 
-    fig, axs = plt.subplots()
+    fig, axs = plt.subplots(2, 2)
 
-    img = axs.imshow(density_map[0], vmin = vmin, vmax = vmax)
+    img1_1 = axs[0, 0].imshow(density_map_1[0], vmin = vmin_1, vmax = vmax_1)
+    img1_2 = axs[0, 1].imshow(density_map_2[0], vmin = vmin_2, vmax = vmax_2)
+    img1_3 = axs[1, 0].imshow(density_map_3[0], vmin = vmin_3, vmax = vmax_3)
+    img1_4 = axs[1, 1].imshow(density_map_4[0], vmin = vmin_4, vmax = vmax_4)
     
     text = axs.text(0.02, 0.02, r'Slice index 0/{0}'.format(n_slices - 1), transform = axs.transAxes, color = 'white')
     
     axs.axis('off')
     axs.set_title(r'{0}'.format(desired_element), fontsize = 14)
-    axs.colorbar()
+
+    divider1 = make_axes_locatable(axs[0, 0])
+    divider2 = make_axes_locatable(axs[0, 1])
+    divider3 = make_axes_locatable(axs[1, 0])
+    divider4 = make_axes_locatable(axs[1, 1])
+
+    cax1 = divider1.append_axes('right', size = '5%', pad = 0.05)
+    cax2 = divider2.append_axes('right', size = '5%', pad = 0.05)
+    cax3 = divider3.append_axes('right', size = '5%', pad = 0.05)
+    cax4 = divider4.append_axes('right', size = '5%', pad = 0.05)
+
+    cbar1 = fig.colorbar(img1_1, cax = cax1)
+    cbar2 = fig.colorbar(img1_2, cax = cax2)
+    cbar3 = fig.colorbar(img1_3, cax = cax3)
+    cbar4 = fig.colorbar(img1_4, cax = cax4)
+
+    cbar1.ax.set_title(r'g/cm\textsuperscript{3}', fontsize = 16)
+    cbar2.ax.set_title(r'g/cm\textsuperscript{3}', fontsize = 16)
+    cbar3.ax.set_title(r'g/cm\textsuperscript{3}', fontsize = 16)
+    cbar4.ax.set_title(r'g/cm\textsuperscript{3}', fontsize = 16)
+
+    for idx, ax in enumerate(axs):
+        ax.set_title(r'{0}'.format(desired_element[idx]))
+        ax.axis('off')
 
     slice_frames = []
 
     for slice_idx in range(n_slices):
-        img.set_data(density_map[slice_idx])
+        img1_1.set_data(density_map_1[slice_idx])
+        img1_2.set_data(density_map_2[slice_idx])
+        img1_3.set_data(density_map_3[slice_idx])
+        img1_4.set_data(density_map_4[slice_idx])
+        
         text.set_text(r'Slice index {0}/{1}'.format(slice_idx, n_slices - 1))
 
         fig.canvas.draw()
@@ -1692,3 +2127,12 @@ def create_gridrec_density_map_gif(dir_path,
     iio2.mimsave(gif_filename, slice_frames, fps = fps)
 
     return
+    # plt.plot(theta, net_y_shift_array, 'ko', markersize = 3, linewidth = 2)
+    # plt.xlim(-180, 180)
+    # plt.ylim(-25, 25)
+    # plt.xlabel(r'$\theta$ (\textdegree{})', fontsize = 16)
+    # plt.ylabel(r'$\delta y$ (cumulative)', fontsize = 16)
+    # plt.tick_params(axis = 'both', which = 'major', labelsize = 14)
+    # plt.tick_params(axis = 'both', which = 'minor', labelsize = 14)
+    # plt.tight_layout()
+    # plt.show()
