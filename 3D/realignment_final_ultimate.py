@@ -211,11 +211,13 @@ def correct_adjacent_angle_jitter_pre_cor_correction(init_proj_array,
 
     net_y_shift_cumsum, net_x_shift_cumsum = np.cumsum(net_y_shift_cumsum_temp), np.cumsum(net_x_shift_cumsum_temp) # Cumulative sum of net y shifts (registering one angle to the previous angle still has residual error due to previous angles)
 
-    net_y_shift_array[1:zero_deg_idx[1]] += net_y_shift_cumsum
-    net_x_shift_array[1:zero_deg_idx[1]] += net_x_shift_cumsum
+    net_y_shift_array[1:zero_deg_idx[1]] += net_y_shift_cumsum[:zero_deg_idx[1]]
+    net_x_shift_array[1:zero_deg_idx[1]] += net_x_shift_cumsum[:zero_deg_idx[1]]
 
     n_theta = len(theta[zero_deg_idx[1]:])
-
+    
+    net_y_shift_cumsum_temp, net_x_shift_cumsum_temp = np.zeros(n_theta - 1), np.zeros(n_theta - 1)
+    
     for theta_idx in range(n_theta - 1):
         shifts, phase_xcorr_2d, phase_xcorr_2d_truncated = phase_xcorr_manual(shifted_proj_array[theta_idx],
                                                                               shifted_proj_array[theta_idx + 1], 
@@ -244,8 +246,8 @@ def correct_adjacent_angle_jitter_pre_cor_correction(init_proj_array,
 
     net_y_shift_cumsum, net_x_shift_cumsum = np.cumsum(net_y_shift_cumsum_temp), np.cumsum(net_x_shift_cumsum_temp) # Cumulative sum of net y shifts (registering one angle to the previous angle still has residual error due to previous angles)
 
-    net_y_shift_array[zero_deg_idx[1] + 1:] += net_y_shift_cumsum
-    net_x_shift_array[zero_deg_idx[1] + 1:] += net_x_shift_cumsum
+    net_y_shift_array[zero_deg_idx[1] + 1:] += net_y_shift_cumsum[zero_deg_idx[1] + 1:]
+    net_x_shift_array[zero_deg_idx[1] + 1:] += net_x_shift_cumsum[zero_deg_idx[1] + 1:]
 
     if return_aux_data:
         print(f'Shifting original projection images of \'{aligning_element}\' post-adjacent angle jitter correction...')
