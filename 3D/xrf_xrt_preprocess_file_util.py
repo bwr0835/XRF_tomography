@@ -1595,11 +1595,6 @@ def create_phase_xcorr_2d_gif(dir_path,
                               ref_element,
                               correction_type,
                               fps):
-    
-    n_theta, n_slices, n_columns = phase_xcorr_2d.shape
-
-    vmin = phase_xcorr_2d.min()
-    vmax = phase_xcorr_2d.max()
 
     theta_frames = []
 
@@ -1612,6 +1607,11 @@ def create_phase_xcorr_2d_gif(dir_path,
         phase_xcorr_2d = phase_xcorr_2d_orig[0]
 
         gif_filename = os.path.join(dir_path, f'phase_xcorr_2d_iter_reproj.gif')
+
+    n_theta, n_slices, n_columns = phase_xcorr_2d.shape
+
+    vmin = phase_xcorr_2d.min()
+    vmax = phase_xcorr_2d.max()
 
     if phase_xcorr_2d_truncated_orig is not None:
         if correction_type == 'adjacent_angle_jitter':
