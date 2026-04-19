@@ -176,8 +176,6 @@ def correct_adjacent_angle_jitter_pre_cor_correction(init_proj_array,
     for theta_idx in range(n_theta - 1):
         shifts, phase_xcorr_2d, phase_xcorr_2d_truncated = phase_xcorr_manual(shifted_proj_array[theta_idx],
                                                                               shifted_proj_array[theta_idx + 1], 
-                                                                              sigma, 
-                                                                              alpha, 
                                                                               pixel_rad[theta_idx],
                                                                               theta[[theta_idx, theta_idx + 1]])
 
