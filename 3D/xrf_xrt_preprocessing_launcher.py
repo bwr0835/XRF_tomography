@@ -1,6 +1,6 @@
 import os, sys, xrf_xrt_preprocess_file_util as futil
 
-from xrf_xrt_preprocessing_control_file import preprocess_xrf_xrt_data
+from xrf_xrt_preprocessing_control_file_final import preprocess_xrf_xrt_data
 
 if __name__ == '__main__':
     if len(sys.argv) == 1:
