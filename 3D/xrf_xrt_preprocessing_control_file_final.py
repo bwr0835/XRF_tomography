@@ -186,7 +186,7 @@ def preprocess_xrf_xrt_data(synchrotron,
         print('Extracting pre-existing normalizations, net x pixel shifts, net y pixel shifts, pixel radii for adjacent angle jitter correction and iterative reprojection, and incident intensity from CSV file...')
         
         pre_existing_align_norm_file_path = os.path.join(pre_existing_align_norm_dir_path, 'raw_input_data.csv')
-
+        print(pre_existing_align_norm_file_path)
         norm_array_xrt, \
         norm_array_xrf, \
         init_x_shift_array, \
