@@ -219,10 +219,10 @@ def correct_adjacent_angle_jitter_pre_cor_correction(init_proj_array,
     net_y_shift_cumsum_temp, net_x_shift_cumsum_temp = np.zeros(n_theta_2 - 1), np.zeros(n_theta_2 - 1)
     
     for theta_idx in range(n_theta_2 - 1):
-        theta_idx_aux = theta_idx + n_theta 
+        theta_idx_aux = theta_idx + n_theta_1
         shifts, phase_xcorr_2d, phase_xcorr_2d_truncated = phase_xcorr_manual(shifted_proj_array[theta_idx_aux],
                                                                               shifted_proj_array[theta_idx_aux + 1], 
-                                                                              pixel_rad[theta_idx],
+                                                                              pixel_rad[theta_idx_aux],
                                                                               theta[[theta_idx_aux, theta_idx_aux + 1]])
 
         net_y_shift_cumsum_temp[theta_idx], net_x_shift_cumsum_temp[theta_idx] = shifts[0], shifts[1]
