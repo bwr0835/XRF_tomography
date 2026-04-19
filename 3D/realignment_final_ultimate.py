@@ -145,8 +145,8 @@ def correct_adjacent_angle_jitter_pre_cor_correction(init_proj_array,
     
     shifted_proj_array_orig = shifted_proj_array.copy()
 
-    plt.imshow(shifted_proj_array[-1])
-    plt.show()
+    # plt.imshow(shifted_proj_array[-1])
+    # plt.show()
     
     if pixel_rad is None:
         print('Warning: \'pixel_rad\' not detected. Performing peak search without truncation...')
