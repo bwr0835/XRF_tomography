@@ -312,16 +312,16 @@ def preprocess_xrf_xrt_data(synchrotron,
             phase_xcorr_2d_aggregate_aux, \
             phase_xcorr_2d_truncated_aggregate_aux, \
             proj_img_array_element_to_align_with_orig, \
-            adj_angle_jitter_corrected_proj_element_to_align_with = realign.correct_adjacent_angle_jitter_pre_cor_correction(proj_img_array_element_to_align_with, 
-                                                                                                                 aligning_element,
-                                                                                                                 init_x_shift_array,
-                                                                                                                 init_y_shift_array,
-                                                                                                                 sigma,
-                                                                                                                 alpha,
-                                                                                                                 pixel_rad_adjacent_angle_jitter,
-                                                                                                                 theta,
-                                                                                                                 cval_array,
-                                                                                                                 return_aux_data = return_aux_data)
+            adj_angle_jitter_corrected_proj_element_to_align_with = realign.correct_adjacent_angle_jitter_pre_cor_correction(vignetted_proj_array_element_to_align_with, 
+                                                                                                                             aligning_element,
+                                                                                                                             init_x_shift_array,
+                                                                                                                             init_y_shift_array,
+                                                                                                                             sigma,
+                                                                                                                             alpha,
+                                                                                                                             pixel_rad_adjacent_angle_jitter,
+                                                                                                                             theta,
+                                                                                                                             cval_array,
+                                                                                                                             return_aux_data = return_aux_data)
             if return_aux_data:
                 print('Writing the following auxiliary data to NumPy (.npy) files (NOTE: Python is needed to view these!) files:')
                 print('     -Original (vignetted) projection data')
