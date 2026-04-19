@@ -179,6 +179,10 @@ def correct_adjacent_angle_jitter_pre_cor_correction(init_proj_array,
         else:
             phase_xcorr_2d_truncated_aggregate = np.zeros((n_theta - 1, 2*pixel_rad.max(), 2*pixel_rad.max()))
 
+    zero_deg_idx = np.where(theta == 0)[0]
+    
+    n_theta = len(theta[:zero_deg_idx[1]])
+
     for theta_idx in range(n_theta - 1):
         shifts, phase_xcorr_2d, phase_xcorr_2d_truncated = phase_xcorr_manual(shifted_proj_array[theta_idx],
                                                                               shifted_proj_array[theta_idx + 1], 
@@ -207,8 +211,41 @@ def correct_adjacent_angle_jitter_pre_cor_correction(init_proj_array,
 
     net_y_shift_cumsum, net_x_shift_cumsum = np.cumsum(net_y_shift_cumsum_temp), np.cumsum(net_x_shift_cumsum_temp) # Cumulative sum of net y shifts (registering one angle to the previous angle still has residual error due to previous angles)
 
-    net_y_shift_array[1:] += net_y_shift_cumsum
-    net_x_shift_array[1:] += net_x_shift_cumsum
+    net_y_shift_array[1:zero_deg_idx[1]] += net_y_shift_cumsum
+    net_x_shift_array[1:zero_deg_idx[1]] += net_x_shift_cumsum
+
+    n_theta = len(theta[zero_deg_idx[1]:])
+
+    for theta_idx in range(n_theta - 1):
+        shifts, phase_xcorr_2d, phase_xcorr_2d_truncated = phase_xcorr_manual(shifted_proj_array[theta_idx],
+                                                                              shifted_proj_array[theta_idx + 1], 
+                                                                              pixel_rad[theta_idx],
+                                                                              theta[[theta_idx, theta_idx + 1]])
+
+        net_y_shift_cumsum_temp[theta_idx], net_x_shift_cumsum_temp[theta_idx] = shifts[0], shifts[1]
+        
+        if pixel_rad is not None and pixel_rad[theta_idx] > 0:
+            phase_xcorr_2d_truncated_aggregate_midpt_idy, \
+            phase_xcorr_2d_truncated_aggregate_midpt_idx = phase_xcorr_2d_truncated_aggregate.shape[1]//2, \
+                                                           phase_xcorr_2d_truncated_aggregate.shape[2]//2
+            
+            start_y = int(phase_xcorr_2d_truncated_aggregate_midpt_idy - pixel_rad[theta_idx])
+            start_x = int(phase_xcorr_2d_truncated_aggregate_midpt_idx - pixel_rad[theta_idx])
+
+            end_y = int(phase_xcorr_2d_truncated_aggregate_midpt_idy + pixel_rad[theta_idx])
+            end_x = int(phase_xcorr_2d_truncated_aggregate_midpt_idx + pixel_rad[theta_idx])
+
+            phase_xcorr_2d_truncated_aggregate[theta_idx, start_y:end_y, start_x:end_x] = phase_xcorr_2d_truncated
+        
+        else:
+            phase_xcorr_2d_truncated_aggregate[theta_idx] = phase_xcorr_2d_truncated
+        
+        phase_xcorr_2d_aggregate[theta_idx] = phase_xcorr_2d
+
+    net_y_shift_cumsum, net_x_shift_cumsum = np.cumsum(net_y_shift_cumsum_temp), np.cumsum(net_x_shift_cumsum_temp) # Cumulative sum of net y shifts (registering one angle to the previous angle still has residual error due to previous angles)
+
+    net_y_shift_array[zero_deg_idx[1] + 1:] += net_y_shift_cumsum
+    net_x_shift_array[zero_deg_idx[1] + 1:] += net_x_shift_cumsum
 
     if return_aux_data:
         print(f'Shifting original projection images of \'{aligning_element}\' post-adjacent angle jitter correction...')
