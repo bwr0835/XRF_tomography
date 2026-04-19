@@ -26,7 +26,7 @@ def preprocess_xrf_xrt_data(synchrotron,
                             aggregate_xrf_h5_file_path,
                             aggregate_xrt_h5_file_path,
                             pre_existing_align_norm_file_enabled,
-                            pre_existing_align_norm_file_path,
+                            pre_existing_align_norm_dir_path,
                             norm_enabled,
                             desired_xrf_element,
                             data_percentile,
@@ -184,6 +184,8 @@ def preprocess_xrf_xrt_data(synchrotron,
 
     if pre_existing_align_norm_file_enabled:
         print('Extracting pre-existing normalizations, net x pixel shifts, net y pixel shifts, pixel radii for adjacent angle jitter correction and iterative reprojection, and incident intensity from CSV file...')
+        
+        pre_existing_align_norm_file_path = os.path.join(pre_existing_align_norm_dir_path, 'raw_input_data.csv')
 
         norm_array_xrt, \
         norm_array_xrf, \
@@ -687,7 +689,7 @@ def preprocess_xrf_xrt_data(synchrotron,
         
         print('Creating new raw input data CSV file...')
 
-        futil.create_csv_raw_input_data(dir_path = aligned_data_output_dir_path,
+        futil.create_csv_raw_input_data(dir_path = xrt_od_xrf_realignment_subdir_path,
                                         theta_array = theta,
                                         norm_factor_xrf = norm_array_xrf,
                                         norm_factor_xrt = norm_array_xrt,
