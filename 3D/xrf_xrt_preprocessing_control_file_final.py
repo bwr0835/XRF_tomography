@@ -320,6 +320,7 @@ def preprocess_xrf_xrt_data(synchrotron,
                                                                                                                  alpha,
                                                                                                                  pixel_rad_adjacent_angle_jitter,
                                                                                                                  theta,
+                                                                                                                 cval_array,
                                                                                                                  return_aux_data = return_aux_data)
             if return_aux_data:
                 print('Writing the following auxiliary data to NumPy (.npy) files (NOTE: Python is needed to view these!) files:')
