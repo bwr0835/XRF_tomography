@@ -1096,6 +1096,8 @@ def extract_csv_raw_input_data(file_path):
     aligning_element = df['aligning_element'][0]
     data_percentile = df['data_percentile'][0]
 
+    print(pixel_rad_pre_cor_jitter)
+
     if data_percentile == '':
         data_percentile = None
     
