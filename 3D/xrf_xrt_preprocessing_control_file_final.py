@@ -196,7 +196,7 @@ def preprocess_xrf_xrt_data(synchrotron,
         data_percentile_aux, \
         aligning_element_aux = futil.extract_csv_raw_input_data(pre_existing_align_norm_file_path)
 
-        file_number = int(pre_existing_align_norm_file_path.split('_')[-1].split('.')[0]) + 1 # Extract file number from pre-existing alignment normalization file path and increment by 1
+        file_number = int(pre_existing_align_norm_file_path.split('_')[-2]) + 1 # Extract file number from pre-existing alignment normalization file path and increment by 1
         file_number = f'{file_number:03d}'
 
         xrt_od_xrf_realignment_subdir_path = os.path.join(aligned_data_output_dir_path, f'xrt_od_xrf_realignment_{file_number}')
