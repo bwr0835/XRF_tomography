@@ -246,8 +246,8 @@ def correct_adjacent_angle_jitter_pre_cor_correction(init_proj_array,
 
     net_y_shift_cumsum, net_x_shift_cumsum = np.cumsum(net_y_shift_cumsum_temp), np.cumsum(net_x_shift_cumsum_temp) # Cumulative sum of net y shifts (registering one angle to the previous angle still has residual error due to previous angles)
 
-    net_y_shift_array[zero_deg_idx[1] + 1:] += net_y_shift_cumsum[zero_deg_idx[1] + 1:]
-    net_x_shift_array[zero_deg_idx[1] + 1:] += net_x_shift_cumsum[zero_deg_idx[1] + 1:]
+    net_y_shift_array[zero_deg_idx[1] + 1:] += net_y_shift_cumsum[zero_deg_idx[1]:]
+    net_x_shift_array[zero_deg_idx[1] + 1:] += net_x_shift_cumsum[zero_deg_idx[1]:]
 
     if return_aux_data:
         print(f'Shifting original projection images of \'{aligning_element}\' post-adjacent angle jitter correction...')
