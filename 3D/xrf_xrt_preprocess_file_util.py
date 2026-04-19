@@ -1527,8 +1527,8 @@ def create_adjacent_angle_jitter_corrected_norm_proj_data_gif(dir_path,
 
     for ax in fig1.axes:
         ax.axis('off')
-        ax.axvline(x = n_columns//2, color = 'red', linewidth = 2)
-        ax.axhline(y = n_slices//2, color = 'red', linewidth = 2)
+        ax.axvline(x = n_columns//2, color = 'white', linestyle = '--', linewidth = 2)
+        ax.axhline(y = n_slices//2, color = 'white', linestyle = '--', linewidth = 2)
 
     for theta_idx in range(n_theta):
         im1_1.set_data(intensity_ref_element[theta_idx])
@@ -1952,11 +1952,12 @@ def create_incremental_shifts_vs_angle_plot(dir_path,
 
     fig1.tight_layout()
     
-    plt.show()
-    # plt.close(fig1)
+    # plt.show()
+    plt.close(fig1)
 
-    # fig_filename = os.path.join(dir_path, f'incremental_shifts_vs_angle_plot.svg')
-    # fig1.savefig(fig_filename)
+    fig_filename = os.path.join(dir_path, f'incremental_shifts_vs_angle_plot.svg')
+    
+    fig1.savefig(fig_filename)
 
     return
 

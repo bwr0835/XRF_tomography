@@ -217,15 +217,15 @@ def correct_adjacent_angle_jitter_pre_cor_correction(init_proj_array,
             shifted_proj_array[theta_idx] = ndi.shift(init_proj_array[theta_idx], shift = (net_y_shift_array[theta_idx], net_x_shift_array[theta_idx]))
     
     if return_aux_data:        
-        return net_y_shift_array, \
-               net_x_shift_array, \
+        return net_x_shift_array, \
+               net_y_shift_array, \
                phase_xcorr_2d_aggregate, \
                phase_xcorr_2d_truncated_aggregate, \
                shifted_proj_array_orig, \
                shifted_proj_array
     
-    return net_y_shift_array, \
-           net_x_shift_array, \
+    return net_x_shift_array, \
+           net_y_shift_array, \
            None, \
            None, \
            None, \

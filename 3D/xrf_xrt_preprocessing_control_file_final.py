@@ -311,8 +311,8 @@ def preprocess_xrf_xrt_data(synchrotron,
             net_y_shift_array, \
             phase_xcorr_2d_aggregate_aux, \
             phase_xcorr_2d_truncated_aggregate_aux, \
-            adj_angle_jitter_corrected_proj_element_to_align_with, \
-            proj_img_array_element_to_align_with_orig = realign.correct_adjacent_angle_jitter_pre_cor_correction(proj_img_array_element_to_align_with, 
+            proj_img_array_element_to_align_with_orig, \
+            adj_angle_jitter_corrected_proj_element_to_align_with = realign.correct_adjacent_angle_jitter_pre_cor_correction(proj_img_array_element_to_align_with, 
                                                                                                                  aligning_element,
                                                                                                                  init_x_shift_array,
                                                                                                                  init_y_shift_array,
