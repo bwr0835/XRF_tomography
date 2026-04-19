@@ -166,7 +166,7 @@ def correct_adjacent_angle_jitter_pre_cor_correction(init_proj_array,
             print('Error: \'pixel_rad\' must have the same number of elements as the number of theta angles. Exiting program...')
 
             sys.exit()
-        
+        print(pixel_rad)
         if np.any(pixel_rad == 0):
             print('Warning: \'pixel_rad\' is 0. Performing peak search without truncation...')
 

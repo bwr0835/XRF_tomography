@@ -1928,18 +1928,18 @@ def create_incremental_shifts_vs_angle_plot(dir_path,
     
         for iter_idx in range(net_x_shift_array.shape[0]):
             if iter_idx == 0:
-                axs1.plot(theta_array, net_x_shift_array[iter_idx], marker = 'o', markersize = 3, linewidth = 2, color = color_array[iter_idx], label = r'$\delta x$')
+                axs1.plot(theta_array, net_x_shift_array[iter_idx], marker = 'o', markersize = 5, linewidth = 2, color = color_array[iter_idx], label = r'$\delta x$')
                 axs1.plot(theta_array, net_y_shift_array[iter_idx], linestyle = '--', marker = 'o', markersize = 3, linewidth = 2, color = color_array[iter_idx], label = r'$\delta y$')
             
             else:
-                axs1.plot(theta_array, net_x_shift_array[iter_idx], marker = 'o', markersize = 3, linewidth = 2, color = color_array[iter_idx])
+                axs1.plot(theta_array, net_x_shift_array[iter_idx], marker = 'o', markersize = 5, linewidth = 2, color = color_array[iter_idx])
                 axs1.plot(theta_array, net_y_shift_array[iter_idx], linestyle = '--', marker = 'o', markersize = 3, linewidth = 2, color = color_array[iter_idx])
 
         axs1.set_ylim(vmin, vmax)
     
     elif correction_type == 'adjacent_angle_jitter':
-        axs1.plot(theta_array, net_x_shift_array, marker = 'o', markersize = 3, linewidth = 2, color = 'k', label = r'$\delta x$')
-        axs1.plot(theta_array, net_y_shift_array, linestyle = '--', marker = 'o', markersize = 3, linewidth = 2, color = 'r', label = r'$\delta y$')
+        axs1.plot(theta_array, net_x_shift_array, marker = 'o', markersize = 5, linewidth = 2, color = 'k', label = r'$\delta x$')
+        axs1.plot(theta_array, net_y_shift_array, marker = 'o', markersize = 5, linewidth = 2, color = 'r', label = r'$\delta y$')
 
         axs1.set_ylim(vmin, vmax)
     
