@@ -1239,9 +1239,9 @@ def create_nonaligned_norm_non_cropped_proj_data_gif(dir_path,
 
             text_1 = axs1[2, 0].text(0.02, 0.02, r'$\theta = {0}$\textdegree'.format(theta_array[0]), transform = axs1[2, 0].transAxes, color = 'white')
 
-            for axs in fig1.axes:
-                axs.axis('off')
-                axs.axvline(x = n_columns//2, color = 'red', linewidth = 2)
+            for ax in fig1.axes:
+                ax.axis('off')
+                ax.axvline(x = n_columns//2, color = 'red', linewidth = 2)
 
             for theta_idx in range(n_theta):
                 threshold = np.percentile(convolution_mag_array[theta_idx], data_percentile)
@@ -1278,9 +1278,9 @@ def create_nonaligned_norm_non_cropped_proj_data_gif(dir_path,
 
             text_1 = axs1[1, 0].text(0.02, 0.02, r'$\theta = {0}$\textdegree'.format(theta_array[0]), transform = axs1[1, 0].transAxes, color = 'white')
 
-            for axs in fig1.axes:
-                axs.axis('off')
-                axs.axvline(x = n_columns//2, color = 'red', linewidth = 2)
+            for ax in fig1.axes:
+                ax.axis('off')
+                ax.axvline(x = n_columns//2, color = 'red', linewidth = 2)
 
             for theta_idx in range(n_theta):
                 im1_1.set_data(intensity_xrt[theta_idx])
@@ -1320,8 +1320,8 @@ def create_nonaligned_norm_non_cropped_proj_data_gif(dir_path,
         axs2[1].set_title(r'Norm. Opt. Dens.', fontsize = 14)
         axs2[2].set_title(r'Norm. XRF ({0})'.format(desired_xrf_element), fontsize = 14)
 
-        for axs in fig2.axes:
-            axs.axis('off')
+        for ax in fig2.axes:
+            ax.axis('off')
 
         for theta_idx in range(n_theta):
             im2_1.set_data(intensity_xrt_norm[theta_idx])
@@ -1358,9 +1358,9 @@ def create_nonaligned_norm_non_cropped_proj_data_gif(dir_path,
         axs3[1].set_title(r'Opt. Dens.', fontsize = 14)
         axs3[2].set_title(r'XRF ({0})'.format(desired_xrf_element), fontsize = 14)
 
-        for axs in fig3.axes:
-            axs.set_xlabel(r'Pixel index', fontsize = 14)
-            axs.set_ylabel(r'$\theta$ (\textdegree)', fontsize = 14)
+        for ax in fig3.axes:
+            ax.set_xlabel(r'Pixel index', fontsize = 14)
+            ax.set_ylabel(r'$\theta$ (\textdegree)', fontsize = 14)
 
         for slice_idx in range(n_slices):
             im3_1.set_data(intensity_xrt_norm[:, slice_idx])
@@ -1398,8 +1398,8 @@ def create_nonaligned_norm_non_cropped_proj_data_gif(dir_path,
         axs1[1].set_title(r'Opt. Dens.', fontsize = 14)
         axs1[2].set_title(r'XRF', fontsize = 14)
 
-        for axs in fig1.axes:
-            axs.axis('off')
+        for ax in fig1.axes:
+            ax.axis('off')
 
         for theta_idx in range(n_theta):
             im1_1.set_data(intensity_xrt[theta_idx])
@@ -1436,10 +1436,10 @@ def create_nonaligned_norm_non_cropped_proj_data_gif(dir_path,
         axs2[1].set_title(r'Opt. Dens.', fontsize = 14)
         axs2[2].set_title(r'XRF', fontsize = 14)
 
-        for axs in fig2.axes:
-            # axs.axis('off')
-            axs.set_xlabel(r'Pixel index', fontsize = 14)
-            axs.set_ylabel(r'$\theta$ (\textdegree)', fontsize = 14)
+        for ax in fig2.axes:
+            # ax.axis('off')
+            ax.set_xlabel(r'Pixel index', fontsize = 14)
+            ax.set_ylabel(r'$\theta$ (\textdegree)', fontsize = 14)
 
         for slice_idx in range(n_slices):
             im2_1.set_data(intensity_xrt[:, slice_idx])
@@ -1525,10 +1525,10 @@ def create_adjacent_angle_jitter_corrected_norm_proj_data_gif(dir_path,
     axs1[0].set_title(r'{0}'.format(ref_element), fontsize = 14)
     axs1[1].set_title(r'{0} (adj. angle jitter-corrected, cropped)'.format(ref_element), fontsize = 14)
 
-    for axs in fig1.axes:
-        axs.axis('off')
-        axs.axvline(x = n_columns//2, color = 'red', linewidth = 2)
-        axs.axhline(y = n_slices//2, color = 'red', linewidth = 2)
+    for ax in fig1.axes:
+        ax.axis('off')
+        ax.axvline(x = n_columns//2, color = 'red', linewidth = 2)
+        ax.axhline(y = n_slices//2, color = 'red', linewidth = 2)
 
     for theta_idx in range(n_theta):
         im1_1.set_data(intensity_ref_element[theta_idx])
@@ -1562,9 +1562,9 @@ def create_adjacent_angle_jitter_corrected_norm_proj_data_gif(dir_path,
     # axs2[0].set_title(r'{0}'.format(ref_element), fontsize = 14)
     # axs2[1].set_title(r'{0} (vert. jitter-corrected, cropped)'.format(ref_element), fontsize = 14)
 
-    # for axs in fig2.axes:
-    #     axs.set_xlabel(r'Pixel index', fontsize = 14)
-    #     axs.set_ylabel(r'$\theta$ (\textdegree)', fontsize = 14)
+    # for ax in fig2.axes:
+    #     ax.set_xlabel(r'Pixel index', fontsize = 14)
+    #     ax.set_ylabel(r'$\theta$ (\textdegree)', fontsize = 14)
 
     # for slice_idx in range(n_slices):
     #     im2_1.set_data(intensity_ref_element[:, slice_idx])
@@ -1627,10 +1627,10 @@ def create_phase_xcorr_2d_gif(dir_path,
         
         text1 = axs[0].text(0.02, 0.02, r'$\theta = {0}$\textdegree'.format(theta_array[0]), transform = axs[0].transAxes, color = 'white')
 
-        for axs in fig.axes:
-            axs.axis('off')
-            axs.axvline(x = n_columns//2, color = 'white', linewidth = 2, linestyle = '--')
-            axs.axhline(y = n_slices//2, color = 'white', linewidth = 2, linestyle = '--')
+        for ax in fig.axes:
+            ax.axis('off')
+            ax.axvline(x = n_columns//2, color = 'white', linewidth = 2, linestyle = '--')
+            ax.axhline(y = n_slices//2, color = 'white', linewidth = 2, linestyle = '--')
         
         axs[0].set_title(r'{0} PCC'.format(ref_element), fontsize = 14)
         axs[1].set_title(r'{0} PCC (truncated)'.format(ref_element), fontsize = 14)
@@ -1977,10 +1977,10 @@ def create_final_aligned_proj_data_gif(dir_path,
     img1_1 = axs1[0].imshow(raw_proj[0], vmin = vmin, vmax = vmax)
     img1_2 = axs1[1].imshow(aligned_proj[0], vmin = vmin, vmax = vmax)
 
-    for axs in fig1.axes:
-        axs.axis('off')
-        axs.axvline(x = n_columns_raw//2, color = 'red', linewidth = 2)
-        axs.axhline(y = n_slices_raw//2, color = 'red', linewidth = 2)
+    for ax in fig1.axes:
+        ax.axis('off')
+        ax.axvline(x = n_columns_raw//2, color = 'red', linewidth = 2)
+        ax.axhline(y = n_slices_raw//2, color = 'red', linewidth = 2)
     
     axs1[0].set_title(r'{0}'.format(aligning_element), fontsize = 14)
     axs1[1].set_title(r'{0} (aligned)'.format(aligning_element), fontsize = 14)
@@ -2020,9 +2020,9 @@ def create_final_aligned_proj_data_gif(dir_path,
 
     # slice_frame_list = []
 
-    # for axs in fig2.axes:
-    #     axs.set_xlabel(r'Pixel index', fontsize = 14)
-    #     axs.set_ylabel(r'$\theta$ (\textdegree)', fontsize = 14)
+    # for ax in fig2.axes:
+    #     ax.set_xlabel(r'Pixel index', fontsize = 14)
+    #     ax.set_ylabel(r'$\theta$ (\textdegree)', fontsize = 14)
 
     # for slice_idx in range(n_slices_raw):
     #     im2_1.set_data(raw_proj[:, slice_idx])

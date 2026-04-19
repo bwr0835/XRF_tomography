@@ -341,7 +341,7 @@ def preprocess_xrf_xrt_data(synchrotron,
                                                                                 net_x_shift_array, 
                                                                                 net_y_shift_array)
 
-                print('Creating \'{aligning_element}\' adjacent angle jitter-corrected, per-projection data GIF...')
+                print(f'Creating \'{aligning_element}\' adjacent angle jitter-corrected, per-projection data GIF...')
 
                 futil.create_adjacent_angle_jitter_corrected_norm_proj_data_gif(xrt_od_xrf_realignment_subdir_path,
                                                                                 aligning_element,
