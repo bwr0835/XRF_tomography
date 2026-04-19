@@ -35,16 +35,18 @@ preprocessing_params_ordered = ['synchrotron',
                                 'init_edge_pixel_lengths_to_crop',
                                 'realignment_enabled',
                                 'cor_correction_alg',
-                                'cor_correction_only',
+                                'cor_correction_enabled',
+                                'iter_reproj_enabled',
                                 'n_iter_iter_reproj',
                                 'sample_flipped_remounted_mid_experiment',
-                                'n_iterations_cor_correction',
-                                'eps_cor_correction',
+                                'sample_flipped_remounted_correction_type',
                                 'sigma',
                                 'alpha',
                                 'eps_iter_reproj',
-                                'final_edge_crop_enabled',
-                                'final_edge_pixel_lengths_to_crop',
+                                'create_final_aligned_proj_enabled',
+                                'edge_crop_enabled',
+                                'edge_pixel_lengths_to_crop',
+                                'desired_xrf_element_list',
                                 'aligned_data_output_dir_path',
                                 'fps']
 
@@ -53,11 +55,10 @@ preprocessing_numeric_params = ['data_percentile',
                                 't_dwell_s',
                                 'sigma',
                                 'alpha',
-                                'eps_cor_correction',
                                 'eps_iter_reproj',
                                 'fps']
 
-preprocessing_list_params = ['edges_to_crop']
+preprocessing_list_params = ['edge_pixel_lengths_to_crop']
 
 preprocessing_bool_params = ['create_aggregate_xrf_xrt_files_enabled',
                              'pre_existing_aggregate_xrf_xrt_file_lists_enabled', 
@@ -67,12 +68,13 @@ preprocessing_bool_params = ['create_aggregate_xrf_xrt_files_enabled',
                              'pre_cor_correction_adjacent_angle_jitter_correction_enabled',
                              'init_edge_crop_enabled',
                              'realignment_enabled',
-                             'cor_correction_only',
+                             'cor_correction_enabled',
+                             'iter_reproj_enabled',
                              'sample_flipped_remounted_mid_experiment',
-                             'final_edge_crop_enabled']
+                             'edge_crop_enabled',
+                             'create_final_aligned_proj_enabled']
 
-preprocessing_dict_params = ['init_edge_pixel_lengths_to_crop',
-                             'final_edge_pixel_lengths_to_crop']
+preprocessing_dict_params = ['edge_pixel_lengths_to_crop']
 
 # recon_params_ordered = ['synchrotron',
 #                         'synchrotron_beamline',
