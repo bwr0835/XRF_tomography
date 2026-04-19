@@ -31,5 +31,5 @@ create_final_aligned_proj_enabled = False
 edge_crop_enabled = False
 edge_pixel_lengths_to_crop =
 desired_xrf_element_list = ['Ni', 'Cu', 'Zn', Ce']
-aligned_data_output_dir_path = /home/bwr0835/3_id_realigned_data_common_fov_cor_correction_only_04_12_2026_jitter_plot
+aligned_data_output_dir_path = /home/bwr0835/3_id_realigned_data_04_19_2026_diff_cor_correction
 fps = 10
