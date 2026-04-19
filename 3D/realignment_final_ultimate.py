@@ -5,6 +5,7 @@ import numpy as np, \
 
 from skimage import transform as xform
 from scipy import ndimage as ndi, fft
+import matplotlib.pyplot as plt
 
 def phase_xcorr_manual(ref_img,
                        mov_img, 
@@ -143,6 +144,9 @@ def correct_adjacent_angle_jitter_pre_cor_correction(init_proj_array,
         shifted_proj_array = init_proj_array.copy()
     
     shifted_proj_array_orig = shifted_proj_array.copy()
+
+    plt.imshow(shifted_proj_array[-1])
+    plt.show()
     
     if pixel_rad is None:
         print('Warning: \'pixel_rad\' not detected. Performing peak search without truncation...')
