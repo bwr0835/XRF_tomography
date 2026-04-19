@@ -267,8 +267,6 @@ def joint_fluct_norm(xrt_array,
     
     n_theta, n_slices, n_columns = xrt_array.shape
 
-    print(xrt_array.shape)
-
     convolution_mag_array = np.zeros((n_theta, n_slices, n_columns))
     
     norm_array_xrt = np.zeros(n_theta)
@@ -277,7 +275,7 @@ def joint_fluct_norm(xrt_array,
     xrt_mask_avg_sum = 0
     
     for theta_idx in range(n_theta):
-        xrt_vignetted = edge_gauss_filter(xrt_array[theta_idx], sigma = sigma_1, alpha = alpha, nx = n_columns, ny = n_slices)
+        xrt_vignetted, _ = edge_gauss_filter(xrt_array[theta_idx], sigma = sigma_1, alpha = alpha, nx = n_columns, ny = n_slices)
 
         convolution_mag = ndi.gaussian_filter(xrt_vignetted, sigma = sigma_2) # Blur the entire image using Gaussian filter/convolution
 
@@ -337,7 +335,8 @@ def calculate_abs_incident_intensity_photons(xrt_array,
     xrt_mask_avg_sum = 0
     
     for theta_idx in range(n_theta):
-        xrt_vignetted = edge_gauss_filter(xrt_array[theta_idx], sigma = sigma_1, alpha = alpha, nx = n_columns, ny = n_slices)
+        xrt_vignetted, _ = edge_gauss_filter(xrt_array[theta_idx], sigma = sigma_1, alpha = alpha, nx = n_columns, ny = n_slices)
+        
         convolution_mag = ndi.gaussian_filter(xrt_vignetted, sigma = sigma_2) # Blur the entire image using Gaussian filter/convolution
 
         threshold = np.percentile(convolution_mag, data_percentile) # EX: Take top 20% of data (data_percentile = 80)
