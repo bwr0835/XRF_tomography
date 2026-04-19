@@ -267,6 +267,8 @@ def joint_fluct_norm(xrt_array,
     
     n_theta, n_slices, n_columns = xrt_array.shape
 
+    print(xrt_array.shape)
+
     convolution_mag_array = np.zeros((n_theta, n_slices, n_columns))
     
     norm_array_xrt = np.zeros(n_theta)
