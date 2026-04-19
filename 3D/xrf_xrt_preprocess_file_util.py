@@ -1625,12 +1625,12 @@ def create_phase_xcorr_2d_gif(dir_path,
         im1_1 = axs[0].imshow(phase_xcorr_2d[0], vmin = vmin, vmax = vmax)
         im1_2 = axs[1].imshow(phase_xcorr_2d_truncated[0], vmin = vmin, vmax = vmax)
         
-        text1 = axs[0].text(0.02, 0.02, r'$\theta = {0}$\textdegree'.format(theta_array[0]), transform = axs[0].transAxes, color = 'white')
+        text1 = axs[0].text(0.02, 0.02, r'$\left(\theta_{{1}} = {0}^{{\circ}}, \theta_{{2}} = {1}^{{\circ}}\right)$'.format(theta_array[0], theta_array[1]), transform = axs[0].transAxes, color = 'white')
 
         for ax in fig.axes:
             ax.axis('off')
-            ax.axvline(x = n_columns//2, color = 'white', linewidth = 2, linestyle = '--')
-            ax.axhline(y = n_slices//2, color = 'white', linewidth = 2, linestyle = '--')
+            # ax.axvline(x = n_columns//2, color = 'white', linewidth = 2, linestyle = '--')
+            # ax.axhline(y = n_slices//2, color = 'white', linewidth = 2, linestyle = '--')
         
         axs[0].set_title(r'{0} PCC'.format(ref_element), fontsize = 14)
         axs[1].set_title(r'{0} PCC (truncated)'.format(ref_element), fontsize = 14)
@@ -1639,7 +1639,7 @@ def create_phase_xcorr_2d_gif(dir_path,
             im1_1.set_data(phase_xcorr_2d[theta_idx])
             im1_2.set_data(phase_xcorr_2d_truncated[theta_idx])
             
-            text1.set_text(r'$\theta = {0}$\textdegree'.format(theta_array[theta_idx]))
+            text1.set_text(r'$\left(\theta_{{1}} = {0}^{{\circ}}, \theta_{{2}} = {1}^{{\circ}}\right)$'.format(theta_array[theta_idx], theta_array[theta_idx + 1]))
 
             fig.canvas.draw()
 
@@ -1652,16 +1652,16 @@ def create_phase_xcorr_2d_gif(dir_path,
 
         im1_1 = axs.imshow(phase_xcorr_2d[0], vmin = vmin, vmax = vmax)
     
-        text1 = axs.text(0.02, 0.02, r'$\theta = {0}$\textdegree'.format(theta_array[0]), transform = axs.transAxes, color = 'white')
+        text1 = axs.text(0.02, 0.02, r'$\left(\theta_{{1}} = {0}^{{\circ}}, \theta_{{2}} = {1}^{{\circ}}\right)$'.format(theta_array[0], theta_array[1]), transform = axs.transAxes, color = 'white')
     
         axs.axis('off')
-        axs.axvline(x = n_columns//2, color = 'white', linewidth = 2, linestyle = '--')
-        axs.axhline(y = n_slices//2, color = 'white', linewidth = 2, linestyle = '--')
+        # axs.axvline(x = n_columns//2, color = 'white', linewidth = 2, linestyle = '--')
+        # axs.axhline(y = n_slices//2, color = 'white', linewidth = 2, linestyle = '--')
     
         for theta_idx in range(n_theta):
             im1_1.set_data(phase_xcorr_2d[theta_idx])
         
-            text1.set_text(r'$\theta = {0}$\textdegree'.format(theta_array[theta_idx]))
+            text1.set_text(r'$\left(\theta_{{1}} = {0}^{{\circ}}, \theta_{{2}} = {1}^{{\circ}}\right)$'.format(theta_array[theta_idx], theta_array[theta_idx + 1]))
         
             fig.canvas.draw()
         
