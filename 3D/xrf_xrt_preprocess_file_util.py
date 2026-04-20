@@ -1738,8 +1738,7 @@ def create_center_of_rotation_figures(dir_path,
         overlay_shifted_0 = np.dstack((shifted_proj_img_array_element_to_align_with_theta_0_0_norm, shifted_proj_img_array_element_to_align_with_theta_1_0_norm, np.zeros_like(shifted_proj_img_array_element_to_align_with_theta_0_0_norm)))
         overlay_shifted_1 = np.dstack((shifted_proj_img_array_element_to_align_with_theta_0_0_norm, shifted_proj_img_array_element_to_align_with_theta_0_1_norm, np.zeros_like(shifted_proj_img_array_element_to_align_with_theta_0_0_norm)))
         overlay_shifted_2 = np.dstack((shifted_proj_img_array_element_to_align_with_theta_1_0_norm, shifted_proj_img_array_element_to_align_with_theta_1_1_norm, np.zeros_like(shifted_proj_img_array_element_to_align_with_theta_1_0_norm)))
-        
-       
+    
         fig1, axs1 = plt.subplots(2, 3)
         
         im1_1 = axs1[0, 0].imshow(shifted_proj_img_array_element_to_align_with_theta_aux_0_0_rgb)
