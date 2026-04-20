@@ -146,7 +146,7 @@ def cos_fit(x, y):
 
     yfit = result.eval(x = x)
 
-    x0 = np.linspace(60, 180, 1201)
+    x0 = np.linspace(55, 180, 1001)
 
     yfit_1 = result.eval(x = x0)
 
