@@ -392,7 +392,6 @@ def warp_shift(img, net_x_shift, net_y_shift, cval = 0):
 def correct_center_of_rotation(proj_img_array,
                                net_x_shift_array,
                                net_y_shift_array,
-                               theta_pair_array,
                                theta_array,
                                cor_correction_alg,
                                aligning_element,
@@ -458,8 +457,8 @@ def correct_center_of_rotation(proj_img_array,
             center_of_rotation_avg_second_part, _, offset_init_second_part = rot_center_avg(shifted_proj_img_array, theta_idx_pairs_second_part, theta_array_second_part, cor_correction_alg = cor_correction_alg, sigma = sigma, alpha = alpha, sample_flipped_remounted_mid_experiment = sample_flipped_remounted_mid_experiment, half_dataset_part = 'second')
             
         elif cor_correction_alg == 'phase_symm':
-            center_of_rotation_avg_first_part, center_geom, offset_init_first_part = rot_center_avg(shifted_proj_img_array, theta_pair_array, theta_array, cor_correction_alg = cor_correction_alg, sigma = sigma, alpha = alpha, sample_flipped_remounted_mid_experiment = sample_flipped_remounted_mid_experiment, half_dataset_part = 'first')
-            center_of_rotation_avg_second_part, _, offset_init_second_part = rot_center_avg(shifted_proj_img_array, theta_pair_array, theta_array, cor_correction_alg = cor_correction_alg, sigma = sigma, alpha = alpha, sample_flipped_remounted_mid_experiment = sample_flipped_remounted_mid_experiment, half_dataset_part = 'second')
+            center_of_rotation_avg_first_part, center_geom, offset_init_first_part = rot_center_avg(shifted_proj_img_array, theta_idx_pairs_first_part, theta_array_first_part, cor_correction_alg = cor_correction_alg, sigma = sigma, alpha = alpha, sample_flipped_remounted_mid_experiment = sample_flipped_remounted_mid_experiment, half_dataset_part = 'first')
+            center_of_rotation_avg_second_part, _, offset_init_second_part = rot_center_avg(shifted_proj_img_array, theta_idx_pairs_second_part, theta_array_second_part, cor_correction_alg = cor_correction_alg, sigma = sigma, alpha = alpha, sample_flipped_remounted_mid_experiment = sample_flipped_remounted_mid_experiment, half_dataset_part = 'second')
             
         else:
             print('Error: Correction algorithm unavailable. Exiting program...')
