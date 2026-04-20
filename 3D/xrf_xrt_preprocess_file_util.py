@@ -739,6 +739,7 @@ def extract_csv_preprocessing_input_params(file_path):
         sys.exit()
     
     numeric_params = ipn.preprocessing_numeric_params
+    numeric_array_params = ipn.preprocessing_numeric_array_params
     bool_params = ipn.preprocessing_bool_params
     list_params = ipn.preprocessing_list_params
     dict_params = ipn.preprocessing_dict_params
@@ -777,6 +778,15 @@ def extract_csv_preprocessing_input_params(file_path):
         elif input_params[idx] in bool_params and (val.lower() == 'true' or val.lower() == 'false'):
             values[idx] = (val.lower() == 'true')
         
+        elif input_params[idx] in numeric_array_params:
+            try:
+                values[idx] = np.array(ast.literal_eval(val))
+            
+            except:
+                print('Error: At least one preprocessing input parameter value cannot be converted to a NumPy array. Exiting program...', flush = True)
+
+                sys.exit()
+                
         elif input_params[idx] in list_params:
             values[idx] = values[idx].split(',')
 

@@ -1,7 +1,11 @@
-import numpy as np, tomopy as tomo, xraylib as xrl, sys
+import numpy as np, \
+       tomopy as tomo, \
+       xraylib as xrl, \
+       sys
 
 from scipy import ndimage as ndi
 from itertools import combinations as combos
+from lmfit import Model
 
 def round_correct(num, ndec):
     if ndec == 0:
@@ -123,6 +127,20 @@ def pad_row(array, dataset_type):
         sys.exit()
 
     return array
+
+def obj_fxn_cos(x, A, B, C, D):
+    return A*np.cos(B*x + C) + D
+
+def cos_fit(x, y):
+    model = Model(obj_fxn_cos)
+
+    params = model.make_params(A = 1, B = 1, C = 1, D = 1)
+
+    result = model.fit(y, params, x = x)
+
+    yfit = result.eval(x = x)
+
+    return yfit
 
 def edge_gauss_filter(image, sigma, alpha, nx, ny):
     n_rolloff = int(0.5 + alpha*sigma)

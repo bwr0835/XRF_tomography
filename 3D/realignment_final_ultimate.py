@@ -96,6 +96,8 @@ def correct_adjacent_angle_jitter_pre_cor_correction(init_proj_array,
                                                      pixel_rad,
                                                      theta,
                                                      cval_array,
+                                                     cos_fit_enabled,
+                                                     angle_range_to_fit,
                                                      return_aux_data):
     """
     Adjacent-angle vs cumulative convention
@@ -170,7 +172,7 @@ def correct_adjacent_angle_jitter_pre_cor_correction(init_proj_array,
             print('Error: \'pixel_rad\' must have the same number of elements as the number of theta angles. Exiting program...')
 
             sys.exit()
-        print(pixel_rad)
+        # print(pixel_rad)
         if np.any(pixel_rad == 0):
             print('Warning: \'pixel_rad\' is 0. Performing peak search without truncation...')
 
@@ -209,6 +211,16 @@ def correct_adjacent_angle_jitter_pre_cor_correction(init_proj_array,
 
     net_y_shift_array[1:] += net_y_shift_cumsum
     net_x_shift_array[1:] += net_x_shift_cumsum
+
+    if cos_fit_enabled:
+        theta_fit_idx_min = np.where(theta == angle_range_to_fit[0])[0][0]
+        theta_fit_idx_max = np.where(theta == angle_range_to_fit[1])[0][0]
+
+        cumulative_x_jitter_fit = ppu.cos_fit(theta[theta_fit_idx_min:theta_fit_idx_max + 1], net_x_shift_cumsum[theta_fit_idx_min:theta_fit_idx_max + 1])
+        # cumulative_y_jitter_fit = ppu.cos_fit(theta[theta_fit_idx_min:theta_fit_idx_max + 1], net_y_shift_cumsum[theta_fit_idx_min:theta_fit_idx_max + 1])
+        
+        net_x_shift_array[theta_fit_idx_min:theta_fit_idx_max + 1] -= cumulative_x_jitter_fit[theta_fit_idx_min:theta_fit_idx_max + 1]
+        # net_y_shift_array[1:] += cumulative_y_jitter_fit
 
     if return_aux_data:
         print(f'Shifting original projection images of \'{aligning_element}\' post-adjacent angle jitter correction...')

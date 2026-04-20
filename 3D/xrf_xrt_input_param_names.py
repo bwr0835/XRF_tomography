@@ -31,6 +31,8 @@ preprocessing_params_ordered = ['synchrotron',
                                 't_dwell_s',
                                 'aligning_element',
                                 'pre_cor_correction_adjacent_angle_jitter_correction_enabled',
+                                'cos_fit_enabled',
+                                'angle_range_to_fit',
                                 'realignment_enabled',
                                 'cor_correction_alg',
                                 'cor_correction_enabled',
@@ -56,6 +58,8 @@ preprocessing_numeric_params = ['data_percentile',
                                 'eps_iter_reproj',
                                 'fps']
 
+preprocessing_numeric_array_params = ['angle_range_to_fit']
+
 preprocessing_list_params = ['edge_pixel_lengths_to_crop']
 
 preprocessing_bool_params = ['create_aggregate_xrf_xrt_files_enabled',
@@ -64,6 +68,7 @@ preprocessing_bool_params = ['create_aggregate_xrf_xrt_files_enabled',
                              'norm_enabled',
                              'return_aux_data',
                              'pre_cor_correction_adjacent_angle_jitter_correction_enabled',
+                             'cos_fit_enabled',
                              'realignment_enabled',
                              'cor_correction_enabled',
                              'iter_reproj_enabled',

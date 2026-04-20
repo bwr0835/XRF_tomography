@@ -35,6 +35,8 @@ def preprocess_xrf_xrt_data(synchrotron,
                             t_dwell_s,
                             aligning_element,
                             pre_cor_correction_adjacent_angle_jitter_correction_enabled,
+                            cos_fit_enabled,
+                            angle_range_to_fit,
                             realignment_enabled,
                             cor_correction_enabled,
                             cor_correction_alg,
@@ -186,7 +188,7 @@ def preprocess_xrf_xrt_data(synchrotron,
         print('Extracting pre-existing normalizations, net x pixel shifts, net y pixel shifts, pixel radii for adjacent angle jitter correction and iterative reprojection, and incident intensity from CSV file...')
         
         pre_existing_align_norm_file_path = os.path.join(pre_existing_align_norm_dir_path, 'raw_input_data.csv')
-        print(pre_existing_align_norm_file_path)
+
         norm_array_xrt, \
         norm_array_xrf, \
         init_x_shift_array, \
@@ -321,6 +323,8 @@ def preprocess_xrf_xrt_data(synchrotron,
                                                                                                                              pixel_rad_adjacent_angle_jitter,
                                                                                                                              theta,
                                                                                                                              cval_array,
+                                                                                                                             cos_fit_enabled,
+                                                                                                                             angle_range_to_fit,
                                                                                                                              return_aux_data = return_aux_data)
             if return_aux_data:
                 print('Writing the following auxiliary data to NumPy (.npy) files (NOTE: Python is needed to view these!) files:')
