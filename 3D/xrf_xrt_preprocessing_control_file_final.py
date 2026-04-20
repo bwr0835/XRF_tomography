@@ -399,8 +399,8 @@ def preprocess_xrf_xrt_data(synchrotron,
             shifted_proj_img_array_element_to_align_with, \
             shifted_proj_img_array_element_to_align_with_aux, \
             shifted_proj_img_array_element_to_align_with_orig = realign.correct_center_of_rotation(proj_img_array_element_to_align_with,
-                                                                                                   net_x_shift_array,
-                                                                                                   net_y_shift_array,
+                                                                                                   init_x_shift_array,
+                                                                                                   init_y_shift_array,
                                                                                                    theta,
                                                                                                    cor_correction_alg,
                                                                                                    aligning_element,
