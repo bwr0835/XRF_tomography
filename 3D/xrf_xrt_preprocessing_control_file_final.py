@@ -393,7 +393,7 @@ def preprocess_xrf_xrt_data(synchrotron,
 
         elif cor_correction_enabled:
             print('Calculating shifts needed for center of rotation correction...')
-            print(theta)
+            
             net_x_shift_array, \
             net_y_shift_array, \
             shifted_proj_img_array_element_to_align_with, \
