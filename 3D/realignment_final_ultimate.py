@@ -132,7 +132,8 @@ def correct_adjacent_angle_jitter_pre_cor_correction(init_proj_array,
 
     phase_xcorr_2d_aggregate = np.zeros((n_theta - 1, n_slices, n_columns))
     # net_x_shift_array, net_y_shift_array = np.zeros(n_theta), np.zeros(n_theta)
-    net_y_shift_cumsum_temp, net_x_shift_cumsum_temp = np.zeros(n_theta - 1), np.zeros(n_theta - 1)
+    net_y_shift_cumsum_temp = np.zeros(n_theta - 1)
+    net_x_shift_cumsum_temp = np.zeros(n_theta - 1)
 
     if np.any(net_y_shift_array != 0) or np.any(net_x_shift_array != 0):
         print(f'Applying initial vertical and horizontal shifts...')
@@ -187,7 +188,10 @@ def correct_adjacent_angle_jitter_pre_cor_correction(init_proj_array,
                                                                               pixel_rad[theta_idx],
                                                                               theta[[theta_idx, theta_idx + 1]])
 
-        net_y_shift_cumsum_temp[theta_idx], net_x_shift_cumsum_temp[theta_idx] = shifts[0], shifts[1]
+        net_y_shift_cumsum_temp[theta_idx] = shifts[0]
+        net_x_shift_cumsum_temp[theta_idx] = shifts[1]
+
+        net_x_shift_array[theta_idx + 1] += net_x_shift_cumsum_temp[theta_idx]
 
         if pixel_rad is not None and pixel_rad[theta_idx] > 0:
             phase_xcorr_2d_truncated_aggregate_midpt_idy, \
@@ -207,10 +211,11 @@ def correct_adjacent_angle_jitter_pre_cor_correction(init_proj_array,
         
         phase_xcorr_2d_aggregate[theta_idx] = phase_xcorr_2d
 
-    net_y_shift_cumsum, net_x_shift_cumsum = np.cumsum(net_y_shift_cumsum_temp), np.cumsum(net_x_shift_cumsum_temp) # Cumulative sum of net y shifts (registering one angle to the previous angle still has residual error due to previous angles)
+    net_y_shift_cumsum = np.cumsum(net_y_shift_cumsum_temp) # Cumulative sum of net y shifts (registering one angle to the previous angle still has residual error due to previous angles)
+    # net_x_shift_cumsum = np.cumsum(net_x_shift_cumsum_temp)
 
     net_y_shift_array[1:] += net_y_shift_cumsum
-    net_x_shift_array[1:] += net_x_shift_cumsum
+    # net_x_shift_array[1:] += net_x_shift_cumsum
 
     if cos_fit_enabled:
         theta_fit_idx_min = np.where(theta == angle_range_to_fit[0])[0][0]
