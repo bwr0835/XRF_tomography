@@ -132,6 +132,15 @@ def obj_fxn_cos(x, A, B, C, D):
     return A*np.cos(B*x + C) + D
 
 def cos_fit(x, y):
+    x = np.asarray(x).ravel()
+    y = np.asarray(y).ravel()
+
+    if x.size != y.size:
+        n = min(x.size, y.size)
+        print(f"Warning: cos_fit received x,y with different lengths ({x.size}, {y.size}); truncating both to {n}.")
+        x = x[:n]
+        y = y[:n]
+
     model = Model(obj_fxn_cos)
 
     params = model.make_params(A = 1, B = 1, C = 1, D = 1)
