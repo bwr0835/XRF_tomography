@@ -143,7 +143,9 @@ def cos_fit(x, y):
 
     x0 = np.linspace(60, 180, 1201)
 
-    plt.plot(x0, yfit)
+    yfit_1 = result.eval(x = x0)
+
+    plt.plot(x0, yfit_1)
     plt.scatter(x, y)
     plt.show()
     
