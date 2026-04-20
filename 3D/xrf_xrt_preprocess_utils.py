@@ -152,6 +152,13 @@ def cos_fit(x, y):
 
     plt.plot(x0, yfit_1)
     plt.scatter(x, y)
+
+    plt.xlabel(r'$\theta$ (\textdegree{})', fontsize = 16)
+    plt.ylabel(r'$\delta x$', fontsize = 16)
+    plt.tick_params(axis = 'both', which = 'major', labelsize = 14)
+    plt.tick_params(axis = 'both', which = 'minor', labelsize = 14)
+    plt.legend(frameon = False, fontsize = 14)
+    plt.tight_layout()
     plt.show()
     
     return yfit
