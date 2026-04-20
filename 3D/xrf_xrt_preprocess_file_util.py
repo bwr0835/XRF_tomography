@@ -1758,14 +1758,14 @@ def create_center_of_rotation_figures(dir_path,
             ax.axvline(x = shifted_proj_img_array_element_to_align_with_theta_0_0.shape[1]//2, color = 'white', linewidth = 2, linestyle = '--')
             ax.axhline(y = shifted_proj_img_array_element_to_align_with_theta_0_0.shape[0]//2, color = 'white', linewidth = 2, linestyle = '--')
 
-        fig1.tight_layout()
+        # fig1.tight_layout()
 
-        plt.show()
-        # plt.close(fig1)
+        # plt.show()
+        plt.close(fig1)
         
-        # fig_filename = os.path.join(dir_path, f'aux_shifted_center_of_rotation_figure.svg')
+        fig_filename = os.path.join(dir_path, f'aux_shifted_center_of_rotation_figure.svg')
         
-        # fig1.savefig(fig_filename)
+        fig1.savefig(fig_filename)
 
         fig2, axs2 = plt.subplots(3, 3)
 
@@ -1791,14 +1791,14 @@ def create_center_of_rotation_figures(dir_path,
             ax.axvline(x = shifted_proj_img_array_element_to_align_with_theta_0_0.shape[1]//2, color = 'white', linewidth = 2, linestyle = '--')
             ax.axhline(y = shifted_proj_img_array_element_to_align_with_theta_0_0.shape[0]//2, color = 'white', linewidth = 2, linestyle = '--')
 
-        fig2.tight_layout()
+        # fig2.tight_layout()
 
-        plt.show()
-        # plt.close(fig2)
+        # plt.show()
+        plt.close(fig2)
 
-        # fig_filename = os.path.join(dir_path, f'shifted_center_of_rotation_figure.svg')
+        fig_filename = os.path.join(dir_path, f'shifted_center_of_rotation_figure.svg')
         
-        # fig2.savefig(fig_filename)
+        fig2.savefig(fig_filename)
 
     else:
         theta_pair_idx = ppu.find_theta_combos(theta_array)[0]
