@@ -135,7 +135,12 @@ def obj_fxn_cos(x, A, B, C, D):
 def cos_fit(x, y):
     model = Model(obj_fxn_cos)
 
-    params = model.make_params(A = 1, B = 1, C = 1, D = 1)
+    A_guess = 0.5*(y.max() - y.min())
+    B_guess = 2*np.pi/(x.max() - x.min())
+    C_guess = 0
+    D_guess = y.mean()
+
+    params = model.make_params(A = A_guess, B = B_guess, C = C_guess, D = D_guess)
 
     result = model.fit(y, params, x = x)
 
