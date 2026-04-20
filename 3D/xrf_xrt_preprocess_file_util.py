@@ -1947,8 +1947,8 @@ def create_incremental_shifts_vs_angle_plot(dir_path,
         axs1.set_ylim(vmin, vmax)
     
     elif correction_type == 'adjacent_angle_jitter':
-        axs1.scatter(theta_array, net_x_shift_array, marker = 'o', markersize = 5, linewidth = 2, color = 'k', label = r'$\delta x$')
-        axs1.scatter(theta_array, net_y_shift_array, marker = 'o', markersize = 5, linewidth = 2, color = 'r', label = r'$\delta y$')
+        axs1.scatter(theta_array, net_x_shift_array, s = 240, marker = 'o', markersize = 5, linewidth = 2, color = 'k', label = r'$\delta x$')
+        axs1.scatter(theta_array, net_y_shift_array, s = 240, marker = 'o', markersize = 5, linewidth = 2, color = 'r', label = r'$\delta y$')
 
         axs1.set_ylim(vmin, vmax)
     
