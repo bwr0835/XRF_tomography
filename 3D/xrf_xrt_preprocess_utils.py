@@ -150,8 +150,8 @@ def cos_fit(x, y):
 
     yfit_1 = result.eval(x = x0)
 
-    plt.plot(x0, yfit_1)
-    plt.scatter(x, y)
+    plt.plot(x0, yfit_1, 'r--', label = r'Fit')
+    plt.scatter(x, y, 'k', label = r'Data')
 
     plt.xlabel(r'$\theta$ (\textdegree{})', fontsize = 16)
     plt.ylabel(r'$\delta x$', fontsize = 16)
