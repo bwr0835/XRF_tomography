@@ -231,7 +231,7 @@ def correct_adjacent_angle_jitter_pre_cor_correction(init_proj_array,
         print(f'Shifting original projection images of \'{aligning_element}\' post-adjacent angle jitter correction...')
         
         for theta_idx in range(n_theta):
-            shifted_proj_array[theta_idx] = ndi.shift(init_proj_array[theta_idx], shift = (net_y_shift_array[theta_idx], net_x_shift_array[theta_idx]))
+            shifted_proj_array[theta_idx] = ndi.shift(init_proj_array[theta_idx], shift = (net_y_shift_array[theta_idx], net_x_shift_array[theta_idx]), cval = cval_array[theta_idx])
     
     if return_aux_data:        
         return net_x_shift_array, \
