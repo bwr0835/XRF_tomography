@@ -396,29 +396,12 @@ def correct_center_of_rotation(proj_img_array,
                                cor_correction_alg,
                                aligning_element,
                                cval_array,
-                               sigma = 5,
-                               alpha = 10,
                                pixel_rad_cor_correction = 0,
                                sample_flipped_remounted_mid_experiment = False,
                                sample_flipped_remounted_correction_type = 'differential',
                                return_aux_data = True):
 
     n_theta, n_slices, n_columns = proj_img_array.shape
-
-    if sigma is None:
-        print('Warning: Positive \'sigma\' not detected. Setting \'sigma\' to 5 pixels...')
-        
-        sigma = 5
-
-    if alpha is None:
-        print('Warning: Positive, \'alpha\' not detected. Setting \'alpha\' to 10 pixels...')
-        
-        alpha = 10
-
-    if sigma < 0 or alpha < 0:
-        print('Error: \'sigma\' and \'alpha\' must be positive numbers. Exiting program...')
-
-        sys.exit()
     
     if pixel_rad_cor_correction is None:
         print('Warning: \'pixel_rad_cor_correction\' not detected. Setting \'pixel_rad_cor_correction\' to zero pixels...')
@@ -453,12 +436,12 @@ def correct_center_of_rotation(proj_img_array,
         theta_idx_pairs_second_part = [(0, -1)] # These remap to original 0° and +180° indices
 
         if cor_correction_alg == 'phase_xcorr':
-            center_of_rotation_avg_first_part, center_geom, offset_init_first_part = rot_center_avg(shifted_proj_img_array, theta_idx_pairs_first_part, theta_array_first_part, cor_correction_alg = cor_correction_alg, sigma = sigma, alpha = alpha, sample_flipped_remounted_mid_experiment = sample_flipped_remounted_mid_experiment, half_dataset_part = 'first')
-            center_of_rotation_avg_second_part, _, offset_init_second_part = rot_center_avg(shifted_proj_img_array, theta_idx_pairs_second_part, theta_array_second_part, cor_correction_alg = cor_correction_alg, sigma = sigma, alpha = alpha, sample_flipped_remounted_mid_experiment = sample_flipped_remounted_mid_experiment, half_dataset_part = 'second')
+            center_of_rotation_avg_first_part, center_geom, offset_init_first_part = rot_center_avg(shifted_proj_img_array, theta_idx_pairs_first_part, theta_array_first_part, cor_correction_alg = cor_correction_alg, sample_flipped_remounted_mid_experiment = sample_flipped_remounted_mid_experiment, half_dataset_part = 'first')
+            center_of_rotation_avg_second_part, _, offset_init_second_part = rot_center_avg(shifted_proj_img_array, theta_idx_pairs_second_part, theta_array_second_part, cor_correction_alg = cor_correction_alg, sample_flipped_remounted_mid_experiment = sample_flipped_remounted_mid_experiment, half_dataset_part = 'second')
             
         elif cor_correction_alg == 'phase_symm':
-            center_of_rotation_avg_first_part, center_geom, offset_init_first_part = rot_center_avg(shifted_proj_img_array, theta_idx_pairs_first_part, theta_array_first_part, cor_correction_alg = cor_correction_alg, sigma = sigma, alpha = alpha, sample_flipped_remounted_mid_experiment = sample_flipped_remounted_mid_experiment, half_dataset_part = 'first')
-            center_of_rotation_avg_second_part, _, offset_init_second_part = rot_center_avg(shifted_proj_img_array, theta_idx_pairs_second_part, theta_array_second_part, cor_correction_alg = cor_correction_alg, sigma = sigma, alpha = alpha, sample_flipped_remounted_mid_experiment = sample_flipped_remounted_mid_experiment, half_dataset_part = 'second')
+            center_of_rotation_avg_first_part, center_geom, offset_init_first_part = rot_center_avg(shifted_proj_img_array, theta_idx_pairs_first_part, theta_array_first_part, cor_correction_alg = cor_correction_alg, sample_flipped_remounted_mid_experiment = sample_flipped_remounted_mid_experiment, half_dataset_part = 'first')
+            center_of_rotation_avg_second_part, _, offset_init_second_part = rot_center_avg(shifted_proj_img_array, theta_idx_pairs_second_part, theta_array_second_part, cor_correction_alg = cor_correction_alg, sample_flipped_remounted_mid_experiment = sample_flipped_remounted_mid_experiment, half_dataset_part = 'second')
             
         else:
             print('Error: Correction algorithm unavailable. Exiting program...')
@@ -482,8 +465,8 @@ def correct_center_of_rotation(proj_img_array,
         if return_aux_data:
             shifted_proj_img_array_aux = shifted_proj_img_array.copy()
 
-        center_of_rotation_avg_first_part, center_geom, offset_first_part = rot_center_avg(shifted_proj_img_array[:zero_deg_idx_array[1]], theta_idx_pairs_first_part, theta_array_first_part, cor_correction_alg = cor_correction_alg, sigma = sigma, alpha = alpha, sample_flipped_remounted_mid_experiment = sample_flipped_remounted_mid_experiment, half_dataset_part = 'first')
-        center_of_rotation_avg_second_part, _, offset_second_part = rot_center_avg(shifted_proj_img_array[zero_deg_idx_array[1]:], theta_idx_pairs_second_part, theta_array_second_part, cor_correction_alg = cor_correction_alg, sigma = sigma, alpha = alpha, sample_flipped_remounted_mid_experiment = sample_flipped_remounted_mid_experiment, half_dataset_part = 'second')
+        center_of_rotation_avg_first_part, center_geom, offset_first_part = rot_center_avg(shifted_proj_img_array[:zero_deg_idx_array[1]], theta_idx_pairs_first_part, theta_array_first_part, cor_correction_alg = cor_correction_alg, sample_flipped_remounted_mid_experiment = sample_flipped_remounted_mid_experiment, half_dataset_part = 'first')
+        center_of_rotation_avg_second_part, _, offset_second_part = rot_center_avg(shifted_proj_img_array[zero_deg_idx_array[1]:], theta_idx_pairs_second_part, theta_array_second_part, cor_correction_alg = cor_correction_alg, sample_flipped_remounted_mid_experiment = sample_flipped_remounted_mid_experiment, half_dataset_part = 'second')
 
         print(f'New average center of rotation (before flipping sample): {ppu.round_correct(center_of_rotation_avg_first_part, ndec = 13)}')
         print(f'New average center of rotation (after flipping sample): {ppu.round_correct(center_of_rotation_avg_second_part, ndec = 13)}\n')
@@ -493,8 +476,6 @@ def correct_center_of_rotation(proj_img_array,
 
         shifts, _, _ = phase_xcorr_manual(shifted_proj_img_array[zero_deg_idx_array[0]], 
                                           shifted_proj_img_array[zero_deg_idx_array[1]], 
-                                          sigma,
-                                          alpha, 
                                           pixel_rad_cor_correction, 
                                           theta = np.array([theta_array[zero_deg_idx_array[0]], theta_array[zero_deg_idx_array[1]]]))
 
@@ -535,7 +516,7 @@ def correct_center_of_rotation(proj_img_array,
         theta_idx_pairs = ppu.find_theta_combos(theta_array)
 
         if cor_correction_alg == 'phase_xcorr':
-            center_of_rotation_avg, center_geom, offset_init = rot_center_avg(shifted_proj_img_array, theta_idx_pairs, theta_array, cor_correction_alg = cor_correction_alg, sigma = sigma, alpha = alpha, sample_flipped_remounted_mid_experiment = sample_flipped_remounted_mid_experiment)
+            center_of_rotation_avg, center_geom, offset_init = rot_center_avg(shifted_proj_img_array, theta_idx_pairs, theta_array, cor_correction_alg = cor_correction_alg, sample_flipped_remounted_mid_experiment = sample_flipped_remounted_mid_experiment)
             
         elif cor_correction_alg == 'phase_symm':
             center_of_rotation_avg, center_geom, offset_init = rot_center_avg(shifted_proj_img_array, theta_idx_pairs, theta_array, cor_correction_alg = cor_correction_alg, sample_flipped_remounted_mid_experiment = sample_flipped_remounted_mid_experiment)
@@ -557,7 +538,7 @@ def correct_center_of_rotation(proj_img_array,
             shifted_proj_img_array[theta_idx] = ndi.shift(proj_img_array[theta_idx], shift = (net_y_shift_array[theta_idx], net_x_shift_array[theta_idx]), cval = cval_array[theta_idx])
 
         if cor_correction_alg == 'phase_xcorr':
-            center_of_rotation_avg, center_geom, offset_init = rot_center_avg(shifted_proj_img_array, theta_idx_pairs, theta_array, cor_correction_alg = cor_correction_alg, sigma = sigma, alpha = alpha, sample_flipped_remounted_mid_experiment = sample_flipped_remounted_mid_experiment)
+            center_of_rotation_avg, center_geom, offset_init = rot_center_avg(shifted_proj_img_array, theta_idx_pairs, theta_array, cor_correction_alg = cor_correction_alg, sample_flipped_remounted_mid_experiment = sample_flipped_remounted_mid_experiment)
             
         elif cor_correction_alg == 'phase_symm':
             center_of_rotation_avg, center_geom, offset_init = rot_center_avg(shifted_proj_img_array, theta_idx_pairs, theta_array, cor_correction_alg = cor_correction_alg, sample_flipped_remounted_mid_experiment = sample_flipped_remounted_mid_experiment)
