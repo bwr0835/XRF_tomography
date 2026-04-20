@@ -393,12 +393,13 @@ def preprocess_xrf_xrt_data(synchrotron,
 
         elif cor_correction_enabled:
             print('Calculating shifts needed for center of rotation correction...')
-            init_x_shift_array = np.zeros(n_theta)
+            # init_x_shift_array = np.zeros(n_theta)
+            
             net_x_shift_array, \
             net_y_shift_array, \
             shifted_proj_img_array_element_to_align_with, \
             shifted_proj_img_array_element_to_align_with_aux, \
-            shifted_proj_img_array_element_to_align_with_orig = realign.correct_center_of_rotation(proj_img_array_element_to_align_with,
+            shifted_proj_img_array_element_to_align_with_orig = realign.correct_center_of_rotation(vignetted_proj_array_element_to_align_with,
                                                                                                    init_x_shift_array,
                                                                                                    init_y_shift_array,
                                                                                                    theta,
@@ -462,7 +463,7 @@ def preprocess_xrf_xrt_data(synchrotron,
             pcc_2d_array, \
             pcc_2d_truncated_array, \
             dx_array_pcc, \
-            dy_array_pcc = realign.iter_reproj(proj_img_array_element_to_align_with,
+            dy_array_pcc = realign.iter_reproj(vignetted_proj_array_element_to_align_with,
                                                theta,
                                                aligning_element,
                                                n_iter_iter_reproj,

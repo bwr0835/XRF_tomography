@@ -212,10 +212,10 @@ def correct_adjacent_angle_jitter_pre_cor_correction(init_proj_array,
         phase_xcorr_2d_aggregate[theta_idx] = phase_xcorr_2d
 
     net_y_shift_cumsum = np.cumsum(net_y_shift_cumsum_temp) # Cumulative sum of net y shifts (registering one angle to the previous angle still has residual error due to previous angles)
-    # net_x_shift_cumsum = np.cumsum(net_x_shift_cumsum_temp)
+    net_x_shift_cumsum = np.cumsum(net_x_shift_cumsum_temp)
 
     net_y_shift_array[1:] += net_y_shift_cumsum
-    # net_x_shift_array[1:] += net_x_shift_cumsum
+    net_x_shift_array[1:] += net_x_shift_cumsum
 
     if cos_fit_enabled:
         theta_fit_idx_min = np.where(theta == angle_range_to_fit[0])[0][0]
