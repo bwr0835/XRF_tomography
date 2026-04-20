@@ -786,7 +786,7 @@ def extract_csv_preprocessing_input_params(file_path):
                 print('Error: At least one preprocessing input parameter value cannot be converted to a NumPy array. Exiting program...', flush = True)
 
                 sys.exit()
-                
+
         elif input_params[idx] in list_params:
             values[idx] = values[idx].split(',')
 
@@ -1742,12 +1742,12 @@ def create_center_of_rotation_figures(dir_path,
        
         fig1, axs1 = plt.subplots(2, 3)
         
-        im1_4 = axs1[1, 0].imshow(shifted_proj_img_array_element_to_align_with_theta_aux_0_0_rgb)
-        im1_5 = axs1[1, 1].imshow(shifted_proj_img_array_element_to_align_with_theta_aux_0_1_rgb)
-        im1_6 = axs1[1, 2].imshow(overlay_aux_shifted_0)
-        im1_7 = axs1[2, 0].imshow(shifted_proj_img_array_element_to_align_with_theta_aux_1_0_rgb)
-        im1_8 = axs1[2, 1].imshow(shifted_proj_img_array_element_to_align_with_theta_aux_1_1_rgb)
-        im1_9 = axs1[2, 2].imshow(overlay_aux_shifted_1)
+        im1_1 = axs1[0, 0].imshow(shifted_proj_img_array_element_to_align_with_theta_aux_0_0_rgb)
+        im1_2 = axs1[0, 1].imshow(shifted_proj_img_array_element_to_align_with_theta_aux_0_1_rgb)
+        im1_3 = axs1[0, 2].imshow(overlay_aux_shifted_0)
+        im1_4 = axs1[1, 0].imshow(shifted_proj_img_array_element_to_align_with_theta_aux_1_0_rgb)
+        im1_5 = axs1[1, 1].imshow(shifted_proj_img_array_element_to_align_with_theta_aux_1_1_rgb)
+        im1_6 = axs1[1, 2].imshow(overlay_aux_shifted_1)
 
         text1 = axs1[0, 0].text(0.02, 0.02, r'$\theta = -180$\textdegree', transform = axs1[0, 0].transAxes, color = 'white')
         text2 = axs1[0, 1].text(0.02, 0.02, r'$\theta = 0^{-}$', transform = axs1[0, 1].transAxes, color = 'white')
