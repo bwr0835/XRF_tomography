@@ -483,7 +483,7 @@ def correct_center_of_rotation(proj_img_array,
                                                                               pixel_rad_cor_correction, 
                                                                               theta = np.array([theta_array[zero_deg_idx_array[0]], theta_array[-1]]))
 
-        plt.imshow(phase_xcorr_2d)
+        plt.imshow(phase_xcorr_2d_truncated)
         plt.show()
         dy, dx = shifts[0], shifts[1]
         
