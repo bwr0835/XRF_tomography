@@ -493,7 +493,8 @@ def correct_center_of_rotation(proj_img_array,
 
                 sample_flipped_remounted_correction_type = 'differential'
         
-            net_y_shift_array += 4*dy
+            # net_y_shift_array += 4*dy
+            net_y_shift_array += 50
         
             if sample_flipped_remounted_correction_type == 'differential':
                 print(f'Correcting sample remounting offset in shifted projection images: {ppu.round_correct(dy, ndec = 13)} pixels in y and {ppu.round_correct(dx/2, ndec = 13)} pixels in x for each half dataset...')
