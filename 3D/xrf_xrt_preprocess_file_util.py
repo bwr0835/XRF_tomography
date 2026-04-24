@@ -1700,15 +1700,15 @@ def create_center_of_rotation_figures(dir_path,
         zero_deg_idx_array = np.where(theta_array == 0)[0]
 
         shifted_proj_img_array_element_to_align_with_theta_aux_0_0 = shifted_proj_img_array_element_to_align_with_aux[0]
-        shifted_proj_img_array_element_to_align_with_theta_aux_0_1 = np.fliplr(shifted_proj_img_array_element_to_align_with_aux[zero_deg_idx_array[0]])
+        shifted_proj_img_array_element_to_align_with_theta_aux_0_1 = shifted_proj_img_array_element_to_align_with_aux[zero_deg_idx_array[0]]
 
         shifted_proj_img_array_element_to_align_with_theta_aux_1_0 = shifted_proj_img_array_element_to_align_with_aux[zero_deg_idx_array[1]]
-        shifted_proj_img_array_element_to_align_with_theta_aux_1_1 = np.fliplr(shifted_proj_img_array_element_to_align_with_aux[-1])
+        shifted_proj_img_array_element_to_align_with_theta_aux_1_1 = shifted_proj_img_array_element_to_align_with_aux[-1]
         
         shifted_proj_img_array_element_to_align_with_theta_0_0 = shifted_proj_img_array_element_to_align_with[0]
-        shifted_proj_img_array_element_to_align_with_theta_0_1 = np.fliplr(shifted_proj_img_array_element_to_align_with[zero_deg_idx_array[0]])
+        shifted_proj_img_array_element_to_align_with_theta_0_1 = shifted_proj_img_array_element_to_align_with[zero_deg_idx_array[0]]
         shifted_proj_img_array_element_to_align_with_theta_1_0 = shifted_proj_img_array_element_to_align_with[zero_deg_idx_array[1]]
-        shifted_proj_img_array_element_to_align_with_theta_1_1 = np.fliplr(shifted_proj_img_array_element_to_align_with[-1])
+        shifted_proj_img_array_element_to_align_with_theta_1_1 = shifted_proj_img_array_element_to_align_with[-1]
 
         shifted_proj_img_array_element_to_align_with_theta_aux_0_0_norm = ppu.normalize_array_for_rgb(shifted_proj_img_array_element_to_align_with_theta_aux_0_0)
         shifted_proj_img_array_element_to_align_with_theta_aux_0_1_norm = ppu.normalize_array_for_rgb(shifted_proj_img_array_element_to_align_with_theta_aux_0_1)
@@ -1721,14 +1721,14 @@ def create_center_of_rotation_figures(dir_path,
         shifted_proj_img_array_element_to_align_with_theta_1_1_norm = ppu.normalize_array_for_rgb(shifted_proj_img_array_element_to_align_with_theta_1_1)
 
         shifted_proj_img_array_element_to_align_with_theta_aux_0_0_rgb = np.dstack((shifted_proj_img_array_element_to_align_with_theta_aux_0_0_norm, np.zeros_like(shifted_proj_img_array_element_to_align_with_theta_aux_0_0_norm), np.zeros_like(shifted_proj_img_array_element_to_align_with_theta_aux_0_0_norm)))
-        shifted_proj_img_array_element_to_align_with_theta_aux_0_1_rgb = np.dstack((np.zeros_like(shifted_proj_img_array_element_to_align_with_theta_aux_0_1_norm), shifted_proj_img_array_element_to_align_with_theta_aux_0_1_norm, np.zeros_like(shifted_proj_img_array_element_to_align_with_theta_aux_0_1_norm)))
+        shifted_proj_img_array_element_to_align_with_theta_aux_0_1_rgb = np.dstack((np.zeros_like(shifted_proj_img_array_element_to_align_with_theta_aux_0_1_norm), np.fliplr(shifted_proj_img_array_element_to_align_with_theta_aux_0_1_norm), np.zeros_like(shifted_proj_img_array_element_to_align_with_theta_aux_0_1_norm)))
         shifted_proj_img_array_element_to_align_with_theta_aux_1_0_rgb = np.dstack((shifted_proj_img_array_element_to_align_with_theta_aux_1_0_norm, np.zeros_like(shifted_proj_img_array_element_to_align_with_theta_aux_1_0_norm), np.zeros_like(shifted_proj_img_array_element_to_align_with_theta_aux_1_0_norm)))
-        shifted_proj_img_array_element_to_align_with_theta_aux_1_1_rgb = np.dstack((np.zeros_like(shifted_proj_img_array_element_to_align_with_theta_aux_1_1_norm), shifted_proj_img_array_element_to_align_with_theta_aux_1_1_norm, np.zeros_like(shifted_proj_img_array_element_to_align_with_theta_aux_1_1_norm)))
+        shifted_proj_img_array_element_to_align_with_theta_aux_1_1_rgb = np.dstack((np.zeros_like(shifted_proj_img_array_element_to_align_with_theta_aux_1_1_norm), np.fliplr(shifted_proj_img_array_element_to_align_with_theta_aux_1_1_norm), np.zeros_like(shifted_proj_img_array_element_to_align_with_theta_aux_1_1_norm)))
     
         shifted_proj_img_array_element_to_align_with_theta_0_0_rgb = np.dstack((shifted_proj_img_array_element_to_align_with_theta_0_0_norm, np.zeros_like(shifted_proj_img_array_element_to_align_with_theta_0_0_norm), np.zeros_like(shifted_proj_img_array_element_to_align_with_theta_0_0_norm)))
-        shifted_proj_img_array_element_to_align_with_theta_0_1_rgb = np.dstack((np.zeros_like(shifted_proj_img_array_element_to_align_with_theta_0_1_norm), shifted_proj_img_array_element_to_align_with_theta_0_1_norm, np.zeros_like(shifted_proj_img_array_element_to_align_with_theta_0_1_norm)))
+        shifted_proj_img_array_element_to_align_with_theta_0_1_rgb = np.dstack((np.zeros_like(shifted_proj_img_array_element_to_align_with_theta_0_1_norm), np.fliplr(shifted_proj_img_array_element_to_align_with_theta_0_1_norm), np.zeros_like(shifted_proj_img_array_element_to_align_with_theta_0_1_norm)))
         shifted_proj_img_array_element_to_align_with_theta_1_0_rgb = np.dstack((shifted_proj_img_array_element_to_align_with_theta_1_0_norm, np.zeros_like(shifted_proj_img_array_element_to_align_with_theta_1_0_norm), np.zeros_like(shifted_proj_img_array_element_to_align_with_theta_1_0_norm)))
-        shifted_proj_img_array_element_to_align_with_theta_1_1_rgb = np.dstack((np.zeros_like(shifted_proj_img_array_element_to_align_with_theta_1_1_norm), shifted_proj_img_array_element_to_align_with_theta_1_1_norm, np.zeros_like(shifted_proj_img_array_element_to_align_with_theta_1_1_norm)))
+        shifted_proj_img_array_element_to_align_with_theta_1_1_rgb = np.dstack((np.zeros_like(shifted_proj_img_array_element_to_align_with_theta_1_1_norm), np.fliplr(shifted_proj_img_array_element_to_align_with_theta_1_1_norm), np.zeros_like(shifted_proj_img_array_element_to_align_with_theta_1_1_norm)))
         
         shifted_proj_img_array_element_to_align_with_sample_offset_1_aux_rgb = np.dstack((np.zeros_like(shifted_proj_img_array_element_to_align_with_theta_aux_1_0_norm), np.fliplr(shifted_proj_img_array_element_to_align_with_theta_aux_1_0_norm), np.zeros_like(shifted_proj_img_array_element_to_align_with_theta_aux_0_0_norm)))
         shifted_proj_img_array_element_to_align_with_sample_offset_2_aux_rgb = np.dstack((shifted_proj_img_array_element_to_align_with_theta_aux_0_0_norm, np.zeros_like(shifted_proj_img_array_element_to_align_with_theta_aux_0_0_norm), np.zeros_like(shifted_proj_img_array_element_to_align_with_theta_aux_0_0_norm)))
