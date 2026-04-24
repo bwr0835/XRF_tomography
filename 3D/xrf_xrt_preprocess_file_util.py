@@ -1784,7 +1784,7 @@ def create_center_of_rotation_figures(dir_path,
         
         fig1.savefig(fig_filename)
 
-        fig2, axs2 = plt.subplots(3, 3)
+        fig2, axs2 = plt.subplots(4, 3)
         
         im2_1 = axs2[1, 0].imshow(shifted_proj_img_array_element_to_align_with_theta_0_0_rgb)
         im2_2 = axs2[1, 1].imshow(shifted_proj_img_array_element_to_align_with_theta_0_1_rgb)
