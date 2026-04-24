@@ -504,7 +504,7 @@ def correct_center_of_rotation(proj_img_array,
             elif sample_flipped_remounted_correction_type == 'absolute':
                 print(f'Correcting sample remounting offset in shifted projection images: {ppu.round_correct(dy, ndec = 13)} pixels in y and {ppu.round_correct(dx, ndec = 13)} pixels in x for second half dataset...')
                 
-                net_x_shift_array[zero_deg_idx_array[1]:] -= dx
+                net_x_shift_array[zero_deg_idx_array[1]:] += dx
             
             else:
                 print('Error: Sample remounting correction type unavailable. Exiting program...')
