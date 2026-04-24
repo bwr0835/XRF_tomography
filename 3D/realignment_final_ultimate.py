@@ -478,8 +478,8 @@ def correct_center_of_rotation(proj_img_array,
         #                                                                       shifted_proj_img_array[zero_deg_idx_array[1]], 
         #                                                                       pixel_rad_cor_correction, 
         #                                                                       theta = np.array([theta_array[0], theta_array[zero_deg_idx_array[1]]]))
-        shifts, phase_xcorr_2d, phase_xcorr_2d_truncated = phase_xcorr_manual(shifted_proj_img_array[0], 
-                                                                              np.fliplr(shifted_proj_img_array[zero_deg_idx_array[1]]), 
+        shifts, phase_xcorr_2d, phase_xcorr_2d_truncated = phase_xcorr_manual(shifted_proj_img_array[zero_deg_idx_array[0]], 
+                                                                              np.fliplr(shifted_proj_img_array[-1]), 
                                                                               pixel_rad_cor_correction, 
                                                                               theta = np.array([theta_array[0], theta_array[zero_deg_idx_array[1]]]))
 
