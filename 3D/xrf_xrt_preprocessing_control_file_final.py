@@ -393,8 +393,15 @@ def preprocess_xrf_xrt_data(synchrotron,
 
         elif cor_correction_enabled:
             print('Calculating shifts needed for center of rotation correction...')
-            # init_x_shift_array = np.zeros(n_theta)
+            if sample_flipped_remounted_mid_experiment:
+                if np.count_nonzero(theta == 0) != 2:
+                    print('Error: Must have two 0° angles. Exiting program...')
 
+                    sys.exit()
+
+                zero_deg_idx_array = np.where(theta == 0)[0]
+            # init_x_shift_array = np.zeros(n_theta)
+            vignetted_proj_array_element_to_align_with[zero_deg_idx_array[1]:] = np.fliplr(vignetted_proj_array_element_to_align_with[zero_deg_idx_array[1]:])
             net_x_shift_array, \
             net_y_shift_array, \
             shifted_proj_img_array_element_to_align_with, \
