@@ -1730,16 +1730,23 @@ def create_center_of_rotation_figures(dir_path,
         shifted_proj_img_array_element_to_align_with_theta_1_0_rgb = np.dstack((shifted_proj_img_array_element_to_align_with_theta_1_0_norm, np.zeros_like(shifted_proj_img_array_element_to_align_with_theta_1_0_norm), np.zeros_like(shifted_proj_img_array_element_to_align_with_theta_1_0_norm)))
         shifted_proj_img_array_element_to_align_with_theta_1_1_rgb = np.dstack((np.zeros_like(shifted_proj_img_array_element_to_align_with_theta_1_1_norm), shifted_proj_img_array_element_to_align_with_theta_1_1_norm, np.zeros_like(shifted_proj_img_array_element_to_align_with_theta_1_1_norm)))
         
+        shifted_proj_img_array_element_to_align_with_sample_offset_1_aux_rgb = np.dstack((np.zeros_like(shifted_proj_img_array_element_to_align_with_theta_aux_1_0_norm), np.fliplr(shifted_proj_img_array_element_to_align_with_theta_aux_1_0_norm), np.zeros_like(shifted_proj_img_array_element_to_align_with_theta_aux_0_0_norm)))
+        shifted_proj_img_array_element_to_align_with_sample_offset_2_aux_rgb = np.dstack((shifted_proj_img_array_element_to_align_with_theta_aux_0_0_norm, np.zeros_like(shifted_proj_img_array_element_to_align_with_theta_aux_0_0_norm), np.zeros_like(shifted_proj_img_array_element_to_align_with_theta_aux_0_0_norm)))
+        
         shifted_proj_img_array_element_to_align_with_sample_offset_1_rgb = np.dstack((np.zeros_like(shifted_proj_img_array_element_to_align_with_theta_1_0_norm), np.fliplr(shifted_proj_img_array_element_to_align_with_theta_1_0_norm), np.zeros_like(shifted_proj_img_array_element_to_align_with_theta_0_0_norm)))
+        shifted_proj_img_array_element_to_align_with_sample_offset_2_rgb = np.dstack((shifted_proj_img_array_element_to_align_with_theta_0_0_norm, np.zeros_like(shifted_proj_img_array_element_to_align_with_theta_0_0_norm), np.zeros_like(shifted_proj_img_array_element_to_align_with_theta_0_0_norm)))
 
         overlay_aux_shifted_0 = np.dstack((shifted_proj_img_array_element_to_align_with_theta_aux_0_0_norm, shifted_proj_img_array_element_to_align_with_theta_aux_0_1_norm, np.zeros_like(shifted_proj_img_array_element_to_align_with_theta_aux_0_0_norm)))
         overlay_aux_shifted_1 = np.dstack((shifted_proj_img_array_element_to_align_with_theta_aux_1_0_norm, shifted_proj_img_array_element_to_align_with_theta_aux_1_1_norm, np.zeros_like(shifted_proj_img_array_element_to_align_with_theta_aux_1_0_norm)))
-        
-        overlay_shifted_0 = np.dstack((shifted_proj_img_array_element_to_align_with_theta_0_0_norm, np.fliplr(shifted_proj_img_array_element_to_align_with_theta_1_0_norm), np.zeros_like(shifted_proj_img_array_element_to_align_with_theta_0_0_norm)))
-        overlay_shifted_1 = np.dstack((shifted_proj_img_array_element_to_align_with_theta_0_0_norm, shifted_proj_img_array_element_to_align_with_theta_0_1_norm, np.zeros_like(shifted_proj_img_array_element_to_align_with_theta_0_0_norm)))
-        overlay_shifted_2 = np.dstack((shifted_proj_img_array_element_to_align_with_theta_1_0_norm, shifted_proj_img_array_element_to_align_with_theta_1_1_norm, np.zeros_like(shifted_proj_img_array_element_to_align_with_theta_1_0_norm)))
-    
-        fig1, axs1 = plt.subplots(2, 3)
+        overlay_aux_shifted_2 = np.dstack((shifted_proj_img_array_element_to_align_with_theta_aux_0_0_norm, np.fliplr(shifted_proj_img_array_element_to_align_with_theta_aux_1_0_norm), np.zeros_like(shifted_proj_img_array_element_to_align_with_theta_aux_0_0_norm)))
+        overlay_aux_shifted_3 = np.dstack((shifted_proj_img_array_element_to_align_with_sample_offset_1_aux_rgb, np.fliplr(shifted_proj_img_array_element_to_align_with_theta_aux_1_1_norm), np.zeros_like(shifted_proj_img_array_element_to_align_with_theta_0_0_norm)))
+
+        overlay_shifted_0 = np.dstack((shifted_proj_img_array_element_to_align_with_theta_0_0_norm, shifted_proj_img_array_element_to_align_with_theta_0_1_norm, np.zeros_like(shifted_proj_img_array_element_to_align_with_theta_0_0_norm)))
+        overlay_shifted_1 = np.dstack((shifted_proj_img_array_element_to_align_with_theta_1_0_norm, shifted_proj_img_array_element_to_align_with_theta_1_1_norm, np.zeros_like(shifted_proj_img_array_element_to_align_with_theta_1_0_norm)))
+        overlay_shifted_2 = np.dstack((shifted_proj_img_array_element_to_align_with_theta_0_0_norm, np.fliplr(shifted_proj_img_array_element_to_align_with_theta_1_0_norm), np.zeros_like(shifted_proj_img_array_element_to_align_with_theta_0_0_norm)))
+        overlay_shifted_3 = np.dstack((shifted_proj_img_array_element_to_align_with_sample_offset_1_rgb, np.fliplr(shifted_proj_img_array_element_to_align_with_theta_1_1_norm), np.zeros_like(shifted_proj_img_array_element_to_align_with_theta_0_0_norm)))
+
+        fig1, axs1 = plt.subplots(4, 3)
         
         im1_1 = axs1[0, 0].imshow(shifted_proj_img_array_element_to_align_with_theta_aux_0_0_rgb)
         im1_2 = axs1[0, 1].imshow(shifted_proj_img_array_element_to_align_with_theta_aux_0_1_rgb)
@@ -1747,12 +1754,22 @@ def create_center_of_rotation_figures(dir_path,
         im1_4 = axs1[1, 0].imshow(shifted_proj_img_array_element_to_align_with_theta_aux_1_0_rgb)
         im1_5 = axs1[1, 1].imshow(shifted_proj_img_array_element_to_align_with_theta_aux_1_1_rgb)
         im1_6 = axs1[1, 2].imshow(overlay_aux_shifted_1)
+        im1_7 = axs1[2, 0].imshow(shifted_proj_img_array_element_to_align_with_theta_aux_0_0_rgb)
+        im1_8 = axs1[2, 1].imshow(shifted_proj_img_array_element_to_align_with_sample_offset_1_aux_rgb)
+        im1_9 = axs1[2, 2].imshow(overlay_aux_shifted_2)
+        im1_10 = axs1[3, 0].imshow(shifted_proj_img_array_element_to_align_with_sample_offset_2_aux_rgb)
+        im1_11 = axs1[3, 1].imshow(shifted_proj_img_array_element_to_align_with_theta_aux_1_1_rgb)
+        im1_12 = axs1[3, 2].imshow(overlay_aux_shifted_3)
 
         text1 = axs1[0, 0].text(0.02, 0.02, r'$\theta = -180$\textdegree', transform = axs1[0, 0].transAxes, color = 'white')
         text2 = axs1[0, 1].text(0.02, 0.02, r'$\theta = 0^{-}$', transform = axs1[0, 1].transAxes, color = 'white')
         text3 = axs1[1, 0].text(0.02, 0.02, r'$\theta = 0^{+}$', transform = axs1[1, 0].transAxes, color = 'white')
         text4 = axs1[1, 1].text(0.02, 0.02, r'$\theta = 180$\textdegree', transform = axs1[1, 1].transAxes, color = 'white')
-
+        text5 = axs1[2, 0].text(0.02, 0.02, r'$\theta = -180$\textdegree', transform = axs1[2, 0].transAxes, color = 'white')
+        text6 = axs1[2, 1].text(0.02, 0.02, r'$\theta = 0^{+}$', transform = axs1[2, 1].transAxes, color = 'white')
+        text7 = axs1[3, 0].text(0.02, 0.02, r'$\theta = 0^{+}$', transform = axs1[3, 0].transAxes, color = 'white')
+        text8 = axs1[3, 1].text(0.02, 0.02, r'$\theta = 180$\textdegree', transform = axs1[3, 1].transAxes, color = 'white')
+       
         for ax in fig1.axes:
             ax.axis('off')
             ax.axvline(x = shifted_proj_img_array_element_to_align_with_theta_0_0.shape[1]//2, color = 'white', linewidth = 2, linestyle = '--')
@@ -1768,16 +1785,19 @@ def create_center_of_rotation_figures(dir_path,
         fig1.savefig(fig_filename)
 
         fig2, axs2 = plt.subplots(3, 3)
-
-        im2_1 = axs2[0, 0].imshow(shifted_proj_img_array_element_to_align_with_theta_0_0_rgb)
-        im2_2 = axs2[0, 1].imshow(shifted_proj_img_array_element_to_align_with_sample_offset_1_rgb)
-        im2_3 = axs2[0, 2].imshow(overlay_shifted_0)
-        im2_4 = axs2[1, 0].imshow(shifted_proj_img_array_element_to_align_with_theta_0_0_rgb)
-        im2_5 = axs2[1, 1].imshow(shifted_proj_img_array_element_to_align_with_theta_0_1_rgb)
-        im2_6 = axs2[1, 2].imshow(overlay_shifted_1)
-        im2_7 = axs2[2, 0].imshow(shifted_proj_img_array_element_to_align_with_theta_1_0_rgb)
-        im2_8 = axs2[2, 1].imshow(shifted_proj_img_array_element_to_align_with_theta_1_1_rgb)
-        im2_9 = axs2[2, 2].imshow(overlay_shifted_2)
+        
+        im2_1 = axs2[1, 0].imshow(shifted_proj_img_array_element_to_align_with_theta_0_0_rgb)
+        im2_2 = axs2[1, 1].imshow(shifted_proj_img_array_element_to_align_with_theta_0_1_rgb)
+        im2_3 = axs2[1, 2].imshow(overlay_shifted_0)
+        im2_4 = axs2[2, 0].imshow(shifted_proj_img_array_element_to_align_with_theta_1_0_rgb)
+        im2_5 = axs2[2, 1].imshow(shifted_proj_img_array_element_to_align_with_theta_1_1_rgb)
+        im2_6 = axs2[2, 2].imshow(overlay_shifted_1)
+        im2_7 = axs2[0, 0].imshow(shifted_proj_img_array_element_to_align_with_theta_0_0_rgb)
+        im2_8 = axs2[0, 1].imshow(shifted_proj_img_array_element_to_align_with_sample_offset_1_rgb)
+        im2_9 = axs2[0, 2].imshow(overlay_shifted_2)
+        im2_10 = axs2[3, 0].imshow(shifted_proj_img_array_element_to_align_with_sample_offset_2_rgb)
+        im2_11 = axs2[3, 1].imshow(shifted_proj_img_array_element_to_align_with_theta_1_1_rgb)
+        im2_12 = axs2[3, 2].imshow(overlay_shifted_3)
 
         text1 = axs2[0, 0].text(0.02, 0.02, r'$\theta = -180$\textdegree', transform = axs2[0, 0].transAxes, color = 'white')
         text2 = axs2[0, 1].text(0.02, 0.02, r'$\theta = 0^{+}$', transform = axs2[0, 1].transAxes, color = 'white')
@@ -1785,6 +1805,8 @@ def create_center_of_rotation_figures(dir_path,
         text4 = axs2[1, 1].text(0.02, 0.02, r'$\theta = 0^{-}$', transform = axs2[1, 1].transAxes, color = 'white')
         text5 = axs2[2, 0].text(0.02, 0.02, r'$\theta = 0^{+}$', transform = axs2[2, 0].transAxes, color = 'white')
         text6 = axs2[2, 1].text(0.02, 0.02, r'$\theta = 180$\textdegree', transform = axs2[2, 1].transAxes, color = 'white')
+        text7 = axs2[3, 0].text(0.02, 0.02, r'$\theta = 0^{+}$', transform = axs2[3, 0].transAxes, color = 'white')
+        text8 = axs2[3, 1].text(0.02, 0.02, r'$\theta = 180$\textdegree', transform = axs2[3, 1].transAxes, color = 'white')
 
         for ax in fig2.axes:
             ax.axis('off')

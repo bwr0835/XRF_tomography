@@ -107,7 +107,7 @@ def preprocess_xrf_xrt_data(synchrotron,
                                           sample_flipped_remounted_mid_experiment,
                                           incident_energy_keV,
                                           us_ic = us_ic)
-
+        
         if not pre_existing_aggregate_xrf_xrt_file_lists_enabled:
             print('Creating aggregate XRF, XRT file list CSV files...')
 
@@ -394,7 +394,7 @@ def preprocess_xrf_xrt_data(synchrotron,
         elif cor_correction_enabled:
             print('Calculating shifts needed for center of rotation correction...')
             # init_x_shift_array = np.zeros(n_theta)
-            
+
             net_x_shift_array, \
             net_y_shift_array, \
             shifted_proj_img_array_element_to_align_with, \

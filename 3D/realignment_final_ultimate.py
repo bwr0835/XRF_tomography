@@ -738,7 +738,7 @@ def iter_reproj(proj_img_array,
             
             dx_array_pcc[i, theta_idx] = dx
             dy_array_pcc[i, theta_idx] = dy
-            
+            tomo.find_center_vo()
             if (theta_idx % 7) == 0:
                 if theta_idx == 0:
                     print(f'\nCurrent x-shift: {ppu.round_correct(dx, ndec = 3)} (theta = {ppu.round_correct(theta_array[theta_idx], ndec = 1)})')
