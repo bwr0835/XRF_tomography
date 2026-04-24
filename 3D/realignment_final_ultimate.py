@@ -478,8 +478,8 @@ def correct_center_of_rotation(proj_img_array,
         #                                                                       shifted_proj_img_array[zero_deg_idx_array[1]], 
         #                                                                       pixel_rad_cor_correction, 
         #                                                                       theta = np.array([theta_array[0], theta_array[zero_deg_idx_array[1]]]))
-        shifts, phase_xcorr_2d, phase_xcorr_2d_truncated = phase_xcorr_manual(shifted_proj_img_array[zero_deg_idx_array[0]], 
-                                                                              np.fliplr(shifted_proj_img_array[-1]), 
+        shifts, phase_xcorr_2d, phase_xcorr_2d_truncated = phase_xcorr_manual(shifted_proj_img_array[0], 
+                                                                              (shifted_proj_img_array[-1]), 
                                                                               pixel_rad_cor_correction, 
                                                                               theta = np.array([theta_array[0], theta_array[zero_deg_idx_array[1]]]))
 
@@ -499,8 +499,8 @@ def correct_center_of_rotation(proj_img_array,
             if sample_flipped_remounted_correction_type == 'differential':
                 print(f'Correcting sample remounting offset in shifted projection images: {ppu.round_correct(dy, ndec = 13)} pixels in y and {ppu.round_correct(dx/2, ndec = 13)} pixels in x for each half dataset...')
 
-                net_x_shift_array[:zero_deg_idx_array[1]] -= dx/2
-                net_x_shift_array[zero_deg_idx_array[1]:] += dx/2
+                net_x_shift_array[:zero_deg_idx_array[1]] += dx/2
+                net_x_shift_array[zero_deg_idx_array[1]:] -= dx/2
             
             elif sample_flipped_remounted_correction_type == 'absolute':
                 print(f'Correcting sample remounting offset in shifted projection images: {ppu.round_correct(dy, ndec = 13)} pixels in y and {ppu.round_correct(dx, ndec = 13)} pixels in x for second half dataset...')
