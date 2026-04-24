@@ -1800,9 +1800,9 @@ def create_center_of_rotation_figures(dir_path,
         im2_12 = axs2[3, 2].imshow(overlay_shifted_3)
 
         text1 = axs2[0, 0].text(0.02, 0.02, r'$\theta = -180$\textdegree', transform = axs2[0, 0].transAxes, color = 'white')
-        text2 = axs2[0, 1].text(0.02, 0.02, r'$\theta = 0^{+}$', transform = axs2[0, 1].transAxes, color = 'white')
-        text3 = axs2[1, 0].text(0.02, 0.02, r'$\theta = -180$\textdegree', transform = axs2[1, 0].transAxes, color = 'white')
-        text4 = axs2[1, 1].text(0.02, 0.02, r'$\theta = 0^{-}$', transform = axs2[1, 1].transAxes, color = 'white')
+        text2 = axs2[0, 1].text(0.02, 0.02, r'$\theta = 0^{-}$', transform = axs2[0, 1].transAxes, color = 'white')
+        text3 = axs2[1, 0].text(0.02, 0.02, r'$\theta = 0^{+}$', transform = axs2[1, 0].transAxes, color = 'white')
+        text4 = axs2[1, 1].text(0.02, 0.02, r'$\theta = 180$\textdegree', transform = axs2[1, 1].transAxes, color = 'white')
         text5 = axs2[2, 0].text(0.02, 0.02, r'$\theta = -180$\textdegree', transform = axs2[2, 0].transAxes, color = 'white')
         text6 = axs2[2, 1].text(0.02, 0.02, r'$\theta = 0^{+}$', transform = axs2[2, 1].transAxes, color = 'white')
         text7 = axs2[3, 0].text(0.02, 0.02, r'$\theta = 0^{-}$', transform = axs2[3, 0].transAxes, color = 'white')
