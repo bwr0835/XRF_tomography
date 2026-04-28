@@ -474,21 +474,13 @@ def correct_center_of_rotation(proj_img_array,
         print(f'New center of rotation error (before flipping sample): {ppu.round_correct(offset_first_part, ndec = 13)}')
         print(f'New center of rotation error (after flipping sample): {ppu.round_correct(offset_second_part, ndec = 13)}\n')
 
-        # shifts, phase_xcorr_2d, phase_xcorr_2d_truncated = phase_xcorr_manual(shifted_proj_img_array[0], 
-        #                                                                       shifted_proj_img_array[zero_deg_idx_array[1]], 
-        #                                                                       pixel_rad_cor_correction, 
-        #                                                                       theta = np.array([theta_array[0], theta_array[zero_deg_idx_array[1]]]))
-        # shifts, phase_xcorr_2d, phase_xcorr_2d_truncated = phase_xcorr_manual(shifted_proj_img_array[zero_deg_idx_array[0]], 
-        #                                                                       np.fliplr(shifted_proj_img_array[-1]), 
-        #                                                                       pixel_rad_cor_correction, 
-        #                                                                       theta = np.array([theta_array[0], theta_array[zero_deg_idx_array[1]]]))
         shifts, phase_xcorr_2d, phase_xcorr_2d_truncated = phase_xcorr_manual(shifted_proj_img_array[zero_deg_idx_array[0]], 
                                                                               np.fliplr(shifted_proj_img_array[-1]), 
                                                                               pixel_rad_cor_correction, 
                                                                               theta = np.array([theta_array[zero_deg_idx_array[0]], theta_array[-1]]))
 
-        plt.imshow(phase_xcorr_2d_truncated)
-        plt.show()
+        # plt.imshow(phase_xcorr_2d_truncated)
+        # plt.show()
         dy, dx = shifts[0], shifts[1]
         
         if (dy, dx) != (0, 0):
@@ -576,6 +568,9 @@ def iter_reproj(proj_img_array,
                 cval_array,
                 pixel_rad_iter_reproj,
                 eps_iter_reproj,
+                sample_flipped_remounted_mid_experiment,
+                cor_correction_alg,
+                pixel_rad_cor_correction,
                 return_aux_data):
 
     '''
@@ -743,7 +738,7 @@ def iter_reproj(proj_img_array,
             
             dx_array_pcc[i, theta_idx] = dx
             dy_array_pcc[i, theta_idx] = dy
-            tomo.find_center_vo()
+
             if (theta_idx % 7) == 0:
                 if theta_idx == 0:
                     print(f'\nCurrent x-shift: {ppu.round_correct(dx, ndec = 3)} (theta = {ppu.round_correct(theta_array[theta_idx], ndec = 1)})')
@@ -762,6 +757,72 @@ def iter_reproj(proj_img_array,
             if np.abs(rms_net_shift - rms_net_shift_prev) <= eps_iter_reproj:
                 print(f'Number of iterations taken: {i + 1}')
 
+                if sample_flipped_remounted_mid_experiment:
+                    if np.count_nonzero(theta_array == 0) != 2:
+                        
+                        print('Error: Must have two 0° angles. Exiting program...')
+
+                        sys.exit()
+
+                    zero_deg_idx_array = np.where(theta_array == 0)[0]
+        
+                    theta_array_first_part = theta_array[:zero_deg_idx_array[1]]
+                    theta_array_second_part = theta_array[zero_deg_idx_array[1]:]
+
+                    theta_idx_pairs_first_part = [(0, -1)] # These remap to original -180° and 0° indices
+                    theta_idx_pairs_second_part = [(0, -1)] # These remap to original 0° and +180° indices
+
+                    if cor_correction_alg == 'phase_xcorr':
+                        center_of_rotation_avg_first_part, center_geom, offset_init_first_part = rot_center_avg(aligned_proj, theta_idx_pairs_first_part, theta_array_first_part, cor_correction_alg = cor_correction_alg, sample_flipped_remounted_mid_experiment = sample_flipped_remounted_mid_experiment, half_dataset_part = 'first')
+                        center_of_rotation_avg_second_part, _, offset_init_second_part = rot_center_avg(aligned_proj, theta_idx_pairs_second_part, theta_array_second_part, cor_correction_alg = cor_correction_alg, sample_flipped_remounted_mid_experiment = sample_flipped_remounted_mid_experiment, half_dataset_part = 'second')
+            
+                    elif cor_correction_alg == 'phase_symm':
+                        center_of_rotation_avg_first_part, center_geom, offset_init_first_part = rot_center_avg(aligned_proj, theta_idx_pairs_first_part, theta_array_first_part, cor_correction_alg = cor_correction_alg, sample_flipped_remounted_mid_experiment = sample_flipped_remounted_mid_experiment, half_dataset_part = 'first')
+                        center_of_rotation_avg_second_part, _, offset_init_second_part = rot_center_avg(aligned_proj, theta_idx_pairs_second_part, theta_array_second_part, cor_correction_alg = cor_correction_alg, sample_flipped_remounted_mid_experiment = sample_flipped_remounted_mid_experiment, half_dataset_part = 'second')
+            
+                    else:
+                        print('Error: Correction algorithm unavailable. Exiting program...')
+
+                        sys.exit()
+        
+                    print(f'Average center of rotation (before flipping sample) post-iterative reprojection: {ppu.round_correct(center_of_rotation_avg_first_part, ndec = 13)}')
+                    print(f'Average center of rotation (after flipping sample) post-iterative reprojection: {ppu.round_correct(center_of_rotation_avg_second_part, ndec = 13)}\n')
+                    print(f'Geometric center: {center_geom}\n')
+                    print(f'Center of rotation error (before flipping sample) post-iterative reprojection: {ppu.round_correct(offset_init_first_part, ndec = 13)}')
+                    print(f'Center of rotation error (after flipping sample) post-iterative reprojection: {ppu.round_correct(offset_init_second_part, ndec = 13)}\n')
+
+                    shifts_1, phase_xcorr_2d_1, phase_xcorr_2d_truncated_1 = phase_xcorr_manual(aligned_proj[zero_deg_idx_array[0]], 
+                                                                                                np.fliplr(aligned_proj[-1]), 
+                                                                                                pixel_rad_cor_correction, 
+                                                                                                theta = np.array([theta_array[zero_deg_idx_array[0]], theta_array[-1]]))
+                    
+                    shifts_2, phase_xcorr_2d_2, phase_xcorr_2d_truncated_2 = phase_xcorr_manual(aligned_proj[0], 
+                                                                                                np.fliplr(aligned_proj[zero_deg_idx_array[1]]), 
+                                                                                                pixel_rad_cor_correction, 
+                                                                                                theta = np.array([theta_array[0], theta_array[zero_deg_idx_array[1]]]))
+
+                    print(f'When using theta = {theta_array[zero_deg_idx_array[0]]} and {theta_array[-1]} degrees for cross-dataset comparison, the two zero degree angles are offset from each other by (x, y) = ({ppu.round_correct(shifts_1[1], ndec = 3)}, {ppu.round_correct(shifts_1[0], ndec = 3)} pixels)')
+                    print(f'When using theta = {theta_array[0]} and {theta_array[zero_deg_idx_array[1]]} degrees for cross-dataset comparison, the two zero degree angles are offset from each other by (x, y) = ({ppu.round_correct(shifts_2[1], ndec = 3)}, {ppu.round_correct(shifts_2[0], ndec = 3)} pixels)')
+                
+                else:
+                    theta_idx_pairs = ppu.find_theta_combos(theta_array)
+
+                    if cor_correction_alg == 'phase_xcorr':
+                        center_of_rotation_avg, center_geom, offset_init = rot_center_avg(aligned_proj, theta_idx_pairs, theta_array, cor_correction_alg = cor_correction_alg, sample_flipped_remounted_mid_experiment = sample_flipped_remounted_mid_experiment)
+            
+                    elif cor_correction_alg == 'phase_symm':
+                        center_of_rotation_avg, center_geom, offset_init = rot_center_avg(aligned_proj, theta_idx_pairs, theta_array, cor_correction_alg = cor_correction_alg, sample_flipped_remounted_mid_experiment = sample_flipped_remounted_mid_experiment)
+            
+                    else:
+                        print('Error: Correction algorithm unavailable. Exiting program...')
+
+                        sys.exit()
+
+                    print(f'Average center of rotation post-iterative reprojection: {ppu.round_correct(center_of_rotation_avg, ndec = 13)}')
+                    print(f'Geometric center: {center_geom}')
+                    print(f'Center of rotation error post-iterative reprojection: {ppu.round_correct(offset_init, ndec = 13)}')
+                    
+
                 net_x_shifts_pcc = net_x_shifts_pcc[:(i + 1)]
                 net_y_shifts_pcc = net_y_shifts_pcc[:(i + 1)]
 
@@ -779,6 +840,71 @@ def iter_reproj(proj_img_array,
 
         if i == n_iterations_iter_reproj - 1:
             print('Iterative reprojection complete.')
+
+            if sample_flipped_remounted_mid_experiment:
+                if np.count_nonzero(theta_array == 0) != 2:
+                        
+                    print('Error: Must have two 0° angles. Exiting program...')
+
+                    sys.exit()
+
+                zero_deg_idx_array = np.where(theta_array == 0)[0]
+        
+                theta_array_first_part = theta_array[:zero_deg_idx_array[1]]
+                theta_array_second_part = theta_array[zero_deg_idx_array[1]:]
+
+                theta_idx_pairs_first_part = [(0, -1)] # These remap to original -180° and 0° indices
+                theta_idx_pairs_second_part = [(0, -1)] # These remap to original 0° and +180° indices
+
+                if cor_correction_alg == 'phase_xcorr':
+                        center_of_rotation_avg_first_part, center_geom, offset_init_first_part = rot_center_avg(aligned_proj, theta_idx_pairs_first_part, theta_array_first_part, cor_correction_alg = cor_correction_alg, sample_flipped_remounted_mid_experiment = sample_flipped_remounted_mid_experiment, half_dataset_part = 'first')
+                        center_of_rotation_avg_second_part, _, offset_init_second_part = rot_center_avg(aligned_proj, theta_idx_pairs_second_part, theta_array_second_part, cor_correction_alg = cor_correction_alg, sample_flipped_remounted_mid_experiment = sample_flipped_remounted_mid_experiment, half_dataset_part = 'second')
+            
+                elif cor_correction_alg == 'phase_symm':
+                        center_of_rotation_avg_first_part, center_geom, offset_init_first_part = rot_center_avg(aligned_proj, theta_idx_pairs_first_part, theta_array_first_part, cor_correction_alg = cor_correction_alg, sample_flipped_remounted_mid_experiment = sample_flipped_remounted_mid_experiment, half_dataset_part = 'first')
+                        center_of_rotation_avg_second_part, _, offset_init_second_part = rot_center_avg(aligned_proj, theta_idx_pairs_second_part, theta_array_second_part, cor_correction_alg = cor_correction_alg, sample_flipped_remounted_mid_experiment = sample_flipped_remounted_mid_experiment, half_dataset_part = 'second')
+            
+                else:
+                    print('Error: Correction algorithm unavailable. Exiting program...')
+
+                    sys.exit()
+        
+                print(f'Average center of rotation (before flipping sample) post-iterative reprojection: {ppu.round_correct(center_of_rotation_avg_first_part, ndec = 13)}')
+                print(f'Average center of rotation (after flipping sample) post-iterative reprojection: {ppu.round_correct(center_of_rotation_avg_second_part, ndec = 13)}\n')
+                print(f'Geometric center: {center_geom}\n')
+                print(f'Center of rotation error (before flipping sample) post-iterative reprojection: {ppu.round_correct(offset_init_first_part, ndec = 13)}')
+                print(f'Center of rotation error (after flipping sample) post-iterative reprojection: {ppu.round_correct(offset_init_second_part, ndec = 13)}\n')
+
+                shifts_1, phase_xcorr_2d_1, phase_xcorr_2d_truncated_1 = phase_xcorr_manual(aligned_proj[zero_deg_idx_array[0]], 
+                                                                                            np.fliplr(aligned_proj[-1]), 
+                                                                                            pixel_rad_cor_correction, 
+                                                                                            theta = np.array([theta_array[zero_deg_idx_array[0]], theta_array[-1]]))
+                    
+                shifts_2, phase_xcorr_2d_2, phase_xcorr_2d_truncated_2 = phase_xcorr_manual(aligned_proj[0], 
+                                                                                            np.fliplr(aligned_proj[zero_deg_idx_array[1]]), 
+                                                                                            pixel_rad_cor_correction, 
+                                                                                            theta = np.array([theta_array[0], theta_array[zero_deg_idx_array[1]]]))
+
+                print(f'When using theta = {theta_array[zero_deg_idx_array[0]]} and {theta_array[-1]} degrees for cross-dataset comparison, the two zero degree angles are offset from each other by (x, y) = ({ppu.round_correct(shifts_1[1], ndec = 3)}, {ppu.round_correct(shifts_1[0], ndec = 3)} pixels)')
+                print(f'When using theta = {theta_array[0]} and {theta_array[zero_deg_idx_array[1]]} degrees for cross-dataset comparison, the two zero degree angles are offset from each other by (x, y) = ({ppu.round_correct(shifts_2[1], ndec = 3)}, {ppu.round_correct(shifts_2[0], ndec = 3)} pixels)')
+                
+            else:
+                theta_idx_pairs = ppu.find_theta_combos(theta_array)
+
+                if cor_correction_alg == 'phase_xcorr':
+                    center_of_rotation_avg, center_geom, offset_init = rot_center_avg(aligned_proj, theta_idx_pairs, theta_array, cor_correction_alg = cor_correction_alg, sample_flipped_remounted_mid_experiment = sample_flipped_remounted_mid_experiment)
+            
+                elif cor_correction_alg == 'phase_symm':
+                    center_of_rotation_avg, center_geom, offset_init = rot_center_avg(aligned_proj, theta_idx_pairs, theta_array, cor_correction_alg = cor_correction_alg, sample_flipped_remounted_mid_experiment = sample_flipped_remounted_mid_experiment)
+            
+                else:
+                    print('Error: Correction algorithm unavailable. Exiting program...')
+
+                    sys.exit()
+
+                print(f'Average center of rotation post-iterative reprojection: {ppu.round_correct(center_of_rotation_avg, ndec = 13)}')
+                print(f'Geometric center: {center_geom}')
+                print(f'Center of rotation error post-iterative reprojection: {ppu.round_correct(offset_init, ndec = 13)}')
             
             break
         
