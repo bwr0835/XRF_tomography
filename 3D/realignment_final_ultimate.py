@@ -9,7 +9,8 @@ import matplotlib.pyplot as plt
 def phase_xcorr_manual(ref_img,
                        mov_img, 
                        pixel_rad,
-                       theta):
+                       theta,
+                       shift_upsample_factor=1):
     
     n_slices = ref_img.shape[0]
     n_columns = ref_img.shape[1]
@@ -34,6 +35,27 @@ def phase_xcorr_manual(ref_img,
 
     else:
         phase_xcorr_truncated = phase_xcorr
+
+    if shift_upsample_factor > 1:
+        try:
+            from skimage.registration import phase_cross_correlation
+        except ImportError:
+            print(
+                'Warning: skimage.registration.phase_cross_correlation not available; '
+                'using truncated peak for shifts.'
+            )
+        else:
+            ref64 = np.nan_to_num(np.asarray(ref_img, dtype=np.float64))
+            mov64 = np.nan_to_num(np.asarray(mov_img, dtype=np.float64))
+            shift_vec, _, _ = phase_cross_correlation(
+                ref64,
+                mov64,
+                upsample_factor=int(shift_upsample_factor),
+                normalization='phase',
+            )
+            shift_y = float(shift_vec[0])
+            shift_x = float(shift_vec[1])
+            return np.array([shift_y, shift_x]), phase_xcorr, phase_xcorr_truncated
 
     pcc_max_idx = np.unravel_index(np.argmax(phase_xcorr_truncated), phase_xcorr_truncated.shape)
 
@@ -727,13 +749,15 @@ def iter_reproj(proj_img_array,
                 shifts, _, _ = phase_xcorr_manual(synth_proj[theta_idx], 
                                                   aligned_proj[theta_idx], 
                                                   pixel_rad_iter_reproj[theta_idx],
-                                                  theta = np.array([theta_array[theta_idx], theta_array[theta_idx]]))
+                                                  theta = np.array([theta_array[theta_idx], theta_array[theta_idx]]),
+                                                  shift_upsample_factor=20)
             
             else:
                 shifts, phase_xcorr_2d, phase_xcorr_2d_truncated = phase_xcorr_manual(synth_proj[theta_idx], 
                                                                                       aligned_proj[theta_idx], 
                                                                                       pixel_rad_iter_reproj[theta_idx],
-                                                                                      theta = np.array([theta_array[theta_idx], theta_array[theta_idx]]))
+                                                                                      theta = np.array([theta_array[theta_idx], theta_array[theta_idx]]),
+                                                                                      shift_upsample_factor=20)
                 
                 pcc_2d_array[i, theta_idx] = phase_xcorr_2d
 
