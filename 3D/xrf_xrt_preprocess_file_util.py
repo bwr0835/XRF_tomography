@@ -2002,7 +2002,7 @@ def create_incremental_shifts_vs_angle_plot(dir_path,
         ]
         leg_shift = axs1.legend(handles = shift_handles, frameon = False, fontsize = 14, loc = 'upper right')
         axs1.add_artist(leg_shift)
-        axs1.legend(handles = iter_handles, frameon = False, fontsize = 14, loc = 'lower left')
+        axs1.legend(handles = iter_handles, frameon = False, fontsize = 14, loc = 'upper left')
     else:
         axs1.legend(frameon = False, fontsize = 14)
 
