@@ -1912,8 +1912,18 @@ def create_exp_synth_proj_data_gif(dir_path,
     img1_5 = axs1[1, 1].imshow(synth_proj_final_iter_rgb)
     img1_6 = axs1[1, 2].imshow(overlay_exp_synth_proj_final_iter)
 
+    axs1[0, 0].set_title(r'Raw proj. (Iter. 0)', fontsize = 14)
+    axs1[0, 1].set_title(r'Synthetic proj. (Iter. 0)', fontsize = 14)
+    axs1[0, 2].set_title(r'Overlay (Iter. 0)', fontsize = 14)
+    axs1[1, 0].set_title(r'Raw proj. (Final)', fontsize = 14)
+    axs1[1, 1].set_title(r'Synthetic proj. (Final)', fontsize = 14)
+    axs1[1, 2].set_title(r'Overlay (Final)', fontsize = 14)
+    
     text1 = axs1[0, 0].text(0.02, 0.02, r'$\theta = {0}$\textdegree'.format(theta_array[0]), transform = axs1[0, 0].transAxes, color = 'white')
     
+    vmin = np.min([exp_proj_first_iter, synth_proj_first_iter, exp_proj_final_iter, synth_proj_final_iter])
+    vmax = np.max([exp_proj_first_iter, synth_proj_first_iter, exp_proj_final_iter, synth_proj_final_iter])
+
     theta_frames = []
     
     for ax in fig1.axes:
@@ -1922,10 +1932,10 @@ def create_exp_synth_proj_data_gif(dir_path,
         ax.axhline(y = n_slices//2, color = 'red', linewidth = 2)
     
     for theta_idx in range(n_theta):
-        exp_proj_first_iter_norm = ppu.normalize_array_for_gif(exp_proj_first_iter[theta_idx])
-        synth_proj_first_iter_norm = ppu.normalize_array_for_gif(synth_proj_first_iter[theta_idx])
-        exp_proj_final_iter_norm = ppu.normalize_array_for_gif(exp_proj_final_iter[theta_idx])
-        synth_proj_final_iter_norm = ppu.normalize_array_for_gif(synth_proj_final_iter[theta_idx])
+        exp_proj_first_iter_norm = ppu.normalize_array_for_gif(exp_proj_first_iter[theta_idx], vmin = vmin, vmax = vmax)
+        synth_proj_first_iter_norm = ppu.normalize_array_for_gif(synth_proj_first_iter[theta_idx], vmin = vmin, vmax = vmax)
+        exp_proj_final_iter_norm = ppu.normalize_array_for_gif(exp_proj_final_iter[theta_idx], vmin = vmin, vmax = vmax)
+        synth_proj_final_iter_norm = ppu.normalize_array_for_gif(synth_proj_final_iter[theta_idx], vmin = vmin, vmax = vmax)
 
         exp_proj_first_iter_rgb = np.dstack((exp_proj_first_iter_norm, np.zeros_like(exp_proj_first_iter_norm), np.zeros_like(exp_proj_first_iter_norm)))
         synth_proj_first_iter_rgb = np.dstack((np.zeros_like(synth_proj_first_iter_norm), synth_proj_first_iter_norm, np.zeros_like(synth_proj_first_iter_norm)))

@@ -526,7 +526,13 @@ def create_gridrec_density_maps(xrf_proj_array, elements_xrf, theta_array):
 def normalize_array_for_rgb(array):
     return (array - np.nanmin(array))/(np.nanmax(array) - np.nanmin(array))
 
-def normalize_array_for_gif(array):
+def normalize_array_for_gif(array, vmin = None, vmax = None):
     array_nonzero = array[array != 0]
 
-    return np.clip((array - np.nanmin(array_nonzero))/(np.nanmax(array_nonzero) - np.nanmin(array_nonzero)), 0, 1)
+    if vmin is None:
+        vmin = np.nanmin(array_nonzero)
+    
+    if vmax is None:
+        vmax = np.nanmax(array_nonzero)
+    
+    return np.clip((array - vmin)/(vmax - vmin), 0, 1)
