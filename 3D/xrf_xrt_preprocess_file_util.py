@@ -1635,7 +1635,11 @@ def create_phase_xcorr_2d_gif(dir_path,
         im1_1 = axs[0].imshow(phase_xcorr_2d[0], vmin = vmin, vmax = vmax)
         im1_2 = axs[1].imshow(phase_xcorr_2d_truncated[0], vmin = vmin, vmax = vmax)
         
-        text1 = axs[0].text(0.02, 0.02, r'$\left(\theta_{{1}} = {0}^{{\circ}}, \theta_{{2}} = {1}^{{\circ}}\right)$'.format(theta_array[0], theta_array[1]), transform = axs[0].transAxes, color = 'white')
+        if correction_type == 'adjacent_angle_jitter':
+            text1 = axs[0].text(0.02, 0.02, r'$\left(\theta_{{1}} = {0}^{{\circ}}, \theta_{{2}} = {1}^{{\circ}}\right)$'.format(theta_array[0], theta_array[1]), transform = axs[0].transAxes, color = 'white')
+
+        else:
+            text1 = axs[0].text(0.02, 0.02, r'$\theta = {0}^{{\circ}}$'.format(theta_array[0]), transform = axs[0].transAxes, color = 'white')
 
         for ax in fig.axes:
             ax.axis('off')
@@ -1649,7 +1653,11 @@ def create_phase_xcorr_2d_gif(dir_path,
             im1_1.set_data(phase_xcorr_2d[theta_idx])
             im1_2.set_data(phase_xcorr_2d_truncated[theta_idx])
             
-            text1.set_text(r'$\left(\theta_{{1}} = {0}^{{\circ}}, \theta_{{2}} = {1}^{{\circ}}\right)$'.format(theta_array[theta_idx], theta_array[theta_idx + 1]))
+            if correction_type == 'adjacent_angle_jitter':
+                text1.set_text(r'$\left(\theta_{{1}} = {0}^{{\circ}}, \theta_{{2}} = {1}^{{\circ}}\right)$'.format(theta_array[theta_idx], theta_array[theta_idx + 1]))
+            
+            else:
+                text1.set_text(r'$\theta = {0}^{{\circ}}$'.format(theta_array[theta_idx]))
 
             fig.canvas.draw()
 
