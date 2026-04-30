@@ -1053,6 +1053,12 @@ def create_csv_raw_input_data(dir_path,
 
     pixel_rad_pre_cor_jitter_array = np.append(np.nan, pixel_rad_pre_cor_jitter)
 
+    if init_x_shifts.ndim == 2:
+        init_x_shifts = init_x_shifts[-1]
+
+    if init_y_shifts.ndim == 2:
+        init_y_shifts = init_y_shifts[-1]
+
     output_dict = {'theta_deg': theta_array,
                    'norm_factor_xrf': norm_factor_xrf,
                    'norm_factor_xrt': norm_factor_xrt,
