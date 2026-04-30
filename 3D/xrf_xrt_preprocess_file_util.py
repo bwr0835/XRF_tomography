@@ -1875,7 +1875,7 @@ def create_exp_synth_proj_data_gif(dir_path,
                                    theta_array,
                                    fps):
     
-    n_theta, n_slices, n_columns = exp_proj.shape
+    n_theta, n_slices, n_columns = exp_proj[0].shape
 
     exp_proj_first_iter = exp_proj[0]
     synth_proj_first_iter = synth_proj[0]
