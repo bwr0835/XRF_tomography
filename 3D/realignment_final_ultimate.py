@@ -621,6 +621,8 @@ def iter_reproj(proj_img_array,
     if np.any(init_x_shift) or np.any(init_y_shift):
         print('Applying initial vertical and/or horizontal shifts...')
 
+        aligned_proj = np.zeros_like(proj_img_array)
+
         net_x_shifts_pcc[0] += init_x_shift
         net_y_shifts_pcc[0] += init_y_shift
 
