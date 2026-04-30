@@ -2000,9 +2000,9 @@ def create_incremental_shifts_vs_angle_plot(dir_path,
             Line2D([0], [0], color = color_array[iter_idx], linewidth = 2, label = 'Iteration {0}'.format(iter_idx))
             for iter_idx in range(n_iter)
         ]
-        leg_shift = axs1.legend(handles = shift_handles, frameon = False, fontsize = 14)
+        leg_shift = axs1.legend(handles = shift_handles, frameon = False, fontsize = 14, loc = 'upper right')
         axs1.add_artist(leg_shift)
-        axs1.legend(handles = iter_handles, frameon = False, fontsize = 14, title = 'Iteration')
+        axs1.legend(handles = iter_handles, frameon = False, fontsize = 14, loc = 'lower left')
     else:
         axs1.legend(frameon = False, fontsize = 14)
 
