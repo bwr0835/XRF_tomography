@@ -3,7 +3,6 @@ import numpy as np, \
        xrf_xrt_preprocess_utils as ppu, \
        sys
 
-from skimage import transform as xform
 from scipy import ndimage as ndi, fft
 import matplotlib.pyplot as plt
 
@@ -24,11 +23,12 @@ def phase_xcorr_manual(ref_img,
     center_column_idx = int(n_columns//2)
 
     if pixel_rad > 0:
+        # Inclusive radius: half-open slice needs +1 so patch is (2*pixel_rad+1)**2, not (2*pixel_rad)**2.
         start_slice_idx = center_slice_idx - pixel_rad
-        end_slice_idx = center_slice_idx + pixel_rad
+        end_slice_idx = center_slice_idx + pixel_rad + 1
 
         start_column_idx = center_column_idx - pixel_rad
-        end_column_idx = center_column_idx + pixel_rad
+        end_column_idx = center_column_idx + pixel_rad + 1
 
         phase_xcorr_truncated = phase_xcorr[start_slice_idx:end_slice_idx, start_column_idx:end_column_idx]
 
@@ -180,7 +180,8 @@ def correct_adjacent_angle_jitter_pre_cor_correction(init_proj_array,
             phase_xcorr_2d_truncated_aggregate = np.zeros((n_theta - 1, n_slices, n_columns))
 
         else:
-            phase_xcorr_2d_truncated_aggregate = np.zeros((n_theta - 1, 2*pixel_rad.max(), 2*pixel_rad.max()))
+            prm = int(pixel_rad.max())
+            phase_xcorr_2d_truncated_aggregate = np.zeros((n_theta - 1, 2 * prm + 1, 2 * prm + 1))
 
     for theta_idx in range(n_theta - 1):
         shifts, phase_xcorr_2d, phase_xcorr_2d_truncated = phase_xcorr_manual(shifted_proj_array[theta_idx],
@@ -201,8 +202,8 @@ def correct_adjacent_angle_jitter_pre_cor_correction(init_proj_array,
             start_y = int(phase_xcorr_2d_truncated_aggregate_midpt_idy - pixel_rad[theta_idx])
             start_x = int(phase_xcorr_2d_truncated_aggregate_midpt_idx - pixel_rad[theta_idx])
 
-            end_y = int(phase_xcorr_2d_truncated_aggregate_midpt_idy + pixel_rad[theta_idx])
-            end_x = int(phase_xcorr_2d_truncated_aggregate_midpt_idx + pixel_rad[theta_idx])
+            end_y = int(phase_xcorr_2d_truncated_aggregate_midpt_idy + pixel_rad[theta_idx] + 1)
+            end_x = int(phase_xcorr_2d_truncated_aggregate_midpt_idx + pixel_rad[theta_idx] + 1)
 
             phase_xcorr_2d_truncated_aggregate[theta_idx, start_y:end_y, start_x:end_x] = phase_xcorr_2d_truncated
         
@@ -608,12 +609,21 @@ def iter_reproj(proj_img_array,
 
         sys.exit()
     
+    n_theta, n_slices, n_columns = proj_img_array.shape
+
     if pixel_rad_iter_reproj is None:
         print('Warning: \'pixel_rad_iter_reproj\' not detected. Setting \'pixel_rad_iter_reproj\' to 0 pixels for each projection angle...')
 
         pixel_rad_iter_reproj = np.zeros(n_theta)
 
-    n_theta, n_slices, n_columns = proj_img_array.shape
+    if np.all(pixel_rad_iter_reproj > 0):
+        pr_max = int(np.max(pixel_rad_iter_reproj))
+        if pr_max <= 2:
+            print(
+                'Warning: pixel_rad_iter_reproj is small (max='
+                f'{pr_max}); measured |dx|,|dy| are limited to about ±{pr_max} px. '
+                'Increase entries in raw_input_data.csv (e.g. 8–20) or use 0 for full-field peak search.'
+            )
 
     net_x_shifts_pcc = np.zeros((n_iterations_iter_reproj, n_theta))
     net_y_shifts_pcc = np.zeros((n_iterations_iter_reproj, n_theta))
@@ -659,7 +669,8 @@ def iter_reproj(proj_img_array,
                 pcc_2d_truncated_array = np.zeros((n_iterations_iter_reproj, n_theta, n_slices, n_columns))
 
             else:
-                pcc_2d_truncated_array = np.zeros((n_iterations_iter_reproj, n_theta, 2*pixel_rad_iter_reproj.max(), 2*pixel_rad_iter_reproj.max()))
+                prm = int(pixel_rad_iter_reproj.max())
+                pcc_2d_truncated_array = np.zeros((n_iterations_iter_reproj, n_theta, 2 * prm + 1, 2 * prm + 1))
 
         recon_array = np.zeros((n_iterations_iter_reproj, n_slices, n_columns, n_columns))
     
@@ -691,29 +702,22 @@ def iter_reproj(proj_img_array,
         if return_aux_data:
             recon_array[i] = recon
         
-        for slice_idx in range(n_slices):
-            print(f'\rReprojecting slice {slice_idx + 1}/{n_slices}', end = '', flush = True)
-
-            # circle=False avoids skimage's "must be zero outside reconstruction circle"
-            # check and uses the full slice. Output sinogram is wider than n_columns;
-            # crop the central n_columns bins to match experimental detector pixels.
-            radon_cols_theta = xform.radon(
-                recon[slice_idx],
-                theta_array,
-                circle=False,
-                preserve_range=True,
+        # tomopy.project matches gridrec geometry; skimage radon + crop does not, so
+        # phase correlation saw a nearly fixed bias and dx/dy barely changed per iteration.
+        print('\rForward-projecting volume (TomoPy)...', end = '', flush = True)
+        theta_rad = theta_array * np.pi / 180.0
+        synth_proj[:] = tomo.project(
+            recon,
+            theta_rad,
+            sinogram_order=False,
+            pad=False,
+        )
+        if synth_proj.shape != (n_theta, n_slices, n_columns):
+            raise ValueError(
+                'tomo.project pad=False shape '
+                f'{synth_proj.shape} != expected {(n_theta, n_slices, n_columns)}; '
+                'check recon vs aligned_proj dimensions.'
             )
-            sinogram = radon_cols_theta.T
-            p_det = sinogram.shape[1]
-            if p_det < n_columns:
-                raise ValueError(
-                    f'radon(circle=False) width {p_det} < n_columns {n_columns}'
-                )
-            if p_det > n_columns:
-                off = (p_det - n_columns) // 2
-                sinogram = sinogram[:, off : off + n_columns]
-
-            synth_proj[:, slice_idx, :] = sinogram
 
         if return_aux_data:
             synth_proj_array[i] = synth_proj
@@ -737,8 +741,8 @@ def iter_reproj(proj_img_array,
                     start_x = int(phase_xcorr_2d_truncated.shape[1]//2 - pixel_rad_iter_reproj[theta_idx])
                     start_y = int(phase_xcorr_2d_truncated.shape[0]//2 - pixel_rad_iter_reproj[theta_idx])
 
-                    end_x = int(phase_xcorr_2d_truncated.shape[1]//2 + pixel_rad_iter_reproj[theta_idx])
-                    end_y = int(phase_xcorr_2d_truncated.shape[0]//2 + pixel_rad_iter_reproj[theta_idx])
+                    end_x = int(phase_xcorr_2d_truncated.shape[1] // 2 + pixel_rad_iter_reproj[theta_idx] + 1)
+                    end_y = int(phase_xcorr_2d_truncated.shape[0] // 2 + pixel_rad_iter_reproj[theta_idx] + 1)
                 
                     pcc_2d_truncated_array[i, theta_idx, start_y:end_y, start_x:end_x] = phase_xcorr_2d_truncated
                 
