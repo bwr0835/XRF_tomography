@@ -11,6 +11,7 @@ import numpy as np, \
 
 from tkinter import filedialog as fd
 from matplotlib import pyplot as plt
+from matplotlib.lines import Line2D
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 from imageio import v2 as iio2
 
@@ -1972,13 +1973,8 @@ def create_incremental_shifts_vs_angle_plot(dir_path,
         color_array = ['k', 'b', 'g', 'r', 'm']
     
         for iter_idx in range(net_x_shift_array.shape[0]):
-            if iter_idx == 0:
-                axs1.plot(theta_array, net_x_shift_array[iter_idx], marker = 'o', markersize = 5, linewidth = 2, color = color_array[iter_idx], label = r'$\delta x$')
-                axs1.plot(theta_array, net_y_shift_array[iter_idx], linestyle = '--', marker = 'o', markersize = 3, linewidth = 2, color = color_array[iter_idx], label = r'$\delta y$')
-            
-            else:
-                axs1.plot(theta_array, net_x_shift_array[iter_idx], marker = 'o', markersize = 5, linewidth = 2, color = color_array[iter_idx])
-                axs1.plot(theta_array, net_y_shift_array[iter_idx], linestyle = '--', marker = 'o', markersize = 3, linewidth = 2, color = color_array[iter_idx])
+            axs1.plot(theta_array, net_x_shift_array[iter_idx], marker = 'o', markersize = 5, linewidth = 2, color = color_array[iter_idx])
+            axs1.plot(theta_array, net_y_shift_array[iter_idx], linestyle = '--', marker = 'o', markersize = 3, linewidth = 2, color = color_array[iter_idx])
 
         axs1.set_ylim(vmin, vmax)
     
@@ -1993,16 +1989,30 @@ def create_incremental_shifts_vs_angle_plot(dir_path,
     axs1.tick_params(axis = 'both', which = 'minor', labelsize = 14)
     axs1.set_xlabel(r'$\theta$ (\textdegree{})', fontsize = 16)
     axs1.set_ylabel(r'Incremental shift', fontsize = 16)
-    axs1.legend(frameon = False, fontsize = 14)
+
+    if correction_type == 'iter_reproj':
+        n_iter = net_x_shift_array.shape[0]
+        shift_handles = [
+            Line2D([0], [0], color = '0.35', linestyle = '-', marker = 'o', markersize = 5, linewidth = 2, label = r'$\delta x$'),
+            Line2D([0], [0], color = '0.35', linestyle = '--', marker = 'o', markersize = 3, linewidth = 2, label = r'$\delta y$'),
+        ]
+        iter_handles = [
+            Line2D([0], [0], color = color_array[iter_idx], linewidth = 2, label = 'Iteration {0}'.format(iter_idx))
+            for iter_idx in range(n_iter)
+        ]
+        leg_shift = axs1.legend(handles = shift_handles, frameon = False, fontsize = 14, loc = 'upper left')
+        axs1.add_artist(leg_shift)
+        axs1.legend(handles = iter_handles, frameon = False, fontsize = 14, loc = 'upper right', title = 'Iteration')
+    else:
+        axs1.legend(frameon = False, fontsize = 14)
 
     fig1.tight_layout()
     
     # plt.show()
-    plt.close(fig1)
-
     fig_filename = os.path.join(dir_path, f'incremental_shifts_vs_angle_plot.svg')
     
     fig1.savefig(fig_filename)
+    plt.close(fig1)
 
     return
 
