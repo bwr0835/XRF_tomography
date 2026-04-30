@@ -7,6 +7,25 @@ from skimage import transform as xform
 from scipy import ndimage as ndi, fft
 import matplotlib.pyplot as plt
 
+
+def zero_outside_radon_reconstruction_circle(image):
+    """
+    TomoPy/gridrec volumes are square but usually non-zero in the corners. skimage.radon
+    with circle=True warns unless those pixels are zero (see skimage radial mask:
+    radius = min(shape) // 2, center at shape // 2). Zero them here so forward projection
+    matches the circle=True convention without changing sinogram width.
+    """
+    image = np.asarray(image)
+    out = image.copy()
+    shape_min = min(out.shape)
+    radius = shape_min // 2
+    img_shape = np.array(out.shape)
+    coords = np.array(np.ogrid[: out.shape[0], : out.shape[1]], dtype=object)
+    dist_sq = ((coords - img_shape // 2) ** 2).sum(0)
+    out[dist_sq > radius ** 2] = 0
+    return out
+
+
 def phase_xcorr_manual(ref_img,
                        mov_img, 
                        pixel_rad,
@@ -694,7 +713,8 @@ def iter_reproj(proj_img_array,
         for slice_idx in range(n_slices):
             print(f'\rReprojecting slice {slice_idx + 1}/{n_slices}', end = '', flush = True)
 
-            sinogram = (xform.radon(recon[slice_idx].copy(), theta_array)).T
+            slice_recon = zero_outside_radon_reconstruction_circle(recon[slice_idx])
+            sinogram = (xform.radon(slice_recon, theta_array, circle=True)).T
 
             synth_proj[:, slice_idx, :] = sinogram
 
