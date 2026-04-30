@@ -465,13 +465,15 @@ def preprocess_xrf_xrt_data(synchrotron,
             dx_array_pcc, \
             dy_array_pcc = realign.iter_reproj(vignetted_proj_array_element_to_align_with,
                                                theta,
-                                               aligning_element,
                                                n_iter_iter_reproj,
                                                init_x_shift_array,
                                                init_y_shift_array,
                                                cval_array,
                                                pixel_rad_iter_reproj,
                                                eps_iter_reproj,
+                                               sample_flipped_remounted_mid_experiment,
+                                               cor_correction_alg,
+                                               pixel_rad_cor_correction,
                                                return_aux_data)
             
             if return_aux_data:
