@@ -519,8 +519,8 @@ def preprocess_xrf_xrt_data(synchrotron,
                     print(f'Creating plot of incremental shifts vs. angle for {net_x_shifts.shape[0]} iterations...')
 
                     futil.create_incremental_shifts_vs_angle_plot(xrt_od_xrf_realignment_subdir_path,
-                                                                  net_x_shifts,
-                                                                  net_y_shifts,
+                                                                  dx_array_pcc,
+                                                                  dy_array_pcc,
                                                                   'iter_reproj',
                                                                   theta)
                 
