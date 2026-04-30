@@ -1964,7 +1964,7 @@ def create_incremental_shifts_vs_angle_plot(dir_path,
                                             correction_type,
                                             theta_array):
     
-    fig1, axs1 = plt.subplots()
+    fig1, axs1 = plt.subplots(figsize = (10, 8))
 
     vmin = np.min([net_x_shift_array, net_y_shift_array])
     vmax = np.max([net_x_shift_array, net_y_shift_array])
