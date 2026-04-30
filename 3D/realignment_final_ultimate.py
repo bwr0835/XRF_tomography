@@ -7,7 +7,6 @@ from skimage import transform as xform
 from scipy import ndimage as ndi, fft
 import matplotlib.pyplot as plt
 
-
 def phase_xcorr_manual(ref_img,
                        mov_img, 
                        pixel_rad,
