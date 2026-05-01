@@ -694,24 +694,10 @@ def iter_reproj(proj_img_array,
         for slice_idx in range(n_slices):
             print(f'\rReprojecting slice {slice_idx + 1}/{n_slices}', end = '', flush = True)
 
-            # circle=False avoids skimage's "must be zero outside reconstruction circle"
-            # check and uses the full slice. Output sinogram is wider than n_columns;
-            # crop the central n_columns bins to match experimental detector pixels.
-            radon_cols_theta = xform.radon(
-                recon[slice_idx],
-                theta_array,
-                circle=False,
-                preserve_range=True,
-            )
-            sinogram = radon_cols_theta.T
-            p_det = sinogram.shape[1]
-            if p_det < n_columns:
-                raise ValueError(
-                    f'radon(circle=False) width {p_det} < n_columns {n_columns}'
-                )
-            if p_det > n_columns:
-                off = (p_det - n_columns) // 2
-                sinogram = sinogram[:, off : off + n_columns]
+            sinogram = (xform.radon(recon[slice_idx].copy(), theta_array, circle = False, preserve_range = True)).T
+
+            off = (sinogram.shape[1] - n_columns) // 2
+            sinogram = sinogram[:, off : off + n_columns]
 
             synth_proj[:, slice_idx, :] = sinogram
 
