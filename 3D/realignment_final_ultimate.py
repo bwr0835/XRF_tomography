@@ -18,7 +18,7 @@ def phase_xcorr_manual(ref_img,
     ref_img_fft = fft.fft2(ref_img)
     mov_img_fft = fft.fft2(mov_img)
 
-    phase_xcorr = fft.fftshift(np.real(fft.ifft2(ref_img_fft*mov_img_fft.conjugate()/np.abs(ref_img_fft*mov_img_fft.conjugate()))))
+    phase_xcorr = fft.fftshift(np.abs(fft.ifft2(ref_img_fft*mov_img_fft.conjugate()/np.abs(ref_img_fft*mov_img_fft.conjugate()))))
 
     center_slice_idx = int(n_slices//2)
     center_column_idx = int(n_columns//2)
@@ -685,8 +685,8 @@ def iter_reproj(proj_img_array,
         if return_aux_data:
             aligned_exp_proj_array[i] = aligned_proj
 
-        recon = tomo.recon(aligned_proj, theta_array*np.pi/180, algorithm = 'gridrec', filter_name = 'ramlak')
-        # recon = tomo.recon(aligned_proj, theta_array*np.pi/180, algorithm = 'mlem', num_iter = 70)
+        # recon = tomo.recon(aligned_proj, theta_array*np.pi/180, algorithm = 'gridrec', filter_name = 'ramlak')
+        recon = tomo.recon(aligned_proj, theta_array*np.pi/180, algorithm = 'mlem', num_iter = 70)
 
         if return_aux_data:
             recon_array[i] = recon
@@ -695,10 +695,7 @@ def iter_reproj(proj_img_array,
             print(f'\rReprojecting slice {slice_idx + 1}/{n_slices}', end = '', flush = True)
 
             sinogram = (xform.radon(recon[slice_idx].copy(), theta_array, circle = False, preserve_range = True)).T
-
-            off = (sinogram.shape[1] - n_columns) // 2
-            sinogram = sinogram[:, off : off + n_columns]
-
+            
             synth_proj[:, slice_idx, :] = sinogram
 
         if return_aux_data:

@@ -283,6 +283,8 @@ def preprocess_xrf_xrt_data(synchrotron,
         
     opt_dens_norm = -np.log(intensity_xrt_norm/I0_photons)
     
+    # pixel_rad_iter_reproj = np.f
+
     if realignment_enabled:
         if aligning_element == 'opt_dens':
             proj_img_array_element_to_align_with = opt_dens_norm
