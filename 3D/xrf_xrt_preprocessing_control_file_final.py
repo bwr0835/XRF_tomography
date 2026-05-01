@@ -282,21 +282,7 @@ def preprocess_xrf_xrt_data(synchrotron,
     print('Calculating optical densities...')
         
     opt_dens_norm = -np.log(intensity_xrt_norm/I0_photons)
-
-    zero_idx_array = np.where(theta == 0)[0]
-
-    intensity_xrt_norm = intensity_xrt_norm[np.arange(n_theta) != zero_idx_array[1]]
-    intensity_xrf_norm = intensity_xrf_norm[:, np.arange(n_theta) != zero_idx_array[1]]
-    opt_dens_norm = opt_dens_norm[np.arange(n_theta) != zero_idx_array[1]]
     
-    init_x_shift_array = init_x_shift_array[np.arange(n_theta) != zero_idx_array[1]]
-    init_y_shift_array = init_y_shift_array[np.arange(n_theta) != zero_idx_array[1]]
-    pixel_rad_iter_reproj = pixel_rad_iter_reproj[np.arange(n_theta) != zero_idx_array[1]]
-    
-    theta = theta[np.arange(n_theta) != zero_idx_array[1]]
-
-    n_theta = theta.shape[0]
-
     if realignment_enabled:
         if aligning_element == 'opt_dens':
             proj_img_array_element_to_align_with = opt_dens_norm

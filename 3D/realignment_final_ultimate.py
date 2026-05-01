@@ -18,7 +18,7 @@ def phase_xcorr_manual(ref_img,
     ref_img_fft = fft.fft2(ref_img)
     mov_img_fft = fft.fft2(mov_img)
 
-    phase_xcorr = fft.fftshift(np.abs(fft.ifft2(ref_img_fft*mov_img_fft.conjugate()/np.abs(ref_img_fft*mov_img_fft.conjugate()))))
+    phase_xcorr = fft.fftshift(np.real(fft.ifft2(ref_img_fft*mov_img_fft.conjugate()/np.abs(ref_img_fft*mov_img_fft.conjugate()))))
 
     center_slice_idx = int(n_slices//2)
     center_column_idx = int(n_columns//2)
