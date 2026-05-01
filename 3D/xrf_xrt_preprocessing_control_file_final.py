@@ -291,7 +291,6 @@ def preprocess_xrf_xrt_data(synchrotron,
     
     init_x_shift_array = init_x_shift_array[np.arange(n_theta) != zero_idx_array[1]]
     init_y_shift_array = init_y_shift_array[np.arange(n_theta) != zero_idx_array[1]]
-    pixel_rad_adjacent_angle_jitter = pixel_rad_adjacent_angle_jitter[np.arange(n_theta) != zero_idx_array[1]]
     pixel_rad_iter_reproj = pixel_rad_iter_reproj[np.arange(n_theta) != zero_idx_array[1]]
     
     theta = theta[np.arange(n_theta) != zero_idx_array[1]]
