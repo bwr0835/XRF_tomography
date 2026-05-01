@@ -142,7 +142,7 @@ def preprocess_xrf_xrt_data(synchrotron,
 
     elements_xrf, intensity_xrf, theta, incident_energy_keV, _, dataset_type = futil.extract_h5_aggregate_xrf_data(aggregate_xrf_h5_file_path)
     elements_xrt, intensity_xrt, theta_xrt, _, _, dataset_type, xrt_photon_counting = futil.extract_h5_aggregate_xrt_data(aggregate_xrt_h5_file_path)
-        
+
     if not np.array_equal(theta, theta_xrt):
         print('Error: Inconsistent XRF, XRT projection angles. Exiting program...')
 
@@ -282,6 +282,12 @@ def preprocess_xrf_xrt_data(synchrotron,
     print('Calculating optical densities...')
         
     opt_dens_norm = -np.log(intensity_xrt_norm/I0_photons)
+
+    zero_idx_array = np.where(theta == 0)[0]
+
+    intensity_xrt_norm = intensity_xrt_norm[np.arange(n_theta) != zero_idx_array[1]]
+    intensity_xrf_norm = intensity_xrf_norm[:, np.arange(n_theta) != zero_idx_array[1]]
+    opt_dens_norm = opt_dens_norm[np.arange(n_theta) != zero_idx_array[1]]
     
     if realignment_enabled:
         if aligning_element == 'opt_dens':
