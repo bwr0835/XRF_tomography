@@ -694,7 +694,7 @@ def iter_reproj(proj_img_array,
         for slice_idx in range(n_slices):
             print(f'\rReprojecting slice {slice_idx + 1}/{n_slices}', end = '', flush = True)
 
-            sinogram = (xform.radon(recon[slice_idx].copy(), theta_array, circle = False, preserve_range = True)).T
+            sinogram = (xform.radon(recon[slice_idx].copy(), theta_array)).T
             
             synth_proj[:, slice_idx, :] = sinogram
 
