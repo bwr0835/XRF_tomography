@@ -282,8 +282,6 @@ def preprocess_xrf_xrt_data(synchrotron,
     print('Calculating optical densities...')
         
     opt_dens_norm = -np.log(intensity_xrt_norm/I0_photons)
-    
-    # pixel_rad_iter_reproj = np.f
 
     if realignment_enabled:
         if aligning_element == 'opt_dens':
@@ -439,7 +437,14 @@ def preprocess_xrf_xrt_data(synchrotron,
                 
                 print('Creating GIF of pre-COR-corrected, post-COR-corrected (vignetted) projection data...')
 
-                
+                futil.create_pre_cor_corrected_post_cor_corrected_proj_data_gif(xrt_od_xrf_realignment_subdir_path,
+                                                                                shifted_proj_img_array_element_to_align_with,
+                                                                                shifted_proj_img_array_element_to_align_with_orig,
+                                                                                theta,
+                                                                                aligning_element,
+                                                                                fps)
+
+
             
             print(f'Creating new raw input data CSV file with file number {file_number}...')
 

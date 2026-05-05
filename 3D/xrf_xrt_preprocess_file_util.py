@@ -1876,6 +1876,55 @@ def create_center_of_rotation_figures(dir_path,
 
     return
 
+def create_pre_cor_corrected_post_cor_corrected_proj_data_gif(dir_path,
+                                                              proj_img_array,
+                                                              proj_img_array_orig,
+                                                              theta_array,
+                                                              aligning_element,
+                                                              fps):
+    
+    n_theta, n_slices, n_columns = proj_img_array.shape
+
+    vmin = np.min([proj_img_array, proj_img_array_orig])
+    vmax = np.max([proj_img_array, proj_img_array_orig])
+
+    theta_frames = []
+
+    fig1, axs1 = plt.subplots(2, 1)
+
+    im1_1 = axs1[0].imshow(proj_img_array_orig[0], vmin = vmin, vmax = vmax)
+    im1_2 = axs1[1].imshow(proj_img_array[0], vmin = vmin, vmax = vmax)
+
+    for ax in fig1.axes:
+        ax.axis('off')
+        ax.axvline(x = n_columns//2, color = 'white', linestyle = '--', linewidth = 2)
+        ax.axhline(y = n_slices//2, color = 'white', linestyle = '--', linewidth = 2)
+    
+    axs1[0].set_title(r'{0} (Pre-COR-correction; vignetted)'.format(aligning_element), fontsize = 14)
+    axs1[1].set_title(r'{0} (Post-COR-correction; vignetted)'.format(aligning_element), fontsize = 14)
+    
+    text1 = axs1[0].text(0.02, 0.02, r'$\theta = {0}$\textdegree'.format(theta_array[0]), transform = axs1[0].transAxes, color = 'white')
+    
+    for theta_idx in range(n_theta):
+        im1_1.set_data(proj_img_array_orig[theta_idx])
+        im1_2.set_data(proj_img_array[theta_idx])
+        
+        text1.set_text(r'$\theta = {0}$\textdegree'.format(theta_array[theta_idx]))
+        
+        fig1.canvas.draw()
+        
+        frame1 = np.array(fig1.canvas.renderer.buffer_rgba())[:, :, :3]
+        
+        theta_frames.append(frame1)
+        
+    plt.close(fig1)
+    
+    gif_filename = os.path.join(dir_path, f'pre_cor_corrected_post_cor_corrected_proj_data.gif')
+    
+    iio2.mimsave(gif_filename, theta_frames, fps = fps)
+    
+    return
+
 def create_exp_synth_proj_data_gif(dir_path,
                                    exp_proj,
                                    synth_proj,
