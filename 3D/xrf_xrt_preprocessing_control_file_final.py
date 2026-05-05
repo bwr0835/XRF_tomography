@@ -436,6 +436,10 @@ def preprocess_xrf_xrt_data(synchrotron,
                                                         shifted_proj_img_array_element_to_align_with_aux,
                                                         sample_flipped_remounted_mid_experiment,
                                                         theta)
+                
+                print('Creating GIF of pre-COR-corrected, post-COR-corrected (vignetted) projection data...')
+
+                
             
             print(f'Creating new raw input data CSV file with file number {file_number}...')
 
