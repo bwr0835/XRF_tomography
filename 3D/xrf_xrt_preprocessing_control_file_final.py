@@ -298,6 +298,8 @@ def preprocess_xrf_xrt_data(synchrotron,
 
             sys.exit()
         
+        proj_img_array_element_to_align_with_orig = proj_img_array_element_to_align_with.copy()
+        
         print(f'Vignetting \'{aligning_element}\' projection images...')
         
         vignetted_proj_array_element_to_align_with = np.zeros_like(proj_img_array_element_to_align_with)
