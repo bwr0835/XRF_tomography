@@ -2244,7 +2244,7 @@ def create_gridrec_density_map_gif(dir_path,
 
     plt.close(fig)
 
-    gif_filename = os.path.join(dir_path, f'gridrec_density_map_{desired_element}.gif')
+    gif_filename = os.path.join(dir_path, f'gridrec_density_maps.gif')
 
     iio2.mimsave(gif_filename, slice_frames, fps = fps)
 
