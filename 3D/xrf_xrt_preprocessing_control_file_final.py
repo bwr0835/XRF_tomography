@@ -562,7 +562,7 @@ def preprocess_xrf_xrt_data(synchrotron,
 
             shifted_xrf_proj_img_array, \
             shifted_xrt_proj_img_array, \
-            shifted_opt_dens_proj_img_array = realign.realign_proj_final(intensity_xrf_norm, intensity_xrt_norm, opt_dens_norm, theta, init_x_shift_array, init_y_shift_array)
+            shifted_opt_dens_proj_img_array = realign.realign_proj_final(intensity_xrf_norm, intensity_xrt_norm, opt_dens_norm, theta, init_x_shift_array, init_y_shift_array, I0_photons)
             
             if np.any(init_y_shift_array != 0):
                 print('Cropping final aligned XRF, XRT, optical density projection images to vertical common field of view...')
