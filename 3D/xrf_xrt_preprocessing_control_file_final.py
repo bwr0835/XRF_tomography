@@ -670,7 +670,7 @@ def preprocess_xrf_xrt_data(synchrotron,
 
                     sys.exit()
                 
-                for desired_xrf_element, idx in enumerate(desired_xrf_element_list):
+                for idx, desired_xrf_element in enumerate(desired_xrf_element_list):
                     if '_' in desired_xrf_element:
                         desired_xrf_element = desired_xrf_element.split('_')[0]
 
