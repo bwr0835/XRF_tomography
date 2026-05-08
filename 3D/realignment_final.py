@@ -527,7 +527,7 @@ def correct_adjacent_angle_jitter_pre_cor_correction(init_proj_array,
     
     else:
         if not isinstance(pixel_rad, np.ndarray):
-            print('Error: \'pixel_rad\' must be a numpy array. Exiting program...')
+            print('Error: \'pixel_rad\' must `be a numpy array. Exiting program...')
 
             sys.exit()
 

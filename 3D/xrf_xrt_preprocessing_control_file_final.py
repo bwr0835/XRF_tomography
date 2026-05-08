@@ -53,7 +53,7 @@ def preprocess_xrf_xrt_data(synchrotron,
                             desired_xrf_element_list,
                             aligned_data_output_dir_path,
                             fps):
-
+    print(len(desired_xrf_element_list))
     if create_aggregate_xrf_xrt_files_enabled:
         if pre_existing_aggregate_xrf_xrt_file_lists_enabled:
             print('Extracting pre-existing XRF, XRT HDF5 file lists...')
