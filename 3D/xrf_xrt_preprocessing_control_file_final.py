@@ -53,7 +53,7 @@ def preprocess_xrf_xrt_data(synchrotron,
                             desired_xrf_element_list,
                             aligned_data_output_dir_path,
                             fps):
-     
+    
     if create_aggregate_xrf_xrt_files_enabled:
         if pre_existing_aggregate_xrf_xrt_file_lists_enabled:
             print('Extracting pre-existing XRF, XRT HDF5 file lists...')
@@ -142,7 +142,7 @@ def preprocess_xrf_xrt_data(synchrotron,
 
     elements_xrf, intensity_xrf, theta, incident_energy_keV, _, dataset_type = futil.extract_h5_aggregate_xrf_data(aggregate_xrf_h5_file_path)
     elements_xrt, intensity_xrt, theta_xrt, _, _, dataset_type, xrt_photon_counting = futil.extract_h5_aggregate_xrt_data(aggregate_xrt_h5_file_path)
-    
+
     if not np.array_equal(theta, theta_xrt):
         print('Error: Inconsistent XRF, XRT projection angles. Exiting program...')
 
@@ -183,8 +183,7 @@ def preprocess_xrf_xrt_data(synchrotron,
         
     intensity_xrt_sig_idx = elements_xrt.index('xrt_sig')
     intensity_xrt_sig = intensity_xrt[intensity_xrt_sig_idx]
-    elements_xrf_new = elements_xrf.copy()
-    elements_xrf_new[elements_xrf.index('_' in elements_xrf)] = elements_xrf[elements_xrf.index('_' in elements_xrf)].split('_')[0]
+
     if pre_existing_align_norm_file_enabled:
         print('Extracting pre-existing normalizations, net x pixel shifts, net y pixel shifts, pixel radii for adjacent angle jitter correction and iterative reprojection, and incident intensity from CSV file...')
         
@@ -670,17 +669,15 @@ def preprocess_xrf_xrt_data(synchrotron,
                     print('Error: \'desired_xrf_element_list\' must contain 4 elements. Exiting program...')
 
                     sys.exit()
-                
+
                 elements_xrf_new = elements_xrf.copy()
-                elements_xrf_new[elements_xrf.index('_' in elements_xrf)] = elements_xrf[elements_xrf.index('_' in elements_xrf)].split('_')[0]
+
+                for idx, element in enumerate(elements_xrf):
+                    if '_' in element:
+                        elements_xrf_new[idx] = element.split('_')[0]
 
                 for idx, desired_xrf_element in enumerate(desired_xrf_element_list):
-                    if '_' in desired_xrf_element:
-                        desired_xrf_element = desired_xrf_element.split('_')[0]
-
-                        elements_xrf_new[idx] = desired_xrf_element
-                    
-                    if desired_xrf_element not in elements_xrf:
+                    if desired_xrf_element not in elements_xrf_new:
                         print(f'Error: \'desired_xrf_element\' {desired_xrf_element} not in \'elements_xrf\'. Exiting program...')
     
                         sys.exit()
@@ -688,7 +685,7 @@ def preprocess_xrf_xrt_data(synchrotron,
                 futil.create_gridrec_density_map_gif(aligned_data_output_dir_path,
                                                      gridrec_density_maps,
                                                      desired_xrf_element_list,
-                                                     elements_xrf,
+                                                     elements_xrf_new,
                                                      fps)
 
             print('Done')

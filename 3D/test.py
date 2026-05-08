@@ -7,17 +7,20 @@ from scipy import ndimage as ndi
 from imageio import v2 as iio2
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 
-pre_existing_align_norm_file_path = '/home/bwr0835/3_id_realigned_data_04_19_2026_diff_cor_correction/xrt_od_xrf_realignment_003/raw_input_data.csv'
+# pre_existing_align_norm_file_path = '/home/bwr0835/3_id_realigned_data_04_19_2026_diff_cor_correction/xrt_od_xrf_realignment_003/raw_input_data.csv'
 
-norm_array_xrt, \
-norm_array_xrf, \
-init_x_shift_array, \
-init_y_shift_array, \
-pixel_rad_adjacent_angle_jitter, \
-pixel_rad_cor_correction, \
-pixel_rad_iter_reproj, \
-I0_photons, \
-data_percentile_aux, \
-aligning_element_aux = futil.extract_csv_raw_input_data(pre_existing_align_norm_file_path)
+# norm_array_xrt, \
+# norm_array_xrf, \
+# init_x_shift_array, \
+# init_y_shift_array, \
+# pixel_rad_adjacent_angle_jitter, \
+# pixel_rad_cor_correction, \
+# pixel_rad_iter_reproj, \
+# I0_photons, \
+# data_percentile_aux, \
+# aligning_element_aux = futil.extract_csv_raw_input_data(pre_existing_align_norm_file_path)
 
-fig1, axs1 = plt.subplots(1, 2)
+# fig1, axs1 = plt.subplots(1, 2)
+a = 'Ba'
+
+print(a.split('_')[0])
