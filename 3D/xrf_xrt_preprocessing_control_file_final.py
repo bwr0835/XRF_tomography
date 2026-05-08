@@ -38,7 +38,6 @@ def preprocess_xrf_xrt_data(synchrotron,
                             cos_fit_enabled,
                             angle_range_to_fit,
                             realignment_enabled,
-                            manual_alignment_enabled,
                             cor_correction_enabled,
                             cor_correction_alg,
                             iter_reproj_enabled,
@@ -306,9 +305,7 @@ def preprocess_xrf_xrt_data(synchrotron,
 
         for theta_idx in range(n_theta):
             vignetted_proj_array_element_to_align_with[theta_idx], cval_array[theta_idx] = ppu.edge_gauss_filter(proj_img_array_element_to_align_with[theta_idx], sigma, alpha, nx = n_columns, ny = n_slices)
-        
-        if manual_alignment_enabled:
-
+            
         if pre_cor_correction_adjacent_angle_jitter_correction_enabled:
             print('Calculating shifts for adjacent angle jitter correction pre-center of rotation error correction...')
             
@@ -557,6 +554,10 @@ def preprocess_xrf_xrt_data(synchrotron,
                                             aligning_element)
 
         elif create_final_aligned_proj_enabled:
+            xrt_od_xrf_realignment_subdir_path = os.path.join(aligned_data_output_dir_path, 'xrt_od_xrf_realignment_final')
+
+            os.makedirs(xrt_od_xrf_realignment_subdir_path, exist_ok = True)
+            
             print('Shifting all XRF, XRT, optical density projection images by final net shifts...')
 
             shifted_xrf_proj_img_array, \
