@@ -60,8 +60,7 @@ preprocessing_numeric_params = ['data_percentile',
 
 preprocessing_numeric_array_params = ['angle_range_to_fit']
 
-preprocessing_list_params = ['edge_pixel_lengths_to_crop',
-                             'desired_xrf_element_list']
+preprocessing_list_params = ['desired_xrf_element_list']
 
 preprocessing_bool_params = ['create_aggregate_xrf_xrt_files_enabled',
                              'pre_existing_aggregate_xrf_xrt_file_lists_enabled', 
