@@ -2167,7 +2167,9 @@ def create_gridrec_density_map_gif(dir_path,
                                    gridrec_density_maps, 
                                    desired_element, 
                                    elements_xrf, 
-                                   fps):    
+                                   fps):
+
+    print(desired_element)
 
     desired_element_idx_1 = elements_xrf.index(desired_element[0])
     desired_element_idx_2 = elements_xrf.index(desired_element[1])
