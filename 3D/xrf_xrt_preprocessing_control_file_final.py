@@ -562,7 +562,7 @@ def preprocess_xrf_xrt_data(synchrotron,
 
             shifted_xrf_proj_img_array, \
             shifted_xrt_proj_img_array, \
-            shifted_opt_dens_proj_img_array = realign.realign_proj_final(intensity_xrf_norm, intensity_xrt_norm, opt_dens_norm, theta, net_x_shifts, net_y_shifts)
+            shifted_opt_dens_proj_img_array = realign.realign_proj_final(intensity_xrf_norm, intensity_xrt_norm, opt_dens_norm, theta, init_x_shift_array, init_y_shift_array)
             
             if np.any(init_y_shift_array != 0):
                 print('Cropping final aligned XRF, XRT, optical density projection images to vertical common field of view...')
@@ -592,7 +592,7 @@ def preprocess_xrf_xrt_data(synchrotron,
             end_column = ppu.joint_array_crop(shifted_xrf_proj_img_array, 
                                               shifted_xrt_proj_img_array, 
                                               shifted_opt_dens_proj_img_array, 
-                                              net_y_shift_array, 
+                                              init_y_shift_array, 
                                               edge_pixel_lengths_to_crop)
 
             if return_aux_data:
@@ -617,7 +617,7 @@ def preprocess_xrf_xrt_data(synchrotron,
                 _, \
                 _, \
                 _ = ppu.crop_array(proj_img_array_element_to_align_with_orig, 
-                                   net_y_shift_array, 
+                                   init_y_shift_array, 
                                    edge_pixel_lengths_to_crop)
                 
                 futil.create_final_aligned_proj_data_gif(xrt_od_xrf_realignment_subdir_path,
