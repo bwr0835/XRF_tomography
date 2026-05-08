@@ -2197,7 +2197,7 @@ def create_gridrec_density_map_gif(dir_path,
     img1_3 = axs[1, 0].imshow(density_map_3[0], vmin = vmin_3, vmax = vmax_3)
     img1_4 = axs[1, 1].imshow(density_map_4[0], vmin = vmin_4, vmax = vmax_4)
     
-    text = axs[0, 0].text(0.02, 0.02, r'Slice index 0/{0}'.format(n_slices - 1), transform = axs.transAxes, color = 'white')
+    text = axs[0, 0].text(0.02, 0.02, r'Slice index 0/{0}'.format(n_slices - 1), transform = axs[0, 0].transAxes, color = 'white')
     
     axs.axis('off')
     axs.set_title(r'{0}'.format(desired_element), fontsize = 14)
