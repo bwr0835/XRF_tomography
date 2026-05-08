@@ -2199,9 +2199,6 @@ def create_gridrec_density_map_gif(dir_path,
     
     text = axs[0, 0].text(0.02, 0.02, r'Slice index 0/{0}'.format(n_slices - 1), transform = axs[0, 0].transAxes, color = 'white')
     
-    axs.axis('off')
-    axs.set_title(r'{0}'.format(desired_element), fontsize = 14)
-
     divider1 = make_axes_locatable(axs[0, 0])
     divider2 = make_axes_locatable(axs[0, 1])
     divider3 = make_axes_locatable(axs[1, 0])
