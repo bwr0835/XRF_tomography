@@ -53,7 +53,7 @@ def preprocess_xrf_xrt_data(synchrotron,
                             desired_xrf_element_list,
                             aligned_data_output_dir_path,
                             fps):
-    print(desired_xrf_element_list)
+    
     if create_aggregate_xrf_xrt_files_enabled:
         if pre_existing_aggregate_xrf_xrt_file_lists_enabled:
             print('Extracting pre-existing XRF, XRT HDF5 file lists...')
@@ -669,13 +669,18 @@ def preprocess_xrf_xrt_data(synchrotron,
                     print('Error: \'desired_xrf_element_list\' must contain 4 elements. Exiting program...')
 
                     sys.exit()
+                
+                for desired_xrf_element, idx in enumerate(desired_xrf_element_list):
+                    if '_' in desired_xrf_element:
+                        desired_xrf_element = desired_xrf_element.split('_')[0]
 
-                for desired_xrf_element in desired_xrf_element_list:
+                        desired_xrf_element_list[idx] = desired_xrf_element
+                    
                     if desired_xrf_element not in elements_xrf:
                         print(f'Error: \'desired_xrf_element\' {desired_xrf_element} not in \'elements_xrf\'. Exiting program...')
-
+    
                         sys.exit()
-
+            
                 futil.create_gridrec_density_map_gif(aligned_data_output_dir_path,
                                                      gridrec_density_maps,
                                                      desired_xrf_element_list,
