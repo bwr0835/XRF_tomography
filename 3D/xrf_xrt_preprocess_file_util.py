@@ -2222,6 +2222,7 @@ def create_gridrec_density_map_gif(dir_path,
     cbar4.ax.set_title(r'g/cm\textsuperscript{3}', fontsize = 16)
 
     for idx, ax in enumerate(fig.axes):
+        print(idx)
         ax.set_title(r'{0}'.format(desired_element[idx]))
         ax.axis('off')
 
