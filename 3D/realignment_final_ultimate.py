@@ -553,7 +553,7 @@ def correct_center_of_rotation(proj_img_array,
     if return_aux_data:
         print(f'Shifting original projection images of \'{aligning_element}\' post-COR correction...')
         
-        if sample_flipped_remounted_correction_type:
+        if sample_flipped_remounted_mid_experiment:
             return net_x_shift_array, net_y_shift_array, shifted_proj_img_array, shifted_proj_img_array_aux, shifted_proj_img_array_orig
 
         return net_x_shift_array, net_y_shift_array, shifted_proj_img_array, None, shifted_proj_img_array_orig
