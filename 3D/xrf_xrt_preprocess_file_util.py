@@ -892,6 +892,7 @@ def extract_csv_preprocessing_input_params(file_path):
         
         print(values[idx])
         idx += 1
+        print(idx)
 
     for param in numeric_params:
         if isinstance(input_param_dict[param], str):
