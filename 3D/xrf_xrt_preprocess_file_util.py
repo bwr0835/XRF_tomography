@@ -890,6 +890,7 @@ def extract_csv_preprocessing_input_params(file_path):
         if param == 'desired_xrf_element_list' and values[idx] is not None:
             input_param_dict[param] = [_str.capitalize() for _str in values[idx]]
         
+        print(values[idx])
         idx += 1
 
     for param in numeric_params:
