@@ -862,8 +862,6 @@ def extract_csv_preprocessing_input_params(file_path):
         sys.exit()
     
     for param in dict_params:
-        idx = 0
-
         if param == 'edge_pixel_lengths_to_crop' and input_param_dict[param] is not None:
             for key in input_param_dict[param]:
                 if key not in edge_crop_dxns:
@@ -886,20 +884,17 @@ def extract_csv_preprocessing_input_params(file_path):
 
                 for edge in missing_edges:
                     input_param_dict[param][edge] = 0
-        
-        if param == 'desired_xrf_element_list' and values[idx] is not None:
-            input_param_dict[param] = [_str.capitalize() for _str in values[idx]]
-        
-        print(values[idx])
-        idx += 1
-        print(idx)
 
     for param in numeric_params:
         if isinstance(input_param_dict[param], str):
             print(f'Error: Expected a number for input parameter \'{param}\'. Exiting program...')
 
             sys.exit()
-    print(input_param_dict['desired_xrf_element_list'])
+
+    for idx, param in enumerate(input_param_dict):
+        if param == 'desired_xrf_element_list' and values[idx] is not None:
+            input_param_dict[param] = [_str.capitalize() for _str in values[idx]]
+
     return input_param_dict
 
 def create_csv_file_list(file_path_array,
