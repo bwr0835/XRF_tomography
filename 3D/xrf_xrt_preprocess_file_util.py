@@ -897,7 +897,7 @@ def extract_csv_preprocessing_input_params(file_path):
             print(f'Error: Expected a number for input parameter \'{param}\'. Exiting program...')
 
             sys.exit()
-
+    print(input_param_dict['desired_xrf_element_list'])
     return input_param_dict
 
 def create_csv_file_list(file_path_array,
