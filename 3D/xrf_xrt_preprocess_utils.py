@@ -420,6 +420,10 @@ def crop_array(array, net_y_shift_array, edge_dict):
         if edge_dict is not None:
             start_slice += edge_dict['top']
             end_slice -= edge_dict['bottom']
+    
+    elif edge_dict is not None:
+        start_slice = edge_dict['top']
+        end_slice = n_slices - edge_dict['bottom']
 
     else:
         start_slice = 0
