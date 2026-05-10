@@ -895,6 +895,7 @@ def extract_csv_preprocessing_input_params(file_path):
         if param == 'desired_xrf_element_list' and values[idx] is not None:
             input_param_dict[param] = [_str.capitalize() for _str in values[idx]]
 
+    print(input_param_dict['edge_pixel_lengths_to_crop'])
     return input_param_dict
 
 def create_csv_file_list(file_path_array,
