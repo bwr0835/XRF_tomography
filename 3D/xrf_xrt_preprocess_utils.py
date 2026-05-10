@@ -463,6 +463,10 @@ def joint_array_crop(xrf_array, xrt_array, opt_dens_array, net_y_shift_array, ed
         if edge_dict is not None:
             start_slice += edge_dict['top']
             end_slice -= edge_dict['bottom']
+    
+    elif edge_dict is not None:
+        start_slice = edge_dict['top']
+        end_slice = n_slices - edge_dict['bottom']
 
     else:
         start_slice = 0
