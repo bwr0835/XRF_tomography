@@ -862,7 +862,9 @@ def extract_csv_preprocessing_input_params(file_path):
         sys.exit()
     
     for param in dict_params:
-        if (param == 'init_edge_pixel_lengths_to_crop' or param == 'final_edge_pixel_lengths_to_crop') and input_param_dict[param] is not None:
+        idx = 0
+
+        if param == 'edge_pixel_lengths_to_crop' and input_param_dict[param] is not None:
             for key in input_param_dict[param]:
                 if key not in edge_crop_dxns:
                     print(f"Error: Unable to identify at least one specified edge for '{param}'. Exiting program...")
@@ -884,6 +886,11 @@ def extract_csv_preprocessing_input_params(file_path):
 
                 for edge in missing_edges:
                     input_param_dict[param][edge] = 0
+        
+        if param == 'desired_xrf_element_list' and values[idx] is not None:
+            input_param_dict[param] = [_str.capitalize() for _str in values[idx]]
+        
+        idx += 1
 
     for param in numeric_params:
         if isinstance(input_param_dict[param], str):
@@ -891,11 +898,6 @@ def extract_csv_preprocessing_input_params(file_path):
 
             sys.exit()
 
-    for idx, param in enumerate(input_param_dict):
-        if param == 'desired_xrf_element_list' and values[idx] is not None:
-            input_param_dict[param] = [_str.capitalize() for _str in values[idx]]
-
-    print(input_param_dict['edge_pixel_lengths_to_crop'])
     return input_param_dict
 
 def create_csv_file_list(file_path_array,
