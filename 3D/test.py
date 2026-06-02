@@ -7,3 +7,7 @@ from scipy import ndimage as ndi
 from imageio import v2 as iio2
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 
+filename = '/Users/bwr0835/Documents/2_ide_aggregate_xrt.h5'
+
+with h5py.File(filename, 'r+') as f:
+    f['exchange/data'].attrs['incident_energy_keV'] = 13.0
