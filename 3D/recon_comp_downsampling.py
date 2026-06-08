@@ -44,8 +44,7 @@ def extract_h5_aggregate_xrf_xrt_data_for_recon(file_path):
 
     #     sys.exit()
     
-    xrt_data_idx = np.argwhere(elements_xrt == 'xrt_sig')[0, 0]
-    xrt_sig_data = xrt_data[xrt_data_idx]
+    xrt_sig_data = xrt_data[elements_xrt.index('xrt_sig')]
 
     return elements_xrf, xrf_data, xrt_sig_data, theta, num_slices_cropped_top, num_slices_cropped_bottom
 
