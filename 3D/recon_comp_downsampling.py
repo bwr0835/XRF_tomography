@@ -359,7 +359,7 @@ for idx, downsample_factor in enumerate(downsample_factors):
 
         sys.exit()
 
-    middle_slice_recons[idx] = recon[idx, middle_slice]
+    middle_slice_recons[idx, :n_columns, :n_columns] = recon[idx, middle_slice]
 
     if save_recon:
         print('Saving reconstruction and downsampled scan data to HDF5 file for middle slice...')
