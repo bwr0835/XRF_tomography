@@ -31,8 +31,8 @@ def extract_h5_aggregate_xrf_xrt_data_for_recon(file_path):
         xrf_data, xrt_data = data['xrf'][()], data['xrt'][()]
         theta = h5['exchange/theta'][()]
 
-        num_slices_cropped_top = h5['exchange/data'].attrs['top_edge_cropped']
-        num_slices_cropped_bottom = h5['exchange/data'].attrs['bottom_edge_cropped']
+        num_slices_cropped_top = h5['exchange/data'].attrs['top_edge_cropped_final']
+        num_slices_cropped_bottom = h5['exchange/data'].attrs['bottom_edge_cropped_final']
     
     # except KeyboardInterrupt:
     #     print('Keyboard interrupt. Exiting program...', flush = True)
