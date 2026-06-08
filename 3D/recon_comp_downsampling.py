@@ -203,11 +203,7 @@ def downsample(array, downsample_factor, data_type, func = np.mean):
     if (n_slices//downsample_factor) % 2 or (n_columns//downsample_factor) % 2:
         print('Warning: Odd number of rows/slices and/or columns/scan positions resulting from downsampling. Consider switching to even number of slices and/or scan positions being output.')
 
-    if data_type == 'xrf':
-        return meas.block_reduce(array, block_size = (1, 1, downsample_factor, downsample_factor), func = func)
-    
-    else:
-        return meas.block_reduce(array, block_size = (1, downsample_factor, downsample_factor), func = func)
+    return meas.block_reduce(array, block_size = (1, downsample_factor, downsample_factor), func = func)
 
 def create_h5_recon(dir_path, element, xrf_data, x, y, downsample_factor, algorithm, synchrotron):
     if not os.path.isdir(dir_path):
@@ -308,6 +304,7 @@ start_slice = num_slices_cropped_top
 end_slice = n_slices - num_slices_cropped_bottom
 
 recon = np.zeros((len(downsample_factors), n_slices, n_columns, n_columns))
+middle_slice_recons = np.zeros((len(downsample_factors), n_columns, n_columns))
 
 if x.ndim == 1:
     # x_cropped_downsampled_array = np.zeros((len(downsample_factors), n_columns))
@@ -320,9 +317,7 @@ else:
     # x_cropped_downsampled_array = np.zeros((len(downsample_factors), n_columns, n_columns))
     # y_cropped_downsampled_array = np.zeros((len(downsample_factors), n_columns, n_columns))
 
-for downsample_factor in downsample_factors:
-    idx = 0
-
+for idx, downsample_factor in enumerate(downsample_factors):
     print(f'Downsampling projection data by factor of {downsample_factor}...')
 
     xrf_data_element_of_interest_downsampled = downsample(xrf_data_element_of_interest, downsample_factor, 'xrf')
@@ -330,6 +325,7 @@ for downsample_factor in downsample_factors:
 
     print('Creating downsampled x and y scan data arrays that mimick scanning the middle reconstructed slice...')
 
+    n_slices = xrf_data_element_of_interest_downsampled.shape[1]
     middle_slice = n_slices//2
 
     if x_cropped_downsampled.ndim == 1:
@@ -364,13 +360,13 @@ for downsample_factor in downsample_factors:
 
         sys.exit()
 
+    middle_slice_recons[idx] = recon[idx, middle_slice]
+
     if save_recon:
         print('Saving reconstruction and downsampled scan data to HDF5 file for middle slice...')
 
-        create_h5_recon(input_proj_dir_path, element_of_interest, xrf_data_element_of_interest_downsampled[middle_slice], x_cropped_downsampled_array, y_cropped_downsampled_array, downsample_factor, algorithm, synchrotron)
-    
-    idx += 1
+        create_h5_recon(input_proj_dir_path, element_of_interest, middle_slice_recons[idx], x_cropped_downsampled_array, y_cropped_downsampled_array, downsample_factor, algorithm, synchrotron)
 
 print('Creating figure comparing middle slices of downsampled reconstructions...')
 
-create_middle_slice_recon_figure(recon[:, middle_slice], downsample_factors)
+create_middle_slice_recon_figure(middle_slice_recons, downsample_factors)
