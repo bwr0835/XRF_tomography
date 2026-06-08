@@ -256,7 +256,7 @@ def create_middle_slice_recon_figure(recon, downsample_factors):
         
         print(n_columns_downsampled)
        
-        ax.imshow(recon[idx, :n_columns_downsampled, :n_columns_downsampled], vmin = vmin, vmax = vmax)
+        ax.imshow(recon[idx, :n_columns_downsampled, :n_columns_downsampled]/downsample_factors[idx], vmin = vmin, vmax = vmax)
         
         ax.axis('off')
         ax.set_title(r'DSF = {0}'.format(downsample_factors[idx]))
