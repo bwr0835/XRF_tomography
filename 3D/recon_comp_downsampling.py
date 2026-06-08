@@ -256,7 +256,7 @@ def create_middle_slice_recon_figure(recon, downsample_factors):
         
         print(n_columns_downsampled)
        
-        ax.imshow(recon[idx, :n_columns_downsampled, :n_columns_downsampled]/downsample_factors[idx], vmin = vmin, vmax = vmax)
+        ax.imshow(recon[idx, :n_columns_downsampled, :n_columns_downsampled], vmin = vmin, vmax = vmax)
         
         ax.axis('off')
         ax.set_title(r'DSF = {0}'.format(downsample_factors[idx]))
@@ -364,7 +364,7 @@ for idx, downsample_factor in enumerate(downsample_factors):
 
         sys.exit()
 
-    middle_slice_recons[idx] = recon[idx, middle_slice]
+    middle_slice_recons[idx] = recon[idx, middle_slice]/downsample_factors[idx]
 
     if save_recon:
         print('Saving reconstruction and downsampled scan data to HDF5 file for middle slice...')
