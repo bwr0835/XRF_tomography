@@ -27,7 +27,7 @@ def extract_h5_aggregate_xrf_xrt_data_for_recon(file_path):
         data = h5['exchange/data']
         elements = h5['exchange/elements']
             
-        elements_xrf, elements_xrt = elements['xrf'].asstr()[:], elements['xrt'].asstr()[:]
+        elements_xrf, elements_xrt = list(elements['xrf'].asstr()[:]), list(elements['xrt'].asstr()[:])
         xrf_data, xrt_data = data['xrf'][()], data['xrt'][()]
         theta = h5['exchange/theta'][()]
 
