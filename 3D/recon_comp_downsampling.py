@@ -156,6 +156,7 @@ def downsample(array, downsample_factor, data_type, func = np.mean):
         _, n_slices, n_columns = array.shape
     
     elif data_type == 'scan_coords':
+        print(array.ndim)
         if array.ndim != 1 or array.ndim != 2:
             print('Error: Input scan coordinates must be 1D or 2D. Exiting program...')
 
