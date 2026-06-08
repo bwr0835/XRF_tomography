@@ -249,6 +249,8 @@ def create_middle_slice_recon_figure(recon, downsample_factors):
 
     for idx, ax in enumerate(fig.axes):
         n_columns = recon[idx].shape[-1]
+
+        print(n_columns)
        
         ax.imshow(recon[idx, :n_columns, :n_columns])
         
