@@ -62,6 +62,8 @@ def extract_h5_scan_coords(file_path, synchrotron):
     if synchrotron == 'aps':
         with h5py.File(file_path, 'r') as h5:
             x = h5['MAPS/Scan/x_axis'][()]
+
+            x = x[:-2]
     
     elif synchrotron == 'nsls-ii':
         with h5py.File(file_path, 'r') as h5:
