@@ -288,7 +288,12 @@ save_proj = False
 
 downsample_factors = np.array([1, 2, 5, 10])
 
+print('Extracting projection data...')
+
 elements_xrf, xrf_data, xrt_sig_data, theta, num_slices_cropped_top, num_slices_cropped_bottom = extract_h5_aggregate_xrf_xrt_data_for_recon(proj_data_h5_path)
+
+print('Extracting scan data...')
+
 x = extract_h5_scan_coords(input_proj_scan_data_file_path, synchrotron)
 
 if save_proj:
