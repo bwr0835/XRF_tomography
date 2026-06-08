@@ -211,11 +211,6 @@ def create_h5_recon(dir_path, element, xrf_data, x, y, downsample_factor, algori
 
         sys.exit()
     
-    if not dir_path.endswith('.h5'):
-        print('Error: Reconstruction file extension must be \'.h5\'. Exiting program...')
-
-        sys.exit()
-    
     if synchrotron == 'aps':
         with h5py.File(os.path.join(dir_path, f'recon_downsample_{downsample_factor}_{element}_{algorithm}.h5'), 'w') as h5:
             maps = h5.create_group('MAPS')
