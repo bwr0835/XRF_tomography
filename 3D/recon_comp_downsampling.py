@@ -327,7 +327,8 @@ for idx, downsample_factor in enumerate(downsample_factors):
     print('Creating downsampled x and y scan data arrays that mimick scanning the middle reconstructed slice...')
 
     n_slices = xrf_data_element_of_interest_downsampled.shape[1]
-    middle_slice = n_slices//2
+    # middle_slice = n_slices//2
+    middle_slice = 90//downsample_factor
 
     if x_cropped_downsampled.ndim == 1:
         n_columns = len(x_cropped_downsampled)
