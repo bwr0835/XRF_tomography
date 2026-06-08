@@ -22,27 +22,27 @@ def extract_h5_aggregate_xrf_xrt_data_for_recon(file_path):
 
         sys.exit()
     
-    try:
-        with h5py.File(file_path, 'r') as h5:
-            data = h5['exchange/data']
-            elements = h5['exchange/elements']
+    # try:
+    with h5py.File(file_path, 'r') as h5:
+        data = h5['exchange/data']
+        elements = h5['exchange/elements']
             
-            elements_xrf, elements_xrt = elements['xrf'].asstr()[:], elements['xrt'].asstr()[:]
-            xrf_data, xrt_data = data['xrf'][()], data['xrt'][()]
-            theta = h5['exchange/theta'][()]
+        elements_xrf, elements_xrt = elements['xrf'].asstr()[:], elements['xrt'].asstr()[:]
+        xrf_data, xrt_data = data['xrf'][()], data['xrt'][()]
+        theta = h5['exchange/theta'][()]
 
-            num_slices_cropped_top = h5['exchange/data'].attrs['top_edge_cropped']
-            num_slices_cropped_bottom = h5['exchange/data'].attrs['bottom_edge_cropped']
+        num_slices_cropped_top = h5['exchange/data'].attrs['top_edge_cropped']
+        num_slices_cropped_bottom = h5['exchange/data'].attrs['bottom_edge_cropped']
     
-    except KeyboardInterrupt:
-        print('Keyboard interrupt. Exiting program...', flush = True)
+    # except KeyboardInterrupt:
+    #     print('Keyboard interrupt. Exiting program...', flush = True)
 
-        sys.exit()
+    #     sys.exit()
     
-    except:
-        print('Error: Incorrect HDF5 file structure. Exiting program...', flush = True)
+    # except:
+    #     print('Error: Incorrect HDF5 file structure. Exiting program...', flush = True)
 
-        sys.exit()
+    #     sys.exit()
     
     xrt_data_idx = np.argwhere(elements_xrt == 'xrt_sig')[0, 0]
     xrt_sig_data = xrt_data[xrt_data_idx]
