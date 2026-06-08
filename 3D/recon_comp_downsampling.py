@@ -144,20 +144,12 @@ def downsample(array, downsample_factor, data_type, func = np.mean):
 
         sys.exit()
     
-    if data_type == 'xrf':
-        if array.ndim != 4:
-            print('Error: Input XRF projection data must be exactly 4D. Exiting program...')
-
-            sys.exit()
-    
-        _, _, n_slices, n_columns = array.shape
-    
-    elif data_type == 'xrt':
+    if data_type == 'xrt' or data_type == 'xrf':
         if array.ndim != 3:
-            print('Error: Input XRT/OD projection data must be exactly 3D. Exiting program...')
+            print('Error: Input XRF/XRT projection data must be exactly 3D. Exiting program...')
 
             sys.exit()
-
+        
         _, n_slices, n_columns = array.shape
     
     elif data_type == 'scan_coords':
