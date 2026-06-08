@@ -308,8 +308,6 @@ if synchrotron == 'aps': # Append additional scan position to ensure matching nu
 start_slice = num_slices_cropped_top
 end_slice = n_slices - num_slices_cropped_bottom
 
-xrf_data_element_of_interest_cropped = xrf_data_element_of_interest[:, start_slice:end_slice]
-
 recon = np.zeros((len(downsample_factors), n_slices, n_columns, n_columns))
 
 if x.ndim == 1:
@@ -328,7 +326,7 @@ for downsample_factor in downsample_factors:
 
     print(f'Downsampling projection data by factor of {downsample_factor}...')
 
-    xrf_data_element_of_interest_cropped_downsampled = downsample(xrf_data_element_of_interest_cropped, downsample_factor, 'xrf')
+    xrf_data_element_of_interest_downsampled = downsample(xrf_data_element_of_interest, downsample_factor, 'xrf')
     x_cropped_downsampled = downsample(x_cropped, downsample_factor, 'scan_coords')
 
     print('Creating downsampled x and y scan data arrays that mimick scanning the middle reconstructed slice...')
@@ -357,10 +355,10 @@ for downsample_factor in downsample_factors:
     print('Reconstructing downsampled XRF projection data...')
 
     if algorithm == 'gridrec':
-        recon[idx, :n_slices, :n_columns, :n_columns] = tomo.recon(xrf_data_element_of_interest_cropped_downsampled, theta*np.pi/180, algorithm = algorithm, filter_name = 'ramlak')
+        recon[idx, :n_slices, :n_columns, :n_columns] = tomo.recon(xrf_data_element_of_interest_downsampled, theta*np.pi/180, algorithm = algorithm, filter_name = 'ramlak')
 
     elif algorithm == 'mlem':
-        recon[idx, :n_slices, :n_columns, :n_columns] = tomo.recon(xrf_data_element_of_interest_cropped_downsampled, theta*np.pi/180, algorithm = algorithm, num_iter = 70)
+        recon[idx, :n_slices, :n_columns, :n_columns] = tomo.recon(xrf_data_element_of_interest_downsampled, theta*np.pi/180, algorithm = algorithm, num_iter = 70)
 
     else:
         print('Error: Algorithm not available. Exiting program...')
@@ -370,7 +368,7 @@ for downsample_factor in downsample_factors:
     if save_recon:
         print('Saving reconstruction and downsampled scan data to HDF5 file for middle slice...')
 
-        create_h5_recon(input_proj_dir_path, element_of_interest, xrf_data_element_of_interest_cropped_downsampled[middle_slice], x_cropped_downsampled_array, y_cropped_downsampled_array, downsample_factor, algorithm, synchrotron)
+        create_h5_recon(input_proj_dir_path, element_of_interest, xrf_data_element_of_interest_downsampled[middle_slice], x_cropped_downsampled_array, y_cropped_downsampled_array, downsample_factor, algorithm, synchrotron)
     
     idx += 1
 
