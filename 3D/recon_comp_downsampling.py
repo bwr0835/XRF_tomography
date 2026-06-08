@@ -248,7 +248,9 @@ def create_middle_slice_recon_figure(recon, downsample_factors):
     fig, axs = plt.subplots(2, 2)
 
     for idx, ax in enumerate(fig.axes):
-        ax.imshow(recon[idx])
+        n_columns = recon[idx].shape[-1]
+       
+        ax.imshow(recon[idx, :n_columns, :n_columns])
         
         ax.axis('off')
         ax.set_title(r'DSF = {0}'.format(downsample_factors[idx]))
@@ -268,7 +270,7 @@ synchrotron = 'aps'
 element_of_interest = 'Fe'
 algorithm = 'gridrec'
 
-save_recon = True
+save_recon = False
 save_proj = False
 
 downsample_factors = np.array([1, 2, 5, 10])
