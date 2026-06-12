@@ -243,9 +243,9 @@ def create_h5_recon(dir_path, element, xrf_data, x, y, downsample_factor, algori
         sys.exit()
     
     if synchrotron == 'aps':
-        xrf_data = pad_col_for_h5(xrf_data, 2)
-        x = pad_col_for_h5(x, 2)
-        y = pad_col_for_h5(y, 2)
+        xrf_data = pad_col_for_h5(xrf_data, 2, data_type = 'xrf')
+        x = pad_col_for_h5(x, 2, data_type = 'x')
+        y = pad_col_for_h5(y, 2, data_type = 'y')
 
         with h5py.File(os.path.join(dir_path, f'recon_downsample_{downsample_factor}_{element}_{algorithm}.h5'), 'w') as h5:
             maps = h5.create_group('MAPS')
