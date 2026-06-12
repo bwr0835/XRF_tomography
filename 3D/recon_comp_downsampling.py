@@ -1,7 +1,4 @@
 import numpy as np, \
-       xrf_xrt_jxrft_file_util as recon_futil, \
-       xrf_xrt_preprocess_file_util as pp_futil, \
-       xrf_xrt_preprocess_utils as ppu, \
        tomopy as tomo, \
        h5py, \
        os, \
@@ -277,6 +274,31 @@ def create_h5_recon(dir_path, element, xrf_data, x, y, downsample_factor, algori
             positions.create_dataset('name', data = ['x', 'y'])
             positions.create_dataset('pos', data = scan_coords)
 
+def create_init_recon_movie(dir_path, recon):
+    fig, axs = plt.subplots()
+
+    img = axs.imshow(recon[0])
+    
+    text = axs.text(0.02, 0.02, r'Slice 0', transform = axs.transAxes, color = 'white')
+    
+    frames = []
+    
+    for slice_idx in range(recon.shape[0]):
+        img.set_data(recon[slice_idx])
+        text.set_text(r'Slice {0}/{1}'.format(slice_idx, recon.shape[0]))
+        
+        fig.canvas.draw()
+        
+        frame = np.array(fig.canvas.renderer.buffer_rgba())[:, :, :3]
+        
+        frames.append(frame)
+
+    gif_filename = os.path.join(dir_path, f'init_recon_movie.gif')
+
+    iio2.mimsave(gif_filename, frames, fps = 10)
+
+    return
+
 def create_middle_slice_recon_figure(recon, downsample_factors, slice_idx):
     if len(downsample_factors) != 4:
         print('Error: Number of downsample factors must be 4. Exiting program...')
@@ -404,13 +426,20 @@ for idx, downsample_factor_1 in enumerate(downsample_factors_1):
     elif algorithm == 'mlem':
         recon[idx, :n_slices, :n_columns, :n_columns] = tomo.recon(xrf_data_element_of_interest_downsampled, theta*np.pi/180, algorithm = algorithm, num_iter = 70)
 
+        if idx == 0:
+            print('Creating initial resolution reconstruction movie...')
+            
+            create_init_recon_movie(input_proj_dir_path, recon[idx, :n_slices, :n_columns, :n_columns])
+
+            sys.exit()
+            
     else:
         print('Error: Algorithm not available. Exiting program...')
 
         sys.exit()
 
-    middle_slice_recons[idx] = recon[idx, middle_slice]/downsample_factors_1[idx]
-    # middle_slice_recons[idx] = recon[idx, middle_slice]
+    # middle_slice_recons[idx] = recon[idx, middle_slice]/downsample_factors_1[idx]
+    middle_slice_recons[idx] = recon[idx, middle_slice]
 
     if save_recon:
         print('Saving reconstruction and downsampled scan data to HDF5 file for middle slice...')
