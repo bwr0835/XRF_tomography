@@ -151,7 +151,7 @@ def pad_col_for_h5(array, n_extra_cols, data_type):
 
         final_columns = np.zeros((n_slices, n_extra_cols))
     
-    elif data_type in ('x', 'y'):
+    elif data_type == 'x':
         if array.ndim == 1:
             final_columns = np.zeros(n_extra_cols)
 
@@ -245,7 +245,6 @@ def create_h5_recon(dir_path, element, xrf_data, x, y, downsample_factor, algori
     if synchrotron == 'aps':
         xrf_data = pad_col_for_h5(xrf_data, 2, data_type = 'xrf')
         x = pad_col_for_h5(x, 2, data_type = 'x')
-        y = pad_col_for_h5(y, 2, data_type = 'y')
 
         print(xrf_data.shape)
         print(x.shape)
