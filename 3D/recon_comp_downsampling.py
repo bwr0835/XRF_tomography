@@ -140,19 +140,25 @@ def pad_col_for_recon(array):
 
     return array
 
-def pad_col_for_h5(array, n_extra_cols):
+def pad_col_for_h5(array, n_extra_cols, data_type):
     if array.ndim != 1 and array.ndim != 2:
         print('Error: Input array must be 1D or 2D. Exiting program...')
 
         sys.exit()
     
-    if array.ndim == 1:
-        n_slices = len(array)
-
-    else:
+    if data_type == 'xrf':
         n_slices, _ = array.shape
 
-    final_columns = np.zeros((n_slices, n_extra_cols))
+        final_columns = np.zeros((n_slices, n_extra_cols))
+    
+    elif data_type in ('x', 'y'):
+        if array.ndim == 1:
+            final_columns = np.zeros(n_extra_cols)
+
+        else:
+            n_slices, _ = array.shape
+
+            final_columns = np.zeros((n_slices, n_extra_cols))
 
     array = np.hstack((array, final_columns))
 
