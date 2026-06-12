@@ -313,7 +313,7 @@ proj_data_h5_path = os.path.join(input_proj_dir_path, 'aligned_data', 'aligned_a
 
 synchrotron = 'aps'
 element_of_interest = 'Fe'
-algorithm = 'gridrec'
+algorithm = 'mlem'
 
 save_recon = True
 save_proj = False
@@ -360,6 +360,8 @@ else:
     # x_cropped_downsampled_array = np.zeros((len(downsample_factors), n_columns, n_columns))
     # y_cropped_downsampled_array = np.zeros((len(downsample_factors), n_columns, n_columns))
 
+middle_slice_orig = 90
+
 for idx, downsample_factor_1 in enumerate(downsample_factors_1):
     print(f'Downsampling projection data by factor of {downsample_factor_1}...')
 
@@ -370,7 +372,7 @@ for idx, downsample_factor_1 in enumerate(downsample_factors_1):
 
     n_slices = xrf_data_element_of_interest_downsampled.shape[1]
     # middle_slice = n_slices//2
-    middle_slice = 90//downsample_factor_1
+    middle_slice = middle_slice_orig//downsample_factor_1
 
     if x_cropped_downsampled.ndim == 1:
         n_columns = len(x_cropped_downsampled)
@@ -414,4 +416,4 @@ for idx, downsample_factor_1 in enumerate(downsample_factors_1):
 
 print('Creating figure comparing middle slices of downsampled reconstructions...')
 
-create_middle_slice_recon_figure(middle_slice_recons, downsample_factors_1, middle_slice)
+create_middle_slice_recon_figure(middle_slice_recons, downsample_factors_1, middle_slice_orig)
