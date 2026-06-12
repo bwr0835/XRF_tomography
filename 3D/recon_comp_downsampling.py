@@ -149,7 +149,7 @@ def downsample(array, downsample_factor_1, downsample_factor_2 = None, data_type
     if downsample_factor_2 is None:
         downsample_factor_2 = downsample_factor_1
     
-    if downsample_factor_2 <= 0:
+    elif downsample_factor_2 <= 0:
         print('Error: Downsampling factor must be positive. Exiting program...')
 
         sys.exit()
@@ -335,8 +335,8 @@ else:
 for idx, downsample_factor_1 in enumerate(downsample_factors_1):
     print(f'Downsampling projection data by factor of {downsample_factor_1}...')
 
-    xrf_data_element_of_interest_downsampled = downsample(xrf_data_element_of_interest, downsample_factor_1, 'xrf')
-    x_cropped_downsampled = downsample(x_cropped, downsample_factor_1, 'scan_coords')
+    xrf_data_element_of_interest_downsampled = downsample(xrf_data_element_of_interest, downsample_factor_1, data_type = 'xrf')
+    x_cropped_downsampled = downsample(x_cropped, downsample_factor_1, data_type = 'scan_coords')
 
     print('Creating downsampled x and y scan data arrays that mimick scanning the middle reconstructed slice...')
 
