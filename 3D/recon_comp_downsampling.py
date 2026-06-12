@@ -140,10 +140,19 @@ def pad_col_for_recon(array):
 
     return array
 
-def pad_col_for_h5(array, n_cols):
-    n_slices, _ = array.shape
+def pad_col_for_h5(array, n_extra_cols):
+    if array.ndim != 1 and array.ndim != 2:
+        print('Error: Input array must be 1D or 2D. Exiting program...')
 
-    final_columns = np.zeros((n_slices, n_cols - 1))
+        sys.exit()
+    
+    if array.ndim == 1:
+        n_slices = len(array)
+
+    else:
+        n_slices, _ = array.shape
+
+    final_columns = np.zeros((n_slices, n_extra_cols))
 
     array = np.hstack((array, final_columns))
 
