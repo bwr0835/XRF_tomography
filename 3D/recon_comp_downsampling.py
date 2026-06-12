@@ -416,7 +416,7 @@ for idx, downsample_factor_1 in enumerate(downsample_factors_1):
     if save_recon:
         print('Saving reconstruction and downsampled scan data to HDF5 file for middle slice...')
 
-        create_h5_recon(input_proj_dir_path, element_of_interest, middle_slice_recons[idx], x_cropped_downsampled_array, y_cropped_downsampled_array, downsample_factor_1, algorithm, synchrotron)
+        create_h5_recon(input_proj_dir_path, element_of_interest, middle_slice_recons[idx, :n_columns, :n_columns], x_cropped_downsampled_array, y_cropped_downsampled_array, downsample_factor_1, algorithm, synchrotron)
 
 print('Creating figure comparing middle slices of downsampled reconstructions...')
 
