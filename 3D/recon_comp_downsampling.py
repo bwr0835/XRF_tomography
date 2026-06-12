@@ -140,13 +140,20 @@ def pad_col(array):
 
     return array
 
-def downsample(array, downsample_factor, data_type, func = np.mean):
-    if downsample_factor <= 0:
+def downsample(array, downsample_factor_1, downsample_factor_2 = None, data_type = None, func = np.mean):
+    if downsample_factor_1 <= 0:
         print('Error: Downsampling factor must be positive. Exiting program...')
 
         sys.exit()
+
+    if downsample_factor_2 is None:
+        downsample_factor_2 = downsample_factor_1
     
-    print(array.shape)
+    elif downsample_factor_2 <= 0:
+        print('Error: Downsampling factor must be positive. Exiting program...')
+
+        sys.exit()
+
     if data_type == 'xrt' or data_type == 'xrf':
         if array.ndim != 3:
             print('Error: Input XRF/XRT projection data must be exactly 3D. Exiting program...')
@@ -164,46 +171,46 @@ def downsample(array, downsample_factor, data_type, func = np.mean):
         if array.ndim == 1:
             array_length = len(array)
 
-            if array_length % downsample_factor != 0:
+            if array_length % downsample_factor_1 != 0:
                 print('Error: Downsampling factor results in non-integer number of scan positions. Exiting program...')
 
                 sys.exit()
 
-            if (array_length//downsample_factor) % 2:
+            if (array_length//downsample_factor_1) % 2:
                 print('Warning: Odd number of scan positions resulting from downsampling. Consider switching to even number of scan positions being output.')
         
-            return meas.block_reduce(array, block_size = downsample_factor, func = func)
+            return meas.block_reduce(array, block_size = downsample_factor_1, func = func)
         
         else:
             n_rows, n_columns = array.shape
 
-            if n_rows % downsample_factor != 0 or n_columns % downsample_factor != 0:
+            if n_rows % downsample_factor_1 != 0 or n_columns % downsample_factor_2 != 0:
                 print('Error: Downsampling factor results in non-integer number of rows and/or columns. Exiting program...')
 
                 sys.exit()
 
-            if (n_rows//downsample_factor) % 2 or (n_columns//downsample_factor) % 2:
+            if (n_rows//downsample_factor_1) % 2 or (n_columns//downsample_factor_2) % 2:
                 print('Warning: Odd number of rows and/or columns resulting from downsampling. Consider switching to even number of rows and/or columns being output.')
         
-            return meas.block_reduce(array, block_size = (downsample_factor, downsample_factor), func = func)
+            return meas.block_reduce(array, block_size = (downsample_factor_1, downsample_factor_2), func = func)
         
     else:
         print('Error: Invalid data type. Exiting program...')
         
         sys.exit()
     
-    if downsample_factor == 1:
+    if downsample_factor_1 == 1 and downsample_factor_2 == 1:
         return array
 
-    if n_slices % downsample_factor != 0 or n_columns % downsample_factor != 0:
+    if n_slices % downsample_factor_1 != 0 or n_columns % downsample_factor_2 != 0:
         print('Error: Downsampling factor results in non-integer number of rows/slices and/or columns/scan positions. Exiting program...')
 
         sys.exit()
 
-    if (n_slices//downsample_factor) % 2 or (n_columns//downsample_factor) % 2:
+    if (n_slices//downsample_factor_1) % 2 or (n_columns//downsample_factor_2) % 2:
         print('Warning: Odd number of rows/slices and/or columns/scan positions resulting from downsampling. Consider switching to even number of slices and/or scan positions being output.')
 
-    return meas.block_reduce(array, block_size = (1, downsample_factor, downsample_factor), func = func)
+    return meas.block_reduce(array, block_size = (1, downsample_factor_1, downsample_factor_2), func = func)
 
 def create_h5_recon(dir_path, element, xrf_data, x, y, downsample_factor, algorithm, synchrotron):
     if not os.path.isdir(dir_path):
@@ -283,7 +290,8 @@ algorithm = 'gridrec'
 save_recon = True
 save_proj = False
 
-downsample_factors = np.array([1, 2, 5, 10])
+downsample_factors_1 = np.array([1, 2, 5, 10])
+downsample_factors_2 = np.array([1, 2, 5, 10])
 
 print('Extracting projection data...')
 
@@ -310,8 +318,8 @@ if synchrotron == 'aps': # Append additional scan position to ensure matching nu
 start_slice = num_slices_cropped_top
 end_slice = n_slices - num_slices_cropped_bottom
 
-recon = np.zeros((len(downsample_factors), n_slices, n_columns, n_columns))
-middle_slice_recons = np.zeros((len(downsample_factors), n_columns, n_columns))
+recon = np.zeros((len(downsample_factors_1), n_slices, n_columns, n_columns))
+middle_slice_recons = np.zeros((len(downsample_factors_1), n_columns, n_columns))
 
 if x.ndim == 1:
     # x_cropped_downsampled_array = np.zeros((len(downsample_factors), n_columns))
@@ -324,17 +332,17 @@ else:
     # x_cropped_downsampled_array = np.zeros((len(downsample_factors), n_columns, n_columns))
     # y_cropped_downsampled_array = np.zeros((len(downsample_factors), n_columns, n_columns))
 
-for idx, downsample_factor in enumerate(downsample_factors):
-    print(f'Downsampling projection data by factor of {downsample_factor}...')
+for idx, downsample_factor_1 in enumerate(downsample_factors_1):
+    print(f'Downsampling projection data by factor of {downsample_factor_1}...')
 
-    xrf_data_element_of_interest_downsampled = downsample(xrf_data_element_of_interest, downsample_factor, 'xrf')
-    x_cropped_downsampled = downsample(x_cropped, downsample_factor, 'scan_coords')
+    xrf_data_element_of_interest_downsampled = downsample(xrf_data_element_of_interest, downsample_factor_1, 'xrf')
+    x_cropped_downsampled = downsample(x_cropped, downsample_factor_1, 'scan_coords')
 
     print('Creating downsampled x and y scan data arrays that mimick scanning the middle reconstructed slice...')
 
     n_slices = xrf_data_element_of_interest_downsampled.shape[1]
     # middle_slice = n_slices//2
-    middle_slice = 90//downsample_factor
+    middle_slice = 90//downsample_factor_1
 
     if x_cropped_downsampled.ndim == 1:
         n_columns = len(x_cropped_downsampled)
@@ -368,13 +376,14 @@ for idx, downsample_factor in enumerate(downsample_factors):
 
         sys.exit()
 
-    middle_slice_recons[idx] = recon[idx, middle_slice]/downsample_factors[idx]
+    # middle_slice_recons[idx] = recon[idx, middle_slice]/downsample_factors[idx]
+    middle_slice_recons[idx] = recon[idx, middle_slice]
 
     if save_recon:
         print('Saving reconstruction and downsampled scan data to HDF5 file for middle slice...')
 
-        create_h5_recon(input_proj_dir_path, element_of_interest, middle_slice_recons[idx], x_cropped_downsampled_array, y_cropped_downsampled_array, downsample_factor, algorithm, synchrotron)
+        create_h5_recon(input_proj_dir_path, element_of_interest, middle_slice_recons[idx], x_cropped_downsampled_array, y_cropped_downsampled_array, downsample_factor_1, algorithm, synchrotron)
 
 print('Creating figure comparing middle slices of downsampled reconstructions...')
 
-create_middle_slice_recon_figure(middle_slice_recons, downsample_factors, middle_slice)
+create_middle_slice_recon_figure(middle_slice_recons, downsample_factors_1, middle_slice)
