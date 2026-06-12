@@ -99,8 +99,8 @@ def create_xrf_proj_movie(dir_path, xrf_data, elements_of_interest, theta, fps):
     
     for ax in fig.axes:
         ax.axis('off')
-        ax.axvline(x = n_columns//2, color = 'red', linewidth = 2)
-        ax.axhline(y = n_slices//2, color = 'red', linewidth = 2)
+        # ax.axvline(x = n_columns//2, color = 'red', linewidth = 2)
+        # ax.axhline(y = n_slices//2, color = 'red', linewidth = 2)
     
     axs[0, 0].set_title(r'{0}'.format(elements_of_interest[element_idx[0]]), fontsize = 14)
     axs[0, 1].set_title(r'{0}'.format(elements_of_interest[element_idx[1]]), fontsize = 14)
@@ -239,7 +239,7 @@ def create_h5_recon(dir_path, element, xrf_data, x, y, downsample_factor, algori
             positions.create_dataset('name', data = ['x', 'y'])
             positions.create_dataset('pos', data = scan_coords)
 
-def create_middle_slice_recon_figure(recon, downsample_factors):
+def create_middle_slice_recon_figure(recon, downsample_factors, slice_idx):
     if len(downsample_factors) != 4:
         print('Error: Number of downsample factors must be 4. Exiting program...')
 
@@ -259,16 +259,20 @@ def create_middle_slice_recon_figure(recon, downsample_factors):
         ax.imshow(recon[idx, :n_columns_downsampled, :n_columns_downsampled], vmin = vmin, vmax = vmax)
         
         ax.axis('off')
-        ax.set_title(r'DSF = {0}'.format(downsample_factors[idx]))
+        ax.set_title(r'DSF = {0}'.format(downsample_factors[idx]), fontsize = 14)
 
     fig.tight_layout()
+    fig.suptitle(r'Slice {0}'.format(slice_idx), fontsize = 16)
 
     plt.show()
 
     return
 
 input_proj_dir_path = '/home/bwr0835/2_ide_realigned_data_03_27_2026_iter_reproj_cor_correction_only_final/xrt_od_xrf_realignment'
-input_proj_scan_data_file_path = '/raid/users/roter/Jacobsen/img.dat/2xfm_0097.mda.h5'
+input_proj_scan_data_file_path = '/raid/users/roter/Jacobsen/img.dat/2xfm_0096.mda.h5' # There is no 0° projection, so use closest to zero (-5°)
+
+# input_proj_dir_path = '/home/bwr0835/3_idrealigned_data_04_19_2026_diff_cor_correction'
+# input_proj_scan_data_file_path = '/Users/bwr0835/Documents/2_ide_realigned_data_03_27_2026_iter_reproj_cor_correction_only_final/2xfm_0097.mda.h5'
 
 proj_data_h5_path = os.path.join(input_proj_dir_path, 'aligned_data', 'aligned_aggregate_xrf_xrt.h5')
 
@@ -276,7 +280,7 @@ synchrotron = 'aps'
 element_of_interest = 'Fe'
 algorithm = 'gridrec'
 
-save_recon = False
+save_recon = True
 save_proj = False
 
 downsample_factors = np.array([1, 2, 5, 10])
@@ -373,4 +377,4 @@ for idx, downsample_factor in enumerate(downsample_factors):
 
 print('Creating figure comparing middle slices of downsampled reconstructions...')
 
-create_middle_slice_recon_figure(middle_slice_recons, downsample_factors)
+create_middle_slice_recon_figure(middle_slice_recons, downsample_factors, middle_slice)
