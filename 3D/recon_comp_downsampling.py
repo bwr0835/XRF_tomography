@@ -131,12 +131,21 @@ def create_xrf_proj_movie(dir_path, xrf_data, elements_of_interest, theta, fps):
 
     return
 
-def pad_col(array):
+def pad_col_for_recon(array):
     n_slices, _ = array.shape
 
     final_column = array[:, -1].reshape(-1, 1) + np.ones((n_slices, 1))
                 
     array = np.hstack((array, final_column))
+
+    return array
+
+def pad_col_for_h5(array, n_cols):
+    n_slices, _ = array.shape
+
+    final_columns = np.zeros((n_slices, n_cols - 1))
+
+    array = np.hstack((array, final_columns))
 
     return array
 
@@ -219,6 +228,10 @@ def create_h5_recon(dir_path, element, xrf_data, x, y, downsample_factor, algori
         sys.exit()
     
     if synchrotron == 'aps':
+        xrf_data = pad_col_for_h5(xrf_data, 2)
+        x = pad_col_for_h5(x, 2)
+        y = pad_col_for_h5(y, 2)
+
         with h5py.File(os.path.join(dir_path, f'recon_downsample_{downsample_factor}_{element}_{algorithm}.h5'), 'w') as h5:
             maps = h5.create_group('MAPS')
         
@@ -285,7 +298,7 @@ proj_data_h5_path = os.path.join(input_proj_dir_path, 'aligned_data', 'aligned_a
 
 synchrotron = 'aps'
 element_of_interest = 'Fe'
-algorithm = 'mlem'
+algorithm = 'gridrec'
 
 save_recon = True
 save_proj = False
