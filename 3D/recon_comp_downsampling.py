@@ -285,7 +285,7 @@ proj_data_h5_path = os.path.join(input_proj_dir_path, 'aligned_data', 'aligned_a
 
 synchrotron = 'aps'
 element_of_interest = 'Fe'
-algorithm = 'gridrec'
+algorithm = 'mlem'
 
 save_recon = True
 save_proj = False
