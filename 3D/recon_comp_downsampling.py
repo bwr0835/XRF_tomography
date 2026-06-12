@@ -149,7 +149,7 @@ def downsample(array, downsample_factor_1, downsample_factor_2 = None, data_type
     if downsample_factor_2 is None:
         downsample_factor_2 = downsample_factor_1
     
-    elif downsample_factor_2 <= 0:
+    if downsample_factor_2 <= 0:
         print('Error: Downsampling factor must be positive. Exiting program...')
 
         sys.exit()
