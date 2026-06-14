@@ -567,7 +567,7 @@ input_proj_dir_path = '/home/bwr0835/3_id_realigned_data_04_19_2026_diff_cor_cor
 x = extract_h5_scan_coords(input_proj_scan_data_file_path, synchrotron)
 
 if save_proj:
-    _, xrf_norm, _, _, _, _ = joint_fluct_norm(xrt_sig_data, xrf_data, data_percentile = 93, xrt_photon_counting = True, incident_photodiode_flux_photons_per_s = None, t_dwell_s = None, return_aux_data = False)
+    _, xrf_norm, _, _, _, _ = joint_fluct_norm(xrt_sig_data, xrf_data, data_percentile = 80, xrt_photon_counting = True, incident_photodiode_flux_photons_per_s = None, t_dwell_s = None, return_aux_data = False)
 
     elements_of_interest_hxn = ['Ni', 'Cu', 'Zn', 'Ce_L']
 
