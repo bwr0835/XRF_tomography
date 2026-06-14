@@ -322,7 +322,7 @@ def create_xrf_proj_movie(dir_path, xrf_data, elements, elements_of_interest, th
 
     plt.close(fig)
 
-    gif_filename = os.path.join(dir_path, f'xrf_proj_movie.gif')
+    gif_filename = os.path.join(dir_path, f'xrf_proj_movie_cropped.gif')
 
     iio2.mimsave(gif_filename, theta_frames, fps = fps)
 
@@ -533,12 +533,12 @@ def create_middle_slice_recon_figure(recon, downsample_factors, slice_idx):
 
 # input_proj_dir_path = '/home/bwr0835/3_id_realigned_data_04_19_2026_diff_cor_correction'
 input_proj_dir_path = '/raid/users/roter/Jacobsen-nslsii/data/xrf'
-input_proj_dir_path_xrt = '/raid/users/roter/Jacobsen-nslsii/data/ptycho/h5_data'
+# input_proj_dir_path_xrt = '/raid/users/roter/Jacobsen-nslsii/data/ptycho/h5_data'
 input_proj_scan_data_file_path = '/raid/users/roter/Jacobsen-nslsii/data/xrf/scan2D_235518.h5'
 
-# proj_data_h5_path = os.path.join(input_proj_dir_path, 'aligned_data', 'aligned_aggregate_xrf_xrt.h5')
-proj_data_h5_path = os.path.join(input_proj_dir_path, '3_id_aggregate_xrf.h5')
-proj_data_h5_path_xrt = os.path.join(input_proj_dir_path_xrt, '3_id_aggregate_xrt.h5')
+proj_data_h5_path = os.path.join(input_proj_dir_path, 'aligned_data', 'aligned_aggregate_xrf_xrt.h5')
+# proj_data_h5_path = os.path.join(input_proj_dir_path, '3_id_aggregate_xrf.h5')
+# proj_data_h5_path_xrt = os.path.join(input_proj_dir_path_xrt, '3_id_aggregate_xrt.h5')
 
 
 # synchrotron = 'aps'
@@ -555,24 +555,24 @@ downsample_factors_2 = np.array([1, 2, 5, 10])
 
 print('Extracting projection data...')
 
-# elements_xrf, xrf_data, xrt_sig_data, theta, num_slices_cropped_top, num_slices_cropped_bottom = extract_h5_aggregate_xrf_xrt_data_for_recon(proj_data_h5_path)
-elements, xrf_data, theta = extract_h5_aggregate_xrf_xrt_data_for_recon(proj_data_h5_path)
-elements_xrt, xrt_data, _ = extract_h5_aggregate_xrf_xrt_data_for_recon(proj_data_h5_path_xrt)
+elements_xrf, xrf_data, xrt_sig_data, theta, num_slices_cropped_top, num_slices_cropped_bottom = extract_h5_aggregate_xrf_xrt_data_for_recon(proj_data_h5_path)
+# elements, xrf_data, theta = extract_h5_aggregate_xrf_xrt_data_for_recon(proj_data_h5_path)
+# elements_xrt, xrt_data, _ = extract_h5_aggregate_xrf_xrt_data_for_recon(proj_data_h5_path_xrt)
 
-xrt_sig_data = xrt_data[elements_xrt.index('xrt_sig')]
+# xrt_sig_data = xrt_data[elements_xrt.index('xrt_sig')]
 
 print('Extracting scan data...')
 input_proj_dir_path = '/home/bwr0835/3_id_realigned_data_04_19_2026_diff_cor_correction'
 x = extract_h5_scan_coords(input_proj_scan_data_file_path, synchrotron)
 
 if save_proj:
-    _, xrf_norm, _, _, _, _ = joint_fluct_norm(xrt_sig_data, xrf_data, data_percentile = 93, xrt_photon_counting = True, incident_photodiode_flux_photons_per_s = None, t_dwell_s = None, return_aux_data = False)
+    # _, xrf_norm, _, _, _, _ = joint_fluct_norm(xrt_sig_data, xrf_data, data_percentile = 93, xrt_photon_counting = True, incident_photodiode_flux_photons_per_s = None, t_dwell_s = None, return_aux_data = False)
 
     elements_of_interest_hxn = ['Ni', 'Cu', 'Zn', 'Ce_L']
 
     print(f'Saving projection data...')
 
-    create_xrf_proj_movie(input_proj_dir_path, xrf_norm, elements, elements_of_interest_hxn, theta, fps = 10)
+    create_xrf_proj_movie(input_proj_dir_path, xrf_data, elements_xrf, elements_of_interest_hxn, theta, fps = 10)
 
     sys.exit()
 
