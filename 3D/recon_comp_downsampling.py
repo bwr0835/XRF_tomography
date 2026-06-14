@@ -270,7 +270,7 @@ def extract_h5_scan_coords(file_path, synchrotron):
     return x
 
 def create_xrf_proj_movie(dir_path, xrf_data, elements_of_interest, theta, fps):
-    _, n_theta, n_slices, n_columns = xrf_data.shape
+    _, n_theta, _, _ = xrf_data.shape
 
     n_elements = len(elements_of_interest)
 
@@ -558,7 +558,7 @@ print('Extracting projection data...')
 
 # elements_xrf, xrf_data, xrt_sig_data, theta, num_slices_cropped_top, num_slices_cropped_bottom = extract_h5_aggregate_xrf_xrt_data_for_recon(proj_data_h5_path)
 elements, xrf_data, theta = extract_h5_aggregate_xrf_xrt_data_for_recon(proj_data_h5_path)
-elements_xrt, xrt_data, theta_xrt = extract_h5_aggregate_xrf_xrt_data_for_recon(proj_data_h5_path_xrt)
+elements_xrt, xrt_data, _ = extract_h5_aggregate_xrf_xrt_data_for_recon(proj_data_h5_path_xrt)
 
 xrt_sig_data = xrt_data[elements_xrt.index('xrt_sig')]
 
@@ -567,13 +567,13 @@ input_proj_dir_path = '/home/bwr0835/3_id_realigned_data_04_19_2026_diff_cor_cor
 x = extract_h5_scan_coords(input_proj_scan_data_file_path, synchrotron)
 
 if save_proj:
-    _, xrf_norm, _, _, _, _ = joint_fluct_norm(xrt_sig_data, xrf_data, data_percentile = 80, xrt_photon_counting = True, incident_photodiode_flux_photons_per_s = None, t_dwell_s = None, return_aux_data = False)
+    _, xrf_norm, _, _, _, _ = joint_fluct_norm(xrt_sig_data, xrf_data, data_percentile = 93, xrt_photon_counting = True, incident_photodiode_flux_photons_per_s = None, t_dwell_s = None, return_aux_data = False)
 
     elements_of_interest_hxn = ['Ni', 'Cu', 'Zn', 'Ce_L']
 
     print(f'Saving projection data...')
 
-    create_xrf_proj_movie(input_proj_dir_path, xrf_norm, elements_of_interest_hxn, theta, fps = 10)
+    create_xrf_proj_movie(input_proj_dir_path, xrf_norm, elements_of_interest_hxn, theta, fps = 5)
 
     sys.exit()
 
