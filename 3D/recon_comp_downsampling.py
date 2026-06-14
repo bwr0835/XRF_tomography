@@ -53,7 +53,7 @@ def extract_h5_aggregate_xrf_xrt_data_for_recon(file_path):
     # xrt_sig_data = xrt_data[elements_xrt.index('xrt_sig')]
 
     # return elements_xrf, xrf_data, xrt_sig_data, theta, num_slices_cropped_top, num_slices_cropped_bottom
-    return elements, xrf_data, theta
+    return elements, data, theta
 def extract_h5_scan_coords(file_path, synchrotron): 
     if not os.path.isfile(file_path):
         print('Error: Cannot locate scan data HDF5 file. Exiting program...')
