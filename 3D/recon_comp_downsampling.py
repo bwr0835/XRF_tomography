@@ -531,8 +531,8 @@ def create_middle_slice_recon_figure(recon, downsample_factors, slice_idx):
 # input_proj_dir_path = '/home/bwr0835/2_ide_realigned_data_03_27_2026_iter_reproj_cor_correction_only_final/xrt_od_xrf_realignment'
 # input_proj_scan_data_file_path = '/raid/users/roter/Jacobsen/img.dat/2xfm_0096.mda.h5' # There is no 0° projection, so use closest to zero (-5°)
 
-# input_proj_dir_path = '/home/bwr0835/3_id_realigned_data_04_19_2026_diff_cor_correction'
-input_proj_dir_path = '/raid/users/roter/Jacobsen-nslsii/data/xrf'
+input_proj_dir_path = '/home/bwr0835/3_id_realigned_data_04_19_2026_diff_cor_correction'
+# input_proj_dir_path = '/raid/users/roter/Jacobsen-nslsii/data/xrf'
 # input_proj_dir_path_xrt = '/raid/users/roter/Jacobsen-nslsii/data/ptycho/h5_data'
 input_proj_scan_data_file_path = '/raid/users/roter/Jacobsen-nslsii/data/xrf/scan2D_235518.h5'
 
