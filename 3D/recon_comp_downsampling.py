@@ -121,7 +121,7 @@ def create_xrf_proj_movie(dir_path, xrf_data, elements_of_interest, theta, fps):
         img1_3.set_data(el_3[theta_idx])
         img1_4.set_data(el_4[theta_idx])
         
-        text.set_text(r'$\theta$ = {0}$\textdegree'.format(theta[theta_idx]))
+        text.set_text(r'$\theta = {0}$\textdegree'.format(theta[theta_idx]))
 
         fig.canvas.draw()
 
