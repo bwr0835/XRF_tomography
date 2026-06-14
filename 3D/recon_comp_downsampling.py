@@ -285,7 +285,7 @@ def create_init_recon_movie(dir_path, recon):
     
     for slice_idx in range(recon.shape[0]):
         img.set_data(recon[slice_idx])
-        text.set_text(r'Slice {0}/{1}'.format(slice_idx, recon.shape[0]))
+        text.set_text(r'Slice {0}/{1}'.format(slice_idx, recon.shape[0] - 1))
         
         fig.canvas.draw()
         
@@ -328,16 +328,18 @@ def create_middle_slice_recon_figure(recon, downsample_factors, slice_idx):
 
     return
 
-input_proj_dir_path = '/home/bwr0835/2_ide_realigned_data_03_27_2026_iter_reproj_cor_correction_only_final/xrt_od_xrf_realignment'
-input_proj_scan_data_file_path = '/raid/users/roter/Jacobsen/img.dat/2xfm_0096.mda.h5' # There is no 0° projection, so use closest to zero (-5°)
+# input_proj_dir_path = '/home/bwr0835/2_ide_realigned_data_03_27_2026_iter_reproj_cor_correction_only_final/xrt_od_xrf_realignment'
+# input_proj_scan_data_file_path = '/raid/users/roter/Jacobsen/img.dat/2xfm_0096.mda.h5' # There is no 0° projection, so use closest to zero (-5°)
 
-# input_proj_dir_path = '/home/bwr0835/3_idrealigned_data_04_19_2026_diff_cor_correction'
-# input_proj_scan_data_file_path = '/Users/bwr0835/Documents/2_ide_realigned_data_03_27_2026_iter_reproj_cor_correction_only_final/2xfm_0097.mda.h5'
+input_proj_dir_path = '/home/bwr0835/3_id_realigned_data_04_19_2026_diff_cor_correction'
+input_proj_scan_data_file_path = '/raid/users/roter/Jacobsen-nslsii/data/xrf/scan2D_235518.h5'
 
 proj_data_h5_path = os.path.join(input_proj_dir_path, 'aligned_data', 'aligned_aggregate_xrf_xrt.h5')
 
-synchrotron = 'aps'
-element_of_interest = 'Fe'
+# synchrotron = 'aps'
+synchrotron = 'nsls-ii'
+# element_of_interest = 'Fe'
+element_of_interest = 'Ni'
 algorithm = 'mlem'
 
 save_recon = True
@@ -360,6 +362,8 @@ if save_proj:
     print(f'Saving projection data...')
 
     create_xrf_proj_movie(input_proj_dir_path, xrf_data, elements_of_interest_hxn, theta, fps = 10)
+
+    sys.exit()
 
 xrf_data_element_of_interest = xrf_data[elements_xrf.index(element_of_interest)]
 
@@ -443,7 +447,9 @@ for idx, downsample_factor_1 in enumerate(downsample_factors_1):
 
     if save_recon:
         print('Saving reconstruction and downsampled scan data to HDF5 file for middle slice...')
-
+        
+        np.save(os.path.join(input_proj_dir_path, f'recon_downsample_{downsample_factor_1}_{element_of_interest}_{algorithm}.npy'), middle_slice_recons[idx, :n_columns, :n_columns])
+        
         create_h5_recon(input_proj_dir_path, element_of_interest, middle_slice_recons[idx, :n_columns, :n_columns], x_cropped_downsampled_array, y_cropped_downsampled_array, downsample_factor_1, algorithm, synchrotron)
 
 print('Creating figure comparing middle slices of downsampled reconstructions...')
