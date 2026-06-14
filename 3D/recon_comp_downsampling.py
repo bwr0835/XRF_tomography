@@ -34,12 +34,12 @@ def extract_h5_aggregate_xrf_xrt_data_for_recon(file_path):
         data = h5['exchange/data'][()]
         elements = list(h5['exchange/elements'].asstr()[:])
             
-        # elements_xrf, elements_xrt = list(elements['xrf'].asstr()[:]), list(elements['xrt'].asstr()[:])
-        # xrf_data, xrt_data = data['xrf'][()], data['xrt'][()]
+        elements_xrf, elements_xrt = list(elements['xrf'].asstr()[:]), list(elements['xrt'].asstr()[:])
+        xrf_data, xrt_data = data['xrf'][()], data['xrt'][()]
         theta = h5['exchange/theta'][()]
 
-        # num_slices_cropped_top = h5['exchange/data'].attrs['top_edge_cropped_final']
-        # num_slices_cropped_bottom = h5['exchange/data'].attrs['bottom_edge_cropped_final']
+        num_slices_cropped_top = h5['exchange/data'].attrs['top_edge_cropped_final']
+        num_slices_cropped_bottom = h5['exchange/data'].attrs['bottom_edge_cropped_final']
     
     # except KeyboardInterrupt:
     #     print('Keyboard interrupt. Exiting program...', flush = True)
@@ -51,10 +51,10 @@ def extract_h5_aggregate_xrf_xrt_data_for_recon(file_path):
 
     #     sys.exit()
     
-    # xrt_sig_data = xrt_data[elements_xrt.index('xrt_sig')]
+    xrt_sig_data = xrt_data[elements_xrt.index('xrt_sig')]
 
-    # return elements_xrf, xrf_data, xrt_sig_data, theta, num_slices_cropped_top, num_slices_cropped_bottom
-    return elements, data, theta
+    return elements_xrf, xrf_data, xrt_sig_data, theta, num_slices_cropped_top, num_slices_cropped_bottom
+    # return elements, data, theta
 
 def edge_gauss_filter(image, sigma, alpha, nx, ny):
     n_rolloff = int(0.5 + alpha*sigma)
