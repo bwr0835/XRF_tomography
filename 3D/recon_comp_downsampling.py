@@ -280,7 +280,7 @@ def create_xrf_proj_movie(dir_path, xrf_data, elements_of_interest, theta, fps):
         sys.exit()
 
     element_idx = [elements_of_interest.index(element) for element in elements_of_interest]
-    print(element_idx[0])
+    print(xrf_data[element_idx])
     el_1 = xrf_data[element_idx[0]]
     el_2 = xrf_data[element_idx[1]]
     el_3 = xrf_data[element_idx[2]]
