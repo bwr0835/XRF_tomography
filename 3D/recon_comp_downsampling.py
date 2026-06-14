@@ -542,7 +542,7 @@ proj_data_h5_path = os.path.join(input_proj_dir_path, 'aligned_data', 'aligned_a
 
 
 # synchrotron = 'aps'
-synchrotron = 'nsls-ii'
+synchrotron = 'aps'
 # element_of_interest = 'Fe'
 element_of_interest = 'Ni'
 algorithm = 'gridrec'
