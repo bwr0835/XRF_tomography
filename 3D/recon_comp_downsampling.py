@@ -101,7 +101,7 @@ def create_xrf_proj_movie(dir_path, xrf_data, elements_of_interest, theta, fps):
     img1_3 = axs[1, 0].imshow(el_3[0], vmin = el_3.min(), vmax = el_3.max())
     img1_4 = axs[1, 1].imshow(el_4[0], vmin = el_4.min(), vmax = el_4.max())
 
-    text = axs[0, 0].text(0.02, 0.02, r'$\theta$ = {0}$\textdegree'.format(theta[0]), transform = axs[0, 0].transAxes, color = 'white', fontsize = 14)
+    text = axs[0, 0].text(0.02, 0.02, r'$\theta = {0}$\textdegree'.format(theta[0]), transform = axs[0, 0].transAxes, color = 'white', fontsize = 14)
     
     for ax in fig.axes:
         ax.axis('off')
