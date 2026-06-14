@@ -7,6 +7,7 @@ import numpy as np, \
 from skimage import measure as meas
 from matplotlib import pyplot as plt
 from imageio import v2 as iio2
+from scipy import ndimage as ndi
 
 plt.rcParams['text.usetex'] = True
 plt.rcParams['font.family'] = 'serif' 
@@ -54,6 +55,197 @@ def extract_h5_aggregate_xrf_xrt_data_for_recon(file_path):
 
     # return elements_xrf, xrf_data, xrt_sig_data, theta, num_slices_cropped_top, num_slices_cropped_bottom
     return elements, data, theta
+
+def edge_gauss_filter(image, sigma, alpha, nx, ny):
+    n_rolloff = int(0.5 + alpha*sigma)
+    
+    if n_rolloff > 2:
+        exp_arg =  np.arange(n_rolloff)/float(sigma)
+
+        rolloff = 1 - np.exp(-0.5*exp_arg**2)
+    
+    edge_total = 0
+        
+    # Bottom edge
+ 
+    y1 = ny - sigma
+    y2 = ny
+
+    edge_total = edge_total + np.sum(image[y1:y2, 0:nx])
+
+    # Top edge
+        
+    y3 = 0
+    y4 = sigma
+        
+        
+    edge_total = edge_total + np.sum(image[y3:y4, 0:nx])
+
+    # Left edge
+
+    x1 = 0
+    x2 = sigma
+
+    edge_total = edge_total + np.sum(image[y4:y1, x1:x2])
+
+    # Right edge
+
+    x3 = nx - sigma
+    x4 = nx
+
+    edge_total = edge_total + np.sum(image[y4:y1, x3:x4])
+
+    n_pixels = 2*sigma*(nx + ny - 2*sigma) # Total number of edge pixels for this "vignetting"
+                                           # sigma*nx + sigma*nx + [(ny - sigma) - sigma]*sigma + (ny - sigma) - sigma]*sigma
+    
+    dc_value = edge_total/n_pixels # Average of edge_total over total number of edge pixels
+
+    image = np.copy(image) - dc_value
+    
+    # Top edge
+
+    xstart = 0
+    xstop = nx - 1
+    idy = 0
+
+    for i_rolloff in range(n_rolloff):
+        image[idy, xstart:(xstop+1)] = image[idy, xstart:(xstop+1)]*rolloff[idy]
+        
+        if xstart < (nx/2 - 1):
+            xstart += 1
+        
+        if xstop > (nx/2):
+            xstop -= 1
+        
+        if idy < (ny - 1):
+            idy += 1
+
+    # Bottom edge
+    
+    xstart = 0
+    xstop = nx - 1
+    idy = ny - 1
+
+    for i_rolloff in range(n_rolloff):
+        image[idy, xstart:(xstop+1)] = image[idy, xstart:(xstop+1)]*rolloff[ny - 1 - idy]
+
+        if xstart < (nx/2 - 1):
+            xstart += 1
+        
+        if xstop > nx/2:
+            xstop -= 1
+        
+        if idy > 0:
+            idy -= 1
+
+    # Left edge
+
+    ystart = 1
+    ystop = ny - 2
+    idx = 0
+
+    for i_rolloff in range(n_rolloff):
+        image[ystart:(ystop+1), idx] = image[ystart:(ystop+1), idx]*rolloff[idx]
+
+        if ystart < (ny/2 - 1):
+            ystart += 1
+       
+        if ystop > (ny/2):
+            ystop -= 1
+        
+        if idx < (nx - 1):
+            idx += 1
+
+    # Right edge
+
+    ystart = 1
+    ystop = ny - 2
+    idx = nx - 1
+
+    for i_rolloff in range(n_rolloff):
+        image[ystart:(ystop+1), idx] = image[ystart:(ystop+1), idx]*rolloff[nx - 1 - idx]
+
+        if ystart < (ny/2 - 1):
+            ystart += 1
+        
+        if ystop > (ny/2):
+            ystop -= 1
+        
+        if idx > 0:
+            idx -= 1
+    
+    return (image + dc_value), dc_value
+
+def joint_fluct_norm(xrt_array,
+                     xrf_array,
+                     data_percentile,
+                     xrt_photon_counting,
+                     incident_photodiode_flux_photons_per_s,
+                     t_dwell_s,
+                     return_aux_data,
+                     sigma_1 = 5,
+                     alpha = 10,
+                     sigma_2 = 10):
+
+    if xrt_array.ndim != 3 or xrf_array.ndim != 4:
+        print('Error: Number of XRT dimensions ≠ 3 and/or number of XRF array dimesions ≠ 4. Exiting program...')
+
+        sys.exit()
+
+    if data_percentile is None or data_percentile < 0 or data_percentile > 100:
+        print('Error: \'data_percentile\' must be between 0 and 100. Exiting program...')
+
+        sys.exit() 
+    
+    n_theta, n_slices, n_columns = xrt_array.shape
+
+    convolution_mag_array = np.zeros((n_theta, n_slices, n_columns))
+    
+    norm_array_xrt = np.zeros(n_theta)
+    norm_array_xrf = np.zeros(n_theta)
+    
+    xrt_mask_avg_sum = 0
+    
+    for theta_idx in range(n_theta):
+        xrt_vignetted, _ = edge_gauss_filter(xrt_array[theta_idx], sigma = sigma_1, alpha = alpha, nx = n_columns, ny = n_slices)
+
+        convolution_mag = ndi.gaussian_filter(xrt_vignetted, sigma = sigma_2) # Blur the entire image using Gaussian filter/convolution
+
+        threshold = np.percentile(convolution_mag, data_percentile) # EX: Take top 20% of data (data_percentile = 80)
+
+        mask = convolution_mag >= threshold
+
+        xrt_mask_avg = xrt_array[theta_idx, mask].mean()
+
+        norm_array_xrt[theta_idx] = 1/xrt_mask_avg
+        norm_array_xrf[theta_idx] = 1/xrt_mask_avg
+
+        xrt_array[theta_idx] /= xrt_mask_avg # First part of I0' = I0(<I_theta,mask,avg>/I_theta,mask,avg)
+        xrf_array[:, theta_idx] /= xrt_mask_avg
+
+        xrt_mask_avg_sum += xrt_mask_avg
+
+        convolution_mag_array[theta_idx] = convolution_mag
+    
+    global_xrt_mask_avg = xrt_mask_avg_sum/n_theta
+    
+    if xrt_photon_counting:
+        inc_intensity = global_xrt_mask_avg
+    
+    else:
+        inc_intensity = incident_photodiode_flux_photons_per_s*t_dwell_s # Incident intensity in photons (instead of, for instance, ion chamber units)
+    
+    xrt_array *= inc_intensity
+    xrf_array *= global_xrt_mask_avg
+
+    norm_array_xrt *= inc_intensity
+    norm_array_xrf *= global_xrt_mask_avg
+    
+    if return_aux_data:
+        return xrt_array, xrf_array, norm_array_xrt, norm_array_xrf, inc_intensity, np.array(convolution_mag_array)
+    
+    return xrt_array, xrf_array, norm_array_xrt, norm_array_xrf, inc_intensity, None
+
 def extract_h5_scan_coords(file_path, synchrotron): 
     if not os.path.isfile(file_path):
         print('Error: Cannot locate scan data HDF5 file. Exiting program...')
@@ -342,10 +534,12 @@ def create_middle_slice_recon_figure(recon, downsample_factors, slice_idx):
 
 # input_proj_dir_path = '/home/bwr0835/3_id_realigned_data_04_19_2026_diff_cor_correction'
 input_proj_dir_path = '/raid/users/roter/Jacobsen-nslsii/data/xrf'
+input_proj_dir_path_xrt = '/raid/users/roter/Jacobsen-nslsii/ptycho/h5_data'
 input_proj_scan_data_file_path = '/raid/users/roter/Jacobsen-nslsii/data/xrf/scan2D_235518.h5'
 
 # proj_data_h5_path = os.path.join(input_proj_dir_path, 'aligned_data', 'aligned_aggregate_xrf_xrt.h5')
 proj_data_h5_path = os.path.join(input_proj_dir_path, '3_id_aggregate_xrf.h5')
+proj_data_h5_path_xrt = os.path.join(input_proj_dir_path_xrt, '3_id_aggregate_xrt.h5')
 
 
 # synchrotron = 'aps'
@@ -364,17 +558,22 @@ print('Extracting projection data...')
 
 # elements_xrf, xrf_data, xrt_sig_data, theta, num_slices_cropped_top, num_slices_cropped_bottom = extract_h5_aggregate_xrf_xrt_data_for_recon(proj_data_h5_path)
 elements, xrf_data, theta = extract_h5_aggregate_xrf_xrt_data_for_recon(proj_data_h5_path)
+elements_xrt, xrt_data, theta_xrt = extract_h5_aggregate_xrf_xrt_data_for_recon(proj_data_h5_path_xrt)
+
+xrt_sig_data = xrt_data[elements_xrt.index('xrt_sig')]
 
 print('Extracting scan data...')
 input_proj_dir_path = '/home/bwr0835/3_id_realigned_data_04_19_2026_diff_cor_correction'
 x = extract_h5_scan_coords(input_proj_scan_data_file_path, synchrotron)
 
 if save_proj:
+    _, xrf_norm, _, _, _, _ = joint_fluct_norm(xrt_sig_data, xrf_data, data_percentile = 93, xrt_photon_counting = True, incident_photodiode_flux_photons_per_s = None, t_dwell_s = None, return_aux_data = False)
+
     elements_of_interest_hxn = ['Ni', 'Cu', 'Zn', 'Ce_L']
 
     print(f'Saving projection data...')
 
-    create_xrf_proj_movie(input_proj_dir_path, xrf_data, elements_of_interest_hxn, theta, fps = 10)
+    create_xrf_proj_movie(input_proj_dir_path, xrf_norm, elements_of_interest_hxn, theta, fps = 10)
 
     sys.exit()
 
