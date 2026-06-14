@@ -572,7 +572,7 @@ if save_proj:
 
     print(f'Saving projection data...')
 
-    create_xrf_proj_movie(input_proj_dir_path, xrf_norm, elements, elements_of_interest_hxn, theta, fps = 15)
+    create_xrf_proj_movie(input_proj_dir_path, xrf_norm, elements, elements_of_interest_hxn, theta, fps = 10)
 
     sys.exit()
 
