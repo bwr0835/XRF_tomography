@@ -30,8 +30,8 @@ def extract_h5_aggregate_xrf_xrt_data_for_recon(file_path):
     
     # try:
     with h5py.File(file_path, 'r') as h5:
-        data = h5['exchange/data']
-        elements = h5['exchange/elements']
+        data = h5['exchange/data'][()]
+        elements = list(h5['exchange/elements'].asstr()[:])
             
         # elements_xrf, elements_xrt = list(elements['xrf'].asstr()[:]), list(elements['xrt'].asstr()[:])
         # xrf_data, xrt_data = data['xrf'][()], data['xrt'][()]
@@ -366,7 +366,7 @@ print('Extracting projection data...')
 elements, xrf_data, theta = extract_h5_aggregate_xrf_xrt_data_for_recon(proj_data_h5_path)
 
 print('Extracting scan data...')
-
+input_proj_dir_path = '/home/bwr0835/3_id_realigned_data_04_19_2026_diff_cor_correction'
 x = extract_h5_scan_coords(input_proj_scan_data_file_path, synchrotron)
 
 if save_proj:
