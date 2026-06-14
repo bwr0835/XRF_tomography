@@ -269,7 +269,7 @@ def extract_h5_scan_coords(file_path, synchrotron):
 
     return x
 
-def create_xrf_proj_movie(dir_path, xrf_data, elements_of_interest, theta, fps):
+def create_xrf_proj_movie(dir_path, xrf_data, elements, elements_of_interest, theta, fps):
     _, n_theta, _, _ = xrf_data.shape
 
     n_elements = len(elements_of_interest)
@@ -279,8 +279,8 @@ def create_xrf_proj_movie(dir_path, xrf_data, elements_of_interest, theta, fps):
 
         sys.exit()
 
-    element_idx = [elements_of_interest.index(element) for element in elements_of_interest]
-    print(xrf_data[element_idx])
+    element_idx = [elements.index(element) for element in elements_of_interest]
+
     el_1 = xrf_data[element_idx[0]]
     el_2 = xrf_data[element_idx[1]]
     el_3 = xrf_data[element_idx[2]]
@@ -573,7 +573,7 @@ if save_proj:
 
     print(f'Saving projection data...')
 
-    create_xrf_proj_movie(input_proj_dir_path, xrf_norm, elements_of_interest_hxn, theta, fps = 15)
+    create_xrf_proj_movie(input_proj_dir_path, xrf_norm, elements, elements_of_interest_hxn, theta, fps = 15)
 
     sys.exit()
 
