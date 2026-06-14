@@ -32,7 +32,7 @@ def extract_h5_aggregate_xrf_xrt_data_for_recon(file_path):
     # try:
     with h5py.File(file_path, 'r') as h5:
         data = h5['exchange/data']
-        elements = list(h5['exchange/elements'].asstr()[:])
+        elements = h5['exchange/elements']
             
         elements_xrf, elements_xrt = list(elements['xrf'].asstr()[:]), list(elements['xrt'].asstr()[:])
         xrf_data, xrt_data = data['xrf'][()], data['xrt'][()]
