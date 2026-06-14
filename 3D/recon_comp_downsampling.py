@@ -545,10 +545,10 @@ proj_data_h5_path = os.path.join(input_proj_dir_path, 'aligned_data', 'aligned_a
 synchrotron = 'nsls-ii'
 # element_of_interest = 'Fe'
 element_of_interest = 'Ni'
-algorithm = 'mlem'
+algorithm = 'gridrec'
 
 save_recon = True
-save_proj = True
+save_proj = False
 
 downsample_factors_1 = np.array([1, 2, 5, 10])
 downsample_factors_2 = np.array([1, 2, 5, 10])
@@ -562,7 +562,7 @@ elements_xrf, xrf_data, xrt_sig_data, theta, num_slices_cropped_top, num_slices_
 # xrt_sig_data = xrt_data[elements_xrt.index('xrt_sig')]
 
 print('Extracting scan data...')
-input_proj_dir_path = '/home/bwr0835/3_id_realigned_data_04_19_2026_diff_cor_correction'
+# input_proj_dir_path = '/home/bwr0835/3_id_realigned_data_04_19_2026_diff_cor_correction'
 x = extract_h5_scan_coords(input_proj_scan_data_file_path, synchrotron)
 
 if save_proj:
@@ -576,93 +576,93 @@ if save_proj:
 
     sys.exit()
 
-# xrf_data_element_of_interest = xrf_data[elements_xrf.index(element_of_interest)]
+xrf_data_element_of_interest = xrf_data[elements_xrf.index(element_of_interest)]
 
-# n_theta, n_slices, n_columns = xrf_data_element_of_interest.shape
+n_theta, n_slices, n_columns = xrf_data_element_of_interest.shape
 
-# if synchrotron == 'aps': # Append additional scan position to ensure matching number of scan positions between coordinate arrays, aligned projections
-#     x = np.append(x, x[-1] + (x[-1] - x[0])/(len(x) - 1))
+if synchrotron == 'aps': # Append additional scan position to ensure matching number of scan positions between coordinate arrays, aligned projections
+    x = np.append(x, x[-1] + (x[-1] - x[0])/(len(x) - 1))
 
-# start_slice = num_slices_cropped_top
-# end_slice = n_slices - num_slices_cropped_bottom
+start_slice = num_slices_cropped_top
+end_slice = n_slices - num_slices_cropped_bottom
 
-# recon = np.zeros((len(downsample_factors_1), n_slices, n_columns, n_columns))
-# middle_slice_recons = np.zeros((len(downsample_factors_1), n_columns, n_columns))
+recon = np.zeros((len(downsample_factors_1), n_slices, n_columns, n_columns))
+middle_slice_recons = np.zeros((len(downsample_factors_1), n_columns, n_columns))
 
-# if x.ndim == 1:
-#     # x_cropped_downsampled_array = np.zeros((len(downsample_factors), n_columns))
+if x.ndim == 1:
+    # x_cropped_downsampled_array = np.zeros((len(downsample_factors), n_columns))
 
-#     x_cropped = x
+    x_cropped = x
 
-# else:
-#     x_cropped = x[start_slice:end_slice] # Since reconstructed object slices are square and are related to scan positions, only need to worry about per-pixel scan distance in x
+else:
+    x_cropped = x[start_slice:end_slice] # Since reconstructed object slices are square and are related to scan positions, only need to worry about per-pixel scan distance in x
 
-#     # x_cropped_downsampled_array = np.zeros((len(downsample_factors), n_columns, n_columns))
-#     # y_cropped_downsampled_array = np.zeros((len(downsample_factors), n_columns, n_columns))
+    # x_cropped_downsampled_array = np.zeros((len(downsample_factors), n_columns, n_columns))
+    # y_cropped_downsampled_array = np.zeros((len(downsample_factors), n_columns, n_columns))
 
-# middle_slice_orig = 90
+middle_slice_orig = 90
 
-# for idx, downsample_factor_1 in enumerate(downsample_factors_1):
-#     print(f'Downsampling projection data by factor of {downsample_factor_1}...')
+for idx, downsample_factor_1 in enumerate(downsample_factors_1):
+    print(f'Downsampling projection data by factor of {downsample_factor_1}...')
 
-#     xrf_data_element_of_interest_downsampled = downsample(xrf_data_element_of_interest, downsample_factor_1, data_type = 'xrf')
-#     x_cropped_downsampled = downsample(x_cropped, downsample_factor_1, data_type = 'scan_coords')
+    xrf_data_element_of_interest_downsampled = downsample(xrf_data_element_of_interest, downsample_factor_1, data_type = 'xrf')
+    x_cropped_downsampled = downsample(x_cropped, downsample_factor_1, data_type = 'scan_coords')
 
-#     print('Creating downsampled x and y scan data arrays that mimick scanning the middle reconstructed slice...')
+    print('Creating downsampled x and y scan data arrays that mimick scanning the middle reconstructed slice...')
 
-#     n_slices = xrf_data_element_of_interest_downsampled.shape[1]
-#     # middle_slice = n_slices//2
-#     middle_slice = middle_slice_orig//downsample_factor_1
+    n_slices = xrf_data_element_of_interest_downsampled.shape[1]
+    # middle_slice = n_slices//2
+    middle_slice = middle_slice_orig//downsample_factor_1
 
-#     if x_cropped_downsampled.ndim == 1:
-#         n_columns = len(x_cropped_downsampled)
+    if x_cropped_downsampled.ndim == 1:
+        n_columns = len(x_cropped_downsampled)
 
-#         dx = (x_cropped_downsampled[-1] - x_cropped_downsampled[0])/(n_columns - 1)
+        dx = (x_cropped_downsampled[-1] - x_cropped_downsampled[0])/(n_columns - 1)
 
-#         # x_cropped_downsampled_array[idx, :n_columns] = dx*np.arange(n_columns)
-#         x_cropped_downsampled_array = dx*np.arange(n_columns)
-#         y_cropped_downsampled_array = x_cropped_downsampled_array
+        # x_cropped_downsampled_array[idx, :n_columns] = dx*np.arange(n_columns)
+        x_cropped_downsampled_array = dx*np.arange(n_columns)
+        y_cropped_downsampled_array = x_cropped_downsampled_array
 
-#     else:
-#         n_slices, n_columns = x_cropped_downsampled.shape
+    else:
+        n_slices, n_columns = x_cropped_downsampled.shape
 
-#         dx = (x_cropped_downsampled[middle_slice, -1] - x_cropped_downsampled[middle_slice, 0])/(n_columns - 1)
+        dx = (x_cropped_downsampled[middle_slice, -1] - x_cropped_downsampled[middle_slice, 0])/(n_columns - 1)
 
-#         y_cropped_downsampled_array, x_cropped_downsampled_array = dx*np.mgrid[0:n_columns, 0:n_columns] # dy = dx since reconstructed object slices are square
+        y_cropped_downsampled_array, x_cropped_downsampled_array = dx*np.mgrid[0:n_columns, 0:n_columns] # dy = dx since reconstructed object slices are square
         
-#         # x_cropped_downsampled_array[idx, :n_columns, :n_columns] = dx*x_grid
-#         # y_cropped_downsampled_array[idx, :n_columns, :n_columns] = dx*y_grid # dy = dx since reconstructed object slices are square
+        # x_cropped_downsampled_array[idx, :n_columns, :n_columns] = dx*x_grid
+        # y_cropped_downsampled_array[idx, :n_columns, :n_columns] = dx*y_grid # dy = dx since reconstructed object slices are square
         
-#     print('Reconstructing downsampled XRF projection data...')
+    print('Reconstructing downsampled XRF projection data...')
 
-#     if algorithm == 'gridrec':
-#         recon[idx, :n_slices, :n_columns, :n_columns] = tomo.recon(xrf_data_element_of_interest_downsampled, theta*np.pi/180, algorithm = algorithm, filter_name = 'ramlak')
+    if algorithm == 'gridrec':
+        recon[idx, :n_slices, :n_columns, :n_columns] = tomo.recon(xrf_data_element_of_interest_downsampled, theta*np.pi/180, algorithm = algorithm, filter_name = 'ramlak')
 
-#     elif algorithm == 'mlem':
-#         recon[idx, :n_slices, :n_columns, :n_columns] = tomo.recon(xrf_data_element_of_interest_downsampled, theta*np.pi/180, algorithm = algorithm, num_iter = 70)
-
-#         if idx == 0:
-#             print('Creating initial resolution reconstruction movie...')
+        if idx == 0:
+            print('Creating initial resolution reconstruction movie...')
             
-#             create_init_recon_movie(input_proj_dir_path, recon[idx, :n_slices, :n_columns, :n_columns])
+            create_init_recon_movie(input_proj_dir_path, recon[idx, :n_slices, :n_columns, :n_columns])
 
-#             sys.exit()
+            sys.exit()
+
+    elif algorithm == 'mlem':
+        recon[idx, :n_slices, :n_columns, :n_columns] = tomo.recon(xrf_data_element_of_interest_downsampled, theta*np.pi/180, algorithm = algorithm, num_iter = 70)
             
-#     else:
-#         print('Error: Algorithm not available. Exiting program...')
+    else:
+        print('Error: Algorithm not available. Exiting program...')
 
-#         sys.exit()
+        sys.exit()
 
-#     # middle_slice_recons[idx] = recon[idx, middle_slice]/downsample_factors_1[idx]
-#     middle_slice_recons[idx] = recon[idx, middle_slice]
+    # middle_slice_recons[idx] = recon[idx, middle_slice]/downsample_factors_1[idx]
+    middle_slice_recons[idx] = recon[idx, middle_slice]
 
-#     if save_recon:
-#         print('Saving reconstruction and downsampled scan data to HDF5 file for middle slice...')
+    if save_recon:
+        print('Saving reconstruction and downsampled scan data to HDF5 file for middle slice...')
         
-#         np.save(os.path.join(input_proj_dir_path, f'recon_downsample_{downsample_factor_1}_{element_of_interest}_{algorithm}.npy'), middle_slice_recons[idx, :n_columns, :n_columns])
+        np.save(os.path.join(input_proj_dir_path, f'recon_downsample_{downsample_factor_1}_{element_of_interest}_{algorithm}.npy'), middle_slice_recons[idx, :n_columns, :n_columns])
         
-#         create_h5_recon(input_proj_dir_path, element_of_interest, middle_slice_recons[idx, :n_columns, :n_columns], x_cropped_downsampled_array, y_cropped_downsampled_array, downsample_factor_1, algorithm, synchrotron)
+        create_h5_recon(input_proj_dir_path, element_of_interest, middle_slice_recons[idx, :n_columns, :n_columns], x_cropped_downsampled_array, y_cropped_downsampled_array, downsample_factor_1, algorithm, synchrotron)
 
-# print('Creating figure comparing middle slices of downsampled reconstructions...')
+print('Creating figure comparing middle slices of downsampled reconstructions...')
 
-# create_middle_slice_recon_figure(middle_slice_recons, downsample_factors_1, middle_slice_orig)
+create_middle_slice_recon_figure(middle_slice_recons, downsample_factors_1, middle_slice_orig)
