@@ -280,7 +280,7 @@ def create_xrf_proj_movie(dir_path, xrf_data, elements_of_interest, theta, fps):
         sys.exit()
 
     element_idx = [elements_of_interest.index(element) for element in elements_of_interest]
-
+    print(element_idx[0])
     el_1 = xrf_data[element_idx[0]]
     el_2 = xrf_data[element_idx[1]]
     el_3 = xrf_data[element_idx[2]]
@@ -573,7 +573,7 @@ if save_proj:
 
     print(f'Saving projection data...')
 
-    create_xrf_proj_movie(input_proj_dir_path, xrf_norm, elements_of_interest_hxn, theta, fps = 5)
+    create_xrf_proj_movie(input_proj_dir_path, xrf_norm, elements_of_interest_hxn, theta, fps = 15)
 
     sys.exit()
 
