@@ -534,7 +534,7 @@ def create_middle_slice_recon_figure(recon, downsample_factors, slice_idx):
 
 # input_proj_dir_path = '/home/bwr0835/3_id_realigned_data_04_19_2026_diff_cor_correction'
 input_proj_dir_path = '/raid/users/roter/Jacobsen-nslsii/data/xrf'
-input_proj_dir_path_xrt = '/raid/users/roter/Jacobsen-nslsii/ptycho/h5_data'
+input_proj_dir_path_xrt = '/raid/users/roter/Jacobsen-nslsii/data/ptycho/h5_data'
 input_proj_scan_data_file_path = '/raid/users/roter/Jacobsen-nslsii/data/xrf/scan2D_235518.h5'
 
 # proj_data_h5_path = os.path.join(input_proj_dir_path, 'aligned_data', 'aligned_aggregate_xrf_xrt.h5')
