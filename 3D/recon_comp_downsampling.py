@@ -545,7 +545,7 @@ proj_data_h5_path = os.path.join(input_proj_dir_path, 'aligned_data', 'aligned_a
 synchrotron = 'aps'
 # element_of_interest = 'Fe'
 element_of_interest = 'Ni'
-algorithm = 'gridrec'
+algorithm = 'mlem'
 
 save_recon = True
 save_proj = False
@@ -638,15 +638,15 @@ for idx, downsample_factor_1 in enumerate(downsample_factors_1):
     if algorithm == 'gridrec':
         recon[idx, :n_slices, :n_columns, :n_columns] = tomo.recon(xrf_data_element_of_interest_downsampled, theta*np.pi/180, algorithm = algorithm, filter_name = 'ramlak')
 
+    elif algorithm == 'mlem':
+        recon[idx, :n_slices, :n_columns, :n_columns] = tomo.recon(xrf_data_element_of_interest_downsampled, theta*np.pi/180, algorithm = algorithm, num_iter = 70)
+        
         if idx == 0:
             print('Creating initial resolution reconstruction movie...')
             
             create_init_recon_movie(input_proj_dir_path, recon[idx, :n_slices, :n_columns, :n_columns])
 
             sys.exit()
-
-    elif algorithm == 'mlem':
-        recon[idx, :n_slices, :n_columns, :n_columns] = tomo.recon(xrf_data_element_of_interest_downsampled, theta*np.pi/180, algorithm = algorithm, num_iter = 70)
             
     else:
         print('Error: Algorithm not available. Exiting program...')
