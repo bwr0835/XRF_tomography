@@ -343,7 +343,7 @@ element_of_interest = 'Ni'
 algorithm = 'mlem'
 
 save_recon = True
-save_proj = False
+save_proj = True
 
 downsample_factors_1 = np.array([1, 2, 5, 10])
 downsample_factors_2 = np.array([1, 2, 5, 10])
