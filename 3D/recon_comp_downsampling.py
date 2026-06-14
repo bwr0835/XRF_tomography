@@ -280,7 +280,6 @@ def create_xrf_proj_movie(dir_path, xrf_data, elements, elements_of_interest, th
         sys.exit()
 
     element_idx = [elements.index(element) for element in elements_of_interest]
-
     el_1 = xrf_data[element_idx[0]]
     el_2 = xrf_data[element_idx[1]]
     el_3 = xrf_data[element_idx[2]]
@@ -300,10 +299,10 @@ def create_xrf_proj_movie(dir_path, xrf_data, elements, elements_of_interest, th
         # ax.axvline(x = n_columns//2, color = 'red', linewidth = 2)
         # ax.axhline(y = n_slices//2, color = 'red', linewidth = 2)
     
-    axs[0, 0].set_title(r'{0}'.format(elements_of_interest[element_idx[0]]), fontsize = 14)
-    axs[0, 1].set_title(r'{0}'.format(elements_of_interest[element_idx[1]]), fontsize = 14)
-    axs[1, 0].set_title(r'{0}'.format(elements_of_interest[element_idx[2]]), fontsize = 14)
-    axs[1, 1].set_title(r'{0}'.format(elements_of_interest[element_idx[3]]), fontsize = 14)
+    axs[0, 0].set_title(r'{0}'.format(elements_of_interest[0]), fontsize = 14)
+    axs[0, 1].set_title(r'{0}'.format(elements_of_interest[1]), fontsize = 14)
+    axs[1, 0].set_title(r'{0}'.format(elements_of_interest[2]), fontsize = 14)
+    axs[1, 1].set_title(r'{0}'.format(elements_of_interest[3]), fontsize = 14)
 
     theta_frames = []
 
