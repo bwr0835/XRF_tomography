@@ -639,8 +639,6 @@ for idx, downsample_factor_1 in enumerate(downsample_factors_1):
         recon[idx, :n_slices, :n_columns, :n_columns] = tomo.recon(xrf_data_element_of_interest_downsampled, theta*np.pi/180, algorithm = algorithm, filter_name = 'ramlak')
 
         if idx == 0:
-            recon[idx, :n_slices, :n_columns, :n_columns] = tomo.recon(xrf_data_element_of_interest_downsampled, theta*np.pi/180, algorithm = algorithm, num_iter = 40, init_recon = recon[idx, :n_slices, :n_columns, :n_columns])
-            
             print('Creating initial resolution reconstruction movie...')
             
             np.save(os.path.join(input_proj_dir_path, f'recon_downsample_{downsample_factor_1}_{element_of_interest}_{algorithm}.npy'), recon[idx, :n_slices, :n_columns, :n_columns])
