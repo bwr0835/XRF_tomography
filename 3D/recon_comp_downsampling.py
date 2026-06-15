@@ -544,7 +544,7 @@ proj_data_h5_path = os.path.join(input_proj_dir_path, 'aligned_data', 'aligned_a
 # synchrotron = 'aps'
 synchrotron = 'aps'
 # element_of_interest = 'Fe'
-element_of_interest = 'Ni'
+element_of_interest = 'Fe'
 algorithm = 'mlem'
 
 save_recon = True
@@ -644,10 +644,12 @@ for idx, downsample_factor_1 in enumerate(downsample_factors_1):
         if idx == 0:
             print('Creating initial resolution reconstruction movie...')
             
-            create_init_recon_movie(input_proj_dir_path, recon[idx, :n_slices, :n_columns, :n_columns])
-
-            sys.exit()
+            np.save(os.path.join(input_proj_dir_path, f'recon_downsample_{downsample_factor_1}_{element_of_interest}_{algorithm}.npy'), middle_slice_recons[idx, :n_columns, :n_columns])
             
+            create_init_recon_movie(input_proj_dir_path, recon[idx, :n_slices, :n_columns, :n_columns])
+            
+            sys.exit()
+
     else:
         print('Error: Algorithm not available. Exiting program...')
 
@@ -658,8 +660,6 @@ for idx, downsample_factor_1 in enumerate(downsample_factors_1):
 
     if save_recon:
         print('Saving reconstruction and downsampled scan data to HDF5 file for middle slice...')
-        
-        np.save(os.path.join(input_proj_dir_path, f'recon_downsample_{downsample_factor_1}_{element_of_interest}_{algorithm}.npy'), middle_slice_recons[idx, :n_columns, :n_columns])
         
         create_h5_recon(input_proj_dir_path, element_of_interest, middle_slice_recons[idx, :n_columns, :n_columns], x_cropped_downsampled_array, y_cropped_downsampled_array, downsample_factor_1, algorithm, synchrotron)
 
