@@ -474,7 +474,7 @@ def create_h5_recon(dir_path, element, xrf_data, x, y, downsample_factor, algori
             positions.create_dataset('name', data = ['x', 'y'])
             positions.create_dataset('pos', data = scan_coords)
 
-def create_init_recon_movie(dir_path, recon):
+def create_init_recon_movie(dir_path, recon, algorithm):
     fig, axs = plt.subplots()
 
     img = axs.imshow(recon[0])
@@ -493,7 +493,7 @@ def create_init_recon_movie(dir_path, recon):
         
         frames.append(frame)
 
-    gif_filename = os.path.join(dir_path, f'init_recon_movie.gif')
+    gif_filename = os.path.join(dir_path, f'init_recon_movie_{algorithm}.gif')
 
     iio2.mimsave(gif_filename, frames, fps = 10)
 
@@ -545,7 +545,7 @@ proj_data_h5_path = os.path.join(input_proj_dir_path, 'aligned_data', 'aligned_a
 synchrotron = 'aps'
 # element_of_interest = 'Fe'
 element_of_interest = 'Fe'
-algorithm = 'gridrec'
+algorithm = 'mlem'
 
 save_recon = True
 save_proj = False
