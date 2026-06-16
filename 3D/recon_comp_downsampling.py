@@ -655,7 +655,7 @@ for idx, downsample_factor_1 in enumerate(downsample_factors_1):
             
             np.save(os.path.join(input_proj_dir_path, f'recon_downsample_{downsample_factor_1}_{element_of_interest}_{algorithm}.npy'), recon[idx, :n_slices, :n_columns, :n_columns])
 
-            create_init_recon_movie(input_proj_dir_path, recon[idx, :n_slices, :n_columns, :n_columns])
+            create_init_recon_movie(input_proj_dir_path, recon[idx, :n_slices, :n_columns, :n_columns], algorithm)
             
             sys.exit()
 
