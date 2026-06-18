@@ -561,7 +561,7 @@ elements_xrf, xrf_data, xrt_sig_data, theta, num_slices_cropped_top, num_slices_
 second_zero_idx = np.where(theta == 0)[0][1]
 
 theta_idx_new = [th for th in range(len(theta)) if th != second_zero_idx]
-
+print(xrf_data.shape)
 theta = theta[theta_idx_new]
 xrf_data = xrf_data[:, theta_idx_new]
 xrt_sig_data = xrt_sig_data[theta_idx_new]
@@ -589,6 +589,8 @@ if save_proj:
 xrf_data_element_of_interest = xrf_data[elements_xrf.index(element_of_interest)]
 
 n_theta, n_slices, n_columns = xrf_data_element_of_interest.shape
+
+n_scan_columns = x.shape[1]
 
 if synchrotron == 'aps': # Append additional scan position to ensure matching number of scan positions between coordinate arrays, aligned projections
     x = np.append(x, x[-1] + (x[-1] - x[0])/(len(x) - 1))
