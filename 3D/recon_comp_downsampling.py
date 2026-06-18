@@ -566,7 +566,7 @@ theta = theta[theta_idx_new]
 xrf_data = xrf_data[:, theta_idx_new]
 xrt_sig_data = xrt_sig_data[theta_idx_new]
 
-num_slices_cropped_top = 16
+num_slices_cropped_top = 14
 num_slices_cropped_bottom = 0
 
 # xrt_sig_data = xrt_data[elements_xrt.index('xrt_sig')]
