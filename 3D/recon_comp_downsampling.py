@@ -555,7 +555,7 @@ downsample_factors_2 = np.array([1, 2, 5, 10])
 
 print('Extracting projection data...')
 
-elements_xrf, xrf_data, xrt_sig_data, theta, num_slices_cropped_top, num_slices_cropped_bottom = extract_h5_aggregate_xrf_xrt_data_for_recon(proj_data_h5_path)
+elements_xrf, xrf_data, xrt_sig_data, theta, _, _ = extract_h5_aggregate_xrf_xrt_data_for_recon(proj_data_h5_path)
 # elements, xrf_data, theta = extract_h5_aggregate_xrf_xrt_data_for_recon(proj_data_h5_path)
 # elements_xrt, xrt_data, _ = extract_h5_aggregate_xrf_xrt_data_for_recon(proj_data_h5_path_xrt)
 second_zero_idx = np.where(theta == 0)[0][1]
@@ -566,8 +566,8 @@ theta = theta[theta_idx_new]
 xrf_data = xrf_data[:, theta_idx_new]
 xrt_sig_data = xrt_sig_data[theta_idx_new]
 
-add_slices_to_crop_top = 16
-num_slices_cropped_top += add_slices_to_crop_top
+num_slices_cropped_top = 16
+num_slices_cropped_bottom = 0
 
 # xrt_sig_data = xrt_data[elements_xrt.index('xrt_sig')]
 
