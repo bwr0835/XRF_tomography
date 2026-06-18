@@ -528,13 +528,13 @@ def create_middle_slice_recon_figure(recon, downsample_factors, slice_idx):
 
     return
 
-input_proj_dir_path = '/home/bwr0835/2_ide_realigned_data_03_27_2026_iter_reproj_cor_correction_only_final/xrt_od_xrf_realignment'
-input_proj_scan_data_file_path = '/raid/users/roter/Jacobsen/img.dat/2xfm_0096.mda.h5' # There is no 0° projection, so use closest to zero (-5°)
+# input_proj_dir_path = '/home/bwr0835/2_ide_realigned_data_03_27_2026_iter_reproj_cor_correction_only_final/xrt_od_xrf_realignment'
+# input_proj_scan_data_file_path = '/raid/users/roter/Jacobsen/img.dat/2xfm_0096.mda.h5' # There is no 0° projection, so use closest to zero (-5°)
 
-# input_proj_dir_path = '/home/bwr0835/3_id_realigned_data_04_19_2026_diff_cor_correction'
+input_proj_dir_path = '/home/bwr0835/3_id_realigned_data_04_19_2026_diff_cor_correction'
 # input_proj_dir_path = '/raid/users/roter/Jacobsen-nslsii/data/xrf'
 # input_proj_dir_path_xrt = '/raid/users/roter/Jacobsen-nslsii/data/ptycho/h5_data'
-# input_proj_scan_data_file_path = '/raid/users/roter/Jacobsen-nslsii/data/xrf/scan2D_235518.h5'
+input_proj_scan_data_file_path = '/raid/users/roter/Jacobsen-nslsii/data/xrf/scan2D_235518.h5'
 
 proj_data_h5_path = os.path.join(input_proj_dir_path, 'aligned_data', 'aligned_aggregate_xrf_xrt.h5')
 # proj_data_h5_path = os.path.join(input_proj_dir_path, '3_id_aggregate_xrf.h5')
@@ -542,10 +542,10 @@ proj_data_h5_path = os.path.join(input_proj_dir_path, 'aligned_data', 'aligned_a
 
 
 # synchrotron = 'aps'
-synchrotron = 'aps'
+synchrotron = 'nsls-ii'
 # element_of_interest = 'Fe'
-element_of_interest = 'Fe'
-algorithm = 'mlem'
+element_of_interest = 'Ni'
+algorithm = 'gridrec'
 
 save_recon = True
 save_proj = False
@@ -558,6 +558,16 @@ print('Extracting projection data...')
 elements_xrf, xrf_data, xrt_sig_data, theta, num_slices_cropped_top, num_slices_cropped_bottom = extract_h5_aggregate_xrf_xrt_data_for_recon(proj_data_h5_path)
 # elements, xrf_data, theta = extract_h5_aggregate_xrf_xrt_data_for_recon(proj_data_h5_path)
 # elements_xrt, xrt_data, _ = extract_h5_aggregate_xrf_xrt_data_for_recon(proj_data_h5_path_xrt)
+second_zero_idx = np.where(theta == 0)[0][1]
+
+theta_idx_new = [th for th in range(len(theta)) if th != second_zero_idx]
+
+theta = theta[theta_idx_new]
+xrf_data = xrf_data[:, theta_idx_new]
+xrt_sig_data = xrt_sig_data[theta_idx_new]
+
+add_slices_to_crop_top = 16
+num_slices_cropped_top += add_slices_to_crop_top
 
 # xrt_sig_data = xrt_data[elements_xrt.index('xrt_sig')]
 
@@ -600,7 +610,8 @@ else:
     # x_cropped_downsampled_array = np.zeros((len(downsample_factors), n_columns, n_columns))
     # y_cropped_downsampled_array = np.zeros((len(downsample_factors), n_columns, n_columns))
 
-middle_slice_orig = 90
+# middle_slice_orig = 90
+middle_slice_orig = n_slices//2
 
 for idx, downsample_factor_1 in enumerate(downsample_factors_1):
     print(f'Downsampling projection data by factor of {downsample_factor_1}...')
@@ -611,7 +622,6 @@ for idx, downsample_factor_1 in enumerate(downsample_factors_1):
     print('Creating downsampled x and y scan data arrays that mimick scanning the middle reconstructed slice...')
 
     n_slices = xrf_data_element_of_interest_downsampled.shape[1]
-    # middle_slice = n_slices//2
     middle_slice = middle_slice_orig//downsample_factor_1
 
     if x_cropped_downsampled.ndim == 1:
@@ -638,26 +648,26 @@ for idx, downsample_factor_1 in enumerate(downsample_factors_1):
     if algorithm == 'gridrec':
         recon[idx, :n_slices, :n_columns, :n_columns] = tomo.recon(xrf_data_element_of_interest_downsampled, theta*np.pi/180, algorithm = algorithm, filter_name = 'ramlak')
 
-        if idx == 0:
-            print('Creating initial resolution reconstruction movie...')
+        # if idx == 0:
+        #     print('Creating initial resolution reconstruction movie...')
             
-            np.save(os.path.join(input_proj_dir_path, f'recon_downsample_{downsample_factor_1}_{element_of_interest}_{algorithm}.npy'), recon[idx, :n_slices, :n_columns, :n_columns])
+        #     np.save(os.path.join(input_proj_dir_path, f'recon_downsample_{downsample_factor_1}_{element_of_interest}_{algorithm}.npy'), recon[idx, :n_slices, :n_columns, :n_columns])
 
-            create_init_recon_movie(input_proj_dir_path, recon[idx, :n_slices, :n_columns, :n_columns], algorithm)
+        #     create_init_recon_movie(input_proj_dir_path, recon[idx, :n_slices, :n_columns, :n_columns], algorithm)
             
-            sys.exit()
+        #     sys.exit()
     elif algorithm == 'mlem':
-        if idx == 0:
-            recon[idx, :n_slices, :n_columns, :n_columns] = tomo.recon(xrf_data_element_of_interest_downsampled, theta*np.pi/180, algorithm = 'gridrec', filter_name = 'ramlak')
         
-            recon[idx, :n_slices, :n_columns, :n_columns] = tomo.recon(xrf_data_element_of_interest_downsampled, theta*np.pi/180, algorithm = algorithm, num_iter = 100, init_recon = recon[idx, :n_slices, :n_columns, :n_columns])
-            print('Creating initial resolution reconstruction movie...')
+        recon[idx, :n_slices, :n_columns, :n_columns] = tomo.recon(xrf_data_element_of_interest_downsampled, theta*np.pi/180, algorithm = algorithm, num_iter = 70)
+        
+        # if idx == 0:
+        #     print('Creating initial resolution reconstruction movie...')
             
-            np.save(os.path.join(input_proj_dir_path, f'recon_downsample_{downsample_factor_1}_{element_of_interest}_{algorithm}.npy'), recon[idx, :n_slices, :n_columns, :n_columns])
+        #     np.save(os.path.join(input_proj_dir_path, f'recon_downsample_{downsample_factor_1}_{element_of_interest}_{algorithm}.npy'), recon[idx, :n_slices, :n_columns, :n_columns])
 
-            create_init_recon_movie(input_proj_dir_path, recon[idx, :n_slices, :n_columns, :n_columns], algorithm)
+        #     create_init_recon_movie(input_proj_dir_path, recon[idx, :n_slices, :n_columns, :n_columns], algorithm)
             
-            sys.exit()
+        #     sys.exit()
 
     else:
         print('Error: Algorithm not available. Exiting program...')
