@@ -561,7 +561,7 @@ elements_xrf, xrf_data, xrt_sig_data, theta, _, _ = extract_h5_aggregate_xrf_xrt
 second_zero_idx = np.where(theta == 0)[0][1]
 
 theta_idx_new = [th for th in range(len(theta)) if th != second_zero_idx]
-print(xrf_data.shape)
+
 theta = theta[theta_idx_new]
 xrf_data = xrf_data[:, theta_idx_new]
 xrt_sig_data = xrt_sig_data[theta_idx_new]
@@ -598,8 +598,7 @@ if synchrotron == 'aps': # Append additional scan position to ensure matching nu
 start_slice = num_slices_cropped_top
 end_slice = n_slices - num_slices_cropped_bottom
 
-recon = np.zeros((len(downsample_factors_1), n_slices, n_columns, n_columns))
-middle_slice_recons = np.zeros((len(downsample_factors_1), n_columns, n_columns))
+xrf_data_element_of_interest = xrf_data_element_of_interest[:, start_slice:end_slice]
 
 if x.ndim == 1:
     # x_cropped_downsampled_array = np.zeros((len(downsample_factors), n_columns))
@@ -608,10 +607,13 @@ if x.ndim == 1:
 
 else:
     x_cropped = x[start_slice:end_slice] # Since reconstructed object slices are square and are related to scan positions, only need to worry about per-pixel scan distance in x
-
     # x_cropped_downsampled_array = np.zeros((len(downsample_factors), n_columns, n_columns))
     # y_cropped_downsampled_array = np.zeros((len(downsample_factors), n_columns, n_columns))
 
+n_theta, n_slices, n_columns = xrf_data_element_of_interest.shape
+
+recon = np.zeros((len(downsample_factors_1), n_slices, n_columns, n_columns))
+middle_slice_recons = np.zeros((len(downsample_factors_1), n_columns, n_columns))
 # middle_slice_orig = 90
 middle_slice_orig = n_slices//2
 
