@@ -24,7 +24,7 @@ for theta_idx, filename in enumerate(filenames):
        for det in range(n_det_elements):
               with h5py.File(os.path.join(input_dir_path, f'{filename}{det}'), 'r') as f:
                      if theta_idx == 0:
-                            elements_xrf_aux = list(f['MAPS/Channel_Names'].asstr()[:])
+                            elements_xrf_aux = list(f['MAPS/channel_names'].asstr()[:])
 
                             elements_of_interest_idx = [elements_xrf.index(element) for element in elements_xrf_aux if element in elements_xrf]
                      
