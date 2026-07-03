@@ -7,8 +7,8 @@ import numpy as np, \
 
 input_dir_path = '/raid/users/roter/Jacobsen/img.dat'
 
-aggregate_xrf_h5_file_path = os.path.join(input_dir_path, '2_id_aggregate_xrf.h5')
-output_file_path = os.path.join(input_dir_path, '2_id_aggregate_xrf_det_elements_0_1_sum.h5')
+aggregate_xrf_h5_file_path = os.path.join(input_dir_path, '2_ide_aggregate_xrf.h5')
+output_file_path = os.path.join(input_dir_path, '2_ide_aggregate_xrf_det_elements_0_1_sum.h5')
 
 elements_xrf, intensity_xrf, theta, incident_energy_keV, _, dataset_type, filenames = futil.extract_h5_aggregate_xrf_data(aggregate_xrf_h5_file_path, filename_array = True)
 
