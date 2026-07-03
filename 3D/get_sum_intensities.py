@@ -20,10 +20,15 @@ intensity_xrf_sum = np.zeros((n_elements, n_theta, n_slices, n_columns))
 
 for theta_idx, filename in enumerate(filenames):
        print(f'Processing angle {theta_idx + 1}/{n_theta}', end = '\r', flush = True)
-       
+
        for det in range(n_det_elements):
               with h5py.File(os.path.join(input_dir_path, f'{filename}{det}'), 'r') as f:
-                     intensity = f['MAPS/XRF_Analyzed/NNLS/Counts_Per_Sec'][()][:, :, :-2]
+                     if theta_idx == 0:
+                            elements_xrf_aux = list(f['MAPS/Channel_Names'].asstr()[:])
+
+                            elements_of_interest_idx = [elements_xrf.index(element) for element in elements_xrf_aux if element in elements_xrf]
+                     
+                     intensity = f['MAPS/XRF_Analyzed/NNLS/Counts_Per_Sec'][()][elements_of_interest_idx, :, :-2]
               
               intensity_xrf_sum[:, theta_idx] += intensity
 
