@@ -572,9 +572,9 @@ def extract_h5_aggregate_xrf_data(file_path, **kwargs):
         sys.exit()
     
     if kwargs.get('filename_array') == True:
-        return elements, intensity, theta, raw_spectrum_fitting_method, dataset_type, filenames
+        return elements, intensity, theta, incident_energy_keV, raw_spectrum_fitting_method, dataset_type, filenames
     
-    return elements, intensity, theta, incident_energy_keV, raw_spectrum_fitting_method, dataset_type
+    return elements, intensity, theta, incident_energy_keV, raw_spectrum_fitting_method, dataset_type, None
 
 def extract_h5_aggregate_xrt_data(file_path, **kwargs):
     if not os.path.isfile(file_path):
