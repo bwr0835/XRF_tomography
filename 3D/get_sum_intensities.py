@@ -8,11 +8,13 @@ import numpy as np, \
 input_dir_path = '/raid/users/roter/Jacobsen/img.dat'
 
 aggregate_xrf_h5_file_path = os.path.join(input_dir_path, '2_ide_aggregate_xrf.h5')
-output_file_path = os.path.join(input_dir_path, '2_ide_aggregate_xrf_det_elements_0_1_sum.h5')
+# output_file_path = os.path.join(input_dir_path, '2_ide_aggregate_xrf_det_elements_0_1_sum.h5')
+output_file_path = os.path.join(input_dir_path, '2_ide_aggregate_xrf_det_element_0.h5')
 
 elements_xrf, intensity_xrf, theta, incident_energy_keV, _, dataset_type, filenames = futil.extract_h5_aggregate_xrf_data(aggregate_xrf_h5_file_path, filename_array = True)
 
-n_det_elements = 2
+n_det_idx_start = 0
+n_det_idx_end = 1
 
 n_elements, n_theta, n_slices, n_columns = intensity_xrf.shape
 
@@ -21,7 +23,7 @@ intensity_xrf_sum = np.zeros((n_elements, n_theta, n_slices, n_columns))
 for theta_idx, filename in enumerate(filenames):
        print(f'Processing angle {theta_idx + 1}/{n_theta}', end = '\r', flush = True)
 
-       for det in range(n_det_elements):
+       for det in range(n_det_idx_start, n_det_idx_end):
               with h5py.File(os.path.join(input_dir_path, f'{filename}{det}'), 'r') as f:
                      if theta_idx == 0:
                             elements_xrf_aux = list(f['MAPS/channel_names'].asstr()[:])
