@@ -140,7 +140,7 @@ def preprocess_xrf_xrt_data(synchrotron,
 
         sys.exit()
 
-    elements_xrf, intensity_xrf, theta, incident_energy_keV, _, dataset_type = futil.extract_h5_aggregate_xrf_data(aggregate_xrf_h5_file_path)
+    elements_xrf, intensity_xrf, theta, incident_energy_keV, _, dataset_type, _ = futil.extract_h5_aggregate_xrf_data(aggregate_xrf_h5_file_path)
     elements_xrt, intensity_xrt, theta_xrt, _, _, dataset_type, xrt_photon_counting = futil.extract_h5_aggregate_xrt_data(aggregate_xrt_h5_file_path)
 
     if not np.array_equal(theta, theta_xrt):
