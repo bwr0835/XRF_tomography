@@ -542,34 +542,34 @@ def extract_h5_aggregate_xrf_data(file_path, **kwargs):
 
         sys.exit()
     
-    # try:
-    with h5py.File(file_path, 'r') as h5:
-        intensity_h5 = h5['exchange/data']
-        theta_h5 = h5['exchange/theta']
-        elements_h5 = h5['exchange/elements']
+    try:
+        with h5py.File(file_path, 'r') as h5:
+            intensity_h5 = h5['exchange/data']
+            theta_h5 = h5['exchange/theta']
+            elements_h5 = h5['exchange/elements']
 
-        intensity = intensity_h5[()]
-        theta = theta_h5[()]
-        elements = list(elements_h5.asstr()[:])
+            intensity = intensity_h5[()]
+            theta = theta_h5[()]
+            elements = list(elements_h5.asstr()[:])
 
-        if kwargs.get('filename_array') == True:
-            filenames_h5 = h5['filenames']
+            if kwargs.get('filename_array') == True:
+                filenames_h5 = h5['filenames']
 
-            filenames = filenames_h5.asstr()[:]
+                filenames = filenames_h5.asstr()[:]
             
-        dataset_type = intensity_h5.attrs['dataset_type']
-        raw_spectrum_fitting_method = intensity_h5.attrs['raw_spectrum_fitting_method']
-        incident_energy_keV = intensity_h5.attrs['incident_energy_keV']
+            dataset_type = intensity_h5.attrs['dataset_type']
+            raw_spectrum_fitting_method = intensity_h5.attrs['raw_spectrum_fitting_method']
+            incident_energy_keV = intensity_h5.attrs['incident_energy_keV']
     
-    # except KeyboardInterrupt:
-    #     print('\n\nKeyboardInterrupt occurred. Exiting program...')
+    except KeyboardInterrupt:
+        print('\n\nKeyboardInterrupt occurred. Exiting program...')
             
-    #     sys.exit()
+        sys.exit()
 
-    # except:
-    #     print('Error: Incompatible XRF HDF5 file structure. Exiting program...')
+    except:
+        print('Error: Incompatible XRF HDF5 file structure. Exiting program...')
 
-        # sys.exit()
+        sys.exit()
     
     if kwargs.get('filename_array') == True:
         return elements, intensity, theta, incident_energy_keV, raw_spectrum_fitting_method, dataset_type, filenames
