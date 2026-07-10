@@ -8,12 +8,12 @@ import numpy as np, \
 input_dir_path = '/raid/users/roter/Jacobsen/img.dat'
 
 aggregate_xrf_h5_file_path = os.path.join(input_dir_path, '2_ide_aggregate_xrf.h5')
-# output_file_path = os.path.join(input_dir_path, '2_ide_aggregate_xrf_det_elements_0_1_sum.h5')
-output_file_path = os.path.join(input_dir_path, '2_ide_aggregate_xrf_det_element_0.h5')
+output_file_path = os.path.join(input_dir_path, '2_ide_aggregate_xrf_det_elements_0_1_sum.h5')
+# output_file_path = os.path.join(input_dir_path, '2_ide_aggregate_xrf_det_element_0.h5')
 
 elements_xrf, intensity_xrf, theta, incident_energy_keV, _, dataset_type, filenames = futil.extract_h5_aggregate_xrf_data(aggregate_xrf_h5_file_path, filename_array = True)
 
-n_det_idx_start = 1
+n_det_idx_start = 0
 n_det_idx_end = 2
 
 n_elements, n_theta, n_slices, n_columns = intensity_xrf.shape
@@ -46,8 +46,9 @@ with h5py.File(output_file_path, 'w') as f:
 
     exchange['data'].attrs['dataset_type'] = 'xrf'
     exchange['data'].attrs['incident_energy_keV'] = incident_energy_keV
-
     exchange['data'].attrs['us_ic_scaler_name'] = 'US_IC'
     exchange['data'].attrs['xrt_signal_name'] = 'DS_IC'
     exchange['data'].attrs['xrt_photon_counting'] = False
     exchange['data'].attrs['xrt_instrument'] = 'ion_chamber'
+    exchange['data'].attrs['raw_spectrum_fititng_method'] = 'NNLS'
+    exchange['data'].attrs['raw_spectrum_fitting_software'] = 'MAPS'
