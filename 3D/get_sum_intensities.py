@@ -13,8 +13,8 @@ output_file_path = os.path.join(input_dir_path, '2_ide_aggregate_xrf_det_element
 
 elements_xrf, intensity_xrf, theta, incident_energy_keV, _, dataset_type, filenames = futil.extract_h5_aggregate_xrf_data(aggregate_xrf_h5_file_path, filename_array = True)
 
-n_det_idx_start = 0
-n_det_idx_end = 1
+n_det_idx_start = 1
+n_det_idx_end = 2
 
 n_elements, n_theta, n_slices, n_columns = intensity_xrf.shape
 
