@@ -9,7 +9,6 @@ input_file_path_xrf_aux = os.path.join(input_aux_and_output_dir_path, '2_ide_agg
 input_file_path_xrt_aux = os.path.join(input_aux_and_output_dir_path, '2_ide_aggregate_xrt.h5')
 
 elements_xrf, intensity_xrf_aux, theta, incident_energy_keV, _, _, _ = futil.extract_h5_aggregate_xrf_data(input_file_path_xrf_aux)
-elements_xrt, intensity_xrt, _, _, _, _, _ = futil.extract_h5_aggregate_xrt_data(input_file_path_xrt_aux)
 
 n_elements, n_theta, n_slices, n_columns = intensity_xrf_aux.shape
 
@@ -24,11 +23,9 @@ with h5py.File(os.path.join(input_aux_and_output_dir_path, '2_ide_aggregate_xrf_
     theta_h5 = exchange.create_dataset('theta', data = theta)
     
     elements_xrf = elements_h5.create_dataset('xrf', data = elements_xrf)
-    elements_xrt = elements_h5.create_dataset('xrt', data = elements_xrt)
 
-    intensity_xrf_h5 = data_h5.create_dataset('xrf', shape = (n_det, n_elements, n_theta, n_slices, n_columns), dtype = 'float32')
-    intensity_xrt_h5 = data_h5.create_dataset('xrt', data = intensity_xrt, dtype = 'float32')
-
+    intensity_xrf_h5 = data_h5.create_dataset('xrf', shape = (n_det, n_elements, n_theta, n_slices, n_columns))
+    
     intensity_xrf_h5.attrs['det_elements_dim_0'] = ['0', '1', 'sum']
 
     data_h5.attrs['incident_energy_keV'] = incident_energy_keV
@@ -50,8 +47,11 @@ with h5py.File(os.path.join(input_aux_and_output_dir_path, '2_ide_aggregate_xrf_
             intensity_xrf_h5[det] = data['xrf'][det]
 
             if det == 2:
+                intensity_xrt_h5 = data.create_dataset('xrt', data = data['xrt'])
+
                 data_h5.attrs['bottom_edge_cropped'] = data.attrs['bottom_edge_cropped']
                 data_h5.attrs['top_edge_cropped'] = data.attrs['top_edge_cropped']
                 data_h5.attrs['left_edge_cropped'] = data.attrs['left_edge_cropped']
                 data_h5.attrs['right_edge_cropped'] = data.attrs['right_edge_cropped']
                 data_h5.attrs['incident_intensity_photons'] = data.attrs['incident_intensity_photons']
+    
