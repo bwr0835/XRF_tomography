@@ -5,10 +5,11 @@ input_aux_and_output_dir_path = '/raid/users/roter/Jacobsen/img.dat'
 
 n_det = 3
 
-input_file_path_aux = os.path.join(input_aux_and_output_dir_path, '2_ide_aggregate_xrf.h5')
+input_file_path_xrf_aux = os.path.join(input_aux_and_output_dir_path, '2_ide_aggregate_xrf.h5')
+input_file_path_xrt_aux = os.path.join(input_aux_and_output_dir_path, '2_ide_aggregate_xrt.h5')
 
-elements_xrf, intensity_xrf_aux, theta, incident_energy_keV, _, _, _ = futil.extract_h5_aggregate_xrf_data(input_file_path_aux)
-elements_xrt, intensity_xrt, _, _, _, _, _ = futil.extract_h5_aggregate_xrt_data(input_file_path_aux)
+elements_xrf, intensity_xrf_aux, theta, incident_energy_keV, _, _, _ = futil.extract_h5_aggregate_xrf_data(input_file_path_xrf_aux)
+elements_xrt, intensity_xrt, _, _, _, _, _ = futil.extract_h5_aggregate_xrt_data(input_file_path_xrt_aux)
 
 n_elements, n_theta, n_slices, n_columns = intensity_xrf_aux.shape
 
