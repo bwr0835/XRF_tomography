@@ -39,7 +39,7 @@ with h5py.File(os.path.join(input_aux_and_output_dir_path, '2_ide_aggregate_xrf_
         else:
             full_input_dir_path = f'{input_dir_path}_det_element_{det}'
 
-        input_file_path = os.path.join(full_input_dir_path, 'aligned_data.h5', 'aligned_aggregate_xrf_xrt.h5')
+        input_file_path = os.path.join(full_input_dir_path, 'aligned_data', 'aligned_aggregate_xrf_xrt.h5')
 
         with h5py.File(input_file_path, 'r') as ff:
             data = ff['exchange/data']
