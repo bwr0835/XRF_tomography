@@ -50,8 +50,8 @@ with h5py.File(os.path.join(input_aux_and_output_dir_path, '2_ide_aggregate_xrf_
             intensity_xrf_h5[det] = data['xrf'][det]
 
             if det == 2:
-                data_h5.attrs['bottom_edge_cropped'] = data['bottom_edge_cropped']
-                data_h5.attrs['top_edge_cropped'] = data['top_edge_cropped']
-                data_h5.attrs['left_edge_cropped'] = data['left_edge_cropped']
-                data_h5.attrs['right_edge_cropped'] = data['right_edge_cropped']
-                data_h5.attrs['incident_intensity_photons'] = data['incident_intensity_photons']
+                data_h5.attrs['bottom_edge_cropped'] = data.attrs['bottom_edge_cropped']
+                data_h5.attrs['top_edge_cropped'] = data.attrs['top_edge_cropped']
+                data_h5.attrs['left_edge_cropped'] = data.attrs['left_edge_cropped']
+                data_h5.attrs['right_edge_cropped'] = data.attrs['right_edge_cropped']
+                data_h5.attrs['incident_intensity_photons'] = data.attrs['incident_intensity_photons']
