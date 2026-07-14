@@ -300,14 +300,18 @@ def preprocess_xrf_xrt_data(synchrotron,
         
         proj_img_array_element_to_align_with_orig = proj_img_array_element_to_align_with.copy()
         
-        print(f'Vignetting \'{aligning_element}\' projection images...')
+        if not create_final_aligned_proj_enabled:
+            print(f'Vignetting \'{aligning_element}\' projection images...')
         
-        vignetted_proj_array_element_to_align_with = np.zeros_like(proj_img_array_element_to_align_with)
-        cval_array = np.zeros(n_theta)
+            vignetted_proj_array_element_to_align_with = np.zeros_like(proj_img_array_element_to_align_with)
+            cval_array = np.zeros(n_theta)
 
-        for theta_idx in range(n_theta):
-            vignetted_proj_array_element_to_align_with[theta_idx], cval_array[theta_idx] = ppu.edge_gauss_filter(proj_img_array_element_to_align_with[theta_idx], sigma, alpha, nx = n_columns, ny = n_slices)
+            for theta_idx in range(n_theta):
+                vignetted_proj_array_element_to_align_with[theta_idx], cval_array[theta_idx] = ppu.edge_gauss_filter(proj_img_array_element_to_align_with[theta_idx], sigma, alpha, nx = n_columns, ny = n_slices)
             
+        else:
+            vignetted_proj_array_element_to_align_with = proj_img_array_element_to_align_with
+
         if pre_cor_correction_adjacent_angle_jitter_correction_enabled:
             print('Calculating shifts for adjacent angle jitter correction pre-center of rotation error correction...')
             
