@@ -587,35 +587,35 @@ def extract_h5_aggregate_xrt_data(file_path, **kwargs):
 
         sys.exit()
     
-    try:
-        with h5py.File(file_path, 'r') as h5:
-            intensity_h5 = h5['exchange/data']
-            theta_h5 = h5['exchange/theta']
-            elements_h5 = h5['exchange/elements']
+    # try:
+    with h5py.File(file_path, 'r') as h5:
+        intensity_h5 = h5['exchange/data']
+        theta_h5 = h5['exchange/theta']
+        elements_h5 = h5['exchange/elements']
 
-            intensity = intensity_h5[()]
-            theta = theta_h5[()]
-            elements = list(elements_h5.asstr()[:])
+        intensity = intensity_h5[()]
+        theta = theta_h5[()]
+        elements = list(elements_h5.asstr()[:])
 
-            if kwargs.get('filename_array') == True:
-                filenames_h5 = h5['filenames']
+        if kwargs.get('filename_array') == True:
+            filenames_h5 = h5['filenames']
 
-                filenames = filenames_h5.asstr()[:]
+            filenames = filenames_h5.asstr()[:]
 
-            dataset_type = intensity_h5.attrs['dataset_type']
-            us_ic_scaler_name = intensity_h5.attrs['us_ic_scaler_name']
-            xrt_photon_counting = intensity_h5.attrs['xrt_photon_counting']
-            incident_energy_keV = intensity_h5.attrs['incident_energy_keV']
+        dataset_type = intensity_h5.attrs['dataset_type']
+        us_ic_scaler_name = intensity_h5.attrs['us_ic_scaler_name']
+        xrt_photon_counting = intensity_h5.attrs['xrt_photon_counting']
+        incident_energy_keV = intensity_h5.attrs['incident_energy_keV']
     
-    except KeyboardInterrupt:
-        print('\n\nKeyboardInterrupt occurred. Exiting program...')
+    # except KeyboardInterrupt:
+    #     print('\n\nKeyboardInterrupt occurred. Exiting program...')
             
-        sys.exit()
+    #     sys.exit()
 
-    except:
-        print('Error: Incompatible XRT HDF5 file structure. Exiting program...')
+    # except:
+    #     print('Error: Incompatible XRT HDF5 file structure. Exiting program...')
 
-        sys.exit()
+    #     sys.exit()
 
     if kwargs.get('filename_array') == True:
         return elements, intensity, theta, us_ic_scaler_name, dataset_type, filenames
