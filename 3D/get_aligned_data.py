@@ -34,10 +34,10 @@ with h5py.File(os.path.join(input_aux_and_output_dir_path, '2_ide_aggregate_xrf_
         print(f'Processing det {det}...', end = '\r', flush = True)
         
         if det == 2:
-            full_input_dir_path = f'{input_dir_path}_det_elements_0_1_sum'
+            full_input_dir_path = f'{input_dir_path}_det_elements_0_1_sum_07_10_2026'
 
         else:
-            full_input_dir_path = f'{input_dir_path}_det_element_{det}'
+            full_input_dir_path = f'{input_dir_path}_det_element_{det}_07_10_2026'
 
         input_file_path = os.path.join(full_input_dir_path, 'aligned_data', 'aligned_aggregate_xrf_xrt.h5')
 
