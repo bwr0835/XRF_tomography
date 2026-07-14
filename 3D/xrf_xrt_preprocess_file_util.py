@@ -1117,13 +1117,9 @@ def extract_csv_raw_input_data(file_path):
     aligning_element = df['aligning_element'][0]
     data_percentile = df['data_percentile'][0]
 
-    print(pixel_rad_pre_cor_jitter.shape)
-
     if data_percentile == '':
         data_percentile = None
     
-    print(data_percentile)
-
     return norm_factor_xrt, \
            norm_factor_xrf, \
            init_x_shifts, \
@@ -2169,8 +2165,6 @@ def create_gridrec_density_map_gif(dir_path,
                                    elements_xrf, 
                                    fps):
 
-    print(desired_element)
-
     desired_element_idx_1 = elements_xrf.index(desired_element[0])
     desired_element_idx_2 = elements_xrf.index(desired_element[1])
     desired_element_idx_3 = elements_xrf.index(desired_element[2])
@@ -2222,7 +2216,6 @@ def create_gridrec_density_map_gif(dir_path,
     cbar4.ax.set_title(r'g/cm\textsuperscript{3}', fontsize = 16)
 
     for idx, ax in enumerate(fig.axes[:4]):
-        print(idx)
         ax.set_title(r'{0}'.format(desired_element[idx]))
         ax.axis('off')
 
