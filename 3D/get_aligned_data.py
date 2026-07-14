@@ -44,7 +44,7 @@ with h5py.File(os.path.join(input_aux_and_output_dir_path, '2_ide_aggregate_xrf_
         with h5py.File(input_file_path, 'r') as ff:
             data = ff['exchange/data']
             
-            intensity_xrf_h5[det] = data['xrf'][det]
+            intensity_xrf_h5[det] = data['xrf'][:]
 
             if det == 2:
                 intensity_xrt_h5 = data_h5.create_dataset('xrt', data = data['xrt'])
