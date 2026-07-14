@@ -47,7 +47,7 @@ with h5py.File(os.path.join(input_aux_and_output_dir_path, '2_ide_aggregate_xrf_
             intensity_xrf_h5[det] = data['xrf'][det]
 
             if det == 2:
-                intensity_xrt_h5 = data.create_dataset('xrt', data = data['xrt'])
+                intensity_xrt_h5 = data_h5.create_dataset('xrt', data = data['xrt'])
 
                 data_h5.attrs['bottom_edge_cropped'] = data.attrs['bottom_edge_cropped']
                 data_h5.attrs['top_edge_cropped'] = data.attrs['top_edge_cropped']
