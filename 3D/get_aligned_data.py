@@ -13,7 +13,7 @@ elements_xrt, intensity_xrt, _, _, _, _, _ = futil.extract_h5_aggregate_xrt_data
 
 n_elements, n_theta, n_slices, n_columns = intensity_xrf_aux.shape
 
-n_slices += 1 # For padding
+n_slices -= 1 # Net change in slices due to padding and cropping
 n_columns += 1 # For padding
 
 with h5py.File(os.path.join(input_aux_and_output_dir_path, '2_ide_aggregate_xrf_xrt_aligned_two_det_elements.h5'), 'w') as f:
