@@ -953,10 +953,10 @@ def realign_proj_final(xrf_proj_img_array,
         net_x_shift = net_x_shifts[theta_idx]
         net_y_shift = net_y_shifts[theta_idx]
 
-        shifted_xrt_proj_img_array[theta_idx] = ndi.shift(xrt_proj_img_array[theta_idx], shift = (net_y_shift, net_x_shift), order = 1, cval = I0)
-        shifted_opt_dens_proj_img_array[theta_idx] = ndi.shift(opt_dens_proj_img_array[theta_idx], shift = (net_y_shift, net_x_shift), order = 1)
+        shifted_xrt_proj_img_array[theta_idx] = ndi.shift(xrt_proj_img_array[theta_idx], shift = (net_y_shift, net_x_shift), cval = I0)
+        shifted_opt_dens_proj_img_array[theta_idx] = ndi.shift(opt_dens_proj_img_array[theta_idx], shift = (net_y_shift, net_x_shift))
 
         for element_idx in range(xrf_proj_img_array.shape[0]):
-            shifted_xrf_proj_img_array[element_idx, theta_idx] = ndi.shift(xrf_proj_img_array[element_idx, theta_idx], shift = (net_y_shift, net_x_shift), order = 1)
+            shifted_xrf_proj_img_array[element_idx, theta_idx] = ndi.shift(xrf_proj_img_array[element_idx, theta_idx], shift = (net_y_shift, net_x_shift))
 
     return shifted_xrf_proj_img_array, shifted_xrt_proj_img_array, shifted_opt_dens_proj_img_array
