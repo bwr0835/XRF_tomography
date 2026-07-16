@@ -42,11 +42,11 @@ params_64_64_64_cabead_xrt = {'src_path': './data/sample8_size_64_pad/nElements_
                               'sample_size_cm': 0.01,
                               'this_aN_dic': {'Ca': 20, 'Sc': 21},
                               'probe_energy_keV': np.array([20.0]),
-                              'probe_cts': 1000000.0, # photons
+                              'probe_cts': 10000000.0, # photons
                               'save_path': '/home/bwr0835',
                               'save_fname': 'simulated_proj_data_xrt_64_64_64',
                               'theta_sep': False,
-                              'Poisson_noise': False,
+                              'Poisson_noise': True,
                               'dev': 'cuda:0'}
 
 params_64_64_64_cabead_xrf = {'n_ranks': n_ranks, 
