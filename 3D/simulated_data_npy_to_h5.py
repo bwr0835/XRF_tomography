@@ -4,6 +4,7 @@ import numpy as np, \
 
 from imageio import v2 as iio2
 from matplotlib import pyplot as plt
+from numpy.ma import true_divide
 
 plt.rcParams['text.usetex'] = True
 plt.rcParams['font.family'] = 'serif' 
@@ -20,16 +21,17 @@ dir_path = '/home/bwr0835'
 output_path_xrt = os.path.join(dir_path, 'simulated_proj_data_xrt_64_64_64.h5')
 
 # proj_data_xrf = np.zeros((4, 200, 64, 64))
-proj_data_xrt = np.zeros((1, 400, 64, 64))
+proj_data_xrt = np.zeros((1, 200, 64, 64))
 
-proj_data_xrt[0] = np.load(os.path.join(dir_path, 'simulated_proj_data_xrt_64_64_64.npy')).reshape(400, 64, 64)
+proj_data_xrt[0] = np.load(os.path.join(dir_path, 'simulated_proj_data_xrt_64_64_64.npy')).reshape(200, 64, 64)
 
-theta = np.linspace(0, 360, 400)
+theta = np.linspace(-180, 180, 201)[:-1]
+dtheta = theta[1] - theta[0]
 
 # elements_xrf = ['Ca', 'Ca_L', 'Sc', 'Sc_L']
 elements_xrt = ['xrt_sig']
 
-proj_img_enabled = False
+proj_img_enabled = True
 sino_enabled = True
 
 # for theta_idx in range(200):
@@ -46,7 +48,7 @@ with h5py.File(output_path_xrt, 'w') as f:
 if proj_img_enabled:
     fig1, axs1 = plt.subplots()
 
-    im = axs1.imshow(proj_data_xrt[0, 0], cmap = 'jet', aspect = 'auto', extent = [-0.5, 63.5, -180.45, 179.55])
+    im = axs1.imshow(proj_data_xrt[0, 0], cmap = 'jet', aspect = 'auto')
     axs1.axis('off')
     # axs1.tick_params(axis = 'both', which = 'major', labelsize = 14)
     axs1.set_title(r'XRT', fontsize = 16)
@@ -79,7 +81,7 @@ if sino_enabled:
     vmin = proj_data_xrt.min()
     vmax = proj_data_xrt.max()
 
-    im = axs2.imshow(proj_data_xrt[0, :, 0], vmin = vmin, vmax = vmax, cmap = 'jet', origin = 'lower', aspect = 'auto', extent = [-0.5, 63.5, -180.45, 179.55])
+    im = axs2.imshow(proj_data_xrt[0, :, 0], vmin = vmin, vmax = vmax, cmap = 'jet', origin = 'lower', aspect = 'auto', extent = [-0.5, 63.5, theta.min() - dtheta/2, theta.max() + dtheta/2])
     # axs2.axis('off')
     axs2.tick_params(axis = 'both', which = 'major', labelsize = 14)
     axs2.set_title(r'XRT', fontsize = 16)
