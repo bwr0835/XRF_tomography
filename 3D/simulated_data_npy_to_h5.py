@@ -22,7 +22,7 @@ output_path_xrt = os.path.join(dir_path, 'simulated_proj_data_xrt_64_64_64.h5')
 # proj_data_xrf = np.zeros((4, 200, 64, 64))
 proj_data_xrt = np.zeros((1, 400, 64, 64))
 
-proj_data_xrt[0] = np.load(os.path.join(dir_path, 'simulated_proj_data_xrt_64_64_64.npy')).reshape(200, 64, 64)
+proj_data_xrt[0] = np.load(os.path.join(dir_path, 'simulated_proj_data_xrt_64_64_64.npy')).reshape(400, 64, 64)
 
 theta = np.linspace(0, 360, 400)
 
