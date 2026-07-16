@@ -322,7 +322,7 @@ def MakeFLlinesDictionary(this_aN_dic,
 #         channel_names = XRF_data['exchange/elements'][...]
         
 #     channel_names = np.array([str(channel_name, 'utf-8') for channel_name in channel_names])
-#     element_lines_roi_idx = np.zeros(len(element_lines_roi)).astype(np.int)
+#     element_lines_roi_idx = np.zeros(len(element_lines_roi)).astype(int)
     
 #     for i, element_line_roi in enumerate(element_lines_roi):
 #         if element_line_roi[1] == "K":
@@ -652,12 +652,12 @@ def intersecting_length_fl_detectorlet_3d_mpi_write_h5(n_ranks, rank, det_size_c
     end_det_axis_2_idx_ls = np.array([int((sample_size_n - det_ds_spacing_n * np.floor(det_size_n/det_ds_spacing_n))/2.),
                                       int((sample_size_n + det_ds_spacing_n * np.floor(det_size_n/det_ds_spacing_n))/2.)])
 
-    det_axis_2_idx_ls = np.linspace(end_det_axis_2_idx_ls[0], end_det_axis_2_idx_ls[1], np.int(det_size_n/det_ds_spacing_n + 1))
+    det_axis_2_idx_ls = np.linspace(end_det_axis_2_idx_ls[0], end_det_axis_2_idx_ls[1], int(det_size_n/det_ds_spacing_n + 1))
 
     end_det_axis_0_idx_ls = np.array([int((sample_height_n - det_ds_spacing_n * np.floor(det_size_n/det_ds_spacing_n))/2.),
                                       int((sample_height_n + det_ds_spacing_n * np.floor(det_size_n/det_ds_spacing_n))/2.)])
 
-    det_axis_0_idx_ls = np.linspace(end_det_axis_0_idx_ls[0], end_det_axis_0_idx_ls[1], np.int(det_size_n/det_ds_spacing_n + 1))
+    det_axis_0_idx_ls = np.linspace(end_det_axis_0_idx_ls[0], end_det_axis_0_idx_ls[1], int(det_size_n/det_ds_spacing_n + 1))
     ## Create the meshgrid of y and z coordinates and keep only the coordinates within the detector circle
     y_d, z_d = np.meshgrid(det_axis_2_idx_ls, det_axis_0_idx_ls)
 
@@ -824,12 +824,12 @@ def intersecting_length_fl_detectorlet_3d_mpi_write_h5_2(n_ranks, minibatch_size
     end_det_axis_2_idx_ls = np.array([int((sample_size_n - det_ds_spacing_n * np.floor(det_size_n/det_ds_spacing_n))/2.),
                                       int((sample_size_n + det_ds_spacing_n * np.floor(det_size_n/det_ds_spacing_n))/2.)])
 
-    det_axis_2_idx_ls = np.linspace(end_det_axis_2_idx_ls[0], end_det_axis_2_idx_ls[1], np.int(det_size_n/det_ds_spacing_n + 1))
+    det_axis_2_idx_ls = np.linspace(end_det_axis_2_idx_ls[0], end_det_axis_2_idx_ls[1], int(det_size_n/det_ds_spacing_n + 1))
 
     end_det_axis_0_idx_ls = np.array([int((sample_height_n - det_ds_spacing_n * np.floor(det_size_n/det_ds_spacing_n))/2.),
                                       int((sample_height_n + det_ds_spacing_n * np.floor(det_size_n/det_ds_spacing_n))/2.)])
 
-    det_axis_0_idx_ls = np.linspace(end_det_axis_0_idx_ls[0], end_det_axis_0_idx_ls[1], np.int(det_size_n/det_ds_spacing_n + 1))
+    det_axis_0_idx_ls = np.linspace(end_det_axis_0_idx_ls[0], end_det_axis_0_idx_ls[1], int(det_size_n/det_ds_spacing_n + 1))
     ## Create the meshgrid of y and z coordinates and keep only the coordinates within the detector circle
     y_d, z_d = np.meshgrid(det_axis_2_idx_ls, det_axis_0_idx_ls)
 
@@ -1012,12 +1012,12 @@ def intersecting_length_fl_detectorlet_3d_mpi_write_h5_3(n_ranks, minibatch_size
     end_det_axis_2_idx_ls = np.array([int((sample_size_n - det_ds_spacing_n * np.floor(det_size_n/det_ds_spacing_n))/2.),
                                       int((sample_size_n + det_ds_spacing_n * np.floor(det_size_n/det_ds_spacing_n))/2.)])
 
-    det_axis_2_idx_ls = np.linspace(end_det_axis_2_idx_ls[0], end_det_axis_2_idx_ls[1], np.int(det_size_n/det_ds_spacing_n + 1))
+    det_axis_2_idx_ls = np.linspace(end_det_axis_2_idx_ls[0], end_det_axis_2_idx_ls[1], int(det_size_n/det_ds_spacing_n + 1))
 
     end_det_axis_0_idx_ls = np.array([int((sample_height_n - det_ds_spacing_n * np.floor(det_size_n/det_ds_spacing_n))/2.),
                                       int((sample_height_n + det_ds_spacing_n * np.floor(det_size_n/det_ds_spacing_n))/2.)])
 
-    det_axis_0_idx_ls = np.linspace(end_det_axis_0_idx_ls[0], end_det_axis_0_idx_ls[1], np.int(det_size_n/det_ds_spacing_n + 1))
+    det_axis_0_idx_ls = np.linspace(end_det_axis_0_idx_ls[0], end_det_axis_0_idx_ls[1], int(det_size_n/det_ds_spacing_n + 1))
     ## Create the meshgrid of y and z coordinates and keep only the coordinates within the detector circle
     y_d, z_d = np.meshgrid(det_axis_2_idx_ls, det_axis_0_idx_ls)
 
@@ -1240,12 +1240,12 @@ def intersecting_length_fl_detectorlet_3d_mpi_write_h5_3_manual(n_ranks, minibat
         end_det_axis_2_idx_ls = np.array([int((sample_size_n - det_ds_spacing_n * np.floor(det_size_n/det_ds_spacing_n))/2.),
                                           int((sample_size_n + det_ds_spacing_n * np.floor(det_size_n/det_ds_spacing_n))/2.)])
 
-        det_axis_2_idx_ls = np.linspace(end_det_axis_2_idx_ls[0], end_det_axis_2_idx_ls[1], np.int(det_size_n/det_ds_spacing_n + 1))
+        det_axis_2_idx_ls = np.linspace(end_det_axis_2_idx_ls[0], end_det_axis_2_idx_ls[1], int(det_size_n/det_ds_spacing_n + 1))
 
         end_det_axis_0_idx_ls = np.array([int((sample_height_n - det_ds_spacing_n * np.floor(det_size_n/det_ds_spacing_n))/2.),
                                           int((sample_height_n + det_ds_spacing_n * np.floor(det_size_n/det_ds_spacing_n))/2.)])
 
-        det_axis_0_idx_ls = np.linspace(end_det_axis_0_idx_ls[0], end_det_axis_0_idx_ls[1], np.int(det_size_n/det_ds_spacing_n + 1))
+        det_axis_0_idx_ls = np.linspace(end_det_axis_0_idx_ls[0], end_det_axis_0_idx_ls[1], int(det_size_n/det_ds_spacing_n + 1))
         ## Create the meshgrid of y and z coordinates and keep only the coordinates within the detector circle
         y_d, z_d = np.meshgrid(det_axis_2_idx_ls, det_axis_0_idx_ls)
 
@@ -1495,12 +1495,12 @@ def intersecting_length_fl_detectorlet_3d(det_size_cm, det_from_sample_cm, det_d
         end_det_axis_2_idx_ls = np.array([int((sample_size_n - det_ds_spacing_n * np.floor(det_size_n/det_ds_spacing_n))/2.),
                                           int((sample_size_n + det_ds_spacing_n * np.floor(det_size_n/det_ds_spacing_n))/2.)])
        
-        det_axis_2_idx_ls = np.linspace(end_det_axis_2_idx_ls[0], end_det_axis_2_idx_ls[1], np.int(det_size_n/det_ds_spacing_n + 1))
+        det_axis_2_idx_ls = np.linspace(end_det_axis_2_idx_ls[0], end_det_axis_2_idx_ls[1], int(det_size_n/det_ds_spacing_n + 1))
 
         end_det_axis_0_idx_ls = np.array([int((sample_height_n - det_ds_spacing_n * np.floor(det_size_n/det_ds_spacing_n))/2.),
                                           int((sample_height_n + det_ds_spacing_n * np.floor(det_size_n/det_ds_spacing_n))/2.)])
 
-        det_axis_0_idx_ls = np.linspace(end_det_axis_0_idx_ls[0], end_det_axis_0_idx_ls[1], np.int(det_size_n/det_ds_spacing_n + 1))
+        det_axis_0_idx_ls = np.linspace(end_det_axis_0_idx_ls[0], end_det_axis_0_idx_ls[1], int(det_size_n/det_ds_spacing_n + 1))
         ## Create the meshgrid of y and z coordinates and keep only the coordinates within the detector circle
         y_d, z_d = np.meshgrid(det_axis_2_idx_ls, det_axis_0_idx_ls)
 
