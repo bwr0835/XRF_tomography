@@ -1,6 +1,7 @@
 import numpy as np, \
        h5py, \
-       os
+       os, \
+       sys
 
 from imageio import v2 as iio2
 from matplotlib import pyplot as plt
@@ -29,7 +30,9 @@ theta = np.linspace(-180, 180, 201)[:-1]
 dtheta = theta[1] - theta[0]
 
 print(theta)
-
+a = 1
+if a:
+    sys.exit()
 # elements_xrf = ['Ca', 'Ca_L', 'Sc', 'Sc_L']
 elements_xrt = ['xrt_sig']
 
