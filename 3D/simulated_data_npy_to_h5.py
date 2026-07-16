@@ -28,6 +28,8 @@ proj_data_xrt[0] = np.load(os.path.join(dir_path, 'simulated_proj_data_xrt_64_64
 theta = np.linspace(-180, 180, 201)[:-1]
 dtheta = theta[1] - theta[0]
 
+print(theta)
+
 # elements_xrf = ['Ca', 'Ca_L', 'Sc', 'Sc_L']
 elements_xrt = ['xrt_sig']
 
