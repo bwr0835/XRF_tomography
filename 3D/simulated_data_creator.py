@@ -67,9 +67,11 @@ params_64_64_64_cabead_xrf = {'n_ranks': n_ranks,
                               'probe_cts': 1000000.0, # photons
                               'probe_energy_keV': np.array([20.0]),
                               'save_path': '/home/bwr0835', 
-                              'save_fname': 'simulated_proj_data_xrf_64_64_64', 
+                              'save_fname': 'simulated_proj_data_xrf_no_probe_att_no_selfab_64_64_64', 
                               'Poisson_noise': True, 
-                              'dev': dev}
+                              'dev': dev,
+                              'probe_att': False,
+                              'selfAb': False}
 
 if __name__ == "__main__":
     if sys.argv[1] == 'xrt':
