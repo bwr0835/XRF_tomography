@@ -18,7 +18,7 @@ elements_xrf = ['Ca', 'Ca_L', 'Sc', 'Sc_L']
 elements_xrt = ['xrt_sig']
 
 for theta_idx in range(200):
-    file_path = f'{dir_path}/simulated_proj_data_xrf_no_probe_att_no_selfab_64_64_64_{theta_idx:03d}.npy'
+    file_path = f'{dir_path}/simulated_proj_data_xrf_no_probe_att_no_selfab_64_64_64_{theta_idx}.npy'
 
     proj_data_xrf[:, theta_idx] = np.load(file_path).reshape(4, 64, 64)
 
