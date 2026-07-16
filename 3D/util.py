@@ -136,7 +136,7 @@ def attenuation_3d(src_path, theta_st, theta_end, n_theta, sample_height_n, samp
     aN_ls = np.array(list(this_aN_dic.values()))
     # probe_attCS_ls = tc.tensor(xlib_np.CS_Total(aN_ls, probe_energy_keV).flatten()).float().to(dev)
     # probe_attCS_ls = tc.tensor(xlib_np.CS_Total_Kissel(aN_ls, probe_energy_keV).flatten()).float().to(dev)
-    probe_attCS_ls = tc.tensor(xlib_np.CS_Photo_Total(aN_ls, probe_energy_keV).flatten()).float().to(dev)
+    probe_attCS_ls = tc.tensor(xlib_np.CS_Photo_Kissel(aN_ls, probe_energy_keV).flatten()).float().to(dev)
     
     att_exponent_acc_map = tc.zeros((len(theta_ls), sample_height_n, sample_size_n, sample_size_n+1), device=dev)
     for i , theta in enumerate(theta_ls):
