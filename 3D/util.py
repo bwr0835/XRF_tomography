@@ -58,7 +58,7 @@ def rotate(arr, theta, dev):
         grid concentration
         
     theta : float
-        rotation angle in degrees (clockwise)
+        rotation angle in radians (clockwise)
     
     dev : string
         specify "cpu" or the cuda diveice (ex: cuda:0)
@@ -75,6 +75,10 @@ def rotate(arr, theta, dev):
     # radians before feeding the rotation matrix, otherwise cos/sin interpret the
     # value as radians and the projections appear to jump/sway between angles.
     theta_rad = theta * (np.pi / 180.0)
+
+    # Old (buggy) version: theta was treated directly as radians.
+    # m0 = tc.tensor([tc.cos(theta), -tc.sin(theta), 0.0], device=dev)
+    # m1 = tc.tensor([tc.sin(theta), tc.cos(theta), 0.0], device=dev)
 
     m0 = tc.tensor([tc.cos(theta_rad), -tc.sin(theta_rad), 0.0], device=dev)
     m1 = tc.tensor([tc.sin(theta_rad), tc.cos(theta_rad), 0.0], device=dev)
