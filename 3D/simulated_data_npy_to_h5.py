@@ -59,7 +59,7 @@ if proj_img_enabled:
 
     theta_frames = []
 
-    for theta_idx in range(400):
+    for theta_idx in range(200):
         im.set_data(proj_data_xrt[0, theta_idx])
         txt1.set_text(r'$\theta = {0}^{{\circ}}$'.format(theta[theta_idx]))
 
