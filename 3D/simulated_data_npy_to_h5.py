@@ -30,7 +30,7 @@ with h5py.File(output_path_xrt, 'w') as f:
     exchange.create_dataset('theta', data = theta)
 
 for theta_idx in range(200):
-    file_path = f'{dir_path}/simulated_proj_data_xrf_no_probe_att_no_selfab_64_64_64_{theta_idx:03d}.npy'
+    file_path = f'{dir_path}/simulated_proj_data_xrf_no_probe_att_no_selfab_64_64_64_{theta_idx}.npy'
 
     os.remove(file_path)
 
