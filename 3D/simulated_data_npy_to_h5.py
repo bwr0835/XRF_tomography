@@ -43,7 +43,7 @@ with h5py.File(output_path_xrt, 'w') as f:
 
 fig1, axs1 = plt.subplots()
 
-axs1.imshow(proj_data_xrt[0, :, 30], cmap = 'jet', aspect = 'auto', extent = [-0.5, 63.5, -180.45, 179.55])
+axs1.imshow(proj_data_xrt[0, :, 40], cmap = 'jet', aspect = 'auto', extent = [-0.5, 63.5, -180.45, 179.55])
 axs1.tick_params(axis = 'both', which = 'major', labelsize = 14)
 axs1.set_title(r'XRT')
 axs1.set_ylabel(r'$\theta$ (degrees)')
