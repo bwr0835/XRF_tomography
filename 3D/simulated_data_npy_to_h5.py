@@ -43,13 +43,32 @@ with h5py.File(output_path_xrt, 'w') as f:
 
 fig1, axs1 = plt.subplots()
 
-axs1.imshow(proj_data_xrt[0, :, 40], cmap = 'jet', aspect = 'auto', extent = [-0.5, 63.5, -180.45, 179.55])
-axs1.tick_params(axis = 'both', which = 'major', labelsize = 14)
-axs1.set_title(r'XRT')
-axs1.set_ylabel(r'$\theta$ (degrees)')
-axs1.set_xlabel(r'Scan position index')
+im = axs1.imshow(proj_data_xrt[0, 0], cmap = 'jet', aspect = 'auto', extent = [-0.5, 63.5, -180.45, 179.55])
+axs1.axis('off')
+# axs1.tick_params(axis = 'both', which = 'major', labelsize = 14)
+axs1.set_title(r'XRT', fontsize = 16)
+# axs1.set_ylabel(r'$\theta$ (degrees)')
+# axs1.set_xlabel(r'Scan position index')
 
-plt.show()
+txt = axs1.text(0.02, 0.02, r'$\theta = 0^{\circ}$', fontsize = 14)
+
+theta_frames = []
+
+for theta_idx in range(400):
+    im.set_data(proj_data_xrt[0, theta_idx])
+    txt.set_text(r'$\theta = {0}^{{\circ}}$'.format(theta[theta_idx]))
+
+    fig1.canvas.draw()
+        
+    frame = np.array(fig1.canvas.renderer.buffer_rgba())[:, :, :3]
+        
+    theta_frames.append(frame)
+
+plt.close(fig1)
+
+gif_filename = os.path.join(dir_path, f'simulated_proj_data_xrt_64_64_64.gif')
+
+iio2.mimsave(gif_filename, theta_frames, fps = 10)
 
 # for theta_idx in range(200):
 #     file_path = f'{dir_path}/simulated_proj_data_xrf_no_probe_att_no_selfab_64_64_64_{theta_idx}.npy'
