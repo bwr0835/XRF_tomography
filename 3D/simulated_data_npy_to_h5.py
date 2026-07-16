@@ -2,6 +2,18 @@ import numpy as np, \
        h5py, \
        os
 
+from imageio import v2 as iio2
+from matplotlib import pyplot as plt
+
+plt.rcParams['text.usetex'] = True
+plt.rcParams['font.family'] = 'serif' 
+plt.rcParams['text.latex.preamble'] = r'\usepackage{times}'
+
+plt.rcParams['xtick.major.size'] = 9
+plt.rcParams['xtick.minor.size'] = 4.5
+plt.rcParams['ytick.major.size'] = 9
+plt.rcParams['ytick.minor.size'] = 4.5
+
 dir_path = '/home/bwr0835'
 
 # output_path_xrf = os.path.join(dir_path, 'simulated_proj_data_xrf_no_probe_att_no_selfab_64_64_64.h5')
@@ -28,6 +40,13 @@ with h5py.File(output_path_xrt, 'w') as f:
     exchange.create_dataset('data', data = proj_data_xrt)
     exchange.create_dataset('elements', data = elements_xrt)
     exchange.create_dataset('theta', data = theta)
+
+fig1, axs1 = plt.subplots()
+
+axs1.imshow(proj_data_xrt[0, 0], cmap = 'jet', aspect = 'auto', extent = [0, 63, -177.8, 178.2])
+axs1.set_title(r'XRT')
+axs1.set_ylabel(r'$\theta$ (degrees)')
+axs1.set_xlabel(r'Scan position index')
 
 # for theta_idx in range(200):
 #     file_path = f'{dir_path}/simulated_proj_data_xrf_no_probe_att_no_selfab_64_64_64_{theta_idx}.npy'

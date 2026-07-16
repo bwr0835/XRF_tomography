@@ -36,7 +36,7 @@ else:
 params_64_64_64_cabead_xrt = {'src_path': './data/sample8_size_64_pad/nElements_2/grid_concentration.npy',
                               'theta_st': 0,
                               'theta_end': 360,
-                              'n_theta': 200,
+                              'n_theta': 400,
                               'sample_height_n': 64, 
                               'sample_size_n': 64,
                               'sample_size_cm': 0.01,
