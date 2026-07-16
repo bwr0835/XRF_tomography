@@ -76,7 +76,10 @@ if proj_img_enabled:
 if sino_enabled:
     fig2, axs2 = plt.subplots()
 
-    im = axs2.imshow(proj_data_xrt[0, :, 0], cmap = 'jet', origin = 'lower', aspect = 'auto', extent = [-0.5, 63.5, -180.45, 179.55])
+    vmin = proj_data_xrt.min()
+    vmax = proj_data_xrt.max()
+
+    im = axs2.imshow(proj_data_xrt[0, :, 0], vmin = vmin, vmax = vmax, cmap = 'jet', origin = 'lower', aspect = 'auto', extent = [-0.5, 63.5, -180.45, 179.55])
     axs2.axis('off')
     axs2.tick_params(axis = 'both', which = 'major', labelsize = 14)
     axs2.set_title(r'XRT', fontsize = 16)
