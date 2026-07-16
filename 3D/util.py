@@ -205,7 +205,9 @@ def create_XRT_data_3d(src_path, theta_st, theta_end, n_theta, sample_height_n, 
     
     if Poisson_noise == True:
         random_noise_generator = default_rng()
-        XRT_data = random_noise_generator.poisson(XRT_data)
+        XRT_data = random_noise_generator.poisson(XRT_data.cpu().numpy())
+    else:
+        XRT_data = XRT_data.cpu().numpy()
     
     if not os.path.exists(save_path):
         os.mkdir(save_path)
@@ -217,7 +219,7 @@ def create_XRT_data_3d(src_path, theta_st, theta_end, n_theta, sample_height_n, 
             np.save(os.path.join(save_path, save_fname +'_{}'.format(this_theta_idx)), XRT_data[this_theta_idx])
     
     else:
-        np.save(os.path.join(save_path, save_fname), XRT_data.cpu())
+        np.save(os.path.join(save_path, save_fname), XRT_data)
     
     return XRT_data
 
@@ -1681,12 +1683,14 @@ def create_XRF_data_single_theta_3d(n_det, P, theta_st, theta_end, n_theta, src_
     h =  r - det_from_sample_cm
     fl_sig_collecting_cap_area = np.pi*((det_size_cm/2)**2 + h**2)
     fl_sig_collecting_ratio = fl_sig_collecting_cap_area / (4*np.pi*r**2)
-    fl_signal_SA_theta = fl_signal_SA_theta * fl_sig_collecting_ratio
+    fl_signal_SA = fl_signal_SA * fl_sig_collecting_ratio
 
 
     if Poisson_noise == True:
         random_noise_generator = default_rng()
-        fl_signal_SA = random_noise_generator.poisson(fl_signal_SA)
+        fl_signal_SA = random_noise_generator.poisson(fl_signal_SA.cpu().numpy())
+    else:
+        fl_signal_SA = fl_signal_SA.cpu().numpy()
     np.save(os.path.join(save_path, save_fname +'_{}'.format(this_theta_idx)), fl_signal_SA)
     
     return fl_signal_SA    
