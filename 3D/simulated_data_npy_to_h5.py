@@ -50,7 +50,7 @@ axs1.set_title(r'XRT', fontsize = 16)
 # axs1.set_ylabel(r'$\theta$ (degrees)')
 # axs1.set_xlabel(r'Scan position index')
 
-txt = axs1.text(0.02, 0.02, r'$\theta = 0^{\circ}$', fontsize = 14)
+txt = axs1.text(0.02, 0.02, r'$\theta = 0^{\circ}$', transform = axs1.transAxes, color = 'white', fontsize = 14)
 
 theta_frames = []
 
