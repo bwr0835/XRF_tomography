@@ -36,13 +36,13 @@ else:
 params_64_64_64_cabead_xrt = {'src_path': './data/sample8_size_64_pad/nElements_2/grid_concentration.npy',
                               'theta_st': 0,
                               'theta_end': 360,
-                              'n_theta': 400,
+                              'n_theta': 200,
                               'sample_height_n': 64, 
                               'sample_size_n': 64,
                               'sample_size_cm': 0.01,
                               'this_aN_dic': {'Ca': 20, 'Sc': 21},
                               'probe_energy_keV': np.array([20.0]),
-                              'probe_cts': 10000000.0, # photons
+                              'probe_cts': 1000000.0, # photons
                               'save_path': '/home/bwr0835',
                               'save_fname': 'simulated_proj_data_xrt_64_64_64',
                               'theta_sep': False,
