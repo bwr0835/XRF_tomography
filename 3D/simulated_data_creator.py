@@ -33,7 +33,7 @@ else:
     
     sys.stdout.flush()
 
-params_64_64_64_cabead_xrt = {'src_path': '',
+params_64_64_64_cabead_xrt = {'src_path': './data/sample8_size_64_pad/nElements_2/grid_concentration.npy',
                               'theta_st': 0,
                               'theta_end': 360,
                               'n_theta': 200,
