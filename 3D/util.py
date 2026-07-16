@@ -1723,6 +1723,7 @@ def create_XRF_data_3d(n_ranks, rank, P_folder, f_P, theta_st, theta_end, n_thet
         P = tc.from_numpy(P_handle['P_array'][...])
         n_det = P.shape[0] 
         theta_ls = -tc.linspace(theta_st, theta_end, n_theta + 1)[:-1] 
+        
         for this_theta_idx, theta in enumerate(tqdm(theta_ls)):
             create_XRF_data_single_theta_3d(n_det, P, theta_st, theta_end, n_theta, src_path, det_size_cm, det_from_sample_cm, det_ds_spacing_cm, sample_size_n,
                                  sample_size_cm, sample_height_n, this_aN_dic, probe_cts, probe_energy_keV, save_path, save_fname, Poisson_noise, dev, this_theta_idx, probe_att, selfAb)
