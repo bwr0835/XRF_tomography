@@ -205,6 +205,7 @@ def create_XRT_data_3d(src_path, theta_st, theta_end, n_theta, sample_height_n, 
     
     if Poisson_noise == True:
         random_noise_generator = default_rng()
+        # XRT_data = random_noise_generator.poisson(XRT_data)
         XRT_data = random_noise_generator.poisson(XRT_data.cpu().numpy())
     else:
         XRT_data = XRT_data.cpu().numpy()
@@ -219,6 +220,7 @@ def create_XRT_data_3d(src_path, theta_st, theta_end, n_theta, sample_height_n, 
             np.save(os.path.join(save_path, save_fname +'_{}'.format(this_theta_idx)), XRT_data[this_theta_idx])
     
     else:
+        # np.save(os.path.join(save_path, save_fname), XRT_data.cpu())
         np.save(os.path.join(save_path, save_fname), XRT_data)
     
     return XRT_data
@@ -441,8 +443,12 @@ def generate_fl_signal_from_each_voxel_3d(src_path, theta_st, theta_end, n_theta
 
     grid_concentration = tc.tensor(np.load(src_path)).float().to(dev)
 
+    # fl_all_lines_dic = MakeFLlinesDictionary(this_aN_dic, probe_energy_keV,
+    #                           sample_size_n.cpu().numpy(), sample_size_cm.cpu().numpy(),
+    #                           fl_line_groups = np.array(["K", "L", "M"]), fl_K = fl["K"], fl_L = fl["L"], fl_M = fl["M"],
+    #                           group_lines = True)
     fl_all_lines_dic = MakeFLlinesDictionary(this_aN_dic, probe_energy_keV,
-                              sample_size_n.cpu().numpy(), sample_size_cm.cpu().numpy(),
+                              sample_size_n, sample_size_cm,
                               fl_line_groups = np.array(["K", "L", "M"]), fl_K = fl["K"], fl_L = fl["L"], fl_M = fl["M"],
                               group_lines = True)
 
@@ -1607,7 +1613,9 @@ def intersecting_length_fl_detectorlet_3d(det_size_cm, det_from_sample_cm, det_d
 def self_absorption_att_ratio_single_theta_3d(src_path, n_det, P, det_size_cm, det_from_sample_cm, det_ds_spacing_cm, sample_size_n, sample_size_cm, sample_height_n, 
                                              this_aN_dic, probe_energy_keV, dev, theta):
     
-    fl_all_lines_dic = MakeFLlinesDictionary(this_aN_dic, probe_energy_keV, sample_size_n.cpu().numpy(), sample_size_cm.cpu().numpy(),
+    # fl_all_lines_dic = MakeFLlinesDictionary(this_aN_dic, probe_energy_keV, sample_size_n.cpu().numpy(), sample_size_cm.cpu().numpy(),
+    #                       fl_line_groups = np.array(["K", "L", "M"]), fl_K = fl["K"], fl_L = fl["L"], fl_M = fl["M"], group_lines = True)
+    fl_all_lines_dic = MakeFLlinesDictionary(this_aN_dic, probe_energy_keV, sample_size_n, sample_size_cm,
                           fl_line_groups = np.array(["K", "L", "M"]), fl_K = fl["K"], fl_L = fl["L"], fl_M = fl["M"], group_lines = True)
 
     n_voxel = sample_height_n * sample_size_n * sample_size_n
@@ -1683,11 +1691,13 @@ def create_XRF_data_single_theta_3d(n_det, P, theta_st, theta_end, n_theta, src_
     h =  r - det_from_sample_cm
     fl_sig_collecting_cap_area = np.pi*((det_size_cm/2)**2 + h**2)
     fl_sig_collecting_ratio = fl_sig_collecting_cap_area / (4*np.pi*r**2)
+    # fl_signal_SA_theta = fl_signal_SA_theta * fl_sig_collecting_ratio
     fl_signal_SA = fl_signal_SA * fl_sig_collecting_ratio
 
 
     if Poisson_noise == True:
         random_noise_generator = default_rng()
+        # fl_signal_SA = random_noise_generator.poisson(fl_signal_SA)
         fl_signal_SA = random_noise_generator.poisson(fl_signal_SA.cpu().numpy())
     else:
         fl_signal_SA = fl_signal_SA.cpu().numpy()
@@ -1701,9 +1711,12 @@ def create_XRF_data_3d(n_ranks, rank, P_folder, f_P, theta_st, theta_end, n_thet
     
     P_save_path = os.path.join(P_folder, f_P)
     if not os.path.isfile(P_save_path + ".h5"):   
+        # intersecting_length_fl_detectorlet_3d_mpi_write_h5(n_ranks, rank, det_size_cm, det_from_sample_cm, det_ds_spacing_cm,
+        #                                           sample_size_n.cpu().numpy(), sample_size_cm.cpu().numpy(),
+        #                                           sample_height_n.cpu().numpy(), P_folder, f_P) #cpu
         intersecting_length_fl_detectorlet_3d_mpi_write_h5(n_ranks, rank, det_size_cm, det_from_sample_cm, det_ds_spacing_cm,
-                                                  sample_size_n.cpu().numpy(), sample_size_cm.cpu().numpy(),
-                                                  sample_height_n.cpu().numpy(), P_folder, f_P) #cpu
+                                                  sample_size_n, sample_size_cm,
+                                                  sample_height_n, P_folder, f_P) #cpu
     
     if rank == 0:
         P_handle = h5py.File(P_save_path + ".h5", 'r')
