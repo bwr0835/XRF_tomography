@@ -47,7 +47,7 @@ params_64_64_64_cabead_xrt = {'src_path': './data/sample8_size_64_pad/nElements_
                               'save_fname': 'simulated_proj_data_xrt_64_64_64',
                               'theta_sep': False,
                               'Poisson_noise': True,
-                              'dev': dev}
+                              'dev': 'cuda:0'}
 
 params_64_64_64_cabead_xrf = {'n_ranks': n_ranks, 
                               'rank': rank, 
