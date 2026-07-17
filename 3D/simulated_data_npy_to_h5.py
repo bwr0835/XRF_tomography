@@ -67,7 +67,7 @@ with h5py.File(output_path_xrf, 'w') as f:
 
 if xrt_proj_img_enabled:
     fig1, axs1 = plt.subplots()
-
+    
     im = axs1.imshow(proj_data_xrt[0, 0], cmap = 'jet', aspect = 'auto')
     axs1.axis('off')
     # axs1.tick_params(axis = 'both', which = 'major', labelsize = 14)
@@ -75,13 +75,13 @@ if xrt_proj_img_enabled:
     # axs1.set_ylabel(r'$\theta$ (degrees)')
     # axs1.set_xlabel(r'Scan position index')
 
-    txt = axs1.text(0.02, 0.02, r'$\theta = 0^{\circ}$', transform = axs1.transAxes, color = 'white', fontsize = 14)
+    txt = axs1.text(0.02, 0.02, r'$\theta = 0.0^{\circ}$', transform = axs1.transAxes, color = 'white', fontsize = 14)
 
     frames = []
 
     for theta_idx in range(200):
         im.set_data(proj_data_xrt[0, theta_idx])
-        txt.set_text(r'$\theta = {0}^{{\circ}}$'.format(theta[theta_idx]))
+        txt.set_text(r'$\theta = {0:.1f}^{{\circ}}$'.format(theta[theta_idx]))
 
         fig1.canvas.draw()
         
@@ -131,12 +131,12 @@ if xrt_sino_enabled:
 if xrf_proj_img_enabled:
     fig, axs = plt.subplots(2, 2)
 
-    im1 = axs[0, 0].imshow(proj_data_xrf[0, 0], vmax = proj_data_xrf.max(), cmap = 'jet')
-    im2 = axs[0, 1].imshow(proj_data_xrf[1, 0], vmax = proj_data_xrf.max(), cmap = 'jet')
-    im3 = axs[1, 0].imshow(proj_data_xrf[2, 0], vmax = proj_data_xrf.max(), cmap = 'jet')
-    im4 = axs[1, 1].imshow(proj_data_xrf[3, 0], vmax = proj_data_xrf.max(), cmap = 'jet')
+    im1 = axs[0, 0].imshow(proj_data_xrf[0, 0], vmax = proj_data_xrf[0].max(), cmap = 'jet')
+    im2 = axs[0, 1].imshow(proj_data_xrf[1, 0], vmax = proj_data_xrf[1].max(), cmap = 'jet')
+    im3 = axs[1, 0].imshow(proj_data_xrf[2, 0], vmax = proj_data_xrf[2].max(), cmap = 'jet')
+    im4 = axs[1, 1].imshow(proj_data_xrf[3, 0], vmax = proj_data_xrf[3].max(), cmap = 'jet')
 
-    txt = axs[0, 0].text(0.02, 0.02, r'$\theta = 0^{\circ}$', transform = axs[0, 0].transAxes, color = 'white', fontsize = 14)
+    txt = axs[0, 0].text(0.02, 0.02, r'$\theta = -180.0^{\circ}$', transform = axs[0, 0].transAxes, color = 'white', fontsize = 14)
     
     for i, ax in enumerate(fig.axes):
         ax.axis('off')
@@ -150,7 +150,7 @@ if xrf_proj_img_enabled:
         im3.set_data(proj_data_xrf[2, theta_idx])
         im4.set_data(proj_data_xrf[3, theta_idx])
 
-        txt.set_text(r'$\theta = {0}^{{\circ}}$'.format(theta[theta_idx]))
+        txt.set_text(r'$\theta = {0:.1f}^{{\circ}}$'.format(theta[theta_idx]))
 
         fig.canvas.draw()
         
@@ -168,12 +168,11 @@ if xrf_sino_enabled:
     fig, axs = plt.subplots(2, 2)
 
     vmin = proj_data_xrf.min()
-    vmax = proj_data_xrf.max()
 
-    im1 = axs[0, 0].imshow(proj_data_xrf[0, :, 0], vmin = vmin, vmax = vmax, cmap = 'jet', origin = 'lower', aspect = 'auto', extent = [-0.5, 63.5, theta.min() - dtheta/2, theta.max() + dtheta/2])
-    im2 = axs[0, 1].imshow(proj_data_xrf[1, :, 0], vmin = vmin, vmax = vmax, cmap = 'jet', origin = 'lower', aspect = 'auto', extent = [-0.5, 63.5, theta.min() - dtheta/2, theta.max() + dtheta/2])
-    im3 = axs[1, 0].imshow(proj_data_xrf[2, :, 0], vmin = vmin, vmax = vmax, cmap = 'jet', origin = 'lower', aspect = 'auto', extent = [-0.5, 63.5, theta.min() - dtheta/2, theta.max() + dtheta/2])
-    im4 = axs[1, 1].imshow(proj_data_xrf[3, :, 0], vmin = vmin, vmax = vmax, cmap = 'jet', origin = 'lower', aspect = 'auto', extent = [-0.5, 63.5, theta.min() - dtheta/2, theta.max() + dtheta/2])
+    im1 = axs[0, 0].imshow(proj_data_xrf[0, :, 0], vmax = proj_data_xrf[0], cmap = 'jet', origin = 'lower', aspect = 'auto', extent = [-0.5, 63.5, theta.min() - dtheta/2, theta.max() + dtheta/2])
+    im2 = axs[0, 1].imshow(proj_data_xrf[1, :, 0], vmax = proj_data_xrf[1], cmap = 'jet', origin = 'lower', aspect = 'auto', extent = [-0.5, 63.5, theta.min() - dtheta/2, theta.max() + dtheta/2])
+    im3 = axs[1, 0].imshow(proj_data_xrf[2, :, 0], vmax = proj_data_xrf[2], cmap = 'jet', origin = 'lower', aspect = 'auto', extent = [-0.5, 63.5, theta.min() - dtheta/2, theta.max() + dtheta/2])
+    im4 = axs[1, 1].imshow(proj_data_xrf[3, :, 0], vmax = proj_data_xrf[3], cmap = 'jet', origin = 'lower', aspect = 'auto', extent = [-0.5, 63.5, theta.min() - dtheta/2, theta.max() + dtheta/2])
 
     for i, ax in enumerate(fig.axes):
         ax.set_title(elements_xrf[i], fontsize = 16)
