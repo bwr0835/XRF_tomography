@@ -1628,7 +1628,7 @@ def self_absorption_att_ratio_single_theta_3d(src_path, n_det, P, det_size_cm, d
                           fl_line_groups = np.array(["K", "L", "M"]), fl_K = fl["K"], fl_L = fl["L"], fl_M = fl["M"], group_lines = True)
 
     n_voxel = sample_height_n * sample_size_n * sample_size_n
-    dia_len_n = int((sample_height_n**2 + sample_size_n**2 + sample_size_n**2)**0.5)
+    dia_len_n = int(1.2*(sample_height_n**2 + sample_size_n**2 + sample_size_n**2)**0.5)
     n_lines = tc.as_tensor(fl_all_lines_dic["n_lines"]).to(dev)
     aN_ls = np.array(list(this_aN_dic.values()))   
     grid_concentration = tc.from_numpy(np.load(src_path)).float().to(dev)
