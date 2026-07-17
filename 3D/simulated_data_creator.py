@@ -71,7 +71,7 @@ params_64_64_64_cabead_xrf = {'n_ranks': n_ranks,
                               'Poisson_noise': True, 
                               'dev': dev,
                               'probe_att': False,
-                              'selfAb': False}
+                              'selfAb': True}
 
 if __name__ == "__main__":
     if sys.argv[1] == 'xrt':
