@@ -169,10 +169,10 @@ if xrf_sino_enabled:
 
     vmin = proj_data_xrf.min()
 
-    im1 = axs[0, 0].imshow(proj_data_xrf[0, :, 0], vmax = proj_data_xrf[0], cmap = 'jet', origin = 'lower', aspect = 'auto', extent = [-0.5, 63.5, theta.min() - dtheta/2, theta.max() + dtheta/2])
-    im2 = axs[0, 1].imshow(proj_data_xrf[1, :, 0], vmax = proj_data_xrf[1], cmap = 'jet', origin = 'lower', aspect = 'auto', extent = [-0.5, 63.5, theta.min() - dtheta/2, theta.max() + dtheta/2])
-    im3 = axs[1, 0].imshow(proj_data_xrf[2, :, 0], vmax = proj_data_xrf[2], cmap = 'jet', origin = 'lower', aspect = 'auto', extent = [-0.5, 63.5, theta.min() - dtheta/2, theta.max() + dtheta/2])
-    im4 = axs[1, 1].imshow(proj_data_xrf[3, :, 0], vmax = proj_data_xrf[3], cmap = 'jet', origin = 'lower', aspect = 'auto', extent = [-0.5, 63.5, theta.min() - dtheta/2, theta.max() + dtheta/2])
+    im1 = axs[0, 0].imshow(proj_data_xrf[0, :, 0], vmax = proj_data_xrf[0].max(), cmap = 'jet', origin = 'lower', aspect = 'auto', extent = [-0.5, 63.5, theta.min() - dtheta/2, theta.max() + dtheta/2])
+    im2 = axs[0, 1].imshow(proj_data_xrf[1, :, 0], vmax = proj_data_xrf[1].max(), cmap = 'jet', origin = 'lower', aspect = 'auto', extent = [-0.5, 63.5, theta.min() - dtheta/2, theta.max() + dtheta/2])
+    im3 = axs[1, 0].imshow(proj_data_xrf[2, :, 0], vmax = proj_data_xrf[2].max(), cmap = 'jet', origin = 'lower', aspect = 'auto', extent = [-0.5, 63.5, theta.min() - dtheta/2, theta.max() + dtheta/2])
+    im4 = axs[1, 1].imshow(proj_data_xrf[3, :, 0], vmax = proj_data_xrf[3].max(), cmap = 'jet', origin = 'lower', aspect = 'auto', extent = [-0.5, 63.5, theta.min() - dtheta/2, theta.max() + dtheta/2])
 
     for i, ax in enumerate(fig.axes):
         ax.set_title(elements_xrf[i], fontsize = 16)
