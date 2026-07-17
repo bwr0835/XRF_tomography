@@ -35,8 +35,8 @@ elements_xrt = ['xrt_sig']
 xrt_proj_img_enabled = False
 xrt_sino_enabled = False
 
-xrf_proj_img_enabled = False
-xrf_sino_enabled = True
+xrf_proj_img_enabled = True
+xrf_sino_enabled = False
 
 remove_files_enabled = False
 
