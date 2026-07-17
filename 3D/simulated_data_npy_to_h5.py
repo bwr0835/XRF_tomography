@@ -160,7 +160,7 @@ if xrf_proj_img_enabled:
 
     plt.close(fig)
 
-    gif_filename = os.path.join(dir_path, f'simulated_proj_data_xrf_64_64_64.gif')
+    gif_filename = os.path.join(dir_path, f'simulated_proj_data_xrf_no_probe_att_no_selfab_64_64_64.gif')
 
     iio2.mimsave(gif_filename, frames, fps = 10)
 
