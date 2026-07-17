@@ -136,7 +136,9 @@ if xrf_proj_img_enabled:
     im3 = axs[1, 0].imshow(proj_data_xrf[2, 0], vmax = proj_data_xrf.max(), cmap = 'jet')
     im4 = axs[1, 1].imshow(proj_data_xrf[3, 0], vmax = proj_data_xrf.max(), cmap = 'jet')
 
-    for i, ax in enumerate(axs.axes):
+    txt = axs[0, 0].text(0.02, 0.02, r'$\theta = 0^{\circ}$', transform = axs[0, 0].transAxes, color = 'white', fontsize = 14)
+    
+    for i, ax in enumerate(fig.axes):
         ax.axis('off')
         ax.set_title(elements_xrf[i], fontsize = 16)
     
@@ -147,6 +149,8 @@ if xrf_proj_img_enabled:
         im2.set_data(proj_data_xrf[1, theta_idx])
         im3.set_data(proj_data_xrf[2, theta_idx])
         im4.set_data(proj_data_xrf[3, theta_idx])
+
+        txt.set_text(r'$\theta = {0}^{{\circ}}$'.format(theta[theta_idx]))
 
         fig.canvas.draw()
         
@@ -171,7 +175,7 @@ if xrf_sino_enabled:
     im3 = axs[1, 0].imshow(proj_data_xrf[2, :, 0], vmin = vmin, vmax = vmax, cmap = 'jet', origin = 'lower', aspect = 'auto', extent = [-0.5, 63.5, theta.min() - dtheta/2, theta.max() + dtheta/2])
     im4 = axs[1, 1].imshow(proj_data_xrf[3, :, 0], vmin = vmin, vmax = vmax, cmap = 'jet', origin = 'lower', aspect = 'auto', extent = [-0.5, 63.5, theta.min() - dtheta/2, theta.max() + dtheta/2])
 
-    for i, ax in enumerate(axs.axes):
+    for i, ax in enumerate(fig.axes):
         ax.set_title(elements_xrf[i], fontsize = 16)
         ax.set_xlabel(r'Scan position index', fontsize = 16)
         ax.set_ylabel(r'$\theta$ (\textdegree{})', fontsize = 16)
