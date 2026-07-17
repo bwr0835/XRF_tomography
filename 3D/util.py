@@ -1729,7 +1729,8 @@ def create_XRF_data_3d(n_ranks, rank, P_folder, f_P, theta_st, theta_end, n_thet
     
     if rank == 0:
         P_handle = h5py.File(P_save_path + ".h5", 'r')
-        P = tc.from_numpy(P_handle['P_array'][...])
+        # P = tc.from_numpy(P_handle['P_array'][...])
+        P = tc.from_numpy(P_handle['P_array'][...]).to(dev)
         n_det = P.shape[0] 
         theta_ls = -tc.linspace(theta_st, theta_end, n_theta + 1)[:-1] 
         
