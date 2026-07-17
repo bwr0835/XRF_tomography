@@ -69,7 +69,7 @@ params_64_64_64_cabead_xrf = {'n_ranks': n_ranks,
                               'save_path': '/home/bwr0835', 
                               'save_fname': 'simulated_proj_data_xrf_no_probe_att_yes_selfab_64_64_64', 
                               'Poisson_noise': True, 
-                              'dev': dev,
+                              'dev': 'cpu',
                               'probe_att': False,
                               'selfAb': True}
 
