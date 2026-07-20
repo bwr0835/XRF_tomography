@@ -155,6 +155,10 @@ def preprocess_xrf_xrt_data(synchrotron,
 
     _, n_theta, n_slices, n_columns = intensity_xrf.shape
 
+    row_padded = 0
+    col_padded = 0
+    row_col_padded = 0
+
     if (n_slices % 2) or (n_columns % 2):
         if (n_slices % 2) and (n_columns % 2):
             print('Odd number of slices (rows) and scan positions (columns) detected. Padding one additional slice and scan position column to XRF and XRT data...')
@@ -164,6 +168,8 @@ def preprocess_xrf_xrt_data(synchrotron,
             
             n_slices += 1
             n_columns += 1
+
+            row_col_padded = 1
         
         elif n_slices % 2:
             print('Odd number of slices (rows) detected. Padding one additional slice to XRF and XRT data...')
@@ -173,6 +179,8 @@ def preprocess_xrf_xrt_data(synchrotron,
 
             n_slices += 1
 
+            row_padded = 1
+
         else:
             print('Odd number of scan positions (columns) detected. Padding one additional scan position column to XRF and XRT data...')
                 
@@ -180,6 +188,8 @@ def preprocess_xrf_xrt_data(synchrotron,
             intensity_xrf = ppu.pad_col(intensity_xrf, dataset_type)
 
             n_columns += 1
+
+            col_padded = 1
         
     intensity_xrt_sig_idx = elements_xrt.index('xrt_sig')
     intensity_xrt_sig = intensity_xrt[intensity_xrt_sig_idx]
@@ -278,7 +288,21 @@ def preprocess_xrf_xrt_data(synchrotron,
 
             intensity_xrf_norm = intensity_xrf
             intensity_xrt_norm = intensity_xrt_sig
-                
+    
+    if row_col_padded:
+        intensity_xrt_norm[:, -1, :] = I0_photons
+        intensity_xrt_norm[:, :, -1] = I0_photons
+        intensity_xrf_norm[:, :, -1, :] = 0
+        intensity_xrf_norm[:, :, :, -1] = 0
+    
+    if row_padded:
+        intensity_xrt_norm[:, -1, :] = I0_photons
+        intensity_xrf_norm[:, :, -1, :] = 0
+    
+    if col_padded:
+        intensity_xrt_norm[:, :, -1, :] = I0_photons
+        intensity_xrf_norm[:, :, :, -1] = 0
+
     print('Calculating optical densities...')
         
     opt_dens_norm = -np.log(intensity_xrt_norm/I0_photons)
