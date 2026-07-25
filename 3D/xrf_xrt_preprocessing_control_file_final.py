@@ -387,10 +387,10 @@ def preprocess_xrf_xrt_data(synchrotron,
                 print(f'Creating GIF of manually aligned \'{aligning_element}\' projection data...')
                 
                 futil.create_manual_realignment_proj_data_gif(xrt_od_xrf_realignment_subdir_path,
+                                                              aligning_element,
                                                               proj_img_array_element_to_align_with_orig,
                                                               shifted_proj_img_array_element_to_align_with,
                                                               theta,
-                                                              aligning_element,
                                                               fps)
                 
                 print(f'Creating new raw input data CSV file with file number \'{file_number}\'...')
