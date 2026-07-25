@@ -38,6 +38,7 @@ def preprocess_xrf_xrt_data(synchrotron,
                             cos_fit_enabled,
                             angle_range_to_fit,
                             realignment_enabled,
+                            manual_realignment_enabled,
                             cor_correction_enabled,
                             cor_correction_alg,
                             iter_reproj_enabled,
@@ -265,6 +266,11 @@ def preprocess_xrf_xrt_data(synchrotron,
                                                                                                                                       return_aux_data)
 
         else:
+            if data_percentile is not None:
+                print('Error: \'data_percentile\' has a value. This is not expected since no normalization is being performed. Exiting program...')
+
+                sys.exit()
+            
             if xrt_photon_counting:
                 print('Calculating incident intensity from XRT data...')
                    
@@ -324,7 +330,7 @@ def preprocess_xrf_xrt_data(synchrotron,
         
         proj_img_array_element_to_align_with_orig = proj_img_array_element_to_align_with.copy()
         
-        if not create_final_aligned_proj_enabled:
+        if not create_final_aligned_proj_enabled and not manual_realignment_enabled:
             print(f'Vignetting \'{aligning_element}\' projection images...')
         
             vignetted_proj_array_element_to_align_with = np.zeros_like(proj_img_array_element_to_align_with)
@@ -336,7 +342,75 @@ def preprocess_xrf_xrt_data(synchrotron,
         else:
             vignetted_proj_array_element_to_align_with = proj_img_array_element_to_align_with
 
-        if pre_cor_correction_adjacent_angle_jitter_correction_enabled:
+        if manual_realignment_enabled:
+            print(f'Manually aligning \'{aligning_element}\' projection images...')
+
+            net_x_shift_array = init_x_shift_array
+            net_y_shift_array = init_y_shift_array
+
+            shifted_proj_img_array_element_to_align_with = realign.manual_realign_proj(proj_img_array_element_to_align_with,
+                                                                                       theta,
+                                                                                       net_x_shift_array,
+                                                                                       net_y_shift_array,
+                                                                                       aligning_element,
+                                                                                       elements_xrf,
+                                                                                       I0_photons)
+            
+            # if np.any(net_y_shift_array != 0):
+            #     print(f'Cropping aligned \'{aligning_element}\' projection images to vertical common field of view...')
+
+            #     if edge_crop_enabled:
+            #         if edge_pixel_lengths_to_crop is None:
+            #             print("Error: Empty field for 'edge_pixel_lengths_to_crop'. Exiting program...")
+
+            #             sys.exit()
+
+            #         print('...and cropping additional rows and/or columns...')
+            
+            # elif edge_crop_enabled:
+            #     if edge_pixel_lengths_to_crop is None:
+            #         print("Error: Empty field for 'edge_pixel_lengths_to_crop'. Exiting program...")
+
+            #         sys.exit()
+
+            #     print(f'Cropping aligned \'{aligning_element}\' projection images based on \'edge_pixel_lengths_to_crop\'...')
+
+            if return_aux_data:
+                print('Writing the following auxiliary data to NumPy (.npy) files (NOTE: Python is needed to view these!) files:')
+                print(f'     -Original \'{aligning_element}\' projection data')
+                print(f'     -Manually aligned \'{aligning_element}\' projection data')
+                
+                futil.create_post_manual_realignment_aux_data_npy(xrt_od_xrf_realignment_subdir_path,
+                                                                  proj_img_array_element_to_align_with_orig,
+                                                                  shifted_proj_img_array_element_to_align_with)
+                
+                print(f'Creating GIF of manually aligned \'{aligning_element}\' projection data...')
+                
+                futil.create_manual_realignment_proj_data_gif(xrt_od_xrf_realignment_subdir_path,
+                                                              proj_img_array_element_to_align_with_orig,
+                                                              shifted_proj_img_array_element_to_align_with,
+                                                              theta,
+                                                              aligning_element,
+                                                              fps)
+                
+                print(f'Creating new raw input data CSV file with file number \'{file_number}\'...')
+
+                futil.create_csv_raw_input_data(xrt_od_xrf_realignment_subdir_path,
+                                                theta,
+                                                norm_array_xrf,
+                                                norm_array_xrt,
+                                                net_x_shift_array,
+                                                net_y_shift_array,
+                                                pixel_rad_adjacent_angle_jitter,
+                                                pixel_rad_cor_correction,
+                                                pixel_rad_iter_reproj,
+                                                I0_photons,
+                                                data_percentile,
+                                                aligning_element)
+
+            return
+
+        elif pre_cor_correction_adjacent_angle_jitter_correction_enabled:
             print('Calculating shifts for adjacent angle jitter correction pre-center of rotation error correction...')
             
             net_x_shift_array, \
@@ -404,7 +478,7 @@ def preprocess_xrf_xrt_data(synchrotron,
                                                               'adjacent_angle_jitter',
                                                               theta)
 
-            print(f'Creating new raw input data CSV file with file number {file_number}...')
+            print(f'Creating new raw input data CSV file with file number \'{file_number}\'...')
     
             futil.create_csv_raw_input_data(xrt_od_xrf_realignment_subdir_path,
                                             theta,
@@ -476,7 +550,7 @@ def preprocess_xrf_xrt_data(synchrotron,
 
 
             
-            print(f'Creating new raw input data CSV file with file number {file_number}...')
+            print(f'Creating new raw input data CSV file with file number \'{file_number}\'...')
 
             futil.create_csv_raw_input_data(xrt_od_xrf_realignment_subdir_path,
                                             theta,
@@ -568,7 +642,7 @@ def preprocess_xrf_xrt_data(synchrotron,
                 else:
                     print('Warning: Number of iterations is greater than 5. Plot of incremental shifts vs. angle will not be created...')
 
-                print(f'Creating new raw input data CSV file with file number {file_number}...')
+                print(f'Creating new raw input data CSV file with file number \'{file_number}\'...')
 
             futil.create_csv_raw_input_data(xrt_od_xrf_realignment_subdir_path,
                                             theta,
@@ -626,7 +700,7 @@ def preprocess_xrf_xrt_data(synchrotron,
                                               edge_pixel_lengths_to_crop)
 
             if return_aux_data:
-                print(f'Creating final aligned projection data GIF for {aligning_element} in common field of view...')
+                print(f'Creating final aligned projection data GIF for \'{aligning_element}\' in common field of view...')
 
                 if aligning_element == 'opt_dens':
                     cropped_intensity_ref_element = cropped_opt_dens_proj_img_array

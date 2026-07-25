@@ -937,6 +937,31 @@ def iter_reproj(proj_img_array,
            None, \
            None
 
+
+def manual_realign_proj(proj_img_array,
+                        theta_array,
+                        net_x_shift_array,
+                        net_y_shift_array,
+                        element_to_align_with,
+                        element_array,
+                        I0):
+    
+    shifted_proj_img_array = np.zeros_like(proj_img_array)
+    
+    if element_to_align_with == 'opt_dens' or element_to_align_with in element_array:
+        cval = 0
+    
+    elif element_to_align_with == 'xrt':
+        cval = I0
+        
+    for theta_idx in range(len(theta_array)):
+        net_x_shift = net_x_shift_array[theta_idx]
+        net_y_shift = net_y_shift_array[theta_idx]
+
+        shifted_proj_img_array[theta_idx] = ndi.shift(proj_img_array[theta_idx], shift = (net_y_shift, net_x_shift), cval = cval)
+
+    return shifted_proj_img_array
+
 def realign_proj_final(xrf_proj_img_array,
                        xrt_proj_img_array,
                        opt_dens_proj_img_array,

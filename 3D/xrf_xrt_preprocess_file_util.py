@@ -978,6 +978,17 @@ def create_aux_conv_mag_data_npy(dir_path, array):
 
     return
 
+def create_post_manual_realignment_aux_data_npy(dir_path,
+                                                proj_img_array_element_to_align_with_orig,
+                                                shifted_proj_img_array_element_to_align_with):
+    
+    os.makedirs(dir_path, exist_ok = True)
+    
+    np.save(os.path.join(dir_path, 'proj_img_array_element_to_align_with_orig.npy'), proj_img_array_element_to_align_with_orig)
+    np.save(os.path.join(dir_path, 'manual_shifted_proj_img_array_element_to_align_with.npy'), shifted_proj_img_array_element_to_align_with)
+    
+    return
+
 def create_post_adjacent_angle_jitter_correction_aux_data_npy(dir_path,
                                                               proj_img_array_element_to_align_with_orig,
                                                               adj_angle_jitter_corrected_proj_element_to_align_with,
@@ -1512,6 +1523,54 @@ def create_gridrec_density_maps_h5(dir_path,
         
         sample.create_dataset("densities", data = gridrec_density_maps.astype('f4'))
         sample.create_dataset("elements", data = np.array(elements_xrf_new).astype('S5'))
+
+    return
+
+def create_manual_realignment_proj_data_gif(dir_path,
+                                            ref_element,
+                                            intensity_ref_element,
+                                            shifted_intensity_ref_element,
+                                            theta_array,
+                                            fps):
+    
+    n_theta, n_slices, n_columns = intensity_ref_element.shape
+    
+    vmin = np.min([intensity_ref_element, shifted_intensity_ref_element])
+    vmax = np.max([intensity_ref_element, shifted_intensity_ref_element])
+    
+    theta_frames = []
+    
+    fig, axs = plt.subplots(1, 2)
+
+    im1_1 = axs[0].imshow(intensity_ref_element[0], vmin = vmin, vmax = vmax)
+    im1_2 = axs[1].imshow(shifted_intensity_ref_element[0], vmin = vmin, vmax = vmax)
+
+    text1 = axs[0].text(0.02, 0.02, r'$\theta = {0}$\textdegree'.format(theta_array[0]), transform = axs[0].transAxes, color = 'white')
+
+    axs[0].set_title(r'{0} (orig.)'.format(ref_element), fontsize = 16)
+    axs[1].set_title(r'{0} (man. aligned)'.format(ref_element), fontsize = 16)
+    
+    fig.tight_layout()
+
+    for theta_idx in range(n_theta):
+        im1_1.set_data(intensity_ref_element[theta_idx])
+        im1_2.set_data(shifted_intensity_ref_element[theta_idx])
+
+        text1.set_text(r'$\theta = {0}$\textdegree'.format(theta_array[theta_idx]))
+
+        fig.canvas.draw()
+
+        frame1 = np.array(fig.canvas.renderer.buffer_rgba())[:, :, :3]
+
+        theta_frames.append(frame1)
+
+    plt.close(fig)
+
+    gif_filename = os.path.join(dir_path, f'manual_realignment_proj_data.gif')
+
+    print('Saving projection data to GIF...')
+
+    iio2.mimsave(gif_filename, theta_frames, fps = fps)
 
     return
 
@@ -2242,12 +2301,3 @@ def create_gridrec_density_map_gif(dir_path,
     iio2.mimsave(gif_filename, slice_frames, fps = fps)
 
     return
-    # plt.plot(theta, net_y_shift_array, 'ko', markersize = 3, linewidth = 2)
-    # plt.xlim(-180, 180)
-    # plt.ylim(-25, 25)
-    # plt.xlabel(r'$\theta$ (\textdegree{})', fontsize = 16)
-    # plt.ylabel(r'$\delta y$ (cumulative)', fontsize = 16)
-    # plt.tick_params(axis = 'both', which = 'major', labelsize = 14)
-    # plt.tick_params(axis = 'both', which = 'minor', labelsize = 14)
-    # plt.tight_layout()
-    # plt.show()
