@@ -1545,7 +1545,7 @@ def create_manual_realignment_proj_data_gif(dir_path,
     
     theta_frames = []
     
-    fig, axs = plt.subplots(1, 2)
+    fig, axs = plt.subplots(2, 1)
 
     im1_1 = axs[0].imshow(intensity_ref_element[0], vmin = vmin, vmax = vmax)
     im1_2 = axs[1].imshow(shifted_intensity_ref_element[0], vmin = vmin, vmax = vmax)
