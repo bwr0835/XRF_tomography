@@ -1535,8 +1535,13 @@ def create_manual_realignment_proj_data_gif(dir_path,
     
     n_theta, n_slices, n_columns = intensity_ref_element.shape
     
+    print(intensity_ref_element.shape)
+    print(shifted_intensity_ref_element.shape)
+
     vmin = np.min([intensity_ref_element, shifted_intensity_ref_element])
     vmax = np.max([intensity_ref_element, shifted_intensity_ref_element])
+    # vmin = min(np.min(intensity_ref_element), np.min(shifted_intensity_ref_element))
+    # vmax = max(np.max(intensity_ref_element), np.max(shifted_intensity_ref_element))
     
     theta_frames = []
     
@@ -1585,8 +1590,10 @@ def create_adjacent_angle_jitter_corrected_norm_proj_data_gif(dir_path,
 
     n_theta, n_slices, n_columns = intensity_ref_element.shape
     
-    vmin = np.min([intensity_ref_element, shifted_intensity_ref_element])
-    vmax = np.max([intensity_ref_element, shifted_intensity_ref_element])
+    # vmin = np.min([intensity_ref_element, shifted_intensity_ref_element])
+    # vmax = np.max([intensity_ref_element, shifted_intensity_ref_element])
+    vmin = min(np.min(intensity_ref_element), np.min(shifted_intensity_ref_element))
+    vmax = max(np.max(intensity_ref_element), np.max(shifted_intensity_ref_element))
 
     theta_frames1 = []
     # slice_frames = []
