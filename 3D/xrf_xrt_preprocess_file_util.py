@@ -2315,9 +2315,11 @@ def run_mpv(filename):
         print('Running MPV...')
         
         os.system('pkill -f mpv 2>/dev/null')
-        subprocess.Popen(['mpv', '--fs', '--keep-open=yes', filename])
+        subprocess.run(['mpv', '--fs', '--keep-open=yes', filename], stdout = subprocess.DEVNULL, stderr = subprocess.DEVNULL)
 
     else:
         print('MPV is not supported on this platform.')
+
+        return
 
     return
