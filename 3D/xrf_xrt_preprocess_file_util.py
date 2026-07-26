@@ -1534,32 +1534,31 @@ def create_manual_realignment_proj_data_gif(dir_path,
                                             theta_array,
                                             fps):
     
-    n_theta, n_slices, n_columns = intensity_ref_element.shape
+    n_theta, _, _ = intensity_ref_element.shape
     
-    print(intensity_ref_element.shape)
-    print(shifted_intensity_ref_element.shape)
-
     vmin = np.min([intensity_ref_element, shifted_intensity_ref_element])
     vmax = np.max([intensity_ref_element, shifted_intensity_ref_element])
-    # vmin = min(np.min(intensity_ref_element), np.min(shifted_intensity_ref_element))
-    # vmax = max(np.max(intensity_ref_element), np.max(shifted_intensity_ref_element))
     
     theta_frames = []
     
-    fig, axs = plt.subplots(2, 1)
+    # fig, axs = plt.subplots(2, 1)
+    fig, axs = plt.subplots()
 
-    im1_1 = axs[0].imshow(intensity_ref_element[0], vmin = vmin, vmax = vmax)
-    im1_2 = axs[1].imshow(shifted_intensity_ref_element[0], vmin = vmin, vmax = vmax)
+    # im1_1 = axs[0].imshow(intensity_ref_element[0], vmin = vmin, vmax = vmax)
+    # im1_2 = axs[1].imshow(shifted_intensity_ref_element[0], vmin = vmin, vmax = vmax)
+    im1_2 = axs.imshow(shifted_intensity_ref_element[0], vmin = vmin, vmax = vmax)
 
-    text1 = axs[0].text(0.02, 0.02, r'$\theta = {0}$\textdegree'.format(theta_array[0]), transform = axs[0].transAxes, color = 'white')
+    # text1 = axs[0].text(0.02, 0.02, r'$\theta = {0}$\textdegree'.format(theta_array[0]), transform = axs[0].transAxes, color = 'white')
+    text1 = axs.text(0.02, 0.02, r'$\theta = {0}$\textdegree'.format(theta_array[0]), transform = axs.transAxes, color = 'white')
 
-    axs[0].set_title(r'{0} (orig.)'.format(ref_element), fontsize = 16)
-    axs[1].set_title(r'{0} (man. aligned)'.format(ref_element), fontsize = 16)
+    # axs[0].set_title(r'{0} (orig.)'.format(ref_element), fontsize = 16)
+    # axs[1].set_title(r'{0} (man. aligned)'.format(ref_element), fontsize = 16)
+    axs.set_title(r'{0} (man. aligned)'.format(ref_element), fontsize = 16)
     
     fig.tight_layout()
 
     for theta_idx in range(n_theta):
-        im1_1.set_data(intensity_ref_element[theta_idx])
+        # im1_1.set_data(intensity_ref_element[theta_idx])
         im1_2.set_data(shifted_intensity_ref_element[theta_idx])
 
         text1.set_text(r'$\theta = {0}$\textdegree'.format(theta_array[theta_idx]))
