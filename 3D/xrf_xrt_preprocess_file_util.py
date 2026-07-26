@@ -7,7 +7,8 @@ import numpy as np, \
        h5py, \
        ast, \
        os, \
-       sys
+       sys, \
+       subprocess
 
 from tkinter import filedialog as fd
 from matplotlib import pyplot as plt
@@ -1577,7 +1578,7 @@ def create_manual_realignment_proj_data_gif(dir_path,
 
     iio2.mimsave(gif_filename, theta_frames, fps = fps)
 
-    return
+    return gif_filename
 
 def create_adjacent_angle_jitter_corrected_norm_proj_data_gif(dir_path,
                                                               ref_element,
@@ -2306,5 +2307,17 @@ def create_gridrec_density_map_gif(dir_path,
     gif_filename = os.path.join(dir_path, f'gridrec_density_maps.gif')
 
     iio2.mimsave(gif_filename, slice_frames, fps = fps)
+
+    return
+
+def run_mpv(filename):
+    if sys.platform == 'linux':
+        print('Running MPV...')
+        
+        os.system('pkill -f mpv 2>/dev/null')
+        subprocess.Popen(['mpv', '--fs', '--keep-open=yes', filename])
+
+    else:
+        print('MPV is not supported on this platform.')
 
     return

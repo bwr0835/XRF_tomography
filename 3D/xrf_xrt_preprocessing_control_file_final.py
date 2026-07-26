@@ -3,7 +3,8 @@ import numpy as np, \
        xrf_xrt_preprocess_utils as ppu, \
        realignment_final_ultimate as realign, \
        sys, \
-       os
+       os, \
+       subprocess
 
 from matplotlib import pyplot as plt
 
@@ -386,12 +387,12 @@ def preprocess_xrf_xrt_data(synchrotron,
                 
                 print(f'Creating GIF of manually aligned \'{aligning_element}\' projection data...')
                 
-                futil.create_manual_realignment_proj_data_gif(xrt_od_xrf_realignment_subdir_path,
-                                                              aligning_element,
-                                                              proj_img_array_element_to_align_with_orig,
-                                                              shifted_proj_img_array_element_to_align_with,
-                                                              theta,
-                                                              fps)
+                gif_filename = futil.create_manual_realignment_proj_data_gif(xrt_od_xrf_realignment_subdir_path,
+                                                                             aligning_element,
+                                                                             proj_img_array_element_to_align_with_orig,
+                                                                             shifted_proj_img_array_element_to_align_with,
+                                                                             theta,
+                                                                             fps)
                 
                 print(f'Creating new raw input data CSV file with file number \'{file_number}\'...')
 
@@ -407,6 +408,8 @@ def preprocess_xrf_xrt_data(synchrotron,
                                                 I0_photons,
                                                 data_percentile,
                                                 aligning_element)
+                
+                futil.run_mpv(gif_filename)
 
             return
 
