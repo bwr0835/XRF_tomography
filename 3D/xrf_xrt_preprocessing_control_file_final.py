@@ -302,17 +302,18 @@ def preprocess_xrf_xrt_data(synchrotron,
         intensity_xrf_norm[:, :, -1, :] = 0
         intensity_xrf_norm[:, :, :, -1] = 0
     
-    if row_padded:
+    elif row_padded:
         intensity_xrt_norm[:, -1, :] = I0_photons
         intensity_xrf_norm[:, :, -1, :] = 0
     
-    if col_padded:
+    elif col_padded:
         intensity_xrt_norm[:, :, -1, :] = I0_photons
         intensity_xrf_norm[:, :, :, -1] = 0
 
     print('Calculating optical densities...')
-        
-    opt_dens_norm = -np.log(intensity_xrt_norm/I0_photons)
+    
+    opt_dens_norm = np.zeros_like(intensity_xrt_norm)
+    opt_dens_norm[intensity_xrt_norm > 0] = -np.log(intensity_xrt_norm[intensity_xrt_norm > 0]/I0_photons)
 
     if realignment_enabled:
         if aligning_element == 'opt_dens':
