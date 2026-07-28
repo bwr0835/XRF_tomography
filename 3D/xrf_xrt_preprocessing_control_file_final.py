@@ -3,8 +3,7 @@ import numpy as np, \
        xrf_xrt_preprocess_utils as ppu, \
        realignment_final_ultimate as realign, \
        sys, \
-       os, \
-       subprocess
+       os
 
 from matplotlib import pyplot as plt
 
