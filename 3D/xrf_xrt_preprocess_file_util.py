@@ -1568,30 +1568,30 @@ def create_manual_realignment_proj_data_gif(dir_path,
         ax.axhline(y = n_slices_orig//2, color = 'white', linestyle = '--', linewidth = 2)
 
     fig.tight_layout()
-    fig.show()
+    plt.show()
 
-    # for theta_idx in range(n_theta):
-    #     # im1_1.set_data(intensity_ref_element[theta_idx])
-    #     im1_1.set_data(shifted_intensity_ref_element[theta_idx])
-    #     im1_2.set_data(shifted_intensity_xrt_norm[theta_idx])
+    for theta_idx in range(n_theta):
+        # im1_1.set_data(intensity_ref_element[theta_idx])
+        im1_1.set_data(shifted_intensity_ref_element[theta_idx])
+        im1_2.set_data(shifted_intensity_xrt_norm[theta_idx])
 
-    #     text1.set_text(r'$\theta = {0}$\textdegree'.format(theta_array[theta_idx]))
+        text1.set_text(r'$\theta = {0}$\textdegree'.format(theta_array[theta_idx]))
 
-    #     fig.canvas.draw()
+        fig.canvas.draw()
 
-    #     frame1 = np.array(fig.canvas.renderer.buffer_rgba())[:, :, :3]
+        frame1 = np.array(fig.canvas.renderer.buffer_rgba())[:, :, :3]
 
-    #     theta_frames.append(frame1)
+        theta_frames.append(frame1)
 
-    # plt.close(fig)
+    plt.close(fig)
 
-    # gif_filename = os.path.join(dir_path, f'manual_realignment_proj_data.gif')
+    gif_filename = os.path.join(dir_path, f'manual_realignment_proj_data.gif')
 
-    # print('Saving projection data to GIF...')
+    print('Saving projection data to GIF...')
 
-    # iio2.mimsave(gif_filename, theta_frames, fps = fps)
+    iio2.mimsave(gif_filename, theta_frames, fps = fps)
 
-    # return gif_filename
+    return gif_filename
 
 def create_adjacent_angle_jitter_corrected_norm_proj_data_gif(dir_path,
                                                               ref_element,
