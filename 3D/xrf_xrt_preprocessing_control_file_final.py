@@ -427,6 +427,12 @@ def preprocess_xrf_xrt_data(synchrotron,
                                      shifted_proj_img_array_element_to_align_with,
                                      aligning_element,
                                      theta)
+                
+                futil.create_cor_fig(xrt_od_xrf_realignment_subdir_path,
+                                     intensity_xrt_norm,
+                                     shifted_xrt_proj_img_array_element_to_align_with,
+                                     aligning_element,
+                                     theta)
 
             return
 
