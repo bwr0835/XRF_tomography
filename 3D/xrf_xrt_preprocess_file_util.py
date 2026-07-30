@@ -1567,6 +1567,8 @@ def create_manual_realignment_proj_data_gif(dir_path,
         ax.axvline(x = n_columns_orig//2, color = 'white', linestyle = '--', linewidth = 2)
         ax.axhline(y = n_slices_orig//2, color = 'white', linestyle = '--', linewidth = 2)
 
+    fig.tight_layout()
+
     for theta_idx in range(n_theta):
         # if theta_idx % 7 == 0:
         #     plt.show()
@@ -2357,8 +2359,11 @@ def create_cor_fig(dir_path, raw, aligned, element_of_interest, theta, desired_t
     axs[1, 2].imshow(overlay_aligned)
 
     axs[0, 0].set_title(r'{0} (raw)'.format(element_of_interest), color = 'red', fontsize = 16)
-    axs[0, 1].set_title(r'{0} (aligned)'.format(element_of_interest), color = 'green', fontsize = 16)
+    axs[0, 1].set_title(r'{0} (raw)'.format(element_of_interest), color = 'green', fontsize = 16)
+    axs[1, 0].set_title(r'{0} (aligned)'.format(element_of_interest), color = 'green', fontsize = 16)
+    axs[1, 1].set_title(r'{0} (aligned)'.format(element_of_interest), color = 'green', fontsize = 16)
     axs[0, 2].set_title(r'Overlay', fontsize = 16)
+    axs[1, 2].set_title(r'Overlay', fontsize = 16)
 
     text_0 = axs[0, 0].text(0.02, 0.02, r'$\theta = {0}^{{\circ}}$'.format(ppu.round_correct(theta[theta_pair[0]], ndec = 1)), transform = axs[0, 0].transAxes, color = 'white', fontsize = 12)
     text_1 = axs[0, 1].text(0.02, 0.02, r'$\theta = {0}^{{\circ}}$'.format(ppu.round_correct(theta[theta_pair[1]], ndec = 1)), transform = axs[0, 1].transAxes, color = 'white', fontsize = 12)
