@@ -357,6 +357,15 @@ def preprocess_xrf_xrt_data(synchrotron,
                                                                                        elements_xrf,
                                                                                        I0_photons)
             
+
+            shifted_xrt_proj_img_array_element_to_align_with = realign.manual_realign_proj(intensity_xrt_norm,
+                                                                                           theta,
+                                                                                           net_x_shift_array,
+                                                                                           net_y_shift_array,
+                                                                                           'xrt',
+                                                                                           elements_xrf,
+                                                                                           I0_photons)
+            
             # if np.any(net_y_shift_array != 0):
             #     print(f'Cropping aligned \'{aligning_element}\' projection images to vertical common field of view...')
 
@@ -391,6 +400,8 @@ def preprocess_xrf_xrt_data(synchrotron,
                                                                              aligning_element,
                                                                              proj_img_array_element_to_align_with_orig,
                                                                              shifted_proj_img_array_element_to_align_with,
+                                                                             intensity_xrt_norm,
+                                                                             shifted_xrt_proj_img_array_element_to_align_with,
                                                                              theta,
                                                                              fps)
                 

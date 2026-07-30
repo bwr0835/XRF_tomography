@@ -947,7 +947,7 @@ def manual_realign_proj(proj_img_array,
                         I0):
     
     shifted_proj_img_array = np.zeros_like(proj_img_array)
-    
+
     if element_to_align_with == 'opt_dens' or element_to_align_with in element_array:
         cval = 0
     
