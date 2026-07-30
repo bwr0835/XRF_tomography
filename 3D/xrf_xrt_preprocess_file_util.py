@@ -1571,8 +1571,8 @@ def create_manual_realignment_proj_data_gif(dir_path,
 
     for theta_idx in range(n_theta):
         # im1_1.set_data(intensity_ref_element[theta_idx])
-        im1_1.set_data(shifted_intensity_xrt_norm[theta_idx])
-        im1_2.set_data(shifted_intensity_ref_element[theta_idx])
+        im1_1.set_data(shifted_intensity_ref_element[theta_idx])
+        im1_2.set_data(shifted_intensity_xrt_norm[theta_idx])
 
         text1.set_text(r'$\theta = {0}$\textdegree'.format(theta_array[theta_idx]))
 
