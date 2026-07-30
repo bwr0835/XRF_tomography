@@ -309,6 +309,9 @@ def preprocess_xrf_xrt_data(synchrotron,
         intensity_xrt_norm[:, :, -1, :] = I0_photons
         intensity_xrf_norm[:, :, :, -1] = 0
 
+    plt.imshow(intensity_xrt_norm[0])
+    plt.show()
+
     print('Calculating optical densities...')
     
     opt_dens_norm = np.zeros_like(intensity_xrt_norm)

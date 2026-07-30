@@ -958,7 +958,7 @@ def manual_realign_proj(proj_img_array,
         net_x_shift = net_x_shift_array[theta_idx]
         net_y_shift = net_y_shift_array[theta_idx]
 
-        shifted_proj_img_array[theta_idx] = ndi.shift(proj_img_array[theta_idx], shift = (net_y_shift, net_x_shift), order = 1,cval = cval)
+        shifted_proj_img_array[theta_idx] = ndi.shift(proj_img_array[theta_idx], shift = (net_y_shift, net_x_shift), cval = cval)
 
     return shifted_proj_img_array
 
