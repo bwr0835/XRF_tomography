@@ -1568,6 +1568,7 @@ def create_manual_realignment_proj_data_gif(dir_path,
         ax.axhline(y = n_slices_orig//2, color = 'white', linestyle = '--', linewidth = 2)
 
     fig.tight_layout()
+    fig.show()
 
     for theta_idx in range(n_theta):
         # im1_1.set_data(intensity_ref_element[theta_idx])

@@ -357,9 +357,6 @@ def preprocess_xrf_xrt_data(synchrotron,
                                                                                        elements_xrf,
                                                                                        I0_photons)
             
-            plt.imshow(shifted_proj_img_array_element_to_align_with[0])
-            plt.show()
-
             shifted_xrt_proj_img_array_element_to_align_with = realign.manual_realign_proj(intensity_xrt_norm,
                                                                                            theta,
                                                                                            net_x_shift_array,
