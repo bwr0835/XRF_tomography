@@ -2322,6 +2322,55 @@ def create_gridrec_density_map_gif(dir_path,
 
     return
 
+def create_cor_fig(dir_path, raw, aligned, element_of_interest, theta):
+    fig, axs = plt.subplots(2, 3)
+
+    theta_pair_idx = ppu.find_theta_combos(theta, dtheta = 0)
+    theta_pair = theta_pair_idx[0]
+
+    raw_0 = raw[theta_pair[0]]
+    raw_1 = np.fliplr(raw[theta_pair[1]])
+    aligned_0 = aligned[theta_pair[0]]
+    aligned_1 = np.fliplr(aligned[theta_pair[1]])
+
+    raw_0_norm = ppu.normalize_array_for_rgb(raw_0)
+    raw_1_norm = ppu.normalize_array_for_rgb(raw_1)
+    aligned_0_norm = ppu.normalize_array_for_rgb(aligned_0)
+    aligned_1_norm = ppu.normalize_array_for_rgb(aligned_1)
+
+    raw_0_rgb = np.dstack((raw_0_norm, np.zeros_like(raw_0_norm), np.zeros_like(raw_0_norm)))
+    raw_1_rgb = np.dstack((np.zeros_like(raw_0_norm), raw_1_norm, np.zeros_like(raw_1_norm)))
+    aligned_0_rgb = np.dstack((aligned_0_norm, np.zeros_like(aligned_0_norm), np.zeros_like(aligned_0_norm)))
+    aligned_1_rgb = np.dstack((np.zeros_like(aligned_0_norm), aligned_1_norm, np.zeros_like(aligned_1_norm)))
+
+    overlay_raw = np.dstack((raw_0_norm, raw_1_norm, np.zeros_like(raw_0_norm)))
+    overlay_aligned = np.dstack((aligned_0_norm, aligned_1_norm, np.zeros_like(aligned_0_norm)))
+
+    axs[0, 0].imshow(raw_0_rgb)
+    axs[0, 1].imshow(aligned_0_rgb)
+    axs[1, 0].imshow(raw_1_rgb)
+    axs[1, 1].imshow(aligned_1_rgb)
+    axs[0, 2].imshow(overlay_raw)
+    axs[1, 2].imshow(overlay_aligned)
+
+    axs[0, 0].set_title(r'{0} (raw)'.format(element_of_interest), color = 'red', fontsize = 16)
+    axs[0, 1].set_title(r'{0} (aligned)'.format(element_of_interest), color = 'green', fontsize = 16)
+    axs[0, 2].set_title(r'Overlay', fontsize = 16)
+
+    text_0 = axs[0, 0].text(0.02, 0.02, r'$\theta = {0}^{{\circ}}$'.format(ppu.round_correct(theta[theta_pair[0]], ndec = 1)), transform = axs[0, 0].transAxes, color = 'white', fontsize = 12)
+    text_1 = axs[0, 1].text(0.02, 0.02, r'$\theta = {0}^{{\circ}}$'.format(ppu.round_correct(theta[theta_pair[1]], ndec = 1)), transform = axs[0, 1].transAxes, color = 'white', fontsize = 12)
+
+    fig.tight_layout()
+
+    fig_filename = os.path.join(dir_path, f'cor_fig_{element_of_interest}_{int(theta[theta_pair[0]])}_{int(theta[theta_pair[1]])}.svg')
+    
+    fig.savefig(fig_filename)
+    
+    plt.show()
+    plt.close(fig)
+
+    return
+
 def run_mpv(filename):
     if sys.platform == 'linux':
         print('Running MPV...')

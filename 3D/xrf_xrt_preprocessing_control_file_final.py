@@ -422,6 +422,12 @@ def preprocess_xrf_xrt_data(synchrotron,
                 
                 futil.run_mpv(gif_filename)
 
+                futil.create_cor_fig(xrt_od_xrf_realignment_subdir_path,
+                                     proj_img_array_element_to_align_with_orig,
+                                     shifted_proj_img_array_element_to_align_with,
+                                     aligning_element,
+                                     theta)
+
             return
 
         elif pre_cor_correction_adjacent_angle_jitter_correction_enabled:
