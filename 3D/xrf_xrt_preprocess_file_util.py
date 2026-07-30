@@ -2352,18 +2352,18 @@ def create_cor_fig(dir_path, raw, aligned, element_of_interest, theta, desired_t
     overlay_aligned = np.dstack((aligned_0_norm, aligned_1_norm, np.zeros_like(aligned_0_norm)))
 
     axs[0, 0].imshow(raw_0_rgb)
-    axs[0, 1].imshow(aligned_0_rgb)
-    axs[1, 0].imshow(raw_1_rgb)
+    axs[0, 1].imshow(raw_1_rgb)
+    axs[1, 0].imshow(aligned_0_rgb)
     axs[1, 1].imshow(aligned_1_rgb)
     axs[0, 2].imshow(overlay_raw)
     axs[1, 2].imshow(overlay_aligned)
 
     axs[0, 0].set_title(r'{0} (raw)'.format(element_of_interest), color = 'red', fontsize = 16)
     axs[0, 1].set_title(r'{0} (raw)'.format(element_of_interest), color = 'green', fontsize = 16)
-    axs[1, 0].set_title(r'{0} (aligned)'.format(element_of_interest), color = 'green', fontsize = 16)
+    axs[1, 0].set_title(r'{0} (aligned)'.format(element_of_interest), color = 'red', fontsize = 16)
     axs[1, 1].set_title(r'{0} (aligned)'.format(element_of_interest), color = 'green', fontsize = 16)
-    axs[0, 2].set_title(r'Overlay', fontsize = 16)
-    axs[1, 2].set_title(r'Overlay', fontsize = 16)
+    axs[0, 2].set_title(r'{0} (Overlay, raw)', fontsize = 16)
+    axs[1, 2].set_title(r'{0} (Overlay, aligned)', fontsize = 16)
 
     text_0 = axs[0, 0].text(0.02, 0.02, r'$\theta = {0}^{{\circ}}$'.format(ppu.round_correct(theta[theta_pair[0]], ndec = 1)), transform = axs[0, 0].transAxes, color = 'white', fontsize = 12)
     text_1 = axs[0, 1].text(0.02, 0.02, r'$\theta = {0}^{{\circ}}$'.format(ppu.round_correct(theta[theta_pair[1]], ndec = 1)), transform = axs[0, 1].transAxes, color = 'white', fontsize = 12)
