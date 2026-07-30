@@ -1536,7 +1536,7 @@ def create_manual_realignment_proj_data_gif(dir_path,
                                             theta_array,
                                             fps):
     
-    n_theta, _, _ = intensity_ref_element.shape
+    n_theta, n_slices_orig, n_columns_orig = intensity_ref_element.shape
     
     vmin = np.min([intensity_ref_element, shifted_intensity_ref_element])
     vmax = np.max([intensity_ref_element, shifted_intensity_ref_element])
@@ -1563,6 +1563,10 @@ def create_manual_realignment_proj_data_gif(dir_path,
     axs[1].set_title(r'{0} (man. aligned)'.format(ref_element), fontsize = 16)
     # axs.set_title(r'{0} (man. aligned)'.format(ref_element), fontsize = 16)
     
+    for ax in fig.axes:
+        ax.axvline(x = n_columns_orig//2, color = 'white', linestyle = '--', linewidth = 2)
+        ax.axhline(y = n_slices_orig//2, color = 'white', linestyle = '--', linewidth = 2)
+
     fig.tight_layout()
 
     for theta_idx in range(n_theta):
