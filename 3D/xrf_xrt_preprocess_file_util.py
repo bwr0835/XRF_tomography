@@ -2322,11 +2322,11 @@ def create_gridrec_density_map_gif(dir_path,
 
     return
 
-def create_cor_fig(dir_path, raw, aligned, element_of_interest, theta):
+def create_cor_fig(dir_path, raw, aligned, element_of_interest, theta, desired_theta_pair_idx):
     fig, axs = plt.subplots(2, 3)
 
     theta_pair_idx = ppu.find_theta_combos(theta, dtheta = 0)
-    theta_pair = theta_pair_idx[0]
+    theta_pair = theta_pair_idx[desired_theta_pair_idx]
 
     raw_0 = raw[theta_pair[0]]
     raw_1 = np.fliplr(raw[theta_pair[1]])
