@@ -309,9 +309,6 @@ def preprocess_xrf_xrt_data(synchrotron,
         intensity_xrt_norm[:, :, -1, :] = I0_photons
         intensity_xrf_norm[:, :, :, -1] = 0
 
-    plt.imshow(intensity_xrt_norm[0])
-    plt.show()
-
     print('Calculating optical densities...')
     
     opt_dens_norm = np.zeros_like(intensity_xrt_norm)
@@ -345,6 +342,9 @@ def preprocess_xrf_xrt_data(synchrotron,
             
         else:
             vignetted_proj_array_element_to_align_with = proj_img_array_element_to_align_with
+
+        plt.imshow(vignetted_proj_array_element_to_align_with[0])
+        plt.show()
 
         if manual_realignment_enabled:
             print(f'Manually aligning \'{aligning_element}\' projection images...')
