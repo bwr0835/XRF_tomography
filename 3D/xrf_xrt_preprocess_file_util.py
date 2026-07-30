@@ -1567,9 +1567,6 @@ def create_manual_realignment_proj_data_gif(dir_path,
         ax.axvline(x = n_columns_orig//2, color = 'white', linestyle = '--', linewidth = 2)
         ax.axhline(y = n_slices_orig//2, color = 'white', linestyle = '--', linewidth = 2)
 
-    fig.tight_layout()
-    plt.show()
-
     for theta_idx in range(n_theta):
         # im1_1.set_data(intensity_ref_element[theta_idx])
         im1_1.set_data(shifted_intensity_ref_element[theta_idx])
@@ -1577,6 +1574,8 @@ def create_manual_realignment_proj_data_gif(dir_path,
 
         text1.set_text(r'$\theta = {0}$\textdegree'.format(theta_array[theta_idx]))
 
+        if theta_idx % 7 == 0:
+            plt.show()
         fig.canvas.draw()
 
         frame1 = np.array(fig.canvas.renderer.buffer_rgba())[:, :, :3]
