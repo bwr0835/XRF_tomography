@@ -421,7 +421,7 @@ def preprocess_xrf_xrt_data(synchrotron,
                 
                 futil.run_mpv(gif_filename)
 
-                desired_theta_pair_idx = 2
+                desired_theta_pair_idx = 0
 
                 futil.create_cor_fig(xrt_od_xrf_realignment_subdir_path,
                                      proj_img_array_element_to_align_with_orig,
@@ -435,7 +435,8 @@ def preprocess_xrf_xrt_data(synchrotron,
                                      shifted_xrt_proj_img_array_element_to_align_with,
                                      aligning_element,
                                      theta,
-                                     desired_theta_pair_idx)
+                                     desired_theta_pair_idx,
+                                     element_of_interest_override = 'xrt')
 
             return
 
