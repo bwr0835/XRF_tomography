@@ -343,9 +343,6 @@ def preprocess_xrf_xrt_data(synchrotron,
         else:
             vignetted_proj_array_element_to_align_with = proj_img_array_element_to_align_with
 
-        plt.imshow(vignetted_proj_array_element_to_align_with[0])
-        plt.show()
-
         if manual_realignment_enabled:
             print(f'Manually aligning \'{aligning_element}\' projection images...')
 
@@ -360,6 +357,8 @@ def preprocess_xrf_xrt_data(synchrotron,
                                                                                        elements_xrf,
                                                                                        I0_photons)
             
+            plt.imshow(shifted_proj_img_array_element_to_align_with[0])
+            plt.show()
 
             shifted_xrt_proj_img_array_element_to_align_with = realign.manual_realign_proj(intensity_xrt_norm,
                                                                                            theta,
