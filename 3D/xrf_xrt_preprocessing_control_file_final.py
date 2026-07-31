@@ -759,6 +759,8 @@ def preprocess_xrf_xrt_data(synchrotron,
                                                          cropped_proj_ref_element,
                                                          cropped_intensity_ref_element,
                                                          theta,
+                                                         n_slices,
+                                                         n_columns,
                                                          fps)
             
             print('Writing final aligned XRF, XRT, and optical density projection data to HDF5 file...')

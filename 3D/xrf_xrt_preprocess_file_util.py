@@ -2161,10 +2161,11 @@ def create_final_aligned_proj_data_gif(dir_path,
                                        raw_proj,
                                        aligned_proj,
                                        theta_array,
+                                       n_slices_raw,
+                                       n_columns_raw,
                                        fps):
     
-    n_theta, n_slices, n_columns = aligned_proj.shape
-    n_slices_raw, n_columns_raw = raw_proj.shape[0], raw_proj.shape[2]
+    n_theta, _, _ = aligned_proj.shape
     
     vmin = aligned_proj.min()
     vmax = aligned_proj.max()
