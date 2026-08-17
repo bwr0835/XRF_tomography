@@ -59,7 +59,7 @@ def extract_h5_xrf_data(file_path, synchrotron, **kwargs):
 
         sys.exit()
 
-    if not file_path.endswith('.h5'):
+    if '.h5' not in file_path:
         print('Error: File must be HDF5. Exiting program...')
 
         sys.exit()
@@ -933,7 +933,7 @@ def extract_csv_xrf_xrt_data_file_lists(file_path_1, file_path_2 = None, **kwarg
     
     with open(file_path_1, newline = '') as f:
         filename_array_1 = [fn for fn in (filename.strip() for filename in f) \
-                            if (os.path.isfile(fn) and fn.endswith('.h5'))] # Nested for loop
+                            if (os.path.isfile(fn) and '.h5' in fn)] # Nested for loop
 
         if len(filename_array_1) == 0:
             print('Error: No .h5 files in first file array. Exiting program...')
@@ -961,7 +961,7 @@ def extract_csv_xrf_xrt_data_file_lists(file_path_1, file_path_2 = None, **kwarg
 
         with open(file_path_2, newline = '') as f:
             filename_array_2 = [fn for fn in (filename.strip() for filename in f) \
-                                if (os.path.isfile(fn) and fn.endswith('.h5'))]
+                                if (os.path.isfile(fn) and '.h5' in fn)]
 
             if len(filename_array_2) == 0:
                 print('Error: No .h5 files in second file array. Exiting program...')
