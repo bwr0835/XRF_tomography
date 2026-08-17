@@ -78,9 +78,6 @@ def preprocess_xrf_xrt_data(synchrotron,
 
         print('Creating aggregate XRF data file...')
 
-        print(xrf_file_array)
-        sys.exit()
-
         if synchrotron == 'aps':
             futil.create_aggregate_xrf_h5(xrf_file_array,
                                           output_xrf_filepath,
