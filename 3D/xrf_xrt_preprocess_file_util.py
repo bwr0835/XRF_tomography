@@ -65,34 +65,34 @@ def extract_h5_xrf_data(file_path, synchrotron, **kwargs):
         sys.exit()
 
     if synchrotron == 'aps':
-        # try:
-        with h5py.File(file_path, 'r') as h5:
-            if "MAPS/XRF_Analyzed/NNLS" in h5.keys():
-                intensity_h5 = h5['MAPS/XRF_Analyzed/NNLS/Counts_Per_Sec']
-                elements_h5 = h5['MAPS/XRF_Analyzed/NNLS/Channel_Names']
+        try:
+            with h5py.File(file_path, 'r') as h5:
+                if "MAPS/XRF_Analyzed/NNLS" in h5.keys():
+                    intensity_h5 = h5['MAPS/XRF_Analyzed/NNLS/Counts_Per_Sec']
+                    elements_h5 = h5['MAPS/XRF_Analyzed/NNLS/Channel_Names']
             
-            extra_pvs_h5 = h5['MAPS/Scan/Extra_PVs']
+                extra_pvs_h5 = h5['MAPS/Scan/Extra_PVs']
             
-            nx_h5 = h5['MAPS/Scan/x_axis']
-            ny_h5 = h5['MAPS/Scan/y_axis']
+                nx_h5 = h5['MAPS/Scan/x_axis']
+                ny_h5 = h5['MAPS/Scan/y_axis']
                 
-            intensity = intensity_h5[()]
-            elements = elements_h5[()]
-            extra_pvs_names = extra_pvs_h5['Names'][()]
-            extra_pvs_values = extra_pvs_h5['Values'][()]
+                intensity = intensity_h5[()]
+                elements = elements_h5[()]
+                extra_pvs_names = extra_pvs_h5['Names'][()]
+                extra_pvs_values = extra_pvs_h5['Values'][()]
 
-            nx_conv = ny_h5[()] # Width and height are reversed in the actual HDF5 data structure
-            ny_conv = nx_h5[()] # Width and height are reversed in the actual HDF5 data structure
+                nx_conv = ny_h5[()] # Width and height are reversed in the actual HDF5 data structure
+                ny_conv = nx_h5[()] # Width and height are reversed in the actual HDF5 data structure
 
-        # except KeyboardInterrupt:
-        #     print('\n\nKeyboardInterrupt occurred. Exiting program...')
+        except KeyboardInterrupt:
+            print('\n\nKeyboardInterrupt occurred. Exiting program...')
             
-        #     sys.exit()
+            sys.exit()
 
-        # except:
-        #     print('Error: Incompatible HDF5 file structure. Exiting program...')
+        except:
+            print('Error: Incompatible HDF5 file structure. Exiting program...')
 
-        #     sys.exit()    
+            sys.exit()    
         
         fitting_software = 'MAPS'
         
