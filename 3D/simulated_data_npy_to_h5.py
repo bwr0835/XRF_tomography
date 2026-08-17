@@ -5,7 +5,6 @@ import numpy as np, \
 
 from imageio import v2 as iio2
 from matplotlib import pyplot as plt
-from numpy.ma import true_divide
 
 plt.rcParams['text.usetex'] = True
 plt.rcParams['font.family'] = 'serif' 
