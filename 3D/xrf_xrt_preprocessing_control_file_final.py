@@ -69,8 +69,7 @@ def preprocess_xrf_xrt_data(synchrotron,
             print('Opening file dialog window for opening XRF, XRT HDF5 file extraction...')
 
             xrf_file_array, xrt_file_array = futil.extract_h5_xrf_xrt_data_file_lists_tk(synchrotron)
-        print(xrf_file_array)
-        sys.exit()
+
         xrf_array_dir = os.path.dirname(xrf_file_array[0])
         xrt_array_dir = os.path.dirname(xrt_file_array[0])
 
