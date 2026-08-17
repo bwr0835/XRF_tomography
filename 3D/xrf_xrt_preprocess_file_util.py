@@ -68,7 +68,7 @@ def extract_h5_xrf_data(file_path, synchrotron, **kwargs):
         # try:
         with h5py.File(file_path, 'r') as h5:
             if "MAPS/XRF_Analyzed/NNLS" in h5.keys():
-                intensity_h5 = h5['MAPS/XRF_Analyzed/NNLS/intensity_Per_Sec']
+                intensity_h5 = h5['MAPS/XRF_Analyzed/NNLS/Counts_Per_Sec']
                 elements_h5 = h5['MAPS/XRF_Analyzed/NNLS/Channel_Names']
             
             extra_pvs_h5 = h5['MAPS/Scan/Extra_PVs']
