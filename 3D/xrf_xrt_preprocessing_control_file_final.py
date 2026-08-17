@@ -76,6 +76,8 @@ def preprocess_xrf_xrt_data(synchrotron,
         output_xrf_filepath = os.path.join(xrf_array_dir, f'{synchrotron_beamline}_aggregate_xrf_det_element_1.h5')
         output_xrt_filepath = os.path.join(xrt_array_dir, f'{synchrotron_beamline}_aggregate_xrt.h5')
 
+        print(xrf_file_array)
+        sys.exit()
         print('Creating aggregate XRF data file...')
 
         if synchrotron == 'aps':
