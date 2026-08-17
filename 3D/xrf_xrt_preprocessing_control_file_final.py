@@ -74,8 +74,6 @@ def preprocess_xrf_xrt_data(synchrotron,
         xrt_array_dir = os.path.dirname(xrt_file_array[0])
 
         output_xrf_filepath = os.path.join(xrf_array_dir, f'{synchrotron_beamline}_aggregate_xrf_det_element_0.h5')
-
-        sys.exit()
         output_xrt_filepath = os.path.join(xrt_array_dir, f'{synchrotron_beamline}_aggregate_xrt.h5')
 
         print('Creating aggregate XRF data file...')
@@ -86,6 +84,8 @@ def preprocess_xrf_xrt_data(synchrotron,
                                           synchrotron,
                                           sample_flipped_remounted_mid_experiment,
                                           incident_energy_keV = incident_energy_keV)
+            
+            sys.exit()
 
             print('Creating aggregate XRT data file...')
 
