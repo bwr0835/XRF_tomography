@@ -17,7 +17,7 @@ plt.rcParams['ytick.minor.size'] = 4.5
 
 dir_path = '/home/bwr0835'
 
-output_path_xrf = os.path.join(dir_path, 'simulated_proj_data_xrf_no_probe_att_yes_selfab_64_64_64_si_fe.h5')
+output_path_xrf = os.path.join(dir_path, 'simulated_proj_data_xrf_no_probe_att_no_selfab_64_64_64_si_fe.h5')
 output_path_xrt = os.path.join(dir_path, 'simulated_proj_data_xrt_64_64_64_si_fe.h5')
 
 proj_data_xrf = np.zeros((4, 200, 64, 64))
@@ -41,7 +41,7 @@ remove_files_enabled = False
 
 if xrf_proj_img_enabled or xrf_sino_enabled:
     for theta_idx in range(200):
-        file_path = f'{dir_path}/simulated_proj_data_xrf_no_probe_att_yes_selfab_64_64_64_si_fe_{theta_idx}.npy'
+        file_path = f'{dir_path}/simulated_proj_data_xrf_no_probe_att_no_selfab_64_64_64_si_fe_{theta_idx}.npy'
 
         proj_data_xrf[:, theta_idx] = np.load(file_path).reshape(4, 64, 64)
 
@@ -54,7 +54,7 @@ with h5py.File(output_path_xrt, 'w') as f:
 
 if remove_files_enabled:
     for theta_idx in range(200):
-        file_path = f'{dir_path}/simulated_proj_data_xrf_no_probe_att_yes_selfab_64_64_64_si_fe_{theta_idx}.npy'
+        file_path = f'{dir_path}/simulated_proj_data_xrf_no_probe_att_no_selfab_64_64_64_si_fe_{theta_idx}.npy'
 
         os.remove(file_path)
 
@@ -160,7 +160,7 @@ if xrf_proj_img_enabled:
 
     plt.close(fig)
 
-    gif_filename = os.path.join(dir_path, f'simulated_proj_data_xrf_no_probe_att_yes_selfab_64_64_64_si_fe.gif')
+    gif_filename = os.path.join(dir_path, f'simulated_proj_data_xrf_no_probe_att_no_selfab_64_64_64_si_fe.gif')
 
     iio2.mimsave(gif_filename, frames, fps = 10)
 
@@ -199,6 +199,6 @@ if xrf_sino_enabled:
 
     plt.close(fig)
 
-    gif_filename = os.path.join(dir_path, f'simulated_sino_data_xrf_no_probe_att_yes_selfab_64_64_64_si_fe.gif')
+    gif_filename = os.path.join(dir_path, f'simulated_sino_data_xrf_no_probe_att_no_selfab_64_64_64_si_fe.gif')
 
     iio2.mimsave(gif_filename, frames, fps = 10)
