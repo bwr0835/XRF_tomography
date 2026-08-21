@@ -33,16 +33,16 @@ else:
     
     sys.stdout.flush()
 
-params_64_64_64_cabead_xrt = {'src_path': './data/sample8_size_64_pad/nElements_2/grid_concentration.npy',
+params_64_64_64_cabead_xrt = {'src_path': './data/sample8_size_64_pad/nElements_2/grid_concentration_si_fe.npy',
                               'theta_st': 0,
                               'theta_end': 360,
                               'n_theta': 200,
                               'sample_height_n': 64, 
                               'sample_size_n': 64,
                               'sample_size_cm': 0.01,
-                              'this_aN_dic': {'Ca': 20, 'Sc': 21},
-                              'probe_energy_keV': np.array([20.0]),
-                              'probe_cts': 1000000.0, # photons
+                              'this_aN_dic': {'Si': 14, 'Fe': 26},
+                              'probe_energy_keV': np.array([13.0]),
+                              'probe_cts': 8.6776e6, # photons
                               'save_path': '/home/bwr0835',
                               'save_fname': 'simulated_proj_data_xrt_64_64_64',
                               'theta_sep': False,
@@ -56,16 +56,16 @@ params_64_64_64_cabead_xrf = {'n_ranks': n_ranks,
                               'theta_st': 0, 
                               'theta_end': 360, 
                               'n_theta': 200, 
-                              'src_path': './data/sample8_size_64_pad/nElements_2/grid_concentration.npy', 
+                              'src_path': './data/sample8_size_64_pad/nElements_2/grid_concentration_si_fe.npy', 
                               'det_size_cm': 0.9, 
                               'det_from_sample_cm': 1.6, 
                               'det_ds_spacing_cm': 0.4, 
                               'sample_size_n': 64,
                               'sample_size_cm': 0.01, 
                               'sample_height_n': 64, 
-                              'this_aN_dic': {'Ca': 20, 'Sc': 21},
-                              'probe_cts': 1000000.0, # photons
-                              'probe_energy_keV': np.array([20.0]),
+                              'this_aN_dic': {'Si': 14, 'Fe': 26},
+                              'probe_cts': 8.6776e6, # photons
+                              'probe_energy_keV': np.array([13.0]),
                               'save_path': '/home/bwr0835', 
                               'save_fname': 'simulated_proj_data_xrf_no_probe_att_yes_selfab_64_64_64', 
                               'Poisson_noise': True, 
