@@ -34,8 +34,8 @@ elements_xrt = ['xrt_sig']
 xrt_proj_img_enabled = True
 xrt_sino_enabled = True
 
-xrf_proj_img_enabled = True
-xrf_sino_enabled = True
+xrf_proj_img_enabled = False
+xrf_sino_enabled = False
 
 remove_files_enabled = False
 
@@ -123,7 +123,7 @@ if xrt_sino_enabled:
 
     plt.close(fig)
 
-    gif_filename = os.path.join(dir_path, f'simulated_proj_data_xrt_64_64_64_si_fe.gif')
+    gif_filename = os.path.join(dir_path, f'simulated_sino_data_xrt_64_64_64_si_fe.gif')
 
     iio2.mimsave(gif_filename, frames, fps = 10)
 
