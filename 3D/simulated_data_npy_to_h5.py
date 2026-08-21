@@ -31,11 +31,11 @@ dtheta = theta[1] - theta[0]
 elements_xrf = ['Si', 'Si_L', 'Fe', 'Fe_L']
 elements_xrt = ['xrt_sig']
 
-xrt_proj_img_enabled = True
-xrt_sino_enabled = True
+xrt_proj_img_enabled = False
+xrt_sino_enabled = False
 
-xrf_proj_img_enabled = False
-xrf_sino_enabled = False
+xrf_proj_img_enabled = True
+xrf_sino_enabled = True
 
 remove_files_enabled = False
 
