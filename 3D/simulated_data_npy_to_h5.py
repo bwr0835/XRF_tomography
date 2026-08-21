@@ -17,8 +17,8 @@ plt.rcParams['ytick.minor.size'] = 4.5
 
 dir_path = '/home/bwr0835'
 
-output_path_xrf = os.path.join(dir_path, 'simulated_proj_data_xrf_no_probe_att_yes_selfab_64_64_64.h5')
-output_path_xrt = os.path.join(dir_path, 'simulated_proj_data_xrt_64_64_64.h5')
+output_path_xrf = os.path.join(dir_path, 'simulated_proj_data_xrf_no_probe_att_no_selfab_64_64_64_si_fe.h5')
+output_path_xrt = os.path.join(dir_path, 'simulated_proj_data_xrt_64_64_64_si_fe.h5')
 
 proj_data_xrf = np.zeros((4, 200, 64, 64))
 proj_data_xrt = np.zeros((1, 200, 64, 64))
@@ -28,14 +28,14 @@ proj_data_xrt[0] = np.load(os.path.join(dir_path, 'simulated_proj_data_xrt_64_64
 theta = np.linspace(-180, 180, 201)[:-1]
 dtheta = theta[1] - theta[0]
 
-elements_xrf = ['Ca', 'Ca_L', 'Sc', 'Sc_L']
+elements_xrf = ['Si', 'Si_L', 'Fe', 'Fe_L']
 elements_xrt = ['xrt_sig']
 
-xrt_proj_img_enabled = False
-xrt_sino_enabled = False
+xrt_proj_img_enabled = True
+xrt_sino_enabled = True
 
-xrf_proj_img_enabled = False
-xrf_sino_enabled = False
+xrf_proj_img_enabled = True
+xrf_sino_enabled = True
 
 remove_files_enabled = False
 
