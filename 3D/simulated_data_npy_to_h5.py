@@ -39,10 +39,11 @@ xrf_sino_enabled = False
 
 remove_files_enabled = False
 
-for theta_idx in range(200):
-    file_path = f'{dir_path}/simulated_proj_data_xrf_no_probe_att_no_selfab_64_64_64_si_fe_{theta_idx}.npy'
+if xrf_proj_img_enabled or xrf_sino_enabled:
+    for theta_idx in range(200):
+        file_path = f'{dir_path}/simulated_proj_data_xrf_no_probe_att_no_selfab_64_64_64_si_fe_{theta_idx}.npy'
 
-    proj_data_xrf[:, theta_idx] = np.load(file_path).reshape(4, 64, 64)
+        proj_data_xrf[:, theta_idx] = np.load(file_path).reshape(4, 64, 64)
 
 with h5py.File(output_path_xrt, 'w') as f:
     exchange = f.create_group('exchange')
