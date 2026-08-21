@@ -23,7 +23,7 @@ output_path_xrt = os.path.join(dir_path, 'simulated_proj_data_xrt_64_64_64_si_fe
 proj_data_xrf = np.zeros((4, 200, 64, 64))
 proj_data_xrt = np.zeros((1, 200, 64, 64))
 
-proj_data_xrt[0] = np.load(os.path.join(dir_path, 'simulated_proj_data_xrt_64_64_64.npy')).reshape(200, 64, 64)
+proj_data_xrt[0] = np.load(os.path.join(dir_path, 'simulated_proj_data_xrt_64_64_64_si_fe.npy')).reshape(200, 64, 64)
 
 theta = np.linspace(-180, 180, 201)[:-1]
 dtheta = theta[1] - theta[0]
@@ -40,7 +40,7 @@ xrf_sino_enabled = True
 remove_files_enabled = False
 
 for theta_idx in range(200):
-    file_path = f'{dir_path}/simulated_proj_data_xrf_no_probe_att_yes_selfab_64_64_64_{theta_idx}.npy'
+    file_path = f'{dir_path}/simulated_proj_data_xrf_no_probe_att_yes_selfab_64_64_64_si_fe_{theta_idx}.npy'
 
     proj_data_xrf[:, theta_idx] = np.load(file_path).reshape(4, 64, 64)
 
@@ -53,7 +53,7 @@ with h5py.File(output_path_xrt, 'w') as f:
 
 if remove_files_enabled:
     for theta_idx in range(200):
-        file_path = f'{dir_path}/simulated_proj_data_xrf_no_probe_att_yes_selfab_64_64_64_{theta_idx}.npy'
+        file_path = f'{dir_path}/simulated_proj_data_xrf_no_probe_att_yes_selfab_64_64_64_si_fe_{theta_idx}.npy'
 
         os.remove(file_path)
 
@@ -90,7 +90,7 @@ if xrt_proj_img_enabled:
 
     plt.close(fig1)
 
-    gif_filename = os.path.join(dir_path, f'simulated_proj_data_xrt_64_64_64.gif')
+    gif_filename = os.path.join(dir_path, f'simulated_proj_data_xrt_64_64_64_si_fe.gif')
 
     iio2.mimsave(gif_filename, frames, fps = 10)
 
@@ -123,7 +123,7 @@ if xrt_sino_enabled:
 
     plt.close(fig)
 
-    gif_filename = os.path.join(dir_path, f'simulated_proj_data_xrt_64_64_64.gif')
+    gif_filename = os.path.join(dir_path, f'simulated_proj_data_xrt_64_64_64_si_fe.gif')
 
     iio2.mimsave(gif_filename, frames, fps = 10)
 
@@ -159,7 +159,7 @@ if xrf_proj_img_enabled:
 
     plt.close(fig)
 
-    gif_filename = os.path.join(dir_path, f'simulated_proj_data_xrf_no_probe_att_yes_selfab_64_64_64.gif')
+    gif_filename = os.path.join(dir_path, f'simulated_proj_data_xrf_no_probe_att_yes_selfab_64_64_64_si_fe.gif')
 
     iio2.mimsave(gif_filename, frames, fps = 10)
 
@@ -198,6 +198,6 @@ if xrf_sino_enabled:
 
     plt.close(fig)
 
-    gif_filename = os.path.join(dir_path, f'simulated_sino_data_xrf_no_probe_att_yes_selfab_64_64_64.gif')
+    gif_filename = os.path.join(dir_path, f'simulated_sino_data_xrf_no_probe_att_yes_selfab_64_64_64_si_fe.gif')
 
     iio2.mimsave(gif_filename, frames, fps = 10)
