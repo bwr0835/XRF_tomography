@@ -40,7 +40,7 @@ xrf_sino_enabled = True
 remove_files_enabled = False
 
 for theta_idx in range(200):
-    file_path = f'{dir_path}/simulated_proj_data_xrf_no_probe_att_yes_selfab_64_64_64_si_fe_{theta_idx}.npy'
+    file_path = f'{dir_path}/simulated_proj_data_xrf_no_probe_att_no_selfab_64_64_64_si_fe_{theta_idx}.npy'
 
     proj_data_xrf[:, theta_idx] = np.load(file_path).reshape(4, 64, 64)
 
@@ -53,7 +53,7 @@ with h5py.File(output_path_xrt, 'w') as f:
 
 if remove_files_enabled:
     for theta_idx in range(200):
-        file_path = f'{dir_path}/simulated_proj_data_xrf_no_probe_att_yes_selfab_64_64_64_si_fe_{theta_idx}.npy'
+        file_path = f'{dir_path}/simulated_proj_data_xrf_no_probe_att_no_selfab_64_64_64_si_fe_{theta_idx}.npy'
 
         os.remove(file_path)
 
