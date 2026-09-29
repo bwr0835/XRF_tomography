@@ -35,9 +35,9 @@ def downsample_data(data, row_start, row_stop, downsample_factor):
     return downsampled_data
 
 def create_density_map(recon_array, element):
-    n_elements_xrf, _, n_slices, n_columns = recon_array.shape
+    n_slices, n_columns = recon_array.shape[1:]
 
-    rho = np.zeros((n_elements_xrf, n_slices, n_columns, n_columns))
+    rho = np.zeros((n_slices, n_columns, n_columns))
     
     if '_' in element:
         element = element.split('_')[0]
