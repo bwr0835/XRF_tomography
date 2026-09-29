@@ -96,7 +96,7 @@ proj_data_elements_of_interest_list = [proj_data_elements_of_interest_det_elemen
 
 n_elements, n_theta, n_slices, n_columns = proj_data_elements_of_interest_det_element_0.shape
 
-n_iterations = 100
+n_iterations = 200
 
 for index, proj_dataset in enumerate(proj_data_elements_of_interest_list):
     print(f'Processing {dir_path_list[index]}...')
