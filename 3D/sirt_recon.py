@@ -99,6 +99,8 @@ n_elements, n_theta, n_slices, n_columns = proj_data_elements_of_interest_det_el
 n_iterations = 100
 
 for index, proj_dataset in enumerate(proj_data_elements_of_interest_list):
+    print(f'Processing {dir_path_list[index]}...')
+    
     downsampled_proj_dataset = downsample_data(proj_dataset, row_start, row_stop, downsample_factor)
 
     if index == 0:
@@ -110,5 +112,7 @@ for index, proj_dataset in enumerate(proj_data_elements_of_interest_list):
         sirt_recon = tomo.recon(downsampled_proj_dataset[idx], theta, algorithm = 'sirt', num_iter = n_iterations)
 
         density[idx] = create_density_map(sirt_recon, element)
+
+        print(f'Processed {element}...')
     
     export_density_maps(dir_path_list[index], density, desired_elements)
