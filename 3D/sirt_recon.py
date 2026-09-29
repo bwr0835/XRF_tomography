@@ -60,9 +60,9 @@ downsample_factor = 4
 row_start = 0
 row_stop = 287
 
-dir_path_det_element_0 = '/Users/bwr0835/Documents/2_ide_realigned_data_cor_manual_09_03_2026_det_element_0_corrected_order_2'
-dir_path_det_element_1 = '/Users/bwr0835/Documents/2_ide_realigned_data_cor_manual_09_03_2026_det_element_1_corrected_order_2'
-dir_path_det_elements_0_1_sum = '/Users/bwr0835/Documents/2_ide_realigned_data_cor_manual_09_03_2026_det_elements_0_1_sum_corrected_order_2'
+dir_path_det_element_0 = '/home/bwr0835/2_ide_realigned_data_cor_manual_09_03_2026_det_element_0_corrected_order_2'
+dir_path_det_element_1 = '/home/bwr0835/2_ide_realigned_data_cor_manual_09_03_2026_det_element_1_corrected_order_2'
+dir_path_det_elements_0_1_sum = '/home/bwr0835/2_ide_realigned_data_cor_manual_09_03_2026_det_elements_0_1_sum_corrected_order_2'
 
 dir_path_list = [dir_path_det_element_0, dir_path_det_element_1, dir_path_det_elements_0_1_sum]
 
