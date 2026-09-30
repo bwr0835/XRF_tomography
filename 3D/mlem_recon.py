@@ -1,0 +1,134 @@
+import numpy as np, tomopy as tomo, xraylib as xrl, h5py, os, sys
+
+def extract_proj_data(dir_path, xrt = False):
+    with h5py.File(os.path.join(dir_path, 'aligned_data', 'aligned_aggregate_xrf_xrt.h5'), "r") as f:
+        exchange = f['exchange']
+
+        elements_xrf = list(exchange['elements/xrf'].asstr()[:])
+        
+        data_xrf = exchange['data/xrf'][()]
+        
+        if xrt:
+            data_xrt = exchange['data/xrt'][()][0]
+        
+        else:
+            data_xrt = None
+        
+        theta = exchange['theta'][()]
+
+    return elements_xrf, data_xrf, data_xrt, theta
+
+def extract_recon_data(dir_path):
+    with h5py.File(os.path.join(dir_path, 'gridrec_density_maps.h5'), "r") as f:
+        sample = f['sample']
+
+        data = sample['densities'][()]
+        elements = list(sample['elements'].asstr()[:])
+
+    return elements, data
+
+def downsample_data(data, row_start, row_stop, downsample_factor):
+    new_row_stop = (row_stop//downsample_factor)*downsample_factor
+    
+    raw = data[:, :, row_start:new_row_stop]
+
+    c, a, h, w = raw.shape
+
+    h_new, w_new = h//downsample_factor, w//downsample_factor
+
+    downsampled_data = (raw.reshape(c, a, h_new, downsample_factor, w_new, downsample_factor)).mean(axis = (3, 5))
+
+    return downsampled_data
+
+def create_density_map(recon_array, element):
+    n_slices, n_columns = recon_array.shape[1:]
+
+    rho = np.zeros((n_slices, n_columns, n_columns))
+    
+    if '_' in element:
+        element = element.split('_')[0]
+
+    vmin = recon_array.min()
+    vmax = recon_array.max()
+        
+    rho = xrl.ElementDensity(xrl.SymbolToAtomicNumber(element))*(recon_array - vmin)/(vmax - vmin) # Initial guess of density based on 0-100% concentration of each element
+
+    return rho
+
+def export_recon(dir_path, xrf_density, xrt_recon, elements_xrf):
+    with h5py.File(os.path.join(dir_path, 'mlem_recon.h5'), "w") as f:
+        sample = f.create_group('sample')
+
+        xrf = sample.create_group('xrf')
+        xrt = sample.create_group('xrt')
+
+        xrf.create_dataset('densities_ug_cm3', data = xrf_density.astype('f4'))
+        xrf.create_dataset('elements', data = np.array(elements_xrf).astype('S5'))
+        xrt.create_dataset('intensity_photons', data = xrt_recon.astype('f4'))
+
+downsample_factor = 4
+row_start = 0
+row_stop = 287
+
+dir_path_det_element_0 = '/home/bwr0835/2_ide_realigned_data_cor_manual_09_03_2026_det_element_0_corrected_order_2'
+dir_path_det_element_1 = '/home/bwr0835/2_ide_realigned_data_cor_manual_09_03_2026_det_element_1_corrected_order_2'
+dir_path_det_elements_0_1_sum = '/home/bwr0835/2_ide_realigned_data_cor_manual_09_03_2026_det_elements_0_1_sum_corrected_order_2'
+
+dir_path_list = [dir_path_det_element_0, dir_path_det_element_1, dir_path_det_elements_0_1_sum]
+
+elements, xrf_proj_data_det_element_0, xrt_proj_data, theta = extract_proj_data(dir_path_det_element_0)
+_, xrf_proj_data_det_element_1, _, _ = extract_proj_data(dir_path_det_element_1)
+_, xrf_proj_data_det_elements_0_1_sum, _, _ = extract_proj_data(dir_path_det_elements_0_1_sum)
+
+# _, gridrec_recon_data_det_element_0 = extract_recon_data(dir_path_det_element_0)
+# _, gridrec_recon_data_det_element_1 = extract_recon_data(dir_path_det_element_1)
+# _, gridrec_recon_data_det_elements_0_1_sum = extract_recon_data(dir_path_det_elements_0_1_sum)
+
+desired_elements_xrf = ['Si', 'Fe']
+
+desired_elements_idx_xrf = [elements.index(element) for element in desired_elements_xrf]
+
+xrf_proj_data_elements_of_interest_det_element_0 = xrf_proj_data_det_element_0[desired_elements_idx_xrf]
+xrf_proj_data_elements_of_interest_det_element_1 = xrf_proj_data_det_element_1[desired_elements_idx_xrf]
+xrf_proj_data_elements_of_interest_det_elements_0_1_sum = xrf_proj_data_det_elements_0_1_sum[desired_elements_idx_xrf]
+
+# recon_data_elements_of_interest_det_element_0 = gridrec_recon_data_det_element_0[desired_elements_idx]
+# recon_data_elements_of_interest_det_element_1 = gridrec_recon_data_det_element_1[desired_elements_idx]
+# recon_data_elements_of_interest_det_elements_0_1_sum = gridrec_recon_data_det_elements_0_1_sum[desired_elements_idx]
+
+xrf_proj_data_elements_of_interest_list = [xrf_proj_data_elements_of_interest_det_element_0, 
+                                           xrf_proj_data_elements_of_interest_det_element_1, 
+                                           xrf_proj_data_elements_of_interest_det_elements_0_1_sum]
+
+# recon_data_elements_of_interest_list = [recon_data_elements_of_interest_det_element_0, 
+#                                         recon_data_elements_of_interest_det_element_1, 
+#                                         recon_data_elements_of_interest_det_elements_0_1_sum]
+
+n_elements_xrf, n_theta, n_slices, n_columns = xrf_proj_data_elements_of_interest_det_element_0.shape
+
+n_iterations = 100
+
+for index, proj_dataset in enumerate(xrf_proj_data_elements_of_interest_list):
+    print(f'Processing {dir_path_list[index]}...')
+    
+    # downsampled_xrf_proj_dataset = downsample_data(proj_dataset, row_start, row_stop, downsample_factor)
+    # downsampled_xrt_proj_dataset = downsample_data(xrt_proj_data, row_start, row_stop, downsample_factor)
+    
+    downsampled_proj_dataset = proj_dataset
+    downsampled_xrt_proj_dataset = xrt_proj_data
+
+    mlem_recon_xrt = tomo.recon(downsampled_xrt_proj_dataset, theta, algorithm = 'mlem', num_iter = n_iterations)
+
+    if index == 0:
+        n_slices, n_columns = downsampled_proj_dataset.shape[2:]
+        
+        density_xrf = np.zeros((n_elements_xrf, n_slices, n_columns, n_columns))
+
+    for idx, element in enumerate(desired_elements_xrf):
+        mlem_recon_xrf = tomo.recon(downsampled_proj_dataset[idx], theta, algorithm = 'mlem', num_iter = n_iterations)
+
+        density_xrf[idx] = create_density_map(mlem_recon_xrf, element)
+
+        print(f'Processed {element}...')
+    
+    export_recon(dir_path_list[index], density_xrf, mlem_recon_xrt, desired_elements_xrf)
