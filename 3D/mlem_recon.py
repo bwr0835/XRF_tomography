@@ -76,7 +76,7 @@ dir_path_det_elements_0_1_sum = '/home/bwr0835/2_ide_realigned_data_cor_manual_0
 
 dir_path_list = [dir_path_det_element_0, dir_path_det_element_1, dir_path_det_elements_0_1_sum]
 
-elements, xrf_proj_data_det_element_0, xrt_proj_data, theta = extract_proj_data(dir_path_det_element_0)
+elements, xrf_proj_data_det_element_0, xrt_proj_data, theta = extract_proj_data(dir_path_det_element_0, xrt = True)
 _, xrf_proj_data_det_element_1, _, _ = extract_proj_data(dir_path_det_element_1)
 _, xrf_proj_data_det_elements_0_1_sum, _, _ = extract_proj_data(dir_path_det_elements_0_1_sum)
 
