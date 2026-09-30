@@ -109,6 +109,9 @@ n_elements_xrf, n_theta, n_slices, n_columns = xrf_proj_data_elements_of_interes
 n_iterations = 100
 
 for index, proj_dataset in enumerate(xrf_proj_data_elements_of_interest_list):
+    if index < 2:
+        continue
+    
     print(f'Processing {dir_path_list[index]}...')
     
     # downsampled_xrf_proj_dataset = downsample_data(proj_dataset, row_start, row_stop, downsample_factor)
