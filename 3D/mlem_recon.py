@@ -70,7 +70,7 @@ def export_recon(dir_path, xrf_density, xrt_recon, elements_xrf):
 
         xrf.create_dataset('densities_ug_cm3', data = xrf_density.astype('f4'))
         xrf.create_dataset('elements', data = np.array(elements_xrf).astype('S5'))
-        xrt.create_dataset('intensity_photons', data = xrt_recon.astype('f4'))
+        xrt.create_dataset('opt_dens', data = xrt_recon.astype('f4'))
 
 def export_recon_append(dir_path, xrf_density, xrt_recon, elements_xrf):
     with h5py.File(os.path.join(dir_path, 'mlem_recon.h5'), "r+") as f:
@@ -116,11 +116,15 @@ downsample_factor = 4
 row_start = 0
 row_stop = 287
 
+I0 = 8.6776e6
+
 dir_path_det_element_0 = '/home/bwr0835/2_ide_realigned_data_cor_manual_09_03_2026_det_element_0_corrected_order_2'
 dir_path_det_element_1 = '/home/bwr0835/2_ide_realigned_data_cor_manual_09_03_2026_det_element_1_corrected_order_2'
 dir_path_det_elements_0_1_sum = '/home/bwr0835/2_ide_realigned_data_cor_manual_09_03_2026_det_elements_0_1_sum_corrected_order_2'
 
 dir_path_list = [dir_path_det_element_0, dir_path_det_element_1, dir_path_det_elements_0_1_sum]
+
+
 
 elements, xrf_proj_data_det_element_0, xrt_proj_data, theta = extract_proj_data(dir_path_det_element_0, xrt = True)
 _, xrf_proj_data_det_element_1, _, _ = extract_proj_data(dir_path_det_element_1)
@@ -152,16 +156,21 @@ xrf_proj_data_elements_of_interest_list = [xrf_proj_data_elements_of_interest_de
 
 n_elements_xrf, n_theta, n_slices, n_columns = xrf_proj_data_elements_of_interest_det_element_0.shape
 
+opt_dens = np.zeros((n_theta, n_slices, n_columns, n_columns))
+
+opt_dens[xrt_proj_data > 0] = -np.log(xrt_proj_data[xrt_proj_data > 0]/I0)
+opt_dens[xrt_proj_data <= 0] = 0
+
 n_iterations = 100
 
 for index, proj_dataset in enumerate(xrf_proj_data_elements_of_interest_list):
     print(f'Processing {dir_path_list[index]}...')
     
     # downsampled_xrf_proj_dataset = downsample_data(proj_dataset, row_start, row_stop, downsample_factor)
-    # downsampled_xrt_proj_dataset = downsample_data(xrt_proj_data, row_start, row_stop, downsample_factor)
+    # downsampled_xrt_proj_dataset = downsample_data(opt_dens, row_start, row_stop, downsample_factor)
     
     downsampled_proj_dataset = proj_dataset
-    downsampled_xrt_proj_dataset = xrt_proj_data
+    downsampled_xrt_proj_dataset = opt_dens
 
     mlem_recon_xrt = tomo.recon(downsampled_xrt_proj_dataset, theta*np.pi/180, algorithm = 'mlem', num_iter = n_iterations)
 
