@@ -50,10 +50,16 @@ def create_density_map(recon_array, element):
 
     vmin = recon_array.min()
     vmax = recon_array.max()
-        
-    rho = xrl.ElementDensity(xrl.SymbolToAtomicNumber(element))*(recon_array - vmin)/(vmax - vmin) # Initial guess of density based on 0-100% concentration of each element
+    
+    if element == 'Si':
+        rho_g_cm3 = 2.26 # Ideal amorphous Si (97% of crystalline Si density)
 
-    return rho
+    else:
+        rho_g_cm3 = xrl.ElementDensity(xrl.SymbolToAtomicNumber(element))
+
+    density_map_g_cm3 = rho_g_cm3*(recon_array - vmin)/(vmax - vmin) # Initial guess of density based on 0-100% concentration of each element
+
+    return density_map_g_cm3
 
 def export_recon(dir_path, xrf_density, xrt_recon, elements_xrf):
     with h5py.File(os.path.join(dir_path, 'mlem_recon.h5'), "w") as f:
@@ -64,6 +70,31 @@ def export_recon(dir_path, xrf_density, xrt_recon, elements_xrf):
 
         xrf.create_dataset('densities_ug_cm3', data = xrf_density.astype('f4'))
         xrf.create_dataset('elements', data = np.array(elements_xrf).astype('S5'))
+        xrt.create_dataset('intensity_photons', data = xrt_recon.astype('f4'))
+
+def export_recon_append(dir_path, xrf_density, xrt_recon, elements_xrf):
+    with h5py.File(os.path.join(dir_path, 'mlem_recon.h5'), "r+") as f:
+        xrf = f['sample/xrf']
+        xrt = f['sample/xrt']
+        
+        elements = list(xrf['elements'].asstr()[:]) + list(elements_xrf)
+        
+        density = np.concatenate((xrf['densities_ug_cm3'][()], xrf_density), axis = 0)
+        
+        order = np.argsort([xrl.SymbolToAtomicNumber(element.split('_')[0]) for element in elements])
+        
+        elements = [elements[i] for i in order]
+        density = density[order]
+        
+        del xrf['elements']
+        del xrf['densities_ug_cm3']
+        
+        xrf.create_dataset('densities_ug_cm3', data = density.astype('f4'))
+        xrf.create_dataset('elements', data = np.array(elements).astype('S5'))
+        
+        if 'intensity_photons' in xrt:
+            del xrt['intensity_photons']
+        
         xrt.create_dataset('intensity_photons', data = xrt_recon.astype('f4'))
 
 downsample_factor = 4
@@ -84,7 +115,7 @@ _, xrf_proj_data_det_elements_0_1_sum, _, _ = extract_proj_data(dir_path_det_ele
 # _, gridrec_recon_data_det_element_1 = extract_recon_data(dir_path_det_element_1)
 # _, gridrec_recon_data_det_elements_0_1_sum = extract_recon_data(dir_path_det_elements_0_1_sum)
 
-desired_elements_xrf = ['Si', 'Fe']
+desired_elements_xrf = ['Si', 'Ti', 'Fe', 'Ba_L']
 
 desired_elements_idx_xrf = [elements.index(element) for element in desired_elements_xrf]
 
@@ -109,9 +140,6 @@ n_elements_xrf, n_theta, n_slices, n_columns = xrf_proj_data_elements_of_interes
 n_iterations = 100
 
 for index, proj_dataset in enumerate(xrf_proj_data_elements_of_interest_list):
-    if index < 2:
-        continue
-    
     print(f'Processing {dir_path_list[index]}...')
     
     # downsampled_xrf_proj_dataset = downsample_data(proj_dataset, row_start, row_stop, downsample_factor)
