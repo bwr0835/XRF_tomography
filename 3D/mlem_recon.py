@@ -156,7 +156,7 @@ xrf_proj_data_elements_of_interest_list = [xrf_proj_data_elements_of_interest_de
 
 n_elements_xrf, n_theta, n_slices, n_columns = xrf_proj_data_elements_of_interest_det_element_0.shape
 
-opt_dens = np.zeros((n_theta, n_slices, n_columns, n_columns))
+opt_dens = np.zeros((n_theta, n_slices, n_columns))
 
 opt_dens[xrt_proj_data > 0] = -np.log(xrt_proj_data[xrt_proj_data > 0]/I0)
 opt_dens[xrt_proj_data <= 0] = 0
