@@ -61,7 +61,7 @@ def create_density_map(recon_array, element):
 
     return density_map_g_cm3
 
-def export_recon(dir_path, xrf_density, xrt_recon, elements_xrf):
+def export_recon(dir_path, xrf_density, opt_dens, elements_xrf):
     with h5py.File(os.path.join(dir_path, 'mlem_recon.h5'), "w") as f:
         sample = f.create_group('sample')
 
@@ -70,7 +70,7 @@ def export_recon(dir_path, xrf_density, xrt_recon, elements_xrf):
 
         xrf.create_dataset('densities_ug_cm3', data = xrf_density.astype('f4'))
         xrf.create_dataset('elements', data = np.array(elements_xrf).astype('S5'))
-        xrt.create_dataset('opt_dens', data = xrt_recon.astype('f4'))
+        xrt.create_dataset('opt_dens', data = opt_dens.astype('f4'))
 
 def export_recon_append(dir_path, xrf_density, xrt_recon, elements_xrf):
     with h5py.File(os.path.join(dir_path, 'mlem_recon.h5'), "r+") as f:
