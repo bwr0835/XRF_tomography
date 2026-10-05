@@ -182,10 +182,9 @@ for index, proj_dataset in enumerate(xrf_proj_data_elements_of_interest_list):
 
         mlem_recon_xrt = tomo.recon(downsampled_xrt_proj_dataset, theta*np.pi/180, algorithm = 'mlem', num_iter = n_iterations)
 
-    if index == 0:
-        n_slices, n_columns = downsampled_proj_dataset.shape[2:]
+    n_slices, n_columns = downsampled_proj_dataset.shape[2:]
         
-        density_xrf = np.zeros((n_elements_xrf, n_slices, n_columns, n_columns))
+    density_xrf = np.zeros((n_elements_xrf, n_slices, n_columns, n_columns))
 
     for idx, element in enumerate(desired_elements_xrf):
         mlem_recon_xrf = tomo.recon(downsampled_proj_dataset[idx], theta*np.pi/180, algorithm = 'mlem', num_iter = n_iterations)
