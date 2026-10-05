@@ -178,7 +178,7 @@ for index, proj_dataset in enumerate(xrf_proj_data_elements_of_interest_list):
     # downsampled_proj_dataset = proj_dataset
     # downsampled_xrt_proj_dataset = opt_dens
     if index == 0:
-        downsampled_xrt_proj_dataset = downsample_data(opt_dens, row_start, row_stop, downsample_factor)
+        downsampled_xrt_proj_dataset = downsample_data(opt_dens, row_start, row_stop, downsample_factor, xrt = True)
 
         mlem_recon_xrt = tomo.recon(downsampled_xrt_proj_dataset, theta*np.pi/180, algorithm = 'mlem', num_iter = n_iterations)
 
