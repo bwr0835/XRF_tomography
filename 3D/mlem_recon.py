@@ -1,5 +1,7 @@
 import numpy as np, tomopy as tomo, xraylib as xrl, h5py, os, sys
 
+from skimage import measure as meas
+
 def extract_proj_data(dir_path, xrt = False):
     with h5py.File(os.path.join(dir_path, 'aligned_data', 'aligned_aggregate_xrf_xrt.h5'), "r") as f:
         exchange = f['exchange']
@@ -27,16 +29,16 @@ def extract_recon_data(dir_path):
 
     return elements, data
 
-def downsample_data(data, row_start, row_stop, downsample_factor):
-    new_row_stop = (row_stop//downsample_factor)*downsample_factor
+def downsample_data(data, row_start, row_stop, downsample_factor, xrt = False):
+    if not xrt:
+        raw = data[:, :, row_start:row_stop]
+
+        downsampled_data = meas.block_reduce(raw, (1, 1, downsample_factor, downsample_factor), np.mean)
     
-    raw = data[:, :, row_start:new_row_stop]
+    else:
+        raw = data[:, row_start:row_stop]
 
-    c, a, h, w = raw.shape
-
-    h_new, w_new = h//downsample_factor, w//downsample_factor
-
-    downsampled_data = (raw.reshape(c, a, h_new, downsample_factor, w_new, downsample_factor)).mean(axis = (3, 5))
+        downsampled_data = meas.block_reduce(raw, (1, downsample_factor, downsample_factor), np.mean)
 
     return downsampled_data
 
