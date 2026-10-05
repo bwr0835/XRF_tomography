@@ -107,10 +107,10 @@ def overwrite_opt_dens_recon(dir_path, xrt_recon):
             xrt['opt_dens'][...] = data
 
         else:
-            if 'intensity_photons' in xrt:
-                del xrt['intensity_photons']
+            if 'opt_dens' in xrt:
+                del xrt['opt_dens']
 
-            xrt.create_dataset('intensity_photons', data = data)
+            xrt.create_dataset('opt_dens', data = data)
 
 downsample_factor = 4
 row_start = 0
@@ -156,11 +156,15 @@ xrf_proj_data_elements_of_interest_list = [xrf_proj_data_elements_of_interest_de
 
 n_elements_xrf, n_theta, n_slices, n_columns = xrf_proj_data_elements_of_interest_det_element_0.shape
 
-# opt_dens = np.zeros((n_theta, n_slices, n_columns))
+# data/xrt[1] is already -log(I/I0). Do not apply that conversion again.
+opt_dens = np.array(xrt_proj_data, dtype = np.float32, copy = True)
 
-# opt_dens[xrt_proj_data > 0] = -np.log(xrt_proj_data[xrt_proj_data > 0]/I0)
-# opt_dens[xrt_proj_data <= 0] = 0
-opt_dens = xrt_proj_data
+n_neg = int(np.count_nonzero(opt_dens < 0))
+
+opt_dens[~np.isfinite(opt_dens)] = 0
+opt_dens[opt_dens < 0] = 0
+
+print(f'Clipped {n_neg} negative optical-density pixels ({100*n_neg/opt_dens.size:.2f}%) to 0')
 
 n_iterations = 100
 
