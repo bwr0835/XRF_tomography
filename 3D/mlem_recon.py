@@ -62,7 +62,7 @@ def create_density_map(recon_array, element):
     return density_map_g_cm3
 
 def export_recon(dir_path, xrf_density, opt_dens, elements_xrf):
-    with h5py.File(os.path.join(dir_path, 'mlem_recon.h5'), "w") as f:
+    with h5py.File(os.path.join(dir_path, 'mlem_recon_downsampled.h5'), "w") as f:
         sample = f.create_group('sample')
 
         xrf = sample.create_group('xrf')
@@ -73,7 +73,7 @@ def export_recon(dir_path, xrf_density, opt_dens, elements_xrf):
         xrt.create_dataset('opt_dens', data = opt_dens.astype('f4'))
 
 def export_recon_append(dir_path, xrf_density, xrt_recon, elements_xrf):
-    with h5py.File(os.path.join(dir_path, 'mlem_recon.h5'), "r+") as f:
+    with h5py.File(os.path.join(dir_path, 'mlem_recon_downsampled.h5'), "r+") as f:
         xrf = f['sample/xrf']
         xrt = f['sample/xrt']
         
@@ -92,13 +92,13 @@ def export_recon_append(dir_path, xrf_density, xrt_recon, elements_xrf):
         xrf.create_dataset('densities_ug_cm3', data = density.astype('f4'))
         xrf.create_dataset('elements', data = np.array(elements).astype('S5'))
         
-        if 'intensity_photons' in xrt:
-            del xrt['intensity_photons']
+        if 'opt_dens' in xrt:
+            del xrt['opt_dens']
         
-        xrt.create_dataset('intensity_photons', data = xrt_recon.astype('f4'))
+        xrt.create_dataset('opt_dens', data = xrt_recon.astype('f4'))
 
 def overwrite_opt_dens_recon(dir_path, xrt_recon):
-    with h5py.File(os.path.join(dir_path, 'mlem_recon.h5'), "r+") as f:
+    with h5py.File(os.path.join(dir_path, 'mlem_recon_downsampled.h5'), "r+") as f:
         xrt = f['sample/xrt']
 
         data = np.asarray(xrt_recon, dtype = 'f4')
@@ -171,26 +171,26 @@ n_iterations = 100
 for index, proj_dataset in enumerate(xrf_proj_data_elements_of_interest_list):
     print(f'Processing {dir_path_list[index]}...')
     
-    # downsampled_xrf_proj_dataset = downsample_data(proj_dataset, row_start, row_stop, downsample_factor)
-    # downsampled_xrt_proj_dataset = downsample_data(opt_dens, row_start, row_stop, downsample_factor)
+    downsampled_proj_dataset = downsample_data(proj_dataset, row_start, row_stop, downsample_factor)
     
-    downsampled_proj_dataset = proj_dataset
-    downsampled_xrt_proj_dataset = opt_dens
-
+    # downsampled_proj_dataset = proj_dataset
+    # downsampled_xrt_proj_dataset = opt_dens
     if index == 0:
+        downsampled_xrt_proj_dataset = downsample_data(opt_dens, row_start, row_stop, downsample_factor)
+
         mlem_recon_xrt = tomo.recon(downsampled_xrt_proj_dataset, theta*np.pi/180, algorithm = 'mlem', num_iter = n_iterations)
 
-    # if index == 0:
-    #     n_slices, n_columns = downsampled_proj_dataset.shape[2:]
+    if index == 0:
+        n_slices, n_columns = downsampled_proj_dataset.shape[2:]
         
-    #     density_xrf = np.zeros((n_elements_xrf, n_slices, n_columns, n_columns))
+        density_xrf = np.zeros((n_elements_xrf, n_slices, n_columns, n_columns))
 
-    # for idx, element in enumerate(desired_elements_xrf):
-    #     mlem_recon_xrf = tomo.recon(downsampled_proj_dataset[idx], theta*np.pi/180, algorithm = 'mlem', num_iter = n_iterations)
+    for idx, element in enumerate(desired_elements_xrf):
+        mlem_recon_xrf = tomo.recon(downsampled_proj_dataset[idx], theta*np.pi/180, algorithm = 'mlem', num_iter = n_iterations)
 
-    #     density_xrf[idx] = create_density_map(mlem_recon_xrf, element)
+        density_xrf[idx] = create_density_map(mlem_recon_xrf, element)
 
-    #     print(f'Processed {element}...')
+        print(f'Processed {element}...')
     
-    # export_recon(dir_path_list[index], density_xrf, mlem_recon_xrt, desired_elements_xrf)
-    overwrite_opt_dens_recon(dir_path_list[index], mlem_recon_xrt)
+    export_recon(dir_path_list[index], density_xrf, mlem_recon_xrt, desired_elements_xrf)
+    # overwrite_opt_dens_recon(dir_path_list[index], mlem_recon_xrt)
