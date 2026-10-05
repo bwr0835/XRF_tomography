@@ -116,7 +116,7 @@ def overwrite_opt_dens_recon(dir_path, xrt_recon):
 
 downsample_factor = 4
 row_start = 0
-row_stop = 287
+row_stop = 288
 
 I0 = 8.6776e6
 
