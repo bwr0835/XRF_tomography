@@ -80,7 +80,7 @@ def write_xrt_dataset(xrt, name, recon):
         xrt.create_dataset(name, data = data)
 
 def export_recon(dir_path, xrf_density, xrt_data, opt_dens, elements_xrf):
-    with h5py.File(os.path.join(dir_path, 'mlem_recon_downsampled.h5'), "w") as f:
+    with h5py.File(os.path.join(dir_path, 'mlem_recon.h5'), "w") as f:
         sample = f.create_group('sample')
 
         xrf = sample.create_group('xrf')
