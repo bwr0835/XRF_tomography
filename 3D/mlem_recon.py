@@ -80,7 +80,7 @@ def write_xrt_dataset(xrt, name, recon):
         xrt.create_dataset(name, data = data)
 
 def export_recon(dir_path, xrf_density, xrt_data, opt_dens, elements_xrf):
-    with h5py.File(os.path.join(dir_path, 'mlem_recon.h5'), "w") as f:
+    with h5py.File(os.path.join(dir_path, 'mlem_recon_nonbulk_densities.h5'), "w") as f:
         sample = f.create_group('sample')
 
         xrf = sample.create_group('xrf')
@@ -224,7 +224,12 @@ for index, proj_dataset in enumerate(xrf_proj_data_elements_of_interest_list):
         downsampled_opt_dens = opt_dens
 
         mlem_recon_xrt = tomo.recon(downsampled_xrt, theta*np.pi/180, algorithm = 'mlem', num_iter = n_iterations)
+        
+        print('Processed XRT...')
+        
         mlem_recon_opt_dens = tomo.recon(downsampled_opt_dens, theta*np.pi/180, algorithm = 'mlem', num_iter = n_iterations)
+        
+        print('Processed Opt. Dens. ...')
         
         n_slices, n_columns = downsampled_proj_dataset.shape[2:]
 
@@ -237,4 +242,4 @@ for index, proj_dataset in enumerate(xrf_proj_data_elements_of_interest_list):
 
         print(f'Processed {element}...')
 
-    export_recon(dir_path_list[index], density_xrf, mlem_recon_opt_dens, desired_elements_xrf)
+    export_recon(dir_path_list[index], density_xrf, mlem_recon_xrt, mlem_recon_opt_dens, desired_elements_xrf)
