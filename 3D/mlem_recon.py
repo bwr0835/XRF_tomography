@@ -47,7 +47,7 @@ def downsample_data(data, row_start, row_stop, downsample_factor, xrt = False):
 
     return downsampled_data
 
-def create_density_map(recon_array, element, rho_g_cm3):
+def create_density_map(recon_array, element, rho_g_cm3 = None):
     n_slices, n_columns = recon_array.shape[1:]
 
     rho = np.zeros((n_slices, n_columns, n_columns))
@@ -58,11 +58,12 @@ def create_density_map(recon_array, element, rho_g_cm3):
     vmin = recon_array.min()
     vmax = recon_array.max()
     
-    # if element == 'Si':
-    #     rho_g_cm3 = 2.26 # Ideal amorphous Si (97% of crystalline Si density)
+    if rho_g_cm3 is None:
+        if element == 'Si':
+            rho_g_cm3 = 2.26 # Ideal amorphous Si (97% of crystalline Si density)
 
-    # else:
-    #     rho_g_cm3 = xrl.ElementDensity(xrl.SymbolToAtomicNumber(element))
+        else:
+            rho_g_cm3 = xrl.ElementDensity(xrl.SymbolToAtomicNumber(element))
 
     density_map_g_cm3 = rho_g_cm3*(recon_array - vmin)/(vmax - vmin) # Initial guess of density based on 0-100% concentration of each element
 
@@ -80,7 +81,7 @@ def write_xrt_dataset(xrt, name, recon):
         xrt.create_dataset(name, data = data)
 
 def export_recon(dir_path, xrf_density, xrt_data, opt_dens, elements_xrf):
-    with h5py.File(os.path.join(dir_path, 'mlem_recon_nonbulk_densities.h5'), "w") as f:
+    with h5py.File(os.path.join(dir_path, 'mlem_recon_densities.h5'), "w") as f:
         sample = f.create_group('sample')
 
         xrf = sample.create_group('xrf')
@@ -187,7 +188,7 @@ _, xrf_proj_data_det_element_1, _, _, _ = extract_proj_data(dir_path_det_element
 _, xrf_proj_data_det_elements_0_1_sum, _, _, _ = extract_proj_data(dir_path_det_elements_0_1_sum)
 
 desired_elements_xrf = ['Si', 'Ti', 'Cr', 'Fe', 'Ni', 'Ba_L']
-densities_xrf = np.array([0.813, 0.867, 1.404, 5.538, 0.624, 2.745])
+# densities_xrf = np.array([0.813, 0.867, 1.404, 5.538, 0.624, 2.745])
 #
 desired_elements_idx_xrf = [elements.index(element) for element in desired_elements_xrf]
 #
@@ -238,7 +239,8 @@ for index, proj_dataset in enumerate(xrf_proj_data_elements_of_interest_list):
     for idx, element in enumerate(desired_elements_xrf):
         mlem_recon_xrf = tomo.recon(downsampled_proj_dataset[idx], theta*np.pi/180, algorithm = 'mlem', num_iter = n_iterations)
 
-        density_xrf[idx] = create_density_map(mlem_recon_xrf, element, densities_xrf[idx])
+        # density_xrf[idx] = create_density_map(mlem_recon_xrf, element, densities_xrf[idx])
+        density_xrf[idx] = create_density_map(mlem_recon_xrf, element)
 
         print(f'Processed {element}...')
 
